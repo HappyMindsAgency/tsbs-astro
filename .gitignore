@@ -26,3 +26,6 @@ pnpm-debug.log*
 #ignora cartelle o file custom
 .claude/
 claude.md
+
+.vercel
+.vscode
