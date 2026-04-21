@@ -1,0 +1,13 @@
+---
+const {fullFooter = true, nofooter = false, lang = 'it'} = Astro.props;
+---
+<footer class={`footer ${fullFooter ? 'full-footer' : ''} ${nofooter ? 'no-footer' : ''} ${lang}`}>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-4">
+                <h3>Footer Title</h3>
+                <p>Some footer content goes here. You can add links, contact information, or anything else you want.</p>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,0 +1,289 @@
+---
+/* 
+ * Quando devi attivare il SEO, devi decommentare riga 163 ~ 172 e eliminare la dichiarazione di defaultSEO che si trova alla riga 175.
+ */ 
+
+import { ClientRouter } from "astro:transitions";
+import { SEO } from "astro-seo";
+import { strapi } from "@strapi/client";
+import { getStrapiMediaUrl } from "../lib/utility-functions.js";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
+const { entita, documentId, lang = 'it' } = Astro.props;
+
+const defaultTitle = 'The Secret Bookish Society - Biblioteca Classense';
+
+const client = strapi({
+  baseURL: import.meta.env.STRAPI_API_URL || 'http://localhost:1337',
+});
+
+interface openGraph {
+  basic: {
+    title: string;
+    type: string;
+    image: string;
+    url: string;
+  },
+  optional?: {
+    audio?: string;
+    description?: string;
+    determiner?: string;
+    locale?: string;
+    localeAlternate?: Array<string>;
+    siteName?: string;
+    video?: string;
+  }
+};
+
+interface Seo {
+/*     titolo: string,
+    headerHero: {
+        titolo: string,
+    }, */
+    seo: {
+        id: number,
+        metaTitle: string,
+        metaDescription: string,
+        keywords: string,
+        metaRobots: string,
+        metaImage: {
+            id: number,
+            documentId: string,
+            name: string,
+            alternativeText: string,
+            caption: string,
+            width: number,
+            height: number,
+            formats: {
+                thumbnail: {
+                    name: string,
+                    hash: string,
+                    ext: string,
+                    mime: string,
+                    width: number,
+                    height: number,
+                    size: number,
+                }
+                small: {
+                    name: string,
+                    hash: string,
+                    ext: string,
+                    mime: string,
+                    width: number,
+                    height: number,
+                    size: number,
+                }
+            },
+            hash: string,
+            ext: string,
+            mime: string,
+            size: number,
+            url: string,
+            previewUrl: string,
+            provider: string,
+            provider_metadata: string,
+            created_at: string,
+            updated_at: string,
+            publishedAt: string,
+            revisedAt: string,
+        },
+        metaSocial: Array<{
+            id: number,
+            socialNetwork: string,
+            title: string,
+            description: string,
+            image: any[],
+        }>,
+    }
+};
+
+let endpoint = '';
+let populate = [];
+let filters = {};
+
+if (documentId && entita) {
+    endpoint = entita
+    filters = { documentId: documentId }
+} else if (!documentId && entita) {
+    endpoint = entita;
+} else if (!entita) {
+    endpoint = 'pagina-home';
+}
+
+
+if (entita === 'pagina-privacy-policy' || entita === 'pagina-cookie-policy') {
+    populate = [
+        'seo'
+    ];
+} else {
+
+    if (documentId) {
+        populate = [
+            'seo',
+            'seo.metaSocial',
+            'seo.metaSocial.image',
+        ];
+    } else {
+        populate = [            
+            'seo',
+            'seo.metaSocial',
+            'seo.metaSocial.image',
+        ];
+    } 
+
+}
+
+let getSEOdataFetch : any;
+let getSEORawData : any;
+let seo : any;
+
+
+if (documentId) {
+    getSEOdataFetch = client.collection(endpoint);
+
+    getSEORawData = await getSEOdataFetch.find({
+        populate: populate,
+        locale: lang,
+        filters: filters
+    });
+
+    seo = getSEORawData.data[0].seo;
+} else if (endpoint!= 'pagina-home') {
+    getSEOdataFetch = client.single(endpoint);
+
+    getSEORawData = await getSEOdataFetch.find({
+        populate: populate,
+        locale: lang,
+    });
+
+    seo = getSEORawData.data.seo;
+}
+
+
+
+/*const defaultSEORawData = await client.single('pagina-home').find({
+    populate: [
+            'seo',
+            'seo.metaSocial',
+            'seo.metaSocial.image',
+        ],
+    locale: 'it'
+});
+
+const defaultSEO = defaultSEORawData.data.seo; */
+
+const defaultSEO = {
+    metaTitle: defaultTitle,
+    metaDescription: '',
+    metaRobots: '',
+    metaSocial: [
+        {
+            socialNetwork: 'generic',
+            title: '',
+            description: '',
+            image: null,
+        },
+        {
+            socialNetwork: 'twitter',
+            title: '',
+            description: '',
+            image: null,
+        }
+    ]
+}
+
+
+
+const titleDefault = 
+    seo 
+        ? (seo.metaTitle 
+            ? seo.metaTitle 
+            : (documentId 
+                ? (seo && seo.titolo 
+                    ? seo.titolo 
+                    : defaultTitle
+                ) 
+                : (seo && seo.headerHero && seo.headerHero.titolo 
+                    ? seo.headerHero.titolo 
+                    : defaultTitle
+                )
+            )
+        ) 
+        : (documentId 
+            ? (seo && seo.titolo 
+                ? seo.titolo 
+                : defaultTitle
+            ) 
+            : (seo && seo.headerHero && seo.headerHero.titolo 
+                ? seo.headerHero.titolo 
+                : defaultTitle
+            )
+        );
+
+let metaSocialGeneric = (seo?.metaSocial && seo.metaSocial[0]) ? seo.metaSocial[0] : defaultSEO?.metaSocial[0];
+let metaSocialTwitter = (seo?.metaSocial && seo.metaSocial[1]) ? seo.metaSocial[1] : defaultSEO?.metaSocial[1];
+
+if (typeof metaSocialGeneric !== "object" || metaSocialGeneric === null) metaSocialGeneric = {};
+if (typeof metaSocialTwitter !== "object" || metaSocialTwitter === null) metaSocialTwitter = {};
+
+metaSocialGeneric.title = metaSocialGeneric.title || titleDefault;
+metaSocialGeneric.description = metaSocialGeneric.description || '';
+metaSocialTwitter.title = metaSocialTwitter.title || titleDefault;
+metaSocialTwitter.description = metaSocialTwitter.description || '';
+
+
+---
+<head>
+    <!-- SEO DA INSERIRE -->
+     <SEO 
+        title={titleDefault}
+        titleDefault={titleDefault}
+        description={seo ? seo.metaDescription : ''}
+        noindex={ seo ? (seo && seo.metaRobots && seo.metaRobots.includes('noindex') ? true : false) : true }
+        nofollow={ seo ? (seo && seo.metaRobots && seo.metaRobots.includes('nofollow') ? true : false) : true }
+        openGraph={{
+            basic: {
+                title: metaSocialGeneric ? metaSocialGeneric.title : '',
+                type: "website",
+                image: metaSocialGeneric && metaSocialGeneric.image ? getStrapiMediaUrl(metaSocialGeneric.image.url) : '',
+                url: Astro.url.href,
+            },
+            optional: {
+                description: metaSocialGeneric ? metaSocialGeneric.description : '',
+                locale: 'it',
+            }
+        }}
+        extend={{
+            // extending the default link tags
+            link: [{ rel: "image/x-icon", href: "/favicon.ico" }],
+            // extending the default meta tags
+            meta: [
+                {
+                name: "twitter:image",
+                content: metaSocialTwitter && metaSocialTwitter.image ? getStrapiMediaUrl(metaSocialTwitter.image.url) : '',
+                },
+                { name: "twitter:title", content: metaSocialTwitter ? metaSocialTwitter.title : '' },
+                { name: "twitter:description", content: metaSocialTwitter ? metaSocialTwitter.description : '' },
+            ],
+        }}
+    />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />  
+
+    <!-- FAVICON DA INSERIRE -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"></noscript>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"></noscript>
+    
+    <ClientRouter />
+
+</head>

@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const { lang = 'it '} = Astro.props;
+
+---
+<Layout lang={lang}>
+	<section class="bg-primary text-white text-center py-5">
+		<div class="container">
+			<h1 class="display-4">Welcome to The Secret Bookish Society</h1>
+			<p class="lead">Discover the hidden gems of literature with us.</p>
+			<a href="/books" class="btn btn-light btn-lg mt-3">Explore Our Collection</a>
+		</div>
+	</section>
+</Layout>
+
