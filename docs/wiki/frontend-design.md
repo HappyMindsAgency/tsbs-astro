@@ -11,7 +11,7 @@ Questo file raccoglie regole visuali, UI e front-end. Va consultato quando si la
 - HTML, TypeScript, CSS e SCSS.
 - Componenti semplici, riutilizzabili e coerenti con l'alberatura gia impostata.
 - Non creare sistemi paralleli se una soluzione globale puo essere declinata.
-- Non inventare testi definitivi: usare `Lorem Ipsum` quando manca copy approvato.
+- Non inventare testi definitivi, microcopy, claim, titoli, descrizioni o CTA: usare solo `Lorem Ipsum` quando il testo non e fornito dall'utente o gia approvato nei file di progetto.
 - Mantenere tono coerente con Societa Segreta, Accademie, missioni, epistole e lore.
 - Restare più fedele possibile al figma senza però creare troppi fix.
 - Il design dev'essere responsive addativo 
@@ -133,7 +133,7 @@ Regole:
 - Testi non sovrapposti su mobile.
 - Stati hover/focus coerenti.
 - Layout verificati prima su mobile.
-- Non usare placeholder narrativi inventati.
+- Non usare placeholder narrativi inventati: se manca testo approvato, usare solo `Lorem Ipsum`.
 - Non creare componenti visivamente scollegati dal sistema globale.
 
 ## Mood Visuale
@@ -150,3 +150,10 @@ Evitare:
 - estetica fantasy stereotipata
 - dashboard SaaS neutra
 - decorazioni non funzionali
+
+## Vedi Anche
+
+- [Index Wiki](./index.md)
+- [Alberatura](./alberatura.md)
+- [Architettura Informativa](./architettura-informativa.md)
+- [Decision Log](./decision-log.md)

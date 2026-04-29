@@ -64,3 +64,35 @@ Impatto:
 
 Stato:
 - approvata
+
+## 2026-04-29 - Struttura Operativa Wiki Ridotta
+
+Decisione:
+- aggiungere `docs/wiki/index.md` come indice operativo della wiki
+- mantenere `docs/wiki/ai-context.md` come file leggero di guardrail, non come contenitore di dettagli
+- usare `docs/wiki/decision-log.md` come passaggio per modifiche strutturali prima di aggiornare i file tematici
+- aggiungere backlink minimi tra i file wiki
+
+Motivo:
+- ottimizzare il flusso di lavoro dell'agenzia
+- evitare che l'AI legga tutta la wiki a ogni richiesta
+- rendere piu chiaro quando consultare e aggiornare ogni file
+- mantenere tracciabili le decisioni che cambiano alberatura, Strapi, navigazione o flussi principali
+
+Impatto:
+- `docs/wiki/index.md`
+- `docs/wiki/ai-context.md`
+- `docs/wiki/decision-log.md`
+- `docs/wiki/alberatura.md`
+- `docs/wiki/architettura-informativa.md`
+- `docs/wiki/backend-strapi.md`
+- `docs/wiki/frontend-design.md`
+
+Stato:
+- approvata
+
+## Vedi Anche
+
+- [Index Wiki](./index.md)
+- [AI Context](./ai-context.md)
+- [Alberatura](./alberatura.md)

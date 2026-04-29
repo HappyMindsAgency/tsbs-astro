@@ -289,3 +289,10 @@ Trofei:
 - Slide 26 del PowerPoint non risultava leggibile dal testo estratto.
 - Alcune occorrenze tipo `E pistole` sono da interpretare come `Epistole`.
 - URL, slug, naming tecnico e stati precisi non sono ancora definiti in questo documento.
+
+## Vedi Anche
+
+- [Index Wiki](./index.md)
+- [Alberatura](./alberatura.md)
+- [Frontend Design](./frontend-design.md)
+- [Decision Log](./decision-log.md)

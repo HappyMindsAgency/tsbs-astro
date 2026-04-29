@@ -53,7 +53,7 @@ La struttura deve rispettare il concept della Societa Segreta:
 - epistole
 - lore
 
-Non inventare testi definitivi. Quando serve un placeholder, usare solo `Lorem Ipsum`.
+Non inventare testi definitivi, microcopy, claim, titoli, descrizioni o CTA. Se il testo non e fornito dall'utente o gia approvato nei file di progetto, usare solo `Lorem Ipsum`.
 
 Non inventare dati, label istituzionali, nomi di collection, flussi o contenuti narrativi non confermati.
 
@@ -122,9 +122,9 @@ Animazioni:
 - usare Lottie quando richiesto o gia previsto dal design
 
 Testi:
-- non inventare copy finale
-- se manca testo approvato, usare `Lorem Ipsum`
-- mantenere tono coerente con Societa Segreta, Accademia, missione, epistola, lore
+- non inventare copy finale, microcopy, claim, titoli, descrizioni o CTA
+- se il testo non e fornito dall'utente o gia approvato nei file di progetto, usare solo `Lorem Ipsum`
+- mantenere tono coerente con Societa Segreta, Accademia, missione, epistola, lore solo quando il testo e fornito o approvato
 
 ## Guardrail Narrativi
 
@@ -136,10 +136,20 @@ Testi:
 
 ## Fonti Di Dettaglio
 
-Consultare solo quando serve:
+Poi usare `docs/wiki/index.md` per capire quali file specifici consultare. Non leggere tutta la wiki se non serve.
 - `docs/wiki/architettura-informativa.md`
 - `docs/wiki/frontend-design.md`
 - `docs/wiki/backend-strapi.md`
 - `docs/wiki/decision-log.md`
+- `docs/wiki/alberatura.md`
+- `docs/wiki/index.md`
+
+Se emergono decisioni nuove o modifiche strutturali, aggiornare o proporre l'aggiornamento di `docs/wiki/decision-log.md` prima di modificare i file tematici coinvolti.
+
+## Vedi Anche
+
+- [Index Wiki](./index.md)
+- [Decision Log](./decision-log.md)
+- [Alberatura](./alberatura.md)
 
 Se emergono decisioni nuove o modifiche strutturali, proporre l'aggiornamento di `docs/wiki/decision-log.md` prima di modificare i guardrail.
