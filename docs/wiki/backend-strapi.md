@@ -2,7 +2,7 @@
 
 ## Scopo
 
-Questo file raccoglie le informazioni backend note e le regole operative per Strapi. Va consultato quando si lavora su API, collection, relazioni, dati, ruoli, validazioni o integrazioni.
+Questo file raccoglie le informazioni backend note e le regole operative per Strapi. Va consultato quando si lavora su API, collection, relazioni, dati, ruoli, validazioni o integrazioni, nella fase di binding.
 
 ## Stack
 

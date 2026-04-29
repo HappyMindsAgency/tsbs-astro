@@ -13,6 +13,8 @@ Questo file raccoglie regole visuali, UI e front-end. Va consultato quando si la
 - Non creare sistemi paralleli se una soluzione globale puo essere declinata.
 - Non inventare testi definitivi: usare `Lorem Ipsum` quando manca copy approvato.
 - Mantenere tono coerente con Societa Segreta, Accademie, missioni, epistole e lore.
+- Restare più fedele possibile al figma senza però creare troppi fix.
+- Il design dev'essere responsive addativo 
 
 ## Tipografia
 
