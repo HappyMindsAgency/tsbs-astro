@@ -106,6 +106,8 @@ Approccio:
 - usare componenti semplici e riutilizzabili
 - mantenere Bootstrap come base
 - usare SCSS globale con attenzione alla scalabilita
+- se sono forniti Figma mobile e desktop, confrontarli prima di implementare e segnalare incongruenze; in caso di conflitto proporre mobile come priorita
+- nelle pagine Astro evitare troppe `const` statiche provvisorie: mantenere codice leggero in vista del binding Strapi
 
 Accademie:
 - le 4 accademie condividono uno stile globale comune

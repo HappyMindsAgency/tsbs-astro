@@ -1,0 +1,132 @@
+---
+const { isOpen = false, theme = '' } = Astro.props;
+---
+
+{isOpen && (
+		<div class={`welcome-toast tsbs-toast ${theme}`} data-welcome-toast role="dialog" aria-modal="true" aria-labelledby="welcome-toast-title">
+		<div class="welcome-toast__backdrop" data-welcome-toast-close></div>
+		<div class="welcome-toast__panel">
+			<div class="welcome-toast__body">
+				<div class="welcome-toast__avatar" aria-hidden="true">
+					<i class="bi bi-person-fill"></i>
+				</div>
+				<div class="welcome-toast__content">
+					<h2 id="welcome-toast-title">Benvenut* Adept*</h2>
+					<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id, porta sapien.</p>
+				</div>
+			</div>
+			<div class="welcome-toast__footer">
+				<button class="btn tsbs-cta-primary welcome-toast__button" type="button" data-welcome-toast-close>Inizia</button>
+			</div>
+		</div>
+	</div>
+)}
+
+<script>
+	const setupWelcomeToast = () => {
+		const toast = document.querySelector<HTMLElement>('[data-welcome-toast]');
+		if (!toast) return;
+
+		const closeToast = () => {
+			toast.hidden = true;
+		};
+
+		toast.querySelectorAll('[data-welcome-toast-close]').forEach((element) => {
+			element.addEventListener('click', closeToast);
+		});
+
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') closeToast();
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupWelcomeToast);
+	setupWelcomeToast();
+</script>
+
+<style lang="scss">
+	.welcome-toast {
+		position: fixed;
+		inset: 0;
+		z-index: 1100;
+		display: grid;
+		place-items: center;
+		padding: 1.75rem;
+	}
+
+	.welcome-toast__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-white) 62%, transparent);
+		backdrop-filter: blur(0.0625rem);
+	}
+
+	.welcome-toast__panel {
+		position: relative;
+		width: min(100%, 23.5rem);
+		overflow: hidden;
+		background: var(--tsbs-color-white);
+		border-radius: 0.875rem;
+		box-shadow: 0 1rem 2.5rem color-mix(in srgb, var(--tsbs-theme-accent) 14%, transparent);
+	}
+
+	.welcome-toast__body {
+		display: grid;
+		grid-template-columns: 7.25rem minmax(0, 1fr);
+		gap: 1.25rem;
+		align-items: center;
+		padding: 2rem 1.875rem 1.5rem;
+	}
+
+	.welcome-toast__avatar {
+		display: grid;
+		place-items: center;
+		color: color-mix(in srgb, var(--tsbs-theme-accent) 54%, var(--tsbs-color-white));
+	}
+
+	.welcome-toast__avatar .bi {
+		font-size: 8.5rem;
+		line-height: 1;
+	}
+		.welcome-toast__content h2 {
+			margin: 0 0 0.625rem;
+		}
+
+		.welcome-toast__content p {
+			margin: 0;
+			color: var(--tsbs-theme-body);
+			font-size: 1rem;
+			line-height: 1.42;
+		}
+
+	.welcome-toast__footer {
+		padding: 1rem;
+		border-top: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-white));
+	}
+
+	.welcome-toast__button {
+		width: 100%;
+		padding: 0.875rem 1rem;
+		border-radius: 0.375rem;
+		font-family: var(--tsbs-font-body);
+		font-weight: 700;
+	}
+
+	@media (max-width: 360px) {
+		.welcome-toast {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+
+		.welcome-toast__body {
+			grid-template-columns: 5.5rem minmax(0, 1fr);
+			gap: 0.875rem;
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+
+		.welcome-toast__avatar .bi {
+			font-size: 6.75rem;
+		}
+	}
+</style>

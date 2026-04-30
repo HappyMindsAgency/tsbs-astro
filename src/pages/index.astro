@@ -1,16 +1,118 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import WelcomeToast from '../components/toastComponents/WelcomeToast.astro';
 
-const { lang = 'it '} = Astro.props;
+const { lang = 'it' } = Astro.props;
+const academyTheme = 'theme-astraria';
+
+const tasks = [
+	{ title: 'Lorem ipsum dolor', progress: 65 },
+	{ title: 'Lorem ipsum dolor', progress: 65 },
+];
+
+const events = [
+	{ date: '12 FEB', time: '18:00', title: 'Lorem ipsum dolor sit amet' },
+	{ date: '21 MAR', time: '18:00', title: 'Lorem ipsum dolor sit amet' },
+	{ date: '05 APR', time: '19:30', title: 'Lorem ipsum dolor sit amet' },
+	{ date: '18 APR', time: '17:00', title: 'Lorem ipsum dolor sit amet' },
+];
 
 ---
 <Layout lang={lang}>
-	<section class="bg-primary text-white text-center py-5">
-		<div class="container">
-			<h1 class="display-4">Welcome to The Secret Bookish Society</h1>
-			<p class="lead">Discover the hidden gems of literature with us.</p>
-			<a href="/books" class="btn btn-light btn-lg mt-3">Explore Our Collection</a>
-		</div>
-	</section>
-</Layout>
+	<Nav lang={lang} />
 
+	<main class={`tsbs-app-shell dashboard-shell ${academyTheme}`}>
+		<header class="dashboard-header">
+			<div class="dashboard-profile">
+				<div class="dashboard-avatar" aria-hidden="true">
+					<i class="bi bi-eyeglasses"></i>
+				</div>
+				<div>
+					<p class="dashboard-username">Username</p>
+					<p class="dashboard-rank">Adepto</p>
+				</div>
+			</div>
+			<button class="dashboard-menu-button d-none" type="button" aria-label="Menu">
+				<i class="bi bi-list" aria-hidden="true"></i>
+			</button>
+		</header>
+
+		<section class="tsbs-card dashboard-epistle" aria-labelledby="epistle-title">
+			<div class="dashboard-epistle__content">
+				<p class="dashboard-eyebrow">L'EPISTOLA</p>
+				<h1 id="epistle-title">Lorem ipsum dolor</h1>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus dignissim magna at magna finibus...</p>
+				<a class="dashboard-inline-link dashboard-epistle-link-desktop tsbs-accent-link d-none d-lg-inline" href="/epistole/">Riepilogo epistole →</a>
+				<a class="btn tsbs-cta-primary dashboard-button" href="/epistole/">Leggi Epistola</a>
+			</div>
+		</section>
+		<a class="dashboard-inline-link dashboard-epistle-link tsbs-accent-link d-lg-none" href="/epistole/">Riepilogo epistole →</a>
+
+		<section class="dashboard-section" aria-labelledby="tasks-title">
+			<div class="dashboard-section__head">
+				<h2 id="tasks-title" class="tsbs-section-title">Incarichi ordine</h2>
+				<a class="tsbs-accent-link" href="/missioni/">Vedi tutti →</a>
+			</div>
+			<div class="dashboard-task-grid">
+				{tasks.map((task) => (
+					<article class="tsbs-card dashboard-task">
+						<div class="dashboard-task__header">
+							<div>
+								<h3 class="tsbs-accent-title">{task.title}</h3>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+							</div>
+						</div>
+						<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${task.progress}%`}>
+							<span style={`width: ${task.progress}%`}></span>
+						</div>
+						<p class="dashboard-progress-label">{task.progress}%</p>
+					</article>
+				))}
+			</div>
+		</section>
+
+		<section class="dashboard-section dashboard-grimoire" aria-labelledby="grimoire-title">
+			<div class="dashboard-section__head dashboard-section__head--desktop">
+				<h2 id="grimoire-title" class="tsbs-section-title">Grimorio</h2>
+				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href="/scrivania/grimorio/">Vai al tuo grimorio →</a>
+			</div>
+			<article class="tsbs-card dashboard-note" aria-label="Grimorio">
+				<a class="dashboard-note__action" href="/scrivania/grimorio/" aria-label="Grimorio">
+					<i class="bi bi-save" aria-hidden="true"></i>
+				</a>
+				<h2 class="dashboard-note__title">Titolo della nota...</h2>
+				<p>Scrivi qui le tue annotazioni da Adepto</p>
+				<div class="dashboard-note__lines" aria-hidden="true">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</article>
+			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href="/scrivania/grimorio/">Vai al tuo grimorio →</a>
+		</section>
+
+		<section class="dashboard-section dashboard-events" aria-labelledby="events-title">
+			<div class="dashboard-section__head">
+				<h2 id="events-title" class="tsbs-section-title">Eventi</h2>
+				<a class="tsbs-accent-link" href="/biblioteca/eventi/">Vedi tutti →</a>
+			</div>
+			<div class="dashboard-event-grid">
+				{events.map((event) => (
+					<article class="dashboard-event-card">
+						<div class="dashboard-event-card__media" aria-hidden="true">
+							<i class="bi bi-image"></i>
+						</div>
+						<div class="dashboard-event-card__body">
+							<p>{event.date} • {event.time}</p>
+							<h3 class="tsbs-accent-title">{event.title}</h3>
+						</div>
+					</article>
+				))}
+			</div>
+		</section>
+	</main>
+	<WelcomeToast isOpen={true} theme={academyTheme} />
+
+
+</Layout>
