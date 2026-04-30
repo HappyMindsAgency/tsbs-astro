@@ -26,6 +26,28 @@ Quando vengono forniti screenshot Figma mobile e desktop:
 
 Se viene fornita una sola versione, ricavare l'altra in modo semplice e coerente con il sistema globale, segnalando le assunzioni principali.
 
+## Pulizia Figma E Background
+
+Quando si implementa una pagina partendo da screenshot Figma, non copiare automaticamente tutti gli elementi visuali presenti nello screenshot.
+
+Regole:
+- fare pulizia dei dettagli provvisori o non confermati prima di scrivere codice
+- non trasformare in codice background, texture o pattern presenti nel Figma se non sono stati confermati come asset definitivo
+- usare il background default delle pagine app `--tsbs-color-surface` (`#FFFBF2`) finche non viene fornito il pattern ufficiale
+- quando arrivera il pattern definitivo, integrarlo tramite token/stile riutilizzabile e non come override isolato pagina per pagina
+- mantenere eventuali cromie di sezione tramite tema/token, evitando background custom temporanei derivati dagli screenshot
+
+## Header Pagine App
+
+Le pagine interne dell'app che usano una banda titolo superiore devono condividere la stessa dimensione, indipendentemente dal nome della sezione mostrata.
+
+Regole:
+- la banda titolo non deve comportarsi come una hero
+- su desktop deve allinearsi all'altezza dell'header app usato in Atrio/index
+- su mobile deve restare compatta e proporzionata al viewport
+- il testo della banda cambia in base alla sezione, ma la struttura dimensionale deve restare coerente
+- eventuali differenze cromatiche devono passare da tema/token, non da altezze diverse pagina per pagina
+
 ## Pulizia Codice Pagine
 
 Nelle singole pagine Astro mantenere il codice leggero.

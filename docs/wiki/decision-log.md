@@ -185,6 +185,49 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-04-30 - Pulizia Figma E Background Default Pagine App
+
+Decisione:
+- quando si implementa da screenshot Figma, fare pulizia dei dettagli provvisori prima di scrivere codice
+- non copiare background, texture o pattern presenti nei Figma se non sono stati confermati come asset definitivo
+- usare il background globale delle pagine app `--tsbs-color-surface` (`#FFFBF2`) finche non viene fornito il pattern definitivo
+- integrare il futuro pattern tramite token/stile riutilizzabile, non con override isolati pagina per pagina
+
+Motivo:
+- evitare che elementi provvisori dello screenshot diventino debito tecnico
+- mantenere coerenza tra pagine app mentre il pattern definitivo non e disponibile
+- rendere piu semplice sostituire il background quando arrivera l'asset ufficiale
+
+Impatto:
+- `docs/wiki/frontend-design.md`
+- pagine app implementate da Figma
+- futuri token/stili background
+
+Stato:
+- approvata
+
+## 2026-04-30 - Dimensione Condivisa Banda Titolo Pagine App
+
+Decisione:
+- le pagine interne dell'app che usano una banda titolo superiore devono condividere la stessa dimensione
+- la banda titolo non deve comportarsi come una hero
+- su desktop deve allinearsi all'altezza dell'header app usato in Atrio/index
+- su mobile deve restare compatta e proporzionata
+- il testo della banda puo cambiare in base alla sezione, ma la struttura dimensionale resta coerente
+
+Motivo:
+- mantenere continuita tra sezioni diverse dell'app
+- evitare che singole pagine introducano header sproporzionati o non responsive
+- rendere il componente riutilizzabile per titoli diversi da `Missioni`
+
+Impatto:
+- `docs/wiki/frontend-design.md`
+- futuri header/bande titolo delle pagine app
+- `src/pages/missioni/index.astro`
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)
