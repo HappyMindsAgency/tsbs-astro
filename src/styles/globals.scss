@@ -1468,11 +1468,11 @@ h1,
 		border-radius: var(--tsbs-radius-sm);
 	}
 
-	.password-mission {
-		--password-mission-field-border: #c8cbd2;
+	.free-answer-mission {
+		--free-answer-mission-field-border: #c8cbd2;
 	}
 
-	.password-mission__info {
+	.free-answer-mission__info {
 		position: absolute;
 		top: 1rem;
 		right: 1.125rem;
@@ -1488,7 +1488,7 @@ h1,
 		border: 0;
 	}
 
-	.password-mission__quote {
+	.free-answer-mission__quote {
 		margin: 0;
 		padding-left: 1rem;
 		color: var(--tsbs-color-heading);
@@ -1499,30 +1499,30 @@ h1,
 		border-left: 2px solid var(--mission-proof-question-accent);
 	}
 
-	.password-mission__quote p {
+	.free-answer-mission__quote p {
 		margin: 0;
 		color: inherit;
 		font: inherit;
 	}
 
-	.password-mission__form {
+	.free-answer-mission__form {
 		display: grid;
 		gap: 3rem;
 	}
 
-	.password-mission__field {
+	.free-answer-mission__field {
 		display: grid;
 		gap: 0.75rem;
 	}
 
-	.password-mission__field label {
+	.free-answer-mission__field label {
 		color: var(--tsbs-color-heading);
 		font-size: 1rem;
 		font-weight: 400;
 		line-height: 1.35;
 	}
 
-	.password-mission__field textarea {
+	.free-answer-mission__field textarea {
 		width: 100%;
 		min-height: 13.625rem;
 		padding: 0.875rem 1rem;
@@ -1531,16 +1531,16 @@ h1,
 		line-height: 1.4;
 		resize: vertical;
 		background: transparent;
-		border: 1px solid var(--password-mission-field-border);
+		border: 1px solid var(--free-answer-mission-field-border);
 		border-radius: 0.625rem;
 	}
 
-	.password-mission__field textarea::placeholder {
+	.free-answer-mission__field textarea::placeholder {
 		color: #9da0a7;
 		opacity: 1;
 	}
 
-	.password-mission__field textarea:focus {
+	.free-answer-mission__field textarea:focus {
 		border-color: var(--mission-proof-question-accent);
 		outline: 0;
 		box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--mission-proof-question-accent) 18%, transparent);
@@ -1645,20 +1645,20 @@ h1,
 			padding-top: 4rem;
 		}
 
-		.password-mission__info {
+		.free-answer-mission__info {
 			top: 1.5rem;
 			right: 2rem;
 		}
 
-		.password-mission__quote {
+		.free-answer-mission__quote {
 			font-size: 1.125rem;
 		}
 
-		.password-mission__form {
+		.free-answer-mission__form {
 			gap: 2rem;
 		}
 
-		.password-mission__field textarea {
+		.free-answer-mission__field textarea {
 			min-height: 11rem;
 		}
 

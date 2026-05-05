@@ -1,0 +1,65 @@
+---
+const { missione = null, lang = 'it', slugMis = '' } = Astro.props;
+
+const title =
+	missione?.titolo ||
+	missione?.nome ||
+	missione?.title ||
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+const eyebrow =
+	missione?.nomeMissione ||
+	missione?.label ||
+	'NOME DELLA MISSIONE';
+
+const quote =
+	missione?.citazione ||
+	missione?.quote ||
+	missione?.descrizioneBreve ||
+	'Phasellus accumsan, felis sed dictum gravida, est leo congue mauris, nec luctus sem nisi a ante. Aenean quis facilisis augue, eget ornare odio. Proin non arcu vel erat finibus venenatis.';
+
+const instruction =
+	missione?.prova?.descrizioneAzione ||
+	missione?.descrizioneAzione ||
+	'Descrizione dell’azione da compiere';
+
+const answerLabel = missione?.prova?.labelRisposta || 'Risposta libera';
+const placeholder = missione?.prova?.placeholder || 'Inserisci qui la tua risposta';
+const nextHref = slugMis ? `/missioni/${slugMis}/esito/` : '/missioni/';
+---
+
+<article class="mission-proof-question free-answer-mission" data-lang={lang} aria-label="Prova missione">
+	<header class="mission-proof-question__header">
+		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
+			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
+			<h1 class="mission-proof-question__title mission-component-title">{title}</h1>
+		</div>
+	</header>
+
+	<div class="container-xl tsbs-app-container mission-proof-question__panel free-answer-mission__panel">
+		<button class="free-answer-mission__info" type="button" aria-label="Informazioni sulla missione">
+			<i class="bi bi-info-circle" aria-hidden="true"></i>
+		</button>
+
+		<blockquote class="free-answer-mission__quote">
+			<p>{quote}</p>
+		</blockquote>
+
+		<form class="free-answer-mission__form" method="get" action={nextHref}>
+			<div class="free-answer-mission__field">
+				<label for="mission-free-answer">{instruction}</label>
+				<textarea
+					id="mission-free-answer"
+					name="risposta-libera"
+					rows="8"
+					placeholder={placeholder}
+					aria-label={answerLabel}
+				></textarea>
+			</div>
+
+			<button class="btn tsbs-cta-primary mission-proof-question__cta free-answer-mission__cta" type="submit">
+				Avanti →
+			</button>
+		</form>
+	</div>
+</article>

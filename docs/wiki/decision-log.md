@@ -276,6 +276,26 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-05 - Risposta Libera Sostituisce Parola Dordine
+
+Decisione:
+- il componente `ParolaDordine.astro` non e piu parte dei componenti prova missione
+- `RispostaLibera.astro` gestisce il flusso testuale libero
+- eventuali valori legacy `parola-dordine` o `parolaDordine` provenienti da Strapi vengono ancora instradati verso `RispostaLibera.astro`
+
+Motivo:
+- evitare duplicazione tra due componenti con lo stesso comportamento
+- mantenere compatibilita temporanea con dati Strapi eventualmente non ancora riallineati
+- semplificare la regia di `missioni/[slugMis]/prova/index.astro`
+
+Impatto:
+- `docs/wiki/alberatura.md`
+- `src/components/MissioniComponents/RispostaLibera.astro`
+- `src/pages/missioni/[slugMis]/prova/index.astro`
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)

@@ -12,55 +12,146 @@ const eyebrow =
 	missione?.label ||
 	'NOME DELLA MISSIONE';
 
-const question =
-	missione?.prova?.domanda ||
-	missione?.prova?.descrizioneAzione ||
-	missione?.descrizioneAzione ||
-	'Scegli una sola risposta';
+const questions = [
+	{
+		question: 'Scegli una sola risposta',
+		answers: ['Risposta A', 'Risposta B', 'Risposta C', 'Risposta D'],
+	},
+	{
+		question: 'Scegli una seconda risposta',
+		answers: ['Risposta B', 'Risposta C', 'Risposta A', 'Risposta D'],
+	},
+	{
+		question: 'Scegli una terza risposta',
+		answers: ['Risposta D', 'Risposta B', 'Risposta C', 'Risposta A'],
+	},
+];
 
-const rawAnswers =
-	missione?.prova?.risposte ||
-	missione?.prova?.opzioni ||
-	missione?.risposte ||
-	['Risposta A', 'Risposta B', 'Risposta C', 'Risposta D'];
-
-const answers = Array.isArray(rawAnswers)
-	? rawAnswers.map((answer, index) => ({
-			id: `mission-answer-${index}`,
-			value: typeof answer === 'string' ? answer : answer?.value || answer?.testo || answer?.label || `Risposta ${index + 1}`,
-			label: typeof answer === 'string' ? answer : answer?.label || answer?.testo || answer?.value || `Risposta ${index + 1}`,
-		}))
-	: [];
-
-const nextHref = slugMis ? `/missioni/${slugMis}/esito/` : '/missioni/';
+const firstQuestion = questions[0];
 ---
 
-<article class="mission-proof-question choice-question" data-lang={lang} aria-label="Prova missione">
+<article class="mission-proof-question choice-question" data-choice-question data-lang={lang} aria-label="Prova missione">
 	<header class="mission-proof-question__header">
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
-			<h1 class="mission-proof-question__title">{title}</h1>
+			<h1 class="mission-proof-question__title mission-component-title">{title}</h1>
 		</div>
 	</header>
 
 	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
-		<form class="choice-question__form" method="get" action={nextHref}>
+		<form class="choice-question__form" data-choice-question-form>
 			<fieldset class="choice-question__fieldset">
-				<legend>{question}</legend>
+				<legend data-choice-question-title>{firstQuestion.question}</legend>
 
-				<div class="choice-question__answers">
-					{answers.map((answer) => (
-						<label class="choice-question__answer" for={answer.id}>
-							<input id={answer.id} type="radio" name="risposta" value={answer.value} />
-							<span>{answer.label}</span>
+				<div class="choice-question__answers" data-choice-question-answers>
+					{firstQuestion.answers.map((answer, index) => (
+						<label class="choice-question__answer" for={`mission-answer-0-${index}`}>
+							<input id={`mission-answer-0-${index}`} type="radio" name="risposta" value={answer} />
+							<span>{answer}</span>
 						</label>
 					))}
 				</div>
 			</fieldset>
 
-			<button class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta" type="submit">
+			<button class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta" type="submit" data-choice-question-submit>
 				Avanti →
 			</button>
 		</form>
 	</div>
+
+	<div class="choice-question__toast" data-choice-question-toast hidden role="status" aria-live="polite">
+		Esito
+	</div>
 </article>
+
+<script define:vars={{ questions }}>
+	const setupChoiceQuestion = () => {
+		const root = document.querySelector('[data-choice-question]');
+		if (!root) return;
+
+		const form = root.querySelector('[data-choice-question-form]');
+		const title = root.querySelector('[data-choice-question-title]');
+		const answers = root.querySelector('[data-choice-question-answers]');
+		const submit = root.querySelector('[data-choice-question-submit]');
+		const toast = root.querySelector('[data-choice-question-toast]');
+
+		if (!form || !title || !answers || !submit || !toast) return;
+
+		let currentQuestionIndex = 0;
+
+		const renderQuestion = () => {
+			const currentQuestion = questions[currentQuestionIndex];
+			const isLastQuestion = currentQuestionIndex === questions.length - 1;
+
+			title.textContent = currentQuestion.question;
+			answers.innerHTML = currentQuestion.answers
+				.map((answer, answerIndex) => {
+					const id = `mission-answer-${currentQuestionIndex}-${answerIndex}`;
+
+					return `
+						<label class="choice-question__answer" for="${id}">
+							<input id="${id}" type="radio" name="risposta" value="${answer}">
+							<span>${answer}</span>
+						</label>
+					`;
+				})
+				.join('');
+			submit.innerHTML = isLastQuestion
+				? '<span>Completato</span><i class="bi bi-stars choice-question__complete-icon" aria-hidden="true"></i>'
+				: 'Avanti →';
+		};
+
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+
+			if (currentQuestionIndex < questions.length - 1) {
+				currentQuestionIndex += 1;
+				renderQuestion();
+				return;
+			}
+
+			toast.hidden = false;
+		});
+
+		renderQuestion();
+	};
+
+	document.addEventListener('astro:page-load', setupChoiceQuestion);
+	setupChoiceQuestion();
+</script>
+
+<style lang="scss">
+	.choice-question__cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.choice-question__complete-icon {
+		color: var(--tsbs-color-white);
+		font-size: 1.125rem;
+		line-height: 1;
+	}
+
+	.choice-question__toast {
+		position: fixed;
+		right: 1rem;
+		bottom: calc(var(--tsbs-mobile-nav-height) + 1rem);
+		z-index: 1200;
+		max-width: min(calc(100vw - 2rem), 20rem);
+		padding: 0.875rem 1rem;
+		color: var(--tsbs-color-white);
+		font-weight: 800;
+		line-height: 1.2;
+		background: var(--tsbs-theme-accent);
+		border-radius: var(--tsbs-radius-sm);
+		box-shadow: 0 0.75rem 1.75rem color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
+	}
+
+	@media (min-width: 768px) {
+		.choice-question__toast {
+			bottom: 1.5rem;
+		}
+	}
+</style>

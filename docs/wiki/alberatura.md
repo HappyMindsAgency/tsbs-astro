@@ -104,7 +104,6 @@ I diversi frame Figma delle missioni non corrispondono necessariamente a file As
 - missioni completate
 - missioni disponibili
 - dettaglio missione
-- prova con parola d'ordine
 - prova a scelta multipla
 - prova con risposta libera
 - scelta citazionale / sfida lettura
@@ -129,7 +128,6 @@ Struttura attuale dei componenti prova:
 ```txt
 src/components/MissioniComponents/
 ├─ SceltaDomanda.astro
-├─ ParolaDordine.astro
 └─ RispostaLibera.astro
 ```
 
