@@ -1,0 +1,160 @@
+---
+const {
+	isOpen = false,
+	renderHidden = false,
+	theme = '',
+	message = 'Hai completando questa missione, ottieni:',
+	trophyLabel = 'Trofeo "Topo da biblioteca"',
+	buttonLabel = 'Colleziona',
+} = Astro.props;
+
+const shouldRender = isOpen || renderHidden;
+---
+
+{shouldRender && (
+	<div class={`test-result-toast test-result-toast--passed tsbs-toast ${theme}`} data-test-result-toast hidden={!isOpen} role="dialog" aria-modal="true" aria-labelledby="test-passed-title">
+		<div class="test-result-toast__backdrop" data-test-result-toast-close></div>
+		<section class="test-result-toast__panel" aria-describedby="test-passed-copy">
+			<div class="test-result-toast__body">
+				<div class="test-result-toast__copy" id="test-passed-copy">
+					<h2 id="test-passed-title">{message}</h2>
+					<p>
+						<i class="bi bi-award" aria-hidden="true"></i>
+						<strong>{trophyLabel}</strong>
+					</p>
+				</div>
+
+				<div class="test-result-toast__icon" aria-hidden="true">
+					<i class="bi bi-book"></i>
+				</div>
+			</div>
+
+			<div class="test-result-toast__footer">
+				<button class="btn tsbs-cta-primary test-result-toast__button" type="button" data-test-result-toast-close>
+					<span>{buttonLabel}</span>
+					<i class="bi bi-check-lg" aria-hidden="true"></i>
+				</button>
+			</div>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupTestResultToast = () => {
+		document.querySelectorAll('[data-test-result-toast]').forEach((toast) => {
+			const closeToast = () => {
+				toast.setAttribute('hidden', '');
+			};
+
+			toast.querySelectorAll('[data-test-result-toast-close]').forEach((element) => {
+				element.addEventListener('click', closeToast);
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape') closeToast();
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupTestResultToast);
+	setupTestResultToast();
+</script>
+
+<style lang="scss">
+	.test-result-toast {
+		position: fixed;
+		inset: 0;
+		z-index: 1200;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		padding: 1.75rem;
+		color: #667084;
+	}
+
+	.test-result-toast__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-surface) 68%, transparent);
+		backdrop-filter: grayscale(0.7) blur(0.0625rem);
+	}
+
+	.test-result-toast__panel {
+		position: relative;
+		width: min(100%, 23.4375rem);
+		overflow: hidden;
+		background: var(--tsbs-color-white);
+		border-radius: 0.75rem;
+		box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--tsbs-theme-accent) 20%, transparent);
+	}
+
+	.test-result-toast__body {
+		display: grid;
+		justify-items: center;
+		gap: 1.5rem;
+		padding: 1.375rem 1.5rem 1.625rem;
+		text-align: center;
+	}
+
+	.test-result-toast__copy {
+		display: grid;
+		gap: 0.25rem;
+	}
+
+	.test-result-toast__copy h2,
+	.test-result-toast__copy p {
+		margin: 0;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.25;
+	}
+
+	.test-result-toast__copy h2 {
+		color: var(--tsbs-color-heading);
+	}
+
+	.test-result-toast__copy p {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.25rem;
+		color: var(--tsbs-theme-accent);
+	}
+
+	.test-result-toast__copy strong {
+		font-weight: 800;
+	}
+
+	.test-result-toast__icon {
+		display: grid;
+		place-items: center;
+		width: 9.75rem;
+		aspect-ratio: 1;
+		color: color-mix(in srgb, var(--tsbs-theme-accent) 46%, #737373);
+	}
+
+	.test-result-toast__icon .bi {
+		font-size: 7.5rem;
+		line-height: 1;
+	}
+
+	.test-result-toast__footer {
+		padding: 0.9375rem 1rem;
+		border-top: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-surface));
+	}
+
+	.test-result-toast__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.625rem;
+		width: 100%;
+		min-height: 3rem;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1;
+		border-radius: 0.25rem;
+	}
+</style>

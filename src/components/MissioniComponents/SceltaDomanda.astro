@@ -1,4 +1,6 @@
 ---
+import TestNotPassed from '../toastComponents/TestNotPassed.astro';
+
 const { missione = null, lang = 'it', slugMis = '' } = Astro.props;
 
 const title =
@@ -59,9 +61,7 @@ const firstQuestion = questions[0];
 		</form>
 	</div>
 
-	<div class="choice-question__toast" data-choice-question-toast hidden role="status" aria-live="polite">
-		Esito
-	</div>
+	<TestNotPassed renderHidden={true} />
 </article>
 
 <script define:vars={{ questions }}>
@@ -73,7 +73,7 @@ const firstQuestion = questions[0];
 		const title = root.querySelector('[data-choice-question-title]');
 		const answers = root.querySelector('[data-choice-question-answers]');
 		const submit = root.querySelector('[data-choice-question-submit]');
-		const toast = root.querySelector('[data-choice-question-toast]');
+		const toast = root.querySelector('[data-test-result-toast]');
 
 		if (!form || !title || !answers || !submit || !toast) return;
 
@@ -143,24 +143,4 @@ const firstQuestion = questions[0];
 		line-height: 1;
 	}
 
-	.choice-question__toast {
-		position: fixed;
-		right: 1rem;
-		bottom: calc(var(--tsbs-mobile-nav-height) + 1rem);
-		z-index: 1200;
-		max-width: min(calc(100vw - 2rem), 20rem);
-		padding: 0.875rem 1rem;
-		color: var(--tsbs-color-white);
-		font-weight: 800;
-		line-height: 1.2;
-		background: var(--tsbs-theme-accent);
-		border-radius: var(--tsbs-radius-sm);
-		box-shadow: 0 0.75rem 1.75rem color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
-	}
-
-	@media (min-width: 768px) {
-		.choice-question__toast {
-			bottom: 1.5rem;
-		}
-	}
 </style>

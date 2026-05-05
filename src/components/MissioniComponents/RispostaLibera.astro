@@ -1,4 +1,7 @@
 ---
+import TestNotPassed from '../toastComponents/TestNotPassed.astro';
+import TestPassed from '../toastComponents/TestPassed.astro';
+
 const { missione = null, lang = 'it', slugMis = '' } = Astro.props;
 
 const title =
@@ -73,9 +76,7 @@ const firstPrompt = prompts[0];
 		</form>
 	</div>
 
-	<div class="free-answer-mission__toast" data-free-answer-toast hidden role="status" aria-live="polite">
-		Esito
-	</div>
+	<TestNotPassed renderHidden={true} />
 </article>
 
 <script define:vars={{ prompts }}>
@@ -87,7 +88,7 @@ const firstPrompt = prompts[0];
 		const instruction = root.querySelector('[data-free-answer-instruction]');
 		const input = root.querySelector('[data-free-answer-input]');
 		const submit = root.querySelector('[data-free-answer-submit]');
-		const toast = root.querySelector('[data-free-answer-toast]');
+		const toast = root.querySelector('[data-test-result-toast]');
 
 		if (!form || !instruction || !input || !submit || !toast) return;
 
@@ -147,24 +148,4 @@ const firstPrompt = prompts[0];
 		line-height: 1;
 	}
 
-	.free-answer-mission__toast {
-		position: fixed;
-		right: 1rem;
-		bottom: calc(var(--tsbs-mobile-nav-height) + 1rem);
-		z-index: 1200;
-		max-width: min(calc(100vw - 2rem), 20rem);
-		padding: 0.875rem 1rem;
-		color: var(--tsbs-color-white);
-		font-weight: 800;
-		line-height: 1.2;
-		background: var(--tsbs-theme-accent);
-		border-radius: var(--tsbs-radius-sm);
-		box-shadow: 0 0.75rem 1.75rem color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
-	}
-
-	@media (min-width: 768px) {
-		.free-answer-mission__toast {
-			bottom: 1.5rem;
-		}
-	}
 </style>
