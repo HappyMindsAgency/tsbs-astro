@@ -53,9 +53,9 @@ const tipoProva =
 	missione?.tipoProva ||
 	missione?.prova?.tipoProva ||
 	missione?.categoriaMissione?.tipoProva ||
-	'scelta-multipla';
+	'parola-dordine';
 
-const ProvaComponent = provaComponents[tipoProva as keyof typeof provaComponents] || SceltaDomanda;
+const ProvaComponent = provaComponents[tipoProva as keyof typeof provaComponents] || ParolaDordine;
 ---
 
 <Layout lang={locale}>

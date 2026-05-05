@@ -1440,11 +1440,10 @@ h1,
 		text-transform: uppercase;
 	}
 
-	.mission-component-title {
-		max-width: 23rem;
+	.mission-proof-question .mission-component-title {
 		margin: 0;
 		color: var(--tsbs-color-white);
-		font-size: 0.735rem;
+		font-size: 1.5rem;
 		font-weight: 800;
 		line-height: 1.2;
 	}
@@ -1570,7 +1569,7 @@ h1,
 
 	.choice-question__fieldset legend {
 		float: none;
-		padding: 0;
+		padding: 0 0 0.75rem;
 		margin: 0;
 		color: var(--tsbs-color-heading);
 		font-size: 1rem;
@@ -1637,9 +1636,8 @@ h1,
 			padding-top: 2.5rem;
 		}
 
-		.mission-component-title {
-			max-width: none;
-			font-size: 0.98rem;
+		.mission-proof-question .mission-component-title {
+			font-size: 2rem;
 		}
 
 		.mission-proof-question__panel {
@@ -1672,6 +1670,14 @@ h1,
 			gap: 3rem;
 		}
 
+		.mission-proof-question__cta {
+			justify-self: start;
+			width: auto;
+			min-width: 13.5rem;
+		}
+	}
+
+	@media (min-width: 992px) {
 		.choice-question__answers {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 			gap: 1.25rem;
@@ -1679,12 +1685,6 @@ h1,
 
 		.choice-question__answer {
 			width: 100%;
-		}
-
-		.mission-proof-question__cta {
-			justify-self: start;
-			width: auto;
-			min-width: 13.5rem;
 		}
 	}
 
@@ -1697,8 +1697,8 @@ h1,
 			padding-top: 4rem;
 		}
 
-		.mission-component-title {
-			font-size: 1.1025rem;
+		.mission-proof-question .mission-component-title {
+			font-size: 2rem;
 		}
 
 		.mission-proof-question__panel {
