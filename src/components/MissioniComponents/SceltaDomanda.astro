@@ -53,7 +53,7 @@ const firstQuestion = questions[0];
 				</div>
 			</fieldset>
 
-			<button class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta" type="submit" data-choice-question-submit>
+			<button class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta" type="submit" data-choice-question-submit hidden>
 				Avanti →
 			</button>
 		</form>
@@ -79,6 +79,8 @@ const firstQuestion = questions[0];
 
 		let currentQuestionIndex = 0;
 
+		const hasSelectedAnswer = () => Boolean(answers.querySelector('input[name="risposta"]:checked'));
+
 		const renderQuestion = () => {
 			const currentQuestion = questions[currentQuestionIndex];
 			const isLastQuestion = currentQuestionIndex === questions.length - 1;
@@ -97,12 +99,19 @@ const firstQuestion = questions[0];
 				})
 				.join('');
 			submit.innerHTML = isLastQuestion
-				? '<span>Completato</span><i class="bi bi-stars choice-question__complete-icon" aria-hidden="true"></i>'
+				? '<span>Concludi la prova</span><i class="bi bi-stars choice-question__complete-icon" aria-hidden="true"></i>'
 				: 'Avanti →';
+			submit.hidden = true;
 		};
+
+		answers.addEventListener('change', () => {
+			submit.hidden = !hasSelectedAnswer();
+		});
 
 		form.addEventListener('submit', (event) => {
 			event.preventDefault();
+
+			if (!hasSelectedAnswer()) return;
 
 			if (currentQuestionIndex < questions.length - 1) {
 				currentQuestionIndex += 1;

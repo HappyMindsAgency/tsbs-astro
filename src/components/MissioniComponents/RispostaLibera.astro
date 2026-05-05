@@ -18,17 +18,26 @@ const quote =
 	missione?.descrizioneBreve ||
 	'Phasellus accumsan, felis sed dictum gravida, est leo congue mauris, nec luctus sem nisi a ante. Aenean quis facilisis augue, eget ornare odio. Proin non arcu vel erat finibus venenatis.';
 
-const instruction =
-	missione?.prova?.descrizioneAzione ||
-	missione?.descrizioneAzione ||
-	'Descrizione dell’azione da compiere';
-
 const answerLabel = missione?.prova?.labelRisposta || 'Risposta libera';
-const placeholder = missione?.prova?.placeholder || 'Inserisci qui la tua risposta';
-const nextHref = slugMis ? `/missioni/${slugMis}/esito/` : '/missioni/';
+const prompts = [
+	{
+		instruction: 'Descrizione dell’azione da compiere',
+		placeholder: 'Inserisci qui la tua risposta',
+	},
+	{
+		instruction: 'Descrizione della seconda azione da compiere',
+		placeholder: 'Inserisci qui la tua seconda risposta',
+	},
+	{
+		instruction: 'Descrizione della terza azione da compiere',
+		placeholder: 'Inserisci qui la tua terza risposta',
+	},
+];
+
+const firstPrompt = prompts[0];
 ---
 
-<article class="mission-proof-question free-answer-mission" data-lang={lang} aria-label="Prova missione">
+<article class="mission-proof-question free-answer-mission" data-free-answer-mission data-lang={lang} aria-label="Prova missione">
 	<header class="mission-proof-question__header">
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
@@ -45,21 +54,117 @@ const nextHref = slugMis ? `/missioni/${slugMis}/esito/` : '/missioni/';
 			<p>{quote}</p>
 		</blockquote>
 
-		<form class="free-answer-mission__form" method="get" action={nextHref}>
+		<form class="free-answer-mission__form" data-free-answer-form>
 			<div class="free-answer-mission__field">
-				<label for="mission-free-answer">{instruction}</label>
+				<label for="mission-free-answer" data-free-answer-instruction>{firstPrompt.instruction}</label>
 				<textarea
 					id="mission-free-answer"
 					name="risposta-libera"
 					rows="8"
-					placeholder={placeholder}
+					placeholder={firstPrompt.placeholder}
 					aria-label={answerLabel}
+					data-free-answer-input
 				></textarea>
 			</div>
 
-			<button class="btn tsbs-cta-primary mission-proof-question__cta free-answer-mission__cta" type="submit">
+			<button class="btn tsbs-cta-primary mission-proof-question__cta free-answer-mission__cta" type="submit" data-free-answer-submit hidden>
 				Avanti →
 			</button>
 		</form>
 	</div>
+
+	<div class="free-answer-mission__toast" data-free-answer-toast hidden role="status" aria-live="polite">
+		Esito
+	</div>
 </article>
+
+<script define:vars={{ prompts }}>
+	const setupFreeAnswerMission = () => {
+		const root = document.querySelector('[data-free-answer-mission]');
+		if (!root) return;
+
+		const form = root.querySelector('[data-free-answer-form]');
+		const instruction = root.querySelector('[data-free-answer-instruction]');
+		const input = root.querySelector('[data-free-answer-input]');
+		const submit = root.querySelector('[data-free-answer-submit]');
+		const toast = root.querySelector('[data-free-answer-toast]');
+
+		if (!form || !instruction || !input || !submit || !toast) return;
+
+		let currentPromptIndex = 0;
+
+		const hasAnswer = () => input.value.trim().length > 0;
+
+		const renderPrompt = () => {
+			const currentPrompt = prompts[currentPromptIndex];
+			const isLastPrompt = currentPromptIndex === prompts.length - 1;
+
+			instruction.textContent = currentPrompt.instruction;
+			input.value = '';
+			input.setAttribute('placeholder', currentPrompt.placeholder);
+			submit.innerHTML = isLastPrompt
+				? '<span>Concludi la prova</span><i class="bi bi-stars free-answer-mission__complete-icon" aria-hidden="true"></i>'
+				: 'Avanti →';
+			submit.hidden = true;
+		};
+
+		input.addEventListener('input', () => {
+			submit.hidden = !hasAnswer();
+		});
+
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+
+			if (!hasAnswer()) return;
+
+			if (currentPromptIndex < prompts.length - 1) {
+				currentPromptIndex += 1;
+				renderPrompt();
+				return;
+			}
+
+			toast.hidden = false;
+		});
+
+		renderPrompt();
+	};
+
+	document.addEventListener('astro:page-load', setupFreeAnswerMission);
+	setupFreeAnswerMission();
+</script>
+
+<style lang="scss">
+	.free-answer-mission__cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.free-answer-mission__complete-icon {
+		color: var(--tsbs-color-white);
+		font-size: 1.125rem;
+		line-height: 1;
+	}
+
+	.free-answer-mission__toast {
+		position: fixed;
+		right: 1rem;
+		bottom: calc(var(--tsbs-mobile-nav-height) + 1rem);
+		z-index: 1200;
+		max-width: min(calc(100vw - 2rem), 20rem);
+		padding: 0.875rem 1rem;
+		color: var(--tsbs-color-white);
+		font-weight: 800;
+		line-height: 1.2;
+		background: var(--tsbs-theme-accent);
+		border-radius: var(--tsbs-radius-sm);
+		box-shadow: 0 0.75rem 1.75rem color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
+	}
+
+	@media (min-width: 768px) {
+		.free-answer-mission__toast {
+			bottom: 1.5rem;
+		}
+	}
+</style>
