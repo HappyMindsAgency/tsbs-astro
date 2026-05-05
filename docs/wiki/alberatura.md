@@ -46,9 +46,10 @@ src/pages/
 │  ├─ index.astro
 │  └─ [slugMis]/
 │     ├─ index.astro
+│     ├─ sfida-lettura.astro
 │     ├─ prova/
 │     │  ├─ index.astro
-│     │  └─ libri.astro
+│     │  └─ sfida-lettura.astro
 │     └─ esito.astro
 │
 ├─ accademia/
@@ -91,9 +92,10 @@ La sezione `missioni/` usa una struttura dinamica basata su singola missione:
 ```txt
 missioni/[slugMis]/
 ├─ index.astro
+├─ sfida-lettura.astro
 ├─ prova/
 │  ├─ index.astro
-│  └─ libri.astro
+│  └─ sfida-lettura.astro
 └─ esito.astro
 ```
 
@@ -113,53 +115,43 @@ La pagina `missioni/index.astro` gestisce elenco e filtri.
 
 La pagina `missioni/[slugMis]/prova/index.astro` gestisce l'ingresso/regia della prova in base ai dati Strapi e allo stato della partecipazione.
 
-La pagina `missioni/[slugMis]/prova/libri.astro` gestisce lo step extra della scelta citazionale / sfida lettura, dove l'utente seleziona i libri letti prima di accedere alla prova a scelta multipla.
+La pagina `missioni/[slugMis]/sfida-lettura.astro` gestisce il layout della sfida lettura legata alla singola missione.
+
+La pagina `missioni/[slugMis]/prova/sfida-lettura.astro` gestisce lo step extra della scelta citazionale / sfida lettura quando il flusso della prova lo richiede.
 
 La pagina `missioni/[slugMis]/esito.astro` gestisce il risultato finale della missione.
 
 La route della singola missione deve restare stabile e non moltiplicarsi in base a categoria o tipologia.
 La variazione di layout deve essere gestita tramite componenti interni scelti in base ai dati Strapi.
 
-Struttura consigliata per i componenti:
+Struttura attuale dei componenti prova:
 
 ```txt
-src/components/missioni/
-├─ MissionDetailDefault.astro
-├─ MissionDetailEsplorazione.astro
-├─ MissionDetailQuiz.astro
-├─ MissionDetailLettura.astro
-├─ MissionDetailIndizio.astro
-├─ prove/
-│  ├─ MissionProofDefault.astro
-│  ├─ MissionProofQuiz.astro
-│  ├─ MissionProofParolaOrdine.astro
-│  ├─ MissionProofRispostaLibera.astro
-│  ├─ MissionProofSceltaMultipla.astro
-│  └─ citazionale/
-│     └─ MissionProofBookSelection.astro
-└─ esiti/
-   ├─ MissionResultDefault.astro
-   ├─ MissionResultWithTrofeo.astro
-   └─ MissionResultNoTrofeo.astro
+src/components/MissioniComponents/
+├─ SceltaDomanda.astro
+├─ ParolaDordine.astro
+└─ RispostaLibera.astro
 ```
 
 Le pagine Astro restano pagine di regia:
 
 ```txt
 missioni/[slugMis]/index.astro -> sceglie il componente dettaglio
+missioni/[slugMis]/sfida-lettura.astro -> layout sfida lettura della singola missione
 missioni/[slugMis]/prova/index.astro -> sceglie il componente prova o fa da regia dello step corrente
-missioni/[slugMis]/prova/libri.astro -> selezione libri per scelta citazionale / sfida lettura
+missioni/[slugMis]/prova/sfida-lettura.astro -> step prova dedicato alla sfida lettura
 missioni/[slugMis]/esito.astro -> sceglie il componente esito
 ```
 
 Per la scelta citazionale / sfida lettura, il flusso previsto e:
 
 ```txt
-/missioni/[slugMis]/prova/libri -> selezione dei libri letti
-/missioni/[slugMis]/prova/      -> prova a scelta multipla basata sul contesto della selezione
+/missioni/[slugMis]/sfida-lettura       -> layout della sfida lettura
+/missioni/[slugMis]/prova/sfida-lettura -> step prova dedicato alla sfida lettura
+/missioni/[slugMis]/prova/              -> regia della prova basata sui dati Strapi
 ```
 
-Lo step `libri.astro` e specifico della scelta citazionale. La domanda a scelta multipla non richiede una route `domanda.astro` separata se puo riusare il componente della prova a scelta multipla dentro `prova/index.astro`.
+Lo step `sfida-lettura.astro` e specifico della scelta citazionale / sfida lettura. La domanda a scelta multipla non richiede una route `domanda.astro` separata se puo riusare il componente della prova a scelta multipla dentro `prova/index.astro`.
 
 La scelta del componente puo basarsi su campi Strapi come:
 - `layoutDettaglio`

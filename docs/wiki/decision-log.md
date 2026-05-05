@@ -235,7 +235,8 @@ Decisione:
 - non creare route diverse per categoria o tipologia missione
 - gestire i diversi layout missione tramite componenti interni scelti in base ai dati Strapi
 - usare `missioni/[slugMis]/prova/index.astro` come ingresso/regia della prova
-- usare `missioni/[slugMis]/prova/libri.astro` solo per lo step extra della scelta citazionale / sfida lettura
+- usare `missioni/[slugMis]/sfida-lettura.astro` per il layout della sfida lettura legata alla singola missione
+- usare `missioni/[slugMis]/prova/sfida-lettura.astro` per lo step prova dedicato alla sfida lettura
 - usare `Categoria Missione` soprattutto per classificazione e filtri, salvo conferma che coincida davvero con la tipologia visiva
 
 Motivo:
@@ -248,8 +249,8 @@ Motivo:
 Impatto:
 - `docs/wiki/alberatura.md`
 - `docs/wiki/backend-strapi.md`
-- futuri componenti `src/components/missioni/`
-- future pagine `src/pages/missioni/[slugMis]/`
+- componenti prova in `src/components/MissioniComponents/`
+- pagine in `src/pages/missioni/[slugMis]/`
 
 Stato:
 - approvata
