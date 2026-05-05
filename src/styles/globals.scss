@@ -435,10 +435,22 @@ h1,
   padding-bottom: var(--tsbs-mobile-nav-height);
 }
 
+.tsbs-app-container {
+  --bs-gutter-x: 1.875rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
 @media (min-width: 992px) {
   .tsbs-app-shell {
     padding-bottom: 0;
     padding-left: var(--tsbs-desktop-nav-width);
+  }
+
+  .tsbs-app-container {
+    --bs-gutter-x: 6rem;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
   }
 }
 
@@ -618,6 +630,10 @@ h1,
 			line-height: 1.2;
 		}
 
+		.dashboard-task .tsbs-accent-title {
+			color: var(--tsbs-theme-accent);
+		}
+
 		.dashboard-task p {
 			margin-top: 0.375rem;
 			color: var(--tsbs-theme-body);
@@ -625,10 +641,10 @@ h1,
 			line-height: 1.3;
 		}
 
-		.dashboard-progress-label {
+		.dashboard-task .dashboard-progress-label {
 			justify-self: end;
 			color: var(--tsbs-theme-accent);
-			font-size: 0.6875rem;
+			font-size: 0.875rem;
 			line-height: 1;
 		}
 
@@ -838,3 +854,854 @@ h1,
 				overflow: visible;
 			}
 		}
+
+// PAGINA MISSIONI
+	.missions-shell {
+		--missions-header-bg: var(--tsbs-theme-accent);
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+
+	.missions-header {
+		display: grid;
+		place-items: center;
+		min-height: 5.25rem;
+		padding: 1.25rem 1.875rem;
+		background: var(--missions-header-bg);
+	}
+
+	.missions-shell .missions-header h1 {
+		margin: 0;
+		color: var(--tsbs-color-white);
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.missions-content {
+		margin: 0 auto;
+	}
+
+	.missions-tabs {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0;
+		padding: 0.25rem;
+		margin: 0 0 1.875rem;
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 18%, var(--tsbs-color-white));
+		border-radius: 0.875rem;
+	}
+
+	.missions-tabs__item {
+		min-width: 0;
+	}
+
+	.missions-tabs__button {
+		width: 100%;
+		min-height: 2.125rem;
+		padding: 0.5rem 0.375rem;
+		color: rgba(29, 23, 21, 0.55);
+		font-size: clamp(0.8125rem, 0.72rem + 0.3vw, 0.9375rem);
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		border: 0;
+		border-radius: 0.75rem;
+	}
+
+	.missions-tabs .nav-link:hover,
+	.missions-tabs .nav-link:focus {
+		color: var(--tsbs-theme-accent);
+	}
+
+	.missions-tabs .nav-link.active {
+		color: var(--tsbs-color-heading);
+		background: var(--tsbs-color-white);
+		box-shadow: 0 0.125rem 0.625rem rgba(42, 51, 105, 0.08);
+	}
+
+	.missions-grid {
+		display: grid;
+	}
+
+	.mission-card.is-hidden {
+		display: none;
+	}
+
+	.mission-card-link {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.mission-card-link:hover,
+	.mission-card-link:focus {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.missions-load-more {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.375rem;
+		width: fit-content;
+		margin: 1.5rem auto 0;
+		color: var(--tsbs-theme-accent);
+		font-size: 0.875rem;
+		font-weight: 700;
+		line-height: 1;
+		text-decoration: none;
+		background: transparent;
+		border: 0;
+	}
+
+	.missions-load-more .bi {
+		font-size: 1rem;
+		line-height: 1;
+	}
+
+	.missions-load-more[hidden] {
+		display: none;
+	}
+
+	@media (min-width: 768px) {
+		.missions-tabs {
+			width: min(100%, clamp(28rem, 42vw, 36rem));
+			margin-right: auto;
+			margin-left: auto;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.missions-header {
+			place-items: center start;
+			min-height: 5.625rem;
+			padding: 0 3rem;
+		}
+
+		.missions-shell .missions-header h1 {
+			font-size: 2.125rem;
+		}
+
+		.missions-tabs__button {
+			min-height: 2.5rem;
+			padding: 0.625rem 0.75rem;
+		}
+	}
+
+	.mission-detail {
+		--mission-detail-accent: var(--tsbs-theme-accent);
+		--mission-detail-muted-accent: #59667a;
+		min-height: 100vh;
+		padding-bottom: calc(var(--tsbs-mobile-nav-height) + 1.75rem);
+		background: var(--tsbs-color-surface);
+	}
+
+	.mission-detail__topbar {
+		display: none;
+	}
+
+	.mission-detail__content {
+		margin: 0 auto;
+	}
+
+	.mission-detail__media {
+		position: relative;
+		display: grid;
+		place-items: center;
+		aspect-ratio: 1.62 / 1;
+		width: 100%;
+		overflow: hidden;
+		color: var(--tsbs-color-white);
+		background:
+			linear-gradient(to bottom right, transparent calc(50% - 1px), #e5e8ee 50%, transparent calc(50% + 1px)),
+			linear-gradient(to top right, transparent calc(50% - 1px), #e5e8ee 50%, transparent calc(50% + 1px)),
+			#ffffff;
+		border: 1px solid #d6dce7;
+		border-radius: 0.5rem;
+	}
+
+	.mission-detail__media::before {
+		position: absolute;
+		width: 6.125rem;
+		height: 6.125rem;
+		content: "";
+		background: #7d7d7d;
+		border-radius: 50%;
+	}
+
+	.mission-detail__media .bi {
+		position: relative;
+		z-index: 1;
+		font-size: 2.625rem;
+		line-height: 1;
+	}
+
+	.mission-detail__body {
+		display: grid;
+		gap: 1.5rem;
+		padding: 2.375rem 1.375rem 0;
+	}
+
+	.mission-detail__body h1 {
+		margin: 0;
+		color: var(--mission-detail-accent);
+		font-size: 1.625rem;
+		font-weight: 700;
+		line-height: 1.1;
+	}
+
+	.mission-detail__rule {
+		width: 100%;
+		margin: -0.5rem 0 0;
+		color: #1d1715;
+		opacity: 1;
+	}
+
+	.mission-detail__quote {
+		margin: 0;
+		color: var(--tsbs-color-body);
+		font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+		font-size: 1rem;
+		font-style: italic;
+		line-height: 1.45;
+	}
+
+	.mission-detail__quote p {
+		margin: 0;
+		font: inherit;
+		color: inherit;
+	}
+
+	.mission-detail__objective {
+		display: grid;
+		gap: 0.375rem;
+		padding: 1.25rem 1rem;
+		color: var(--tsbs-color-white);
+		background: var(--mission-detail-accent);
+		border-radius: 0.5rem;
+	}
+
+	.mission-detail__objective h2,
+	.mission-detail__objective p {
+		margin: 0;
+		color: inherit;
+	}
+
+	.mission-detail__objective h2 {
+		font-size: 0.75rem;
+		font-weight: 800;
+		line-height: 1;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	.mission-detail__objective p {
+		font-size: 1.0625rem;
+		line-height: 1.25;
+	}
+
+	.mission-detail__description {
+		color: var(--tsbs-color-body);
+		font-size: 1.0625rem;
+		line-height: 1.45;
+		text-align: center;
+	}
+
+	.mission-detail__rule--reward {
+		margin-top: 0.5rem;
+	}
+
+	.mission-detail__reward {
+		display: grid;
+		justify-items: center;
+		gap: 0.375rem;
+		color: #6d7380;
+		text-align: center;
+	}
+
+	.mission-detail__reward p {
+		color: inherit;
+		font-size: 0.9375rem;
+		line-height: 1.35;
+	}
+
+	.mission-detail__trophy {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		color: var(--mission-detail-accent) !important;
+	}
+
+	.mission-detail__trophy .bi {
+		font-size: 1rem;
+		line-height: 1;
+	}
+
+	.mission-detail__cta {
+		justify-self: center;
+		min-width: min(100%, 13.5rem);
+		padding: 0.875rem 1.5rem;
+		margin-top: 0.75rem;
+		color: var(--tsbs-color-white);
+		font-family: var(--tsbs-font-body);
+		font-weight: 700;
+		border-radius: 999rem;
+	}
+
+	@media (min-width: 768px) {
+		.mission-detail {
+			padding-bottom: 4rem;
+			background: var(--tsbs-color-surface);
+		}
+
+		.mission-detail__topbar {
+			display: flex;
+			align-items: center;
+			min-height: 4.25rem;
+			padding: 0 3.125rem;
+			background: #ffffff;
+			border-bottom: 1px solid #e7e8eb;
+		}
+
+		.mission-detail__back {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.875rem;
+			color: var(--mission-detail-muted-accent);
+			font-size: 0.9375rem;
+			font-weight: 600;
+			line-height: 1;
+			text-decoration: none;
+		}
+
+		.mission-detail__back:hover,
+		.mission-detail__back:focus {
+			color: var(--mission-detail-accent);
+			text-decoration: none;
+		}
+
+		.mission-detail__back .bi {
+			font-size: 1.125rem;
+			line-height: 1;
+		}
+
+		.mission-detail__media {
+			border-radius: 0.875rem;
+		}
+
+		.mission-detail__body {
+			gap: 1.75rem;
+			padding: 2.25rem 0 0;
+		}
+
+		.mission-detail__body h1 {
+			font-size: 1.625rem;
+		}
+
+		.mission-detail__quote {
+			padding-left: 1.25rem;
+			border-left: 2px solid var(--mission-detail-accent);
+		}
+
+		.mission-detail__objective {
+			padding: 1.375rem 1.25rem;
+		}
+
+		.mission-detail__description {
+			text-align: left;
+		}
+
+		.mission-detail__cta {
+			min-width: 14.5rem;
+			margin-top: 0.25rem;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.mission-detail__topbar {
+			padding-left: 3.125rem;
+		}
+	}
+
+// PAGINA SFIDA LETTURA
+	.reading-challenge {
+		--reading-challenge-accent: var(--tsbs-theme-accent);
+		--mission-detail-accent: var(--reading-challenge-accent);
+		--mission-detail-muted-accent: #59667a;
+		min-height: 100vh;
+		padding-bottom: calc(var(--tsbs-mobile-nav-height) + 1.75rem);
+		background: var(--tsbs-color-surface);
+	}
+
+	.reading-challenge__body {
+		display: grid;
+		gap: 1.5rem;
+		padding: 2.375rem 1.375rem 0;
+	}
+
+	.reading-challenge__body h1 {
+		margin: 0;
+		color: var(--reading-challenge-accent);
+		font-size: 1.625rem;
+		font-weight: 700;
+		line-height: 1.1;
+	}
+
+	.reading-challenge__rule {
+		margin-top: -0.5rem;
+	}
+
+	.reading-challenge__objective {
+		background: var(--reading-challenge-accent);
+	}
+
+	.reading-challenge__progress {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		justify-self: center;
+		margin-top: 0.5rem;
+		color: #6d7380;
+		font-size: 0.875rem;
+		line-height: 1;
+	}
+
+	.reading-challenge__progress strong {
+		display: inline-flex;
+		align-items: center;
+		min-height: 2rem;
+		padding: 0.375rem 0.75rem;
+		color: var(--tsbs-color-white);
+		font-size: 1rem;
+		font-weight: 800;
+		background: var(--reading-challenge-accent);
+		border-radius: 999rem;
+	}
+
+	.reading-challenge__progress span {
+		color: inherit;
+		font-size: 0.875rem;
+	}
+
+	.reading-challenge__accordion {
+		overflow: hidden;
+		background: #ffffff;
+		border: 1px solid #d6dce7;
+		border-radius: 0.875rem;
+	}
+
+	.reading-challenge__category {
+		color: #334056;
+		background: transparent;
+		border: 0;
+		border-bottom: 1px solid #d6dce7;
+	}
+
+	.reading-challenge__category:last-child {
+		border-bottom: 0;
+	}
+
+	.reading-challenge__category-button {
+		min-height: 3.5rem;
+		padding: 1rem 0.75rem;
+		color: var(--reading-challenge-accent);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.1;
+		background: transparent;
+		box-shadow: none;
+	}
+
+	.reading-challenge__category-button:not(.collapsed) {
+		color: var(--reading-challenge-accent);
+		background: transparent;
+		box-shadow: none;
+	}
+
+	.reading-challenge__category-button:focus {
+		border-color: transparent;
+		box-shadow: none;
+	}
+
+	.reading-challenge__category-button::after {
+		width: 1rem;
+		height: 1rem;
+		background-size: 1rem;
+		filter: grayscale(1) brightness(0.45);
+	}
+
+	.reading-challenge__book-list {
+		display: grid;
+		gap: 0.625rem;
+		padding: 0 0.75rem 1rem;
+	}
+
+	.reading-challenge__book {
+		display: grid;
+		grid-template-columns: 1.25rem minmax(0, 1fr);
+		align-items: start;
+		gap: 0.625rem;
+		color: #666666;
+		font-size: 0.9375rem;
+		line-height: 1.25;
+	}
+
+	.reading-challenge__book input {
+		width: 1.25rem;
+		height: 1.25rem;
+		margin: 0;
+		accent-color: var(--reading-challenge-accent);
+		border-radius: 0.25rem;
+	}
+
+	.reading-challenge__rule--reward {
+		margin-top: 0.25rem;
+	}
+
+	@media (max-width: 767.98px) {
+		.reading-challenge__accordion {
+			background: transparent;
+			border-right: 0;
+			border-left: 0;
+			border-radius: 0;
+		}
+
+		.reading-challenge__category-button {
+			padding-right: 0.25rem;
+			padding-left: 0.75rem;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.reading-challenge {
+			padding-bottom: 4rem;
+		}
+
+		.reading-challenge__body {
+			gap: 1.75rem;
+			padding: 2.25rem 0 0;
+		}
+
+		.reading-challenge__body h1 {
+			font-size: 1.625rem;
+		}
+
+		.reading-challenge__objective {
+			padding: 1.375rem 1.25rem;
+		}
+
+		.reading-challenge__category-button {
+			min-height: 3.75rem;
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+
+		.reading-challenge__book-list {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+	}
+
+// PROVE MISSIONE
+	.mission-proof {
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+
+	.mission-proof-question {
+		--mission-proof-question-accent: var(--tsbs-theme-accent);
+		--mission-proof-question-header: var(--mission-proof-question-accent);
+		display: grid;
+		min-height: calc(100vh - var(--tsbs-mobile-nav-height));
+		background: var(--tsbs-color-surface);
+	}
+
+	.mission-proof-question__header {
+		color: var(--tsbs-color-white);
+		background: var(--mission-proof-question-header);
+	}
+
+	.mission-proof-question__header-content {
+		display: grid;
+		align-content: start;
+		gap: 1.75rem;
+		min-height: 10.9375rem;
+		padding-top: 2.875rem;
+	}
+
+	.mission-proof-question__eyebrow {
+		margin: 0;
+		color: rgba(245, 245, 245, 0.74);
+		font-size: 0.75rem;
+		font-weight: 300;
+		line-height: 1;
+		text-transform: uppercase;
+	}
+
+	.mission-component-title {
+		max-width: 23rem;
+		margin: 0;
+		color: var(--tsbs-color-white);
+		font-size: 0.735rem;
+		font-weight: 800;
+		line-height: 1.2;
+	}
+
+	.mission-proof-question__panel {
+		position: relative;
+		display: grid;
+		align-content: start;
+		gap: 3.25rem;
+		padding-top: 4.75rem;
+	}
+
+	.mission-proof-question__cta {
+		justify-self: center;
+		width: min(100%, 20.4375rem);
+		min-height: 3rem;
+		padding: 0.875rem 1.5rem;
+		color: var(--tsbs-color-white);
+		font-family: var(--tsbs-font-body);
+		font-weight: 800;
+		line-height: 1;
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.password-mission {
+		--password-mission-field-border: #c8cbd2;
+	}
+
+	.password-mission__info {
+		position: absolute;
+		top: 1rem;
+		right: 1.125rem;
+		display: grid;
+		place-items: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		padding: 0;
+		color: var(--tsbs-color-heading);
+		font-size: 1.5rem;
+		line-height: 1;
+		background: transparent;
+		border: 0;
+	}
+
+	.password-mission__quote {
+		margin: 0;
+		padding-left: 1rem;
+		color: var(--tsbs-color-heading);
+		font-family: var(--tsbs-font-cta);
+		font-size: 1rem;
+		font-style: italic;
+		line-height: 1.5;
+		border-left: 2px solid var(--mission-proof-question-accent);
+	}
+
+	.password-mission__quote p {
+		margin: 0;
+		color: inherit;
+		font: inherit;
+	}
+
+	.password-mission__form {
+		display: grid;
+		gap: 3rem;
+	}
+
+	.password-mission__field {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.password-mission__field label {
+		color: var(--tsbs-color-heading);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.35;
+	}
+
+	.password-mission__field textarea {
+		width: 100%;
+		min-height: 13.625rem;
+		padding: 0.875rem 1rem;
+		color: var(--tsbs-color-heading);
+		font: inherit;
+		line-height: 1.4;
+		resize: vertical;
+		background: transparent;
+		border: 1px solid var(--password-mission-field-border);
+		border-radius: 0.625rem;
+	}
+
+	.password-mission__field textarea::placeholder {
+		color: #9da0a7;
+		opacity: 1;
+	}
+
+	.password-mission__field textarea:focus {
+		border-color: var(--mission-proof-question-accent);
+		outline: 0;
+		box-shadow: 0 0 0 0.1875rem color-mix(in srgb, var(--mission-proof-question-accent) 18%, transparent);
+	}
+
+	.choice-question__panel {
+		padding-top: 2.375rem;
+	}
+
+	.choice-question__form,
+	.choice-question__fieldset,
+	.choice-question__answers {
+		display: grid;
+	}
+
+	.choice-question__form {
+		gap: 4.5rem;
+	}
+
+	.choice-question__fieldset {
+		gap: 2.25rem;
+		padding: 0;
+		margin: 0;
+		border: 0;
+	}
+
+	.choice-question__fieldset legend {
+		float: none;
+		padding: 0;
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.35;
+	}
+
+	.choice-question__answers {
+		justify-items: center;
+		gap: 1.875rem;
+	}
+
+	.choice-question__answer {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: min(100%, 17.875rem);
+		min-height: 4.5rem;
+		padding: 1rem;
+		color: var(--tsbs-color-heading);
+		font-size: 1.375rem;
+		font-weight: 400;
+		line-height: 1.1;
+		text-align: center;
+		cursor: pointer;
+		background: #cfcfcf;
+		border: 1px solid transparent;
+		border-radius: var(--tsbs-radius-md);
+	}
+
+	.choice-question__answer input {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		cursor: pointer;
+		opacity: 0;
+	}
+
+	.choice-question__answer span {
+		position: relative;
+		z-index: 1;
+		color: inherit;
+	}
+
+	.choice-question__answer:has(input:checked) {
+		color: var(--tsbs-color-white);
+		background: var(--mission-proof-question-accent);
+	}
+
+	.choice-question__answer:has(input:focus-visible) {
+		outline: 0.1875rem solid var(--tsbs-color-focus);
+		outline-offset: 0.1875rem;
+	}
+
+	@media (min-width: 768px) {
+		.mission-proof-question {
+			min-height: calc(100vh - 4rem);
+		}
+
+		.mission-proof-question__header-content {
+			min-height: 12rem;
+			padding-top: 2.5rem;
+		}
+
+		.mission-component-title {
+			max-width: none;
+			font-size: 0.98rem;
+		}
+
+		.mission-proof-question__panel {
+			gap: 3rem;
+			padding-top: 4rem;
+		}
+
+		.password-mission__info {
+			top: 1.5rem;
+			right: 2rem;
+		}
+
+		.password-mission__quote {
+			font-size: 1.125rem;
+		}
+
+		.password-mission__form {
+			gap: 2rem;
+		}
+
+		.password-mission__field textarea {
+			min-height: 11rem;
+		}
+
+		.choice-question__panel {
+			padding-top: 4rem;
+		}
+
+		.choice-question__form {
+			gap: 3rem;
+		}
+
+		.choice-question__answers {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1.25rem;
+		}
+
+		.choice-question__answer {
+			width: 100%;
+		}
+
+		.mission-proof-question__cta {
+			justify-self: start;
+			width: auto;
+			min-width: 13.5rem;
+		}
+	}
+
+	@media (min-width: 1200px) {
+		.mission-proof-question {
+			min-height: calc(100vh - 6rem);
+		}
+
+		.mission-proof-question__header-content {
+			padding-top: 4rem;
+		}
+
+		.mission-component-title {
+			font-size: 1.1025rem;
+		}
+
+		.mission-proof-question__panel {
+			padding-top: 5rem;
+		}
+	}

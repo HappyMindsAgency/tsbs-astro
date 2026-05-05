@@ -46,7 +46,9 @@ src/pages/
 │  ├─ index.astro
 │  └─ [slugMis]/
 │     ├─ index.astro
-│     ├─ prova.astro
+│     ├─ prova/
+│     │  ├─ index.astro
+│     │  └─ libri.astro
 │     └─ esito.astro
 │
 ├─ accademia/
@@ -89,7 +91,9 @@ La sezione `missioni/` usa una struttura dinamica basata su singola missione:
 ```txt
 missioni/[slugMis]/
 ├─ index.astro
-├─ prova.astro
+├─ prova/
+│  ├─ index.astro
+│  └─ libri.astro
 └─ esito.astro
 ```
 
@@ -101,18 +105,82 @@ I diversi frame Figma delle missioni non corrispondono necessariamente a file As
 - prova con parola d'ordine
 - prova a scelta multipla
 - prova con risposta libera
-- scelta citazione
-- sfida lettura
+- scelta citazionale / sfida lettura
 - esito con trofeo
 - esito senza trofeo
 
 La pagina `missioni/index.astro` gestisce elenco e filtri.
 
-Le pagine `missioni/[slugMis]/prova.astro` e `missioni/[slugMis]/esito.astro` gestiscono il flusso operativo della missione in base ai dati Strapi e allo stato della partecipazione.
+La pagina `missioni/[slugMis]/prova/index.astro` gestisce l'ingresso/regia della prova in base ai dati Strapi e allo stato della partecipazione.
+
+La pagina `missioni/[slugMis]/prova/libri.astro` gestisce lo step extra della scelta citazionale / sfida lettura, dove l'utente seleziona i libri letti prima di accedere alla prova a scelta multipla.
+
+La pagina `missioni/[slugMis]/esito.astro` gestisce il risultato finale della missione.
+
+La route della singola missione deve restare stabile e non moltiplicarsi in base a categoria o tipologia.
+La variazione di layout deve essere gestita tramite componenti interni scelti in base ai dati Strapi.
+
+Struttura consigliata per i componenti:
+
+```txt
+src/components/missioni/
+├─ MissionDetailDefault.astro
+├─ MissionDetailEsplorazione.astro
+├─ MissionDetailQuiz.astro
+├─ MissionDetailLettura.astro
+├─ MissionDetailIndizio.astro
+├─ prove/
+│  ├─ MissionProofDefault.astro
+│  ├─ MissionProofQuiz.astro
+│  ├─ MissionProofParolaOrdine.astro
+│  ├─ MissionProofRispostaLibera.astro
+│  ├─ MissionProofSceltaMultipla.astro
+│  └─ citazionale/
+│     └─ MissionProofBookSelection.astro
+└─ esiti/
+   ├─ MissionResultDefault.astro
+   ├─ MissionResultWithTrofeo.astro
+   └─ MissionResultNoTrofeo.astro
+```
+
+Le pagine Astro restano pagine di regia:
+
+```txt
+missioni/[slugMis]/index.astro -> sceglie il componente dettaglio
+missioni/[slugMis]/prova/index.astro -> sceglie il componente prova o fa da regia dello step corrente
+missioni/[slugMis]/prova/libri.astro -> selezione libri per scelta citazionale / sfida lettura
+missioni/[slugMis]/esito.astro -> sceglie il componente esito
+```
+
+Per la scelta citazionale / sfida lettura, il flusso previsto e:
+
+```txt
+/missioni/[slugMis]/prova/libri -> selezione dei libri letti
+/missioni/[slugMis]/prova/      -> prova a scelta multipla basata sul contesto della selezione
+```
+
+Lo step `libri.astro` e specifico della scelta citazionale. La domanda a scelta multipla non richiede una route `domanda.astro` separata se puo riusare il componente della prova a scelta multipla dentro `prova/index.astro`.
+
+La scelta del componente puo basarsi su campi Strapi come:
+- `layoutDettaglio`
+- `tipoProva`
+- `tipoEsito`
+- `categoriaMissione.slug`, solo se categoria e tipologia visiva coincidono davvero
+
+Evitare route separate per categoria o tipologia, come:
+
+```txt
+missioni/esplorazione/[slugMis].astro
+missioni/quiz/[slugMis].astro
+missioni/lettura/[slugMis].astro
+```
+
+perche legherebbero URL e architettura Astro a una classificazione editoriale che potrebbe cambiare.
 
 Da confermare lato Strapi:
 - la collection `Missione` dovra avere un campo `slug` se si vuole usare `[slugMis]`
 - in alternativa si dovra usare un identificativo tecnico Strapi, meno adatto a URL editoriali
+- la collection `Missione` dovra esporre campi o relazioni sufficienti per scegliere layout dettaglio, tipo prova e tipo esito senza moltiplicare le route Astro
 
 ### Categorie Missione
 

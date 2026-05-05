@@ -4,7 +4,6 @@ import Nav from '../components/Nav.astro';
 import WelcomeToast from '../components/toastComponents/WelcomeToast.astro';
 
 const { lang = 'it' } = Astro.props;
-const academyTheme = 'theme-astraria';
 
 const tasks = [
 	{ title: 'Lorem ipsum dolor', progress: 65 },
@@ -22,7 +21,7 @@ const events = [
 <Layout lang={lang}>
 	<Nav lang={lang} />
 
-	<main class={`tsbs-app-shell dashboard-shell ${academyTheme}`}>
+	<main class="tsbs-app-shell dashboard-shell">
 		<header class="dashboard-header">
 			<div class="dashboard-profile">
 				<div class="dashboard-avatar" aria-hidden="true">
@@ -112,7 +111,7 @@ const events = [
 			</div>
 		</section>
 	</main>
-	<WelcomeToast isOpen={true} theme={academyTheme} />
+	<WelcomeToast isOpen={true} />
 
 
 </Layout>

@@ -1,0 +1,66 @@
+---
+const { missione = null, lang = 'it', slugMis = '' } = Astro.props;
+
+const title =
+	missione?.titolo ||
+	missione?.nome ||
+	missione?.title ||
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+
+const eyebrow =
+	missione?.nomeMissione ||
+	missione?.label ||
+	'NOME DELLA MISSIONE';
+
+const question =
+	missione?.prova?.domanda ||
+	missione?.prova?.descrizioneAzione ||
+	missione?.descrizioneAzione ||
+	'Scegli una sola risposta';
+
+const rawAnswers =
+	missione?.prova?.risposte ||
+	missione?.prova?.opzioni ||
+	missione?.risposte ||
+	['Risposta A', 'Risposta B', 'Risposta C', 'Risposta D'];
+
+const answers = Array.isArray(rawAnswers)
+	? rawAnswers.map((answer, index) => ({
+			id: `mission-answer-${index}`,
+			value: typeof answer === 'string' ? answer : answer?.value || answer?.testo || answer?.label || `Risposta ${index + 1}`,
+			label: typeof answer === 'string' ? answer : answer?.label || answer?.testo || answer?.value || `Risposta ${index + 1}`,
+		}))
+	: [];
+
+const nextHref = slugMis ? `/missioni/${slugMis}/esito/` : '/missioni/';
+---
+
+<article class="mission-proof-question choice-question" data-lang={lang} aria-label="Prova missione">
+	<header class="mission-proof-question__header">
+		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
+			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
+			<h1 class="mission-proof-question__title mission-component-title">{title}</h1>
+		</div>
+	</header>
+
+	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
+		<form class="choice-question__form" method="get" action={nextHref}>
+			<fieldset class="choice-question__fieldset">
+				<legend>{question}</legend>
+
+				<div class="choice-question__answers">
+					{answers.map((answer) => (
+						<label class="choice-question__answer" for={answer.id}>
+							<input id={answer.id} type="radio" name="risposta" value={answer.value} />
+							<span>{answer.label}</span>
+						</label>
+					))}
+				</div>
+			</fieldset>
+
+			<button class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta" type="submit">
+				Avanti →
+			</button>
+		</form>
+	</div>
+</article>

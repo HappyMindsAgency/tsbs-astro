@@ -2,13 +2,14 @@
 import Head from "../components/Head.astro";
 import '../styles/globals.scss';
 
-const { entita, documentId, lang = 'it' } = Astro.props;
+const { entita, documentId, lang = 'it', theme = 'theme-astraria' } = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang={lang}>
     <Head entita={entita} documentId={documentId} lang={lang} />
 
     <body
+        class={theme}
         data-bs-smooth-scroll="true"
         data-page-lang={lang ?? 'it'}
         data-page-entity={entita ?? ''}

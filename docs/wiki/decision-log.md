@@ -228,6 +228,53 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-04 - Route Missioni Stabili E Componenti Variabili
+
+Decisione:
+- mantenere stabile l'alberatura Astro delle missioni su `missioni/[slugMis]/`
+- non creare route diverse per categoria o tipologia missione
+- gestire i diversi layout missione tramite componenti interni scelti in base ai dati Strapi
+- usare `missioni/[slugMis]/prova/index.astro` come ingresso/regia della prova
+- usare `missioni/[slugMis]/prova/libri.astro` solo per lo step extra della scelta citazionale / sfida lettura
+- usare `Categoria Missione` soprattutto per classificazione e filtri, salvo conferma che coincida davvero con la tipologia visiva
+
+Motivo:
+- evitare URL fragili se una missione cambia categoria
+- mantenere l'alberatura Astro semplice e scalabile
+- preparare il binding Strapi senza moltiplicare pagine e micro-logiche
+- separare classificazione editoriale, layout dettaglio, tipo prova e tipo esito
+- riusare il componente prova a scelta multipla anche nella scelta citazionale, evitando una route `domanda.astro` separata
+
+Impatto:
+- `docs/wiki/alberatura.md`
+- `docs/wiki/backend-strapi.md`
+- futuri componenti `src/components/missioni/`
+- future pagine `src/pages/missioni/[slugMis]/`
+
+Stato:
+- approvata
+
+## 2026-05-05 - Priorita A Classi Globali E Pattern Esistenti
+
+Decisione:
+- prima di aggiungere CSS o wrapper locali, verificare se una classe globale, un token o un pattern esistente risolve gia il problema
+- usare direttamente `container-xl tsbs-app-container`, token tema e componenti esistenti quando coprono larghezza, gutter, shell, cromie e spaziature comuni
+- limitare il CSS specifico alle sole differenze reali del componente
+- se un fix richiede margini negativi, max-width locali o padding duplicati rispetto al sistema globale, rivalutare il markup e spostare la classe globale nel punto corretto
+
+Motivo:
+- mantenere il codice pulito, semplice e scalabile
+- evitare micro-fix fragili e duplicazioni di logiche gia globali
+- garantire coerenza tra pagine app, dettaglio missione e pagine figlie delle missioni
+
+Impatto:
+- `docs/wiki/frontend-design.md`
+- future implementazioni UI e componenti missione
+- review dei fix CSS su pagine app
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)

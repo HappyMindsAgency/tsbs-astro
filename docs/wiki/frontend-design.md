@@ -22,6 +22,9 @@ Quando vengono forniti screenshot Figma mobile e desktop:
 - analizzare entrambe le versioni prima di implementare
 - segnalare in chat eventuali incongruenze di design o responsive
 - proporre come riferimento prioritario la soluzione mobile, per coerenza con il mobile first
+- se mobile e desktop non sono allineati sui colori Accademia, usare il mobile come fonte attendibile: il desktop puo guidare layout, spaziature e responsive, ma non deve sovrascrivere cromie tematiche gia presenti nel mobile
+- se Figma contraddice una regola globale gia definita nel progetto, vince la regola globale del progetto: container, spaziature, shell, token, temi e componenti condivisi devono restare coerenti e scalabili
+- quando possibile, adottare o estendere una regola globale gia esistente invece di introdurre micro-fix pagina per pagina
 - implementare solo dopo aver chiarito eventuali differenze rilevanti
 
 Se viene fornita una sola versione, ricavare l'altra in modo semplice e coerente con il sistema globale, segnalando le assunzioni principali.
@@ -34,6 +37,7 @@ Regole:
 - fare pulizia dei dettagli provvisori o non confermati prima di scrivere codice
 - non trasformare in codice background, texture o pattern presenti nel Figma se non sono stati confermati come asset definitivo
 - usare il background default delle pagine app `--tsbs-color-surface` (`#FFFBF2`) finche non viene fornito il pattern ufficiale
+- nel dettaglio missione mantenere lo stesso background globale `--tsbs-color-surface` su mobile e desktop; il pattern visto nei layout e da considerare placeholder finche non arriva l'asset definitivo
 - quando arrivera il pattern definitivo, integrarlo tramite token/stile riutilizzabile e non come override isolato pagina per pagina
 - mantenere eventuali cromie di sezione tramite tema/token, evitando background custom temporanei derivati dagli screenshot
 
@@ -47,6 +51,28 @@ Regole:
 - su mobile deve restare compatta e proporzionata al viewport
 - il testo della banda cambia in base alla sezione, ma la struttura dimensionale deve restare coerente
 - eventuali differenze cromatiche devono passare da tema/token, non da altezze diverse pagina per pagina
+
+## Spaziatura Pagine App
+
+Le pagine interne dell'app devono usare una struttura Bootstrap-first:
+- `tsbs-app-shell` gestisce lo spazio del menu app mobile e della sidebar desktop
+- `container-xl tsbs-app-container` gestisce larghezza, gutter e padding verticale del contenuto
+- su mobile `tsbs-app-container` usa `--bs-gutter-x: 1.875rem`, pari a circa `0.9375rem` per lato
+- le classi specifiche di pagina devono gestire solo layout interno e componenti, non la spaziatura generale della pagina
+
+Se una pagina richiede gli stessi spazi laterali o verticali di altre pagine app, usare o estendere `tsbs-app-container` invece di duplicare padding e max-width locali.
+
+Regola di priorita implementativa:
+- prima di scrivere nuovo CSS o markup wrapper, verificare se esiste gia una classe globale o un pattern locale che risolve il problema
+- usare direttamente classi globali come `container-xl tsbs-app-container`, token tema e componenti esistenti quando coprono il caso
+- scrivere CSS specifico solo per differenze reali del componente, non per replicare spaziature, larghezze, gutter, shell, colori tema o logiche gia globali
+- se un fix richiede margini negativi, max-width locali o padding duplicati rispetto al container globale, rivalutare la struttura: spesso la soluzione corretta e spostare la classe globale nel punto giusto del markup
+- preferire sempre la strada piu semplice, efficace, scalabile e coerente con l'architettura esistente
+
+Regola specifica missioni:
+- le pagine figlie di una singola missione, inclusa `sfida-lettura`, devono riusare lo stesso contenitore dell'esploso missione: `container-xl tsbs-app-container`
+- non aggiungere `max-width`, gutter, padding laterali o override mobile locali sul wrapper contenuto se cambiano lo spazio a destra e sinistra rispetto all'esploso missione
+- eventuali differenze devono stare dentro i componenti interni della pagina, non nel contenitore principale
 
 ## Pulizia Codice Pagine
 
@@ -185,6 +211,14 @@ Evitare:
 - 4 layout separati
 - 4 componenti duplicati
 - regole CSS ripetute e non scalabili
+
+Le classi tema Accademia, come `theme-astraria`, `theme-arcadia`, `theme-armonia` e `theme-arborea`, devono essere applicate a un padre comune tramite `Layout.astro`, non ripetute nei singoli `main` pagina per pagina.
+
+Regole:
+- `Layout.astro` gestisce la classe tema globale con fallback temporaneo
+- le pagine Astro non devono dichiarare `const academyTheme = 'theme-...'` se non serve un override esplicito
+- `main`, sezioni, componenti, toast, CTA e progress devono ereditare i token tema dal padre
+- quando il tema arrivera da Strapi o dallo stato utente, il binding dovra aggiornare il valore passato al layout, non ogni singola pagina
 
 ## Hero
 

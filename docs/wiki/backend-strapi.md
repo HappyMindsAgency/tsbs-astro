@@ -101,6 +101,8 @@ Nota:
 - campi obbligatori
 - naming tecnico definitivo
 - policy API e autenticazione
+- per `Missione`, campi o relazioni per distinguere layout dettaglio, tipo prova e tipo esito
+- per `Categoria Missioni`, chiarire se serve solo a classificare/filtrare oppure anche a determinare la tipologia visiva della missione
 
 ## Vedi Anche
 

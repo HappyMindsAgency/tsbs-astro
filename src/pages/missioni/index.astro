@@ -3,14 +3,13 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 
 const { lang = 'it' } = Astro.props;
-const academyTheme = 'theme-astraria';
 
 const missionTabs = [
 	{
 		id: 'in-corso',
 		label: 'In corso',
 		missions: [
-			{ progress: 65, meta: '65%' },
+			{ progress: 65, meta: '65%', href: '/missioni/lorem-ipsum-dolor/' },
 			{ progress: 90, meta: '90%' },
 			{ progress: 50, meta: 'Step 2/4' },
 			{ progress: 25, meta: 'Step 1/4' },
@@ -54,12 +53,12 @@ const missionTabs = [
 <Layout lang={lang}>
 	<Nav lang={lang} />
 
-	<main class={`tsbs-app-shell missions-shell ${academyTheme}`}>
+	<main class="tsbs-app-shell missions-shell">
 		<header class="missions-header">
 			<h1>Missioni</h1>
 		</header>
 
-		<section class="missions-content" aria-labelledby="missions-title">
+		<section class="container-xl tsbs-app-container missions-content" aria-labelledby="missions-title">
 			<h2 id="missions-title" class="visually-hidden">Elenco missioni</h2>
 
 			<ul class="nav missions-tabs" id="missions-tabs" role="tablist" aria-label="Stato missioni">
@@ -92,18 +91,33 @@ const missionTabs = [
 					>
 						<div class="missions-grid dashboard-task-grid">
 							{tab.missions.map((mission) => (
-								<article class="tsbs-card dashboard-task mission-card" data-mission-card>
-									<div class="dashboard-task__header">
-										<div>
-											<h3 class="tsbs-accent-title">Lorem ipsum dolor</h3>
-											<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+								mission.href ? (
+									<a class="tsbs-card dashboard-task mission-card mission-card-link" href={mission.href} data-mission-card>
+										<div class="dashboard-task__header">
+											<div>
+												<h3 class="tsbs-accent-title">Lorem ipsum dolor</h3>
+												<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+											</div>
 										</div>
-									</div>
-									<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
-										<span style={`width: ${mission.progress}%`}></span>
-									</div>
-									<p class="dashboard-progress-label">{mission.meta}</p>
-								</article>
+										<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
+											<span style={`width: ${mission.progress}%`}></span>
+										</div>
+										<p class="dashboard-progress-label">{mission.meta}</p>
+									</a>
+								) : (
+									<article class="tsbs-card dashboard-task mission-card" data-mission-card>
+										<div class="dashboard-task__header">
+											<div>
+												<h3 class="tsbs-accent-title">Lorem ipsum dolor</h3>
+												<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+											</div>
+										</div>
+										<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
+											<span style={`width: ${mission.progress}%`}></span>
+										</div>
+										<p class="dashboard-progress-label">{mission.meta}</p>
+									</article>
+								)
 							))}
 						</div>
 
@@ -206,140 +220,3 @@ const missionTabs = [
 		});
 	</script>
 </Layout>
-
-<style lang="scss">
-	.missions-shell {
-		--missions-header-bg: var(--tsbs-color-astraria);
-		min-height: 100vh;
-		background: var(--tsbs-color-surface);
-	}
-
-	.missions-header {
-		display: grid;
-		place-items: center;
-		min-height: 5.25rem;
-		padding: 1.25rem 1.875rem;
-		background: var(--missions-header-bg);
-	}
-
-	.missions-shell .missions-header h1 {
-		margin: 0;
-		color: var(--tsbs-color-white);
-		font-size: 2rem;
-		font-weight: 700;
-		line-height: 1;
-	}
-
-	.missions-content {
-		width: min(100%, 72rem);
-		padding: 1.875rem 1.875rem 2rem;
-		margin: 0 auto;
-	}
-
-	.missions-tabs {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: 0;
-		padding: 0.25rem;
-		margin: 0 0 1.875rem;
-		background: #d8e5fb;
-		border-radius: 0.875rem;
-	}
-
-	.missions-tabs__item {
-		min-width: 0;
-	}
-
-	.missions-tabs__button {
-		width: 100%;
-		min-height: 2.125rem;
-		padding: 0.5rem 0.375rem;
-		color: rgba(29, 23, 21, 0.55);
-		font-size: clamp(0.8125rem, 0.72rem + 0.3vw, 0.9375rem);
-		font-weight: 700;
-		line-height: 1;
-		text-align: center;
-		border: 0;
-		border-radius: 0.75rem;
-	}
-
-	.missions-tabs .nav-link:hover,
-	.missions-tabs .nav-link:focus {
-		color: var(--tsbs-color-astraria);
-	}
-
-	.missions-tabs .nav-link.active {
-		color: var(--tsbs-color-heading);
-		background: var(--tsbs-color-white);
-		box-shadow: 0 0.125rem 0.625rem rgba(42, 51, 105, 0.08);
-	}
-
-	.missions-grid {
-		display: grid;
-	}
-
-	.mission-card.is-hidden {
-		display: none;
-	}
-
-	.missions-load-more {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.375rem;
-		width: fit-content;
-		margin: 1.5rem auto 0;
-		color: var(--tsbs-color-astraria);
-		font-size: 0.875rem;
-		font-weight: 700;
-		line-height: 1;
-		text-decoration: none;
-		background: transparent;
-		border: 0;
-	}
-
-	.missions-load-more .bi {
-		font-size: 1rem;
-		line-height: 1;
-	}
-
-	.missions-load-more[hidden] {
-		display: none;
-	}
-
-	@media (min-width: 768px) {
-		.missions-content {
-			padding-right: 3rem;
-			padding-left: 3rem;
-		}
-
-		.missions-tabs {
-			width: min(100%, clamp(28rem, 42vw, 36rem));
-			margin-right: auto;
-			margin-left: auto;
-		}
-	}
-
-	@media (min-width: 992px) {
-		.missions-header {
-			place-items: center start;
-			min-height: 5.625rem;
-			padding: 0 3rem;
-		}
-
-		.missions-shell .missions-header h1 {
-			font-size: 2.125rem;
-		}
-
-		.missions-content {
-			padding-top: 2rem;
-			padding-right: 3rem;
-			padding-left: 3rem;
-		}
-
-		.missions-tabs__button {
-			min-height: 2.5rem;
-			padding: 0.625rem 0.75rem;
-		}
-	}
-</style>
