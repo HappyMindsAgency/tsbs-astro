@@ -1,5 +1,7 @@
 ---
-const { lang = "it" } = Astro.props;
+const { lang = "it", deactivateAll = false } = Astro.props;
+
+console.log("in Nav deactivateAll ", deactivateAll);
 
 const pathname = Astro.url.pathname;
 
@@ -47,9 +49,10 @@ const activeDesktopHref = getActiveHref(desktopItems);
     {mobileItems.map((item) => (
       <li class="tsbs-mobile-nav__item">
         <a
-          class={`tsbs-mobile-nav__link ${normalizePath(item.href) === activeMobileHref ? "is-active" : ""}`}
+          class={`tsbs-mobile-nav__link ${normalizePath(item.href) === activeMobileHref ? "is-active" : ""} ${deactivateAll ? "pe-none" : ""}`}
           href={item.href}
           aria-current={normalizePath(item.href) === activeMobileHref ? "page" : undefined}
+          aria-disabled={deactivateAll ? "true" : undefined}
         >
           <i class={`bi ${item.icon}`} aria-hidden="true"></i>
           <span>{item.label}</span>
@@ -66,9 +69,10 @@ const activeDesktopHref = getActiveHref(desktopItems);
       {desktopItems.map((item) => (
         <li class="tsbs-desktop-nav__item">
           <a
-            class={`tsbs-desktop-nav__link ${normalizePath(item.href) === activeDesktopHref ? "is-active" : ""}`}
+            class={`tsbs-desktop-nav__link ${normalizePath(item.href) === activeDesktopHref ? "is-active" : ""} ${deactivateAll ? "pe-none" : ""}`}
             href={item.href}
             aria-current={normalizePath(item.href) === activeDesktopHref ? "page" : undefined}
+            aria-disabled={deactivateAll ? "true" : undefined}
           >
             <i class={`bi ${item.icon}`} aria-hidden="true"></i>
             <span>{item.label}</span>
