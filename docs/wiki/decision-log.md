@@ -296,6 +296,30 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-06 - Icone Esito Prova E Componenti Prova
+
+Decisione:
+- le icone definitive degli esiti prova non sono ancora state fornite
+- l'icona della prova non superata sara unica per tutte le tipologie di prova
+- l'icona della prova superata potra variare in base alla tipologia di prova
+- anche se le prove avranno piu tipologie editoriali o funzionali, devono restare gestibili con due componenti principali: `RispostaLibera.astro` e `SceltaDomanda.astro`
+
+Motivo:
+- mantenere il frontend semplice e scalabile in attesa degli asset definitivi
+- evitare di creare un componente Astro diverso per ogni tipologia di prova
+- preparare il binding Strapi a guidare icone e comportamento tramite dati controllati
+
+Impatto:
+- `docs/wiki/alberatura.md`
+- `docs/wiki/backend-strapi.md`
+- `src/components/MissioniComponents/RispostaLibera.astro`
+- `src/components/MissioniComponents/SceltaDomanda.astro`
+- `src/components/toastComponents/TestPassed.astro`
+- `src/components/toastComponents/TestNotPassed.astro`
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)

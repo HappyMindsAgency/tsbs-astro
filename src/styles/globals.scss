@@ -1414,6 +1414,7 @@ h1,
 		--mission-proof-question-accent: var(--tsbs-theme-accent);
 		--mission-proof-question-header: var(--mission-proof-question-accent);
 		display: grid;
+		grid-template-rows: auto 1fr;
 		min-height: calc(100vh - var(--tsbs-mobile-nav-height));
 		background: var(--tsbs-color-surface);
 	}
@@ -1443,7 +1444,7 @@ h1,
 	.mission-proof-question .mission-component-title {
 		margin: 0;
 		color: var(--tsbs-color-white);
-		font-size: 1.5rem;
+		font-size: 1.875rem;
 		font-weight: 800;
 		line-height: 1.2;
 	}
@@ -1470,22 +1471,6 @@ h1,
 
 	.free-answer-mission {
 		--free-answer-mission-field-border: #c8cbd2;
-	}
-
-	.free-answer-mission__info {
-		position: absolute;
-		top: 1rem;
-		right: 1.125rem;
-		display: grid;
-		place-items: center;
-		width: 1.75rem;
-		height: 1.75rem;
-		padding: 0;
-		color: var(--tsbs-color-heading);
-		font-size: 1.5rem;
-		line-height: 1;
-		background: transparent;
-		border: 0;
 	}
 
 	.free-answer-mission__quote {
@@ -1637,17 +1622,12 @@ h1,
 		}
 
 		.mission-proof-question .mission-component-title {
-			font-size: 2rem;
+			font-size: 2.5rem;
 		}
 
 		.mission-proof-question__panel {
 			gap: 3rem;
 			padding-top: 4rem;
-		}
-
-		.free-answer-mission__info {
-			top: 1.5rem;
-			right: 2rem;
 		}
 
 		.free-answer-mission__quote {
@@ -1694,11 +1674,12 @@ h1,
 		}
 
 		.mission-proof-question__header-content {
-			padding-top: 4rem;
+			min-height: 10rem;
+			padding-top: 3rem;
 		}
 
 		.mission-proof-question .mission-component-title {
-			font-size: 2rem;
+			font-size: 2.5rem;
 		}
 
 		.mission-proof-question__panel {

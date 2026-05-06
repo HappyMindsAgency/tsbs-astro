@@ -131,6 +131,10 @@ src/components/MissioniComponents/
 └─ RispostaLibera.astro
 ```
 
+Anche se le prove avranno piu tipologie editoriali o funzionali, la UI deve restare gestita tramite questi due componenti principali:
+- `SceltaDomanda.astro` per prove a scelta, quiz, scelta citazionale o varianti riconducibili a selezione guidata
+- `RispostaLibera.astro` per prove testuali, parola d'ordine o varianti riconducibili a input libero
+
 Le pagine Astro restano pagine di regia:
 
 ```txt
@@ -156,6 +160,12 @@ La scelta del componente puo basarsi su campi Strapi come:
 - `tipoProva`
 - `tipoEsito`
 - `categoriaMissione.slug`, solo se categoria e tipologia visiva coincidono davvero
+
+Gli esiti prova usano toast dedicati. Le icone definitive non sono ancora state fornite:
+- prova non superata: una sola icona condivisa per tutte le tipologie di prova
+- prova superata: icona variabile in base alla tipologia di prova
+
+Quando arriveranno le icone definitive, il dato Strapi dovra guidare la scelta dell'icona di successo tramite `tipoProva` o tramite un campo controllato equivalente, evitando classi icona libere non validate.
 
 Evitare route separate per categoria o tipologia, come:
 
