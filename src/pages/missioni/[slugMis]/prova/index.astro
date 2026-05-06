@@ -52,9 +52,9 @@ const tipoProva =
 	missione?.tipoProva ||
 	missione?.prova?.tipoProva ||
 	missione?.categoriaMissione?.tipoProva ||
-	'risposta-libera';
+	'scelta-multipla';
 
-const ProvaComponent = provaComponents[tipoProva as keyof typeof provaComponents] || RispostaLibera;
+const ProvaComponent = provaComponents[tipoProva as keyof typeof provaComponents] || SceltaDomanda;
 ---
 
 <Layout lang={locale}>

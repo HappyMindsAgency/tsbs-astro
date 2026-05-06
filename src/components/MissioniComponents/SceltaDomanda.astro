@@ -17,15 +17,30 @@ const eyebrow =
 const questions = [
 	{
 		question: 'Scegli una sola risposta',
-		answers: ['Risposta A', 'Risposta B', 'Risposta C', 'Risposta D'],
+		answers: [
+			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+		],
 	},
 	{
 		question: 'Scegli una seconda risposta',
-		answers: ['Risposta B', 'Risposta C', 'Risposta A', 'Risposta D'],
+		answers: [
+			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+		],
 	},
 	{
 		question: 'Scegli una terza risposta',
-		answers: ['Risposta D', 'Risposta B', 'Risposta C', 'Risposta A'],
+		answers: [
+			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+		],
 	},
 ];
 
@@ -48,8 +63,9 @@ const firstQuestion = questions[0];
 				<div class="choice-question__answers" data-choice-question-answers>
 					{firstQuestion.answers.map((answer, index) => (
 						<label class="choice-question__answer" for={`mission-answer-0-${index}`}>
-							<input id={`mission-answer-0-${index}`} type="radio" name="risposta" value={answer} />
-							<span>{answer}</span>
+							<input id={`mission-answer-0-${index}`} type="radio" name="risposta" value={answer.label} />
+							<span class="choice-question__answer-label">{answer.label}</span>
+							<span class="choice-question__answer-description">{answer.description}</span>
 						</label>
 					))}
 				</div>
@@ -92,8 +108,9 @@ const firstQuestion = questions[0];
 
 					return `
 						<label class="choice-question__answer" for="${id}">
-							<input id="${id}" type="radio" name="risposta" value="${answer}">
-							<span>${answer}</span>
+							<input id="${id}" type="radio" name="risposta" value="${answer.label}">
+							<span class="choice-question__answer-label">${answer.label}</span>
+							<span class="choice-question__answer-description">${answer.description}</span>
 						</label>
 					`;
 				})
