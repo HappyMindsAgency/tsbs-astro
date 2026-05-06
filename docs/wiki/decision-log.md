@@ -320,6 +320,25 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-06 - Missioni Dentro Atrio
+
+Decisione:
+- le pagine missioni vengono collocate sotto `src/pages/atrio/missioni/`
+- gli URL missioni diventano `/atrio/missioni/` e `/atrio/missioni/[slugMis]/`
+- la struttura interna della singola missione resta stabile: dettaglio, `sfida-lettura`, `prova/index` ed eventuale `prova/sfida-lettura`
+
+Motivo:
+- allineare l'alberatura Astro alla nuova organizzazione dell'area Atrio
+- mantenere le missioni come sotto-area dell'hub applicativo senza moltiplicare route per categoria o tipologia
+
+Impatto:
+- `docs/wiki/alberatura.md`
+- `src/pages/atrio/missioni/`
+- `src/components/Nav.astro`
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)

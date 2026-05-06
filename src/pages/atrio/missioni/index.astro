@@ -1,6 +1,6 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import Nav from '../../components/Nav.astro';
+import Layout from '../../../layouts/Layout.astro';
+import Nav from '../../../components/Nav.astro';
 
 const { lang = 'it' } = Astro.props;
 
@@ -9,7 +9,7 @@ const missionTabs = [
 		id: 'in-corso',
 		label: 'In corso',
 		missions: [
-			{ progress: 65, meta: '65%', href: '/missioni/lorem-ipsum-dolor/' },
+			{ progress: 65, meta: '65%', href: '/atrio/missioni/lorem-ipsum-dolor/' },
 			{ progress: 90, meta: '90%' },
 			{ progress: 50, meta: 'Step 2/4' },
 			{ progress: 25, meta: 'Step 1/4' },

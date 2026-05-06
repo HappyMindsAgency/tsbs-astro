@@ -1,13 +1,13 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import Nav from '../../../components/Nav.astro';
+import Layout from '../../../../layouts/Layout.astro';
+import Nav from '../../../../components/Nav.astro';
 
 export const prerender = false;
 
 const { lang = 'it' } = Astro.props;
 const { slugMis } = Astro.params;
 const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
-const missionPath = `/missioni/${slugMis ?? ''}/`;
+const missionPath = `/atrio/missioni/${slugMis ?? ''}/`;
 
 const categories = [
 	{
