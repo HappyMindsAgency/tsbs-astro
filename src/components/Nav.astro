@@ -19,7 +19,27 @@ const desktopItems = [
   { label: "Biblioteca", href: "/biblioteca/", icon: "bi-archive" },
 ];
 
-const isActive = (href: string) => href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href);
+const normalizePath = (path: string) => path.replace(/\/+$/, "") || "/";
+const currentPath = normalizePath(pathname);
+
+// Parte dall'URL corrente e risale l'alberatura finche trova una voce presente nel menu.
+const getActiveHref = (items: typeof mobileItems) => {
+  const itemPaths = new Set(items.map((item) => normalizePath(item.href)));
+  let path = currentPath;
+
+  while (path !== "/") {
+    if (itemPaths.has(path)) {
+      return path;
+    }
+
+    path = normalizePath(path.split("/").slice(0, -1).join("/"));
+  }
+
+  return itemPaths.has("/") ? "/" : "";
+};
+
+const activeMobileHref = getActiveHref(mobileItems);
+const activeDesktopHref = getActiveHref(desktopItems);
 ---
 
 <nav class="tsbs-mobile-nav" aria-label="Menu principale" data-lang={lang}>
@@ -27,9 +47,9 @@ const isActive = (href: string) => href === "/" ? pathname === "/" : pathname ==
     {mobileItems.map((item) => (
       <li class="tsbs-mobile-nav__item">
         <a
-          class={`tsbs-mobile-nav__link ${isActive(item.href) ? "is-active" : ""}`}
+          class={`tsbs-mobile-nav__link ${normalizePath(item.href) === activeMobileHref ? "is-active" : ""}`}
           href={item.href}
-          aria-current={isActive(item.href) ? "page" : undefined}
+          aria-current={normalizePath(item.href) === activeMobileHref ? "page" : undefined}
         >
           <i class={`bi ${item.icon}`} aria-hidden="true"></i>
           <span>{item.label}</span>
@@ -46,9 +66,9 @@ const isActive = (href: string) => href === "/" ? pathname === "/" : pathname ==
       {desktopItems.map((item) => (
         <li class="tsbs-desktop-nav__item">
           <a
-            class={`tsbs-desktop-nav__link ${isActive(item.href) ? "is-active" : ""}`}
+            class={`tsbs-desktop-nav__link ${normalizePath(item.href) === activeDesktopHref ? "is-active" : ""}`}
             href={item.href}
-            aria-current={isActive(item.href) ? "page" : undefined}
+            aria-current={normalizePath(item.href) === activeDesktopHref ? "page" : undefined}
           >
             <i class={`bi ${item.icon}`} aria-hidden="true"></i>
             <span>{item.label}</span>
