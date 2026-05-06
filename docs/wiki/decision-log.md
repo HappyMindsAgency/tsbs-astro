@@ -339,6 +339,30 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-06 - Popup Dedicati E DomandaModal Per Sfida Lettura
+
+Decisione:
+- usare `src/components/PopupComponents/` per popup e modali interattivi
+- mantenere separati popup/modali dai toast: i toast sono feedback brevi, i popup gestiscono scelte utente
+- il popup della sfida lettura si chiama `DomandaModal.astro`
+- `DomandaModal.astro` deve riusare il linguaggio visivo di `SceltaDomanda.astro`, adattato a popup/modale
+- nella sfida lettura, quando l'utente seleziona un libro letto, il popup deve permettere di scegliere la risposta corretta
+- il popup deve includere una `X` in alto a destra per chiudere e annullare una selezione fatta per errore
+
+Motivo:
+- mantenere `sfida-lettura.astro` come pagina di regia leggera
+- evitare di trasformare i toast in componenti interattivi complessi
+- rendere il flusso riusabile e scalabile per altre sfide o missioni simili
+
+Impatto:
+- `docs/wiki/frontend-design.md`
+- `docs/wiki/alberatura.md`
+- `src/components/PopupComponents/DomandaModal.astro`
+- `src/pages/atrio/missioni/[slugMis]/sfida-lettura.astro`
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)

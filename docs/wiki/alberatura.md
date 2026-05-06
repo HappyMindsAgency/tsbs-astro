@@ -132,6 +132,15 @@ Anche se le prove avranno piu tipologie editoriali o funzionali, la UI deve rest
 - `SceltaDomanda.astro` per prove a scelta, quiz, scelta citazionale o varianti riconducibili a selezione guidata
 - `RispostaLibera.astro` per prove testuali, parola d'ordine o varianti riconducibili a input libero
 
+Struttura popup/modali:
+
+```txt
+src/components/PopupComponents/
+└─ DomandaModal.astro
+```
+
+`DomandaModal.astro` gestisce il popup/modale di domanda usato nella sfida lettura quando l'utente seleziona un libro letto. Deve restare separato dalla pagina `sfida-lettura.astro` e dai toast di esito, per mantenere la pagina Astro leggera e distinguere le interazioni guidate dai feedback brevi.
+
 Le pagine Astro restano pagine di regia:
 
 ```txt

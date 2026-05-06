@@ -243,6 +243,21 @@ Regole:
 - usare prop Astro come `isOpen={true}` per controllare la visibilita iniziale
 - mantenere SCSS leggero e JS minimo per chiusura o interazioni essenziali
 
+## Popup E Modali
+
+Regole:
+- usare `src/components/PopupComponents/` per popup e modali interattivi che richiedono una scelta utente
+- tenere separati popup/modali dai toast: i toast restano feedback brevi, i popup gestiscono interazioni guidate
+- importare i popup solo nelle pagine che li usano
+- mantenere layout, stile e logica di chiusura dentro componenti dedicati, evitando di appesantire le pagine Astro
+- i popup che dipendono dall'accademia devono ereditare il tema dal padre e usare `tsbs-cta-primary`
+- prevedere una `X` di chiusura quando l'utente deve poter annullare una selezione fatta per errore
+
+Sfida lettura:
+- il popup per la domanda aperta dopo la selezione di un libro letto si chiama `DomandaModal.astro`
+- `DomandaModal.astro` vive in `src/components/PopupComponents/`
+- il design puo riusare il linguaggio visivo di `SceltaDomanda.astro`, adattandolo a un popup/modale compatto
+
 ## Animazioni
 
 Libreria prevista:

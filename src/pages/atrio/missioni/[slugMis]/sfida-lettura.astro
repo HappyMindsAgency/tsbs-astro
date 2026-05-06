@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
 import Nav from '../../../../components/Nav.astro';
+import DomandaModal from '../../../../components/PopupComponents/DomandaModal.astro';
 
 export const prerender = false;
 
@@ -112,4 +113,28 @@ const categories = [
 			</div>
 		</section>
 	</main>
+
+	<DomandaModal />
 </Layout>
+
+<script>
+	const setupReadingChallengeModal = () => {
+		document.querySelectorAll('.reading-challenge__book input[type="checkbox"]').forEach((input) => {
+			if (input.dataset.readingChallengeQuestionReady === 'true') return;
+			input.dataset.readingChallengeQuestionReady = 'true';
+
+			input.addEventListener('change', () => {
+				if (!input.checked) return;
+
+				document.dispatchEvent(
+					new CustomEvent('tsbs:question-modal-open', {
+						detail: { input },
+					})
+				);
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupReadingChallengeModal);
+	setupReadingChallengeModal();
+</script>

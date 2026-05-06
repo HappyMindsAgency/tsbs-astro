@@ -1,0 +1,313 @@
+---
+const {
+	isOpen = false,
+	question = 'Scegli una sola risposta',
+	answers = [
+		{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+		{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+		{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+		{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
+	],
+	buttonLabel = 'Conferma',
+} = Astro.props;
+---
+
+<div
+	class="question-modal"
+	data-question-modal
+	hidden={!isOpen}
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="question-modal-title"
+>
+	<div class="question-modal__backdrop" data-question-modal-close></div>
+
+	<section class="question-modal__panel" aria-describedby="question-modal-copy">
+		<button class="question-modal__close" type="button" data-question-modal-close aria-label="Chiudi">
+			<i class="bi bi-x-lg" aria-hidden="true"></i>
+		</button>
+
+		<form class="question-modal__form" data-question-modal-form>
+			<fieldset class="question-modal__fieldset">
+				<legend id="question-modal-title">{question}</legend>
+				<p class="visually-hidden" id="question-modal-copy">Seleziona una risposta per confermare il libro letto.</p>
+
+				<div class="question-modal__answers">
+					{answers.map((answer, index) => (
+						<label class="question-modal__answer" for={`question-modal-answer-${index}`}>
+							<input id={`question-modal-answer-${index}`} type="radio" name="domanda-modal-risposta" value={answer.label} />
+							<span class="question-modal__answer-label">{answer.label}</span>
+							<span class="question-modal__answer-description">{answer.description}</span>
+						</label>
+					))}
+				</div>
+			</fieldset>
+
+			<button class="btn tsbs-cta-primary question-modal__cta" type="submit" data-question-modal-submit hidden>
+				{buttonLabel}
+			</button>
+		</form>
+	</section>
+</div>
+
+<script>
+	const setupQuestionModal = () => {
+		document.querySelectorAll('[data-question-modal]').forEach((modal) => {
+			if (modal.dataset.questionModalReady === 'true') return;
+			modal.dataset.questionModalReady = 'true';
+
+			const form = modal.querySelector('[data-question-modal-form]');
+			const submit = modal.querySelector('[data-question-modal-submit]');
+			const answers = modal.querySelectorAll('input[name="domanda-modal-risposta"]');
+			const closeControls = modal.querySelectorAll('[data-question-modal-close]');
+			let activeInput = null;
+			let previousFocus = null;
+
+			if (!form || !submit) return;
+
+			const resetAnswers = () => {
+				answers.forEach((answer) => {
+					answer.checked = false;
+				});
+				submit.hidden = true;
+			};
+
+			const closeModal = ({ undoSelection = true } = {}) => {
+				modal.hidden = true;
+
+				if (undoSelection && activeInput) {
+					activeInput.checked = false;
+				}
+
+				resetAnswers();
+				activeInput = null;
+
+				if (previousFocus && typeof previousFocus.focus === 'function') {
+					previousFocus.focus();
+				}
+			};
+
+			const openModal = (input) => {
+				activeInput = input || null;
+				previousFocus = document.activeElement;
+				resetAnswers();
+				modal.hidden = false;
+
+				const closeButton = modal.querySelector('.question-modal__close');
+				if (closeButton && typeof closeButton.focus === 'function') {
+					closeButton.focus();
+				}
+			};
+
+			document.addEventListener('tsbs:question-modal-open', (event) => {
+				openModal(event.detail?.input);
+			});
+
+			closeControls.forEach((control) => {
+				control.addEventListener('click', () => closeModal());
+			});
+
+			answers.forEach((answer) => {
+				answer.addEventListener('change', () => {
+					submit.hidden = false;
+				});
+			});
+
+			form.addEventListener('submit', (event) => {
+				event.preventDefault();
+
+				if (!modal.querySelector('input[name="domanda-modal-risposta"]:checked')) return;
+
+				closeModal({ undoSelection: false });
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !modal.hidden) {
+					closeModal();
+				}
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupQuestionModal);
+	setupQuestionModal();
+</script>
+
+<style lang="scss">
+	.question-modal {
+		--question-modal-accent: var(--tsbs-theme-accent);
+		position: fixed;
+		inset: 0;
+		z-index: 1080;
+		display: grid;
+		align-items: end;
+		padding: 1rem;
+	}
+
+	.question-modal[hidden] {
+		display: none;
+	}
+
+	.question-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-heading) 56%, transparent);
+	}
+
+	.question-modal__panel {
+		position: relative;
+		z-index: 1;
+		width: min(100%, 42rem);
+		max-height: min(42rem, calc(100dvh - 2rem));
+		overflow-y: auto;
+		justify-self: center;
+		padding: 3.5rem 1.25rem 1.5rem;
+		background: var(--tsbs-color-surface);
+		border: 1px solid color-mix(in srgb, var(--question-modal-accent) 18%, var(--tsbs-color-white));
+		border-radius: 0.875rem;
+		box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--question-modal-accent) 20%, transparent);
+	}
+
+	.question-modal__close {
+		position: absolute;
+		top: 0.875rem;
+		right: 0.875rem;
+		display: inline-grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		padding: 0;
+		color: var(--question-modal-accent);
+		background: color-mix(in srgb, var(--question-modal-accent) 10%, var(--tsbs-color-white));
+		border: 1px solid color-mix(in srgb, var(--question-modal-accent) 18%, var(--tsbs-color-white));
+		border-radius: 999rem;
+	}
+
+	.question-modal__close:focus-visible {
+		outline: 0.1875rem solid var(--tsbs-color-focus);
+		outline-offset: 0.1875rem;
+	}
+
+	.question-modal__form,
+	.question-modal__fieldset,
+	.question-modal__answers {
+		display: grid;
+	}
+
+	.question-modal__form {
+		gap: 2rem;
+	}
+
+	.question-modal__fieldset {
+		gap: 2rem;
+		padding: 0;
+		margin: 0;
+		border: 0;
+	}
+
+	.question-modal__fieldset legend {
+		float: none;
+		padding: 0 2.25rem 0 0;
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.35;
+	}
+
+	.question-modal__answers {
+		justify-items: center;
+		gap: 1rem;
+	}
+
+	.question-modal__answer {
+		position: relative;
+		display: grid;
+		align-content: center;
+		place-items: center;
+		gap: 0.375rem;
+		width: min(100%, 17.875rem);
+		min-height: 5.5rem;
+		padding: 1rem;
+		color: var(--tsbs-color-heading);
+		text-align: center;
+		cursor: pointer;
+		background: #cfcfcf;
+		border: 1px solid transparent;
+		border-radius: var(--tsbs-radius-md);
+	}
+
+	.question-modal__answer input {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		cursor: pointer;
+		opacity: 0;
+	}
+
+	.question-modal__answer span {
+		position: relative;
+		z-index: 1;
+		color: inherit;
+	}
+
+	.question-modal__answer-label {
+		font-size: 1.375rem;
+		font-weight: 400;
+		line-height: 1.1;
+	}
+
+	.question-modal__answer-description {
+		font-size: 0.875rem;
+		font-weight: 400;
+		line-height: 1.25;
+	}
+
+	.question-modal__answer:has(input:checked) {
+		color: var(--tsbs-color-white);
+		background: var(--question-modal-accent);
+	}
+
+	.question-modal__answer:has(input:focus-visible) {
+		outline: 0.1875rem solid var(--tsbs-color-focus);
+		outline-offset: 0.1875rem;
+	}
+
+	.question-modal__cta {
+		justify-self: center;
+		width: min(100%, 20.4375rem);
+		min-height: 3rem;
+		padding: 0.875rem 1.5rem;
+		color: var(--tsbs-color-white);
+		font-family: var(--tsbs-font-body);
+		font-weight: 800;
+		line-height: 1;
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	@media (min-width: 768px) {
+		.question-modal {
+			align-items: center;
+			padding: 2rem;
+		}
+
+		.question-modal__panel {
+			padding: 3.75rem 2.5rem 2.5rem;
+		}
+
+		.question-modal__form {
+			gap: 2.5rem;
+		}
+
+		.question-modal__answers {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1.25rem;
+		}
+
+		.question-modal__answer {
+			width: 100%;
+		}
+	}
+</style>
