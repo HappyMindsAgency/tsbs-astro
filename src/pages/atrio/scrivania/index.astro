@@ -85,15 +85,15 @@ const notes = [
 			<section class="desk-section desk-latest" aria-labelledby="latest-title">
 				<h2 id="latest-title" class="tsbs-section-title">Ultime note</h2>
 
-				<div class="desk-note-list">
+				<div class="tsbs-note-list">
 					{notes.map((note) => (
-						<article class="desk-note-card">
-							<div class="desk-note-card__copy">
-								<p class="desk-note-card__meta">{note.meta}</p>
+						<article class="tsbs-note-card">
+							<div class="tsbs-note-card__copy">
+								<p class="tsbs-note-card__meta">{note.meta}</p>
 								<h3>{note.title}</h3>
 								<p>{note.text}</p>
 							</div>
-							<div class="desk-note-card__actions" aria-hidden="true">
+							<div class="tsbs-note-card__actions" aria-hidden="true">
 								<i class="bi bi-share"></i>
 								<i class="bi bi-chevron-right"></i>
 							</div>
@@ -280,67 +280,6 @@ const notes = [
 		gap: 1.25rem;
 	}
 
-	.desk-note-list {
-		display: grid;
-		gap: 1rem;
-	}
-
-	.desk-note-card {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 1rem;
-		min-height: 9.375rem;
-		padding: 1.125rem 1.25rem;
-		background: #f5f5f5;
-		border: 1px solid #8d8f95;
-		border-radius: 0.875rem;
-	}
-
-	.desk-note-card__copy {
-		display: grid;
-		align-content: start;
-		gap: 0.75rem;
-		min-width: 0;
-	}
-
-	.desk-note-card__meta {
-		margin: 0;
-		color: #666666;
-		font-size: 0.75rem;
-		font-weight: 500;
-		letter-spacing: 0.04em;
-		line-height: 1;
-		text-transform: uppercase;
-	}
-
-	.desk-note-card h3 {
-		margin: 0;
-		color: var(--desk-blue);
-		font-size: 1rem;
-		font-weight: 800;
-		line-height: 1.2;
-	}
-
-	.desk-note-card p:not(.desk-note-card__meta) {
-		margin: 0;
-		color: #8f98aa;
-		font-size: 0.875rem;
-		line-height: 1.55;
-	}
-
-	.desk-note-card__actions {
-		display: flex;
-		align-items: start;
-		gap: 0.875rem;
-		color: #546176;
-		padding-top: 0.125rem;
-	}
-
-	.desk-note-card__actions .bi {
-		font-size: 0.875rem;
-		line-height: 1;
-	}
-
 	@media (min-width: 768px) {
 		.desk-hero__panel {
 			width: 100%;
@@ -421,9 +360,5 @@ const notes = [
 			background: var(--desk-blue);
 		}
 
-		.desk-note-card {
-			min-height: 8.75rem;
-			padding: 1.5rem 1.625rem;
-		}
 	}
 </style>

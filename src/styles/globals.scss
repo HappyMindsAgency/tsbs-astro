@@ -704,6 +704,67 @@ h1,
 			border-top: 1px dashed rgba(84, 97, 118, 0.28);
 		}
 
+		.tsbs-note-list {
+			display: grid;
+			gap: 1rem;
+		}
+
+		.tsbs-note-card {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) auto;
+			gap: 1rem;
+			min-height: 9.375rem;
+			padding: 1.125rem 1.25rem;
+			background: #f5f5f5;
+			border: 1px solid #8d8f95;
+			border-radius: 0.875rem;
+		}
+
+		.tsbs-note-card__copy {
+			display: grid;
+			align-content: start;
+			gap: 0.75rem;
+			min-width: 0;
+		}
+
+		.tsbs-note-card__meta {
+			margin: 0;
+			color: #666666;
+			font-size: 0.75rem;
+			font-weight: 500;
+			letter-spacing: 0.04em;
+			line-height: 1;
+			text-transform: uppercase;
+		}
+
+		.tsbs-note-card h3 {
+			margin: 0;
+			color: var(--tsbs-theme-accent);
+			font-size: 1rem;
+			font-weight: 800;
+			line-height: 1.2;
+		}
+
+		.tsbs-note-card p:not(.tsbs-note-card__meta) {
+			margin: 0;
+			color: #8f98aa;
+			font-size: 0.875rem;
+			line-height: 1.55;
+		}
+
+		.tsbs-note-card__actions {
+			display: flex;
+			align-items: start;
+			gap: 0.875rem;
+			color: #546176;
+			padding-top: 0.125rem;
+		}
+
+		.tsbs-note-card__actions .bi {
+			font-size: 0.875rem;
+			line-height: 1;
+		}
+
 		.dashboard-events {
 			margin-bottom: 1.5rem;
 		}
@@ -856,6 +917,11 @@ h1,
 
 			.tsbs-note-pad__lines {
 				gap: 1rem;
+			}
+
+			.tsbs-note-card {
+				min-height: 8.75rem;
+				padding: 1.5rem 1.625rem;
 			}
 
 			.dashboard-event-grid {

@@ -1,0 +1,103 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Nav from '../../../components/Nav.astro';
+
+const { lang = 'it' } = Astro.props;
+
+const notes = [
+	{
+		meta: 'OGGI • PERSONALE',
+		title: 'Etiam vehicula dui ante',
+		text: 'onec et dui nec augue semper placerat. Vestibulum ante ipsum primis in faucibus luctus...',
+	},
+	{
+		meta: 'IERI • ACCADEMIA',
+		title: 'Lorem ipsum dolor sit amet',
+		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+	},
+	{
+		meta: 'IERI • ACCADEMIA',
+		title: 'Lorem ipsum dolor sit amet',
+		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+	},
+];
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell missions-shell grimorio-page">
+		<header class="missions-header">
+			<h1>Grimorio</h1>
+		</header>
+
+		<div class="container-xl tsbs-app-container grimorio-content">
+			<section class="tsbs-note-pad" aria-labelledby="grimorio-note-title">
+				<a class="tsbs-note-pad__action" href="/atrio/scrivania/grimorio/" aria-label="Aggiungi nota">
+					<i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+				</a>
+				<h2 id="grimorio-note-title">Titolo della nota</h2>
+				<p>Scrivi qui le tue annotazioni da Adepto</p>
+				<div class="tsbs-note-pad__lines" aria-hidden="true">
+					<span></span>
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</section>
+
+			<section class="grimorio-section" aria-labelledby="grimorio-latest-title">
+				<h2 id="grimorio-latest-title" class="tsbs-section-title">Ultime note</h2>
+
+				<div class="tsbs-note-list">
+					{notes.map((note) => (
+						<article class="tsbs-note-card">
+							<div class="tsbs-note-card__copy">
+								<p class="tsbs-note-card__meta">{note.meta}</p>
+								<h3>{note.title}</h3>
+								<p>{note.text}</p>
+							</div>
+							<div class="tsbs-note-card__actions" aria-hidden="true">
+								<i class="bi bi-share"></i>
+								<i class="bi bi-chevron-right"></i>
+							</div>
+						</article>
+					))}
+				</div>
+
+				<button class="missions-load-more" type="button">
+					<span>Carica altro</span>
+					<i class="bi bi-arrow-right" aria-hidden="true"></i>
+				</button>
+			</section>
+		</div>
+	</main>
+</Layout>
+
+<style lang="scss">
+	.grimorio-content,
+	.grimorio-section {
+		display: grid;
+		gap: 1.875rem;
+	}
+
+	.grimorio-content {
+		padding-top: 2.5rem;
+	}
+
+	.grimorio-section h2 {
+		margin: 0;
+		color: #1d1715;
+		font-size: 1.625rem;
+		font-weight: 800;
+		line-height: 1.1;
+	}
+
+	@media (min-width: 992px) {
+		.grimorio-content {
+			max-width: 64rem;
+			gap: 2.5rem;
+			padding-top: 2.75rem;
+		}
+	}
+</style>
