@@ -995,7 +995,7 @@ h1,
 	.academy-hero__mobile-crest > img {
 		width: 100%;
 		height: auto;
-		filter: drop-shadow(0 1rem 1.25rem rgba(42, 51, 105, 0.22));
+		filter: drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--tsbs-theme-accent) 22%, transparent));
 	}
 
 	.academy-hero__mobile-copy {
@@ -1039,7 +1039,7 @@ h1,
 		font-size: 0.875rem;
 		line-height: 1;
 		background: rgba(245, 245, 245, 0.88);
-		border: 1px solid rgba(42, 51, 105, 0.18);
+		border: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 18%, transparent);
 		border-radius: 999rem;
 	}
 
@@ -1404,7 +1404,7 @@ h1,
 			margin-top: 0.5rem;
 			color: var(--tsbs-theme-accent);
 			background: rgba(245, 245, 245, 0.88);
-			border-color: rgba(42, 51, 105, 0.18);
+			border-color: color-mix(in srgb, var(--tsbs-theme-accent) 18%, transparent);
 		}
 
 		.academy-content {
@@ -1594,7 +1594,7 @@ h1,
 	.missions-tabs .nav-link.active {
 		color: var(--tsbs-color-heading);
 		background: var(--tsbs-color-white);
-		box-shadow: 0 0.125rem 0.625rem rgba(42, 51, 105, 0.08);
+		box-shadow: 0 0.125rem 0.625rem color-mix(in srgb, var(--tsbs-theme-accent) 8%, transparent);
 	}
 
 	.missions-grid {

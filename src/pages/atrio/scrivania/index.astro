@@ -112,7 +112,7 @@ const notes = [
 
 <style lang="scss">
 	.desk-page {
-		--desk-blue: #2a3369;
+		--desk-accent: var(--tsbs-theme-accent);
 
 		min-height: 100vh;
 		background-color: var(--tsbs-color-surface);
@@ -132,7 +132,7 @@ const notes = [
 		margin: 0 auto;
 		color: #ffffff;
 		text-align: center;
-		background: var(--desk-blue);
+		background: var(--desk-accent);
 		border: 0;
 		border-radius: 0.875rem;
 	}
@@ -146,7 +146,7 @@ const notes = [
 		width: 1.5rem;
 		height: 1.5rem;
 		padding: 0;
-		color: var(--desk-blue);
+		color: var(--desk-accent);
 		background: #ffffff;
 		border: 0;
 		border-radius: 50%;
@@ -164,12 +164,12 @@ const notes = [
 		min-height: 1.5625rem;
 		padding: 0.125rem 1rem;
 		margin: 0;
-		color: var(--desk-blue);
+		color: var(--desk-accent);
 		font-size: 0.875rem;
 		font-weight: 500;
 		line-height: 1;
 		background: #ffffff;
-		border: 1px solid rgba(42, 51, 105, 0.18);
+		border: 1px solid color-mix(in srgb, var(--desk-accent) 18%, transparent);
 		border-radius: 999rem;
 	}
 
@@ -260,7 +260,7 @@ const notes = [
 		color: #ffffff;
 		text-align: center;
 		text-decoration: none;
-		background: var(--desk-blue);
+		background: var(--desk-accent);
 		border-radius: 0.5rem;
 	}
 
@@ -297,7 +297,7 @@ const notes = [
 	@media (min-width: 992px) {
 		.desk-hero {
 			padding: 3rem 3rem 3.25rem;
-			background: var(--desk-blue);
+			background: var(--desk-accent);
 		}
 
 		.desk-hero__panel {
@@ -331,7 +331,7 @@ const notes = [
 		.desk-academy-pill {
 			min-height: 1.875rem;
 			margin-bottom: 0.875rem;
-			color: var(--desk-blue);
+			color: var(--desk-accent);
 		}
 
 		.desk-hero h1 {
@@ -357,7 +357,7 @@ const notes = [
 
 		.desk-recap-card {
 			color: #ffffff;
-			background: var(--desk-blue);
+			background: var(--desk-accent);
 		}
 
 	}

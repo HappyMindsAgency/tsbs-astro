@@ -180,7 +180,7 @@ const { lang = 'it' } = Astro.props;
 		width: 100%;
 		min-width: 0;
 		padding: 0;
-		color: #2a3369;
+		color: var(--tsbs-theme-accent);
 		font-size: 1.5rem;
 		font-weight: 800;
 		line-height: 1.15;
@@ -201,18 +201,6 @@ const { lang = 'it' } = Astro.props;
 		color: var(--tsbs-theme-accent);
 		background: transparent;
 		border: 0;
-		transition:
-			color 160ms ease,
-			transform 160ms ease;
-	}
-
-	.note-editor__icon-button:hover {
-		color: var(--tsbs-theme-cta-hover-bg);
-		transform: translateY(-1px);
-	}
-
-	.note-editor__icon-button:active {
-		transform: translateY(0);
 	}
 
 	.note-editor__icon-button .bi {
