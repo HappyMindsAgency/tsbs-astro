@@ -1021,6 +1021,10 @@ h1,
 		border-color: var(--tsbs-theme-accent);
 	}
 
+	.academy-ranking-card.is-hidden {
+		display: none;
+	}
+
 	.academy-ranking-card__position {
 		display: flex;
 		align-items: center;
@@ -1151,6 +1155,57 @@ h1,
 
 	.academy-load-more:hover,
 	.academy-load-more:focus {
+		color: var(--tsbs-theme-accent);
+	}
+
+	.academy-ranking-page {
+		--missions-header-bg: var(--tsbs-theme-accent);
+		background: var(--tsbs-color-surface);
+	}
+
+	.academy-ranking-page .academy-ranking-header h1 {
+		margin: 0;
+		color: var(--tsbs-color-white);
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.academy-ranking-page__content {
+		display: grid;
+		gap: 2rem;
+	}
+
+	.academy-ranking-intro {
+		width: 100%;
+		max-width: none;
+		margin: 0;
+		color: #666666;
+		font-size: 1rem;
+		line-height: 1.45;
+		text-align: center;
+	}
+
+	.academy-ranking-page .academy-section {
+		gap: 0.875rem;
+	}
+
+	.academy-ranking-page .academy-section h2 {
+		margin: 0;
+		font-size: 1.625rem;
+	}
+
+	.academy-ranking-load-more {
+		color: #4f5b70;
+	}
+
+	.academy-ranking-load-more-row {
+		display: flex;
+		justify-content: center;
+	}
+
+	.academy-ranking-load-more:hover,
+	.academy-ranking-load-more:focus {
 		color: var(--tsbs-theme-accent);
 	}
 
@@ -1330,6 +1385,44 @@ h1,
 
 		.academy-note-card p:not(.academy-note-card__meta) {
 			color: #9aa3b2;
+		}
+
+		.academy-ranking-page__content {
+			width: min(100%, 63rem);
+			gap: 2.75rem;
+			padding-top: 3rem;
+			padding-bottom: 5rem;
+		}
+
+		.academy-ranking-header {
+			display: none;
+		}
+
+		.academy-ranking-intro {
+			max-width: none;
+			width: 100%;
+			font-size: 1.125rem;
+			text-align: left;
+		}
+
+		.academy-ranking-page .academy-ranking-load-more-row {
+			justify-content: flex-end;
+			width: 100%;
+		}
+
+		.academy-ranking-page .academy-ranking-load-more {
+			margin-right: 0;
+			margin-left: 0;
+		}
+
+		.academy-ranking-page .academy-section {
+			gap: 1.5rem;
+		}
+
+		.academy-ranking-page .academy-section h2 {
+			color: #4f5b70;
+			font-size: 1.625rem;
+			font-weight: 700;
 		}
 	}
 
