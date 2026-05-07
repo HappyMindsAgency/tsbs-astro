@@ -5,12 +5,23 @@ import DomandaModal from '../../../../components/PopupComponents/DomandaModal.as
 
 export const prerender = false;
 
+interface ReadingChallengeBook {
+	title: string;
+	checked?: boolean;
+}
+
+interface ReadingChallengeCategory {
+	id: string;
+	label: string;
+	books?: ReadingChallengeBook[];
+}
+
 const { lang = 'it' } = Astro.props;
 const { slugMis } = Astro.params;
 const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
 const missionPath = `/atrio/missioni/${slugMis ?? ''}/`;
 
-const categories = [
+const categories: ReadingChallengeCategory[] = [
 	{
 		id: 'giallo',
 		label: 'Giallo',
@@ -90,7 +101,7 @@ const categories = [
 									<div class="accordion-body reading-challenge__book-list">
 										{category.books.map((book) => (
 											<label class="reading-challenge__book">
-												<input type="checkbox" checked={book.checked} />
+												<input type="checkbox" checked={book.checked ?? false} />
 												<span>{book.title}</span>
 											</label>
 										))}
@@ -119,7 +130,7 @@ const categories = [
 
 <script>
 	const setupReadingChallengeModal = () => {
-		document.querySelectorAll('.reading-challenge__book input[type="checkbox"]').forEach((input) => {
+		document.querySelectorAll<HTMLInputElement>('.reading-challenge__book input[type="checkbox"]').forEach((input) => {
 			if (input.dataset.readingChallengeQuestionReady === 'true') return;
 			input.dataset.readingChallengeQuestionReady = 'true';
 

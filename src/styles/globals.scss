@@ -1666,16 +1666,36 @@ h1,
 			width: auto;
 			min-width: 13.5rem;
 		}
+
+		.mission-proof-question__cta.choice-question__cta {
+			justify-self: center;
+			width: min(100%, calc(17.875rem - 1rem));
+			min-width: 0;
+		}
 	}
 
 	@media (min-width: 992px) {
+		.choice-question__form {
+			width: min(100%, 42rem);
+			justify-self: center;
+		}
+
 		.choice-question__answers {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-columns: minmax(0, 1fr);
 			gap: 1.25rem;
 		}
 
 		.choice-question__answer {
 			width: 100%;
+		}
+
+		.choice-question__fieldset legend {
+			width: 100%;
+		}
+
+		.mission-proof-question__cta.choice-question__cta {
+			justify-self: center;
+			width: calc(100% - 1.5rem);
 		}
 	}
 
