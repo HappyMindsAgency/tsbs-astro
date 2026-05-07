@@ -1,0 +1,429 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Nav from '../../../components/Nav.astro';
+
+const { lang = 'it' } = Astro.props;
+
+const notes = [
+	{
+		meta: 'OGGI • PERSONALE',
+		title: 'Etiam vehicula dui ante',
+		text: 'onec et dui nec augue semper placerat. Vestibulum ante ipsum primis in faucibus luctus...',
+	},
+	{
+		meta: 'IERI • ACCADEMIA',
+		title: 'Lorem ipsum dolor sit amet',
+		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+	},
+	{
+		meta: 'IERI • ACCADEMIA',
+		title: 'Lorem ipsum dolor sit amet',
+		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+	},
+];
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell desk-page">
+		<header class="desk-hero" aria-labelledby="desk-title">
+			<div class="desk-hero__panel">
+				<button class="desk-menu-button" type="button" aria-label="Menu">
+					<i class="bi bi-list" aria-hidden="true"></i>
+				</button>
+
+				<p class="desk-academy-pill">Accademia Astraria</p>
+
+				<div class="desk-avatar" aria-hidden="true">
+					<i class="bi bi-image"></i>
+				</div>
+
+				<h1 id="desk-title">Username Adepto</h1>
+				<p class="desk-rank">Adepto - n° trofei</p>
+				<p class="desk-code">
+					<i class="bi bi-person-vcard" aria-hidden="true"></i>
+					<span>000000</span>
+				</p>
+			</div>
+		</header>
+
+		<div class="container-xl tsbs-app-container desk-content">
+			<section class="desk-section" aria-labelledby="recap-title">
+				<h2 id="recap-title" class="tsbs-section-title">Recap</h2>
+
+				<div class="desk-recap-grid">
+					<a class="desk-recap-card" href="/atrio/scrivania/trofei/">
+						<i class="bi bi-award" aria-hidden="true"></i>
+						<span>Trofei</span>
+					</a>
+					<a class="desk-recap-card" href="/atrio/scrivania/livello/">
+						<i class="bi bi-bar-chart" aria-hidden="true"></i>
+						<span>Livello</span>
+					</a>
+					<a class="desk-recap-card" href="/atrio/scrivania/grimorio/">
+						<i class="bi bi-book" aria-hidden="true"></i>
+						<span>Grimorio</span>
+					</a>
+				</div>
+			</section>
+
+			<section class="tsbs-note-pad" aria-labelledby="note-title">
+				<a class="tsbs-note-pad__action" href="/atrio/scrivania/grimorio/" aria-label="Aggiungi nota">
+					<i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+				</a>
+				<h2 id="note-title">Titolo della nota</h2>
+				<p>Scrivi qui le tue annotazioni da Adepto</p>
+				<div class="tsbs-note-pad__lines" aria-hidden="true">
+					<span></span>
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</section>
+
+			<section class="desk-section desk-latest" aria-labelledby="latest-title">
+				<h2 id="latest-title" class="tsbs-section-title">Ultime note</h2>
+
+				<div class="desk-note-list">
+					{notes.map((note) => (
+						<article class="desk-note-card">
+							<div class="desk-note-card__copy">
+								<p class="desk-note-card__meta">{note.meta}</p>
+								<h3>{note.title}</h3>
+								<p>{note.text}</p>
+							</div>
+							<div class="desk-note-card__actions" aria-hidden="true">
+								<i class="bi bi-share"></i>
+								<i class="bi bi-chevron-right"></i>
+							</div>
+						</article>
+					))}
+				</div>
+
+				<button class="missions-load-more" type="button">
+					<span>Carica altro</span>
+					<i class="bi bi-arrow-right" aria-hidden="true"></i>
+				</button>
+			</section>
+		</div>
+	</main>
+</Layout>
+
+<style lang="scss">
+	.desk-page {
+		--desk-blue: #2a3369;
+
+		min-height: 100vh;
+		background-color: var(--tsbs-color-surface);
+	}
+
+	.desk-hero {
+		padding: 2rem 0.9375rem 1.75rem;
+	}
+
+	.desk-hero__panel {
+		position: relative;
+		display: grid;
+		justify-items: center;
+		width: 100%;
+		min-height: 16.75rem;
+		padding: 0.625rem 1.25rem 1.375rem;
+		margin: 0 auto;
+		color: #ffffff;
+		text-align: center;
+		background: var(--desk-blue);
+		border: 0;
+		border-radius: 0.875rem;
+	}
+
+	.desk-menu-button {
+		position: absolute;
+		top: 0.625rem;
+		right: 0.625rem;
+		display: grid;
+		place-items: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		padding: 0;
+		color: var(--desk-blue);
+		background: #ffffff;
+		border: 0;
+		border-radius: 50%;
+	}
+
+	.desk-menu-button .bi {
+		font-size: 1rem;
+		line-height: 1;
+	}
+
+	.desk-academy-pill {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 1.5625rem;
+		padding: 0.125rem 1rem;
+		margin: 0;
+		color: var(--desk-blue);
+		font-size: 0.875rem;
+		font-weight: 500;
+		line-height: 1;
+		background: #ffffff;
+		border: 1px solid rgba(42, 51, 105, 0.18);
+		border-radius: 999rem;
+	}
+
+	.desk-avatar {
+		display: grid;
+		place-items: center;
+		width: 5.875rem;
+		height: 5.875rem;
+		margin-top: 0.625rem;
+		color: #727272;
+		background: #f5f5f5;
+		border-radius: 50%;
+	}
+
+	.desk-avatar .bi {
+		font-size: 2.25rem;
+	}
+
+	.desk-hero h1 {
+		margin: 0.5rem 0 0;
+		color: #ffffff;
+		font-size: 1.875rem;
+		font-weight: 800;
+		line-height: 1.08;
+	}
+
+	.desk-rank,
+	.desk-code {
+		margin: 0;
+		color: #ffffff;
+	}
+
+	.desk-rank {
+		margin-top: 0.25rem;
+		font-size: 1rem;
+		font-style: italic;
+		font-weight: 700;
+		line-height: 1.2;
+	}
+
+	.desk-code {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		margin-top: 0.5rem;
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.desk-code .bi {
+		font-size: 1.375rem;
+		line-height: 1;
+	}
+
+	.desk-content {
+		display: grid;
+		gap: 2.5rem;
+		padding-top: 0.75rem;
+	}
+
+	.desk-section {
+		display: grid;
+		gap: 0.875rem;
+	}
+
+	.desk-section h2 {
+		margin: 0;
+		color: #1d1715;
+		font-size: 1.625rem;
+		font-weight: 800;
+		line-height: 1.1;
+	}
+
+	.desk-recap-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.625rem;
+	}
+
+	.desk-recap-card {
+		display: grid;
+		place-items: center;
+		align-content: center;
+		gap: 0.375rem;
+		aspect-ratio: 1.05;
+		min-width: 0;
+		color: #ffffff;
+		text-align: center;
+		text-decoration: none;
+		background: var(--desk-blue);
+		border-radius: 0.5rem;
+	}
+
+	.desk-recap-card .bi {
+		font-size: clamp(2rem, 10vw, 3.375rem);
+		line-height: 1;
+	}
+
+	.desk-recap-card span {
+		color: #ffffff;
+		font-size: 0.875rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.desk-latest {
+		gap: 1.25rem;
+	}
+
+	.desk-note-list {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.desk-note-card {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 1rem;
+		min-height: 9.375rem;
+		padding: 1.125rem 1.25rem;
+		background: #f5f5f5;
+		border: 1px solid #8d8f95;
+		border-radius: 0.875rem;
+	}
+
+	.desk-note-card__copy {
+		display: grid;
+		align-content: start;
+		gap: 0.75rem;
+		min-width: 0;
+	}
+
+	.desk-note-card__meta {
+		margin: 0;
+		color: #666666;
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0.04em;
+		line-height: 1;
+		text-transform: uppercase;
+	}
+
+	.desk-note-card h3 {
+		margin: 0;
+		color: var(--desk-blue);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1.2;
+	}
+
+	.desk-note-card p:not(.desk-note-card__meta) {
+		margin: 0;
+		color: #8f98aa;
+		font-size: 0.875rem;
+		line-height: 1.55;
+	}
+
+	.desk-note-card__actions {
+		display: flex;
+		align-items: start;
+		gap: 0.875rem;
+		color: #546176;
+		padding-top: 0.125rem;
+	}
+
+	.desk-note-card__actions .bi {
+		font-size: 0.875rem;
+		line-height: 1;
+	}
+
+	@media (min-width: 768px) {
+		.desk-hero__panel {
+			width: 100%;
+		}
+
+		.desk-recap-grid {
+			gap: 1rem;
+		}
+
+		.desk-recap-card {
+			aspect-ratio: 2.05;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.desk-hero {
+			padding: 3rem 3rem 3.25rem;
+			background: var(--desk-blue);
+		}
+
+		.desk-hero__panel {
+			width: min(100%, 48rem);
+			min-height: 16.25rem;
+			padding: 0;
+			background: transparent;
+			border: 0;
+			border-radius: 0;
+			box-shadow: none;
+		}
+
+		.desk-menu-button {
+			display: none;
+		}
+
+		.desk-avatar {
+			order: -1;
+			width: 6rem;
+			height: 6rem;
+			margin-top: 0;
+			margin-bottom: 1rem;
+			color: #ffffff;
+			background: rgba(245, 245, 245, 0.32);
+		}
+
+		.desk-avatar .bi {
+			font-size: 2.625rem;
+		}
+
+		.desk-academy-pill {
+			min-height: 1.875rem;
+			margin-bottom: 0.875rem;
+			color: var(--desk-blue);
+		}
+
+		.desk-hero h1 {
+			margin-top: 0;
+			font-size: 2.375rem;
+		}
+
+		.desk-content {
+			max-width: 64rem;
+			gap: 2.5rem;
+			padding-top: 2.75rem;
+			padding-bottom: 3rem;
+		}
+
+		.desk-section h2 {
+			color: #4f5b70;
+			font-size: 1.625rem;
+		}
+
+		.desk-recap-grid {
+			gap: 1rem;
+		}
+
+		.desk-recap-card {
+			color: #ffffff;
+			background: var(--desk-blue);
+		}
+
+		.desk-note-card {
+			min-height: 8.75rem;
+			padding: 1.5rem 1.625rem;
+		}
+	}
+</style>

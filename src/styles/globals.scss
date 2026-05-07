@@ -652,46 +652,56 @@ h1,
 			display: none;
 		}
 
-		.dashboard-note {
+		.tsbs-note-pad {
 			position: relative;
 			display: grid;
-			gap: 1.375rem;
-			min-height: 14.25rem;
+			gap: 1.5rem;
+			min-height: 18.5rem;
 			padding: 1.5rem 1.25rem;
-			background: transparent;
+			color: var(--tsbs-theme-accent);
+			background: #f1e3b8;
+			border: 1px solid #8d8f95;
 			border-radius: 0.875rem;
 		}
 
-		.dashboard-note__action {
+		.tsbs-note-pad__action {
 			position: absolute;
 			top: 1.25rem;
 			right: 1.25rem;
+			color: #546176;
 			text-decoration: none;
 		}
 
-		.dashboard-note__title {
+		.tsbs-note-pad__action .bi {
+			font-size: 1.25rem;
+			line-height: 1;
+		}
+
+		.tsbs-note-pad h2 {
 			margin: 0;
-			color: var(--dashboard-soft);
+			color: var(--tsbs-theme-accent);
 			font-family: var(--tsbs-font-body);
 			font-size: 1.125rem;
-			font-weight: 600;
+			font-weight: 800;
 			line-height: 1.2;
 		}
 
-		.dashboard-note p {
-			color: var(--dashboard-soft);
-			font-size: 0.9375rem;
+		.tsbs-note-pad p {
+			margin: 0;
+			color: var(--tsbs-theme-accent);
+			font-size: 0.875rem;
 			font-style: italic;
+			line-height: 1.4;
 		}
 
-		.dashboard-note__lines {
+		.tsbs-note-pad__lines {
 			display: grid;
-			gap: 1.25rem;
+			gap: 1.375rem;
 			margin-top: auto;
 		}
 
-		.dashboard-note__lines span {
-			border-top: 1px dashed color-mix(in srgb, var(--tsbs-theme-accent) 22%, var(--tsbs-color-white));
+		.tsbs-note-pad__lines span {
+			border-top: 1px dashed rgba(84, 97, 118, 0.28);
 		}
 
 		.dashboard-events {
@@ -839,10 +849,13 @@ h1,
 				display: none;
 			}
 
-			.dashboard-note {
-				min-height: 17.5rem;
-				padding: 1.75rem;
-				border-style: dashed;
+			.tsbs-note-pad {
+				min-height: 16.5rem;
+				padding: 2.25rem 2rem 2rem;
+			}
+
+			.tsbs-note-pad__lines {
+				gap: 1rem;
 			}
 
 			.dashboard-event-grid {
