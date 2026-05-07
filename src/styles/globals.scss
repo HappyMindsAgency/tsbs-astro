@@ -69,6 +69,7 @@
   --tsbs-theme-cta-active-bg: var(--tsbs-global-cta-var1-active-bg);
   --tsbs-theme-cta-active-border: var(--tsbs-global-cta-var1-active-border);
   --tsbs-theme-cta-active-color: var(--tsbs-global-cta-var1-active-color);
+  --tsbs-theme-cta-soft-hover-bg: color-mix(in srgb, var(--tsbs-theme-cta-active-bg) 88%, #ffffff);
   --tsbs-theme-cta-focus-bg: var(--tsbs-global-cta-var1-focus-bg);
   --tsbs-theme-cta-focus-border: var(--tsbs-global-cta-var1-focus-border);
   --tsbs-theme-cta-focus-color: var(--tsbs-global-cta-var1-focus-color);
@@ -208,6 +209,7 @@ h1,
 .global-cta-var1,
 .global-cta-var2,
 .tsbs-cta-primary,
+.tsbs-cta-primary-soft,
 .tsbs-cta {
   border-radius: var(--tsbs-radius-sm);
   font-family: var(--tsbs-font-cta);
@@ -228,6 +230,21 @@ h1,
   --bs-btn-active-color: var(--tsbs-theme-cta-active-color);
   --bs-btn-focus-bg: var(--tsbs-theme-cta-focus-bg);
   --bs-btn-focus-border-color: var(--tsbs-theme-cta-focus-border);
+  --bs-btn-focus-color: var(--tsbs-theme-cta-focus-color);
+}
+
+.tsbs-cta-primary-soft {
+  --bs-btn-bg: var(--tsbs-theme-cta-active-bg);
+  --bs-btn-border-color: transparent;
+  --bs-btn-color: var(--tsbs-theme-cta-active-color);
+  --bs-btn-hover-bg: var(--tsbs-theme-cta-soft-hover-bg);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-hover-color: var(--tsbs-theme-cta-active-color);
+  --bs-btn-active-bg: var(--tsbs-theme-cta-focus-bg);
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-active-color: var(--tsbs-theme-cta-focus-color);
+  --bs-btn-focus-bg: var(--tsbs-theme-cta-focus-bg);
+  --bs-btn-focus-border-color: transparent;
   --bs-btn-focus-color: var(--tsbs-theme-cta-focus-color);
 }
 
@@ -267,6 +284,12 @@ h1,
   color: var(--tsbs-theme-cta-focus-color);
   background-color: var(--tsbs-theme-cta-focus-bg);
   border-color: var(--tsbs-theme-cta-focus-border);
+}
+
+.tsbs-cta-primary-soft:focus-visible {
+  color: var(--tsbs-theme-cta-focus-color);
+  background-color: var(--tsbs-theme-cta-focus-bg);
+  border-color: transparent;
 }
 
 .global-cta-var1:focus-visible {
@@ -354,6 +377,7 @@ h1,
   --tsbs-theme-cta-active-bg: #e2eaaa;
   --tsbs-theme-cta-active-border: #e2eaaa;
   --tsbs-theme-cta-active-color: var(--tsbs-color-heading);
+  --tsbs-theme-cta-soft-hover-bg: #edf2c8;
   --tsbs-theme-cta-focus-bg: #e2eaaa;
   --tsbs-theme-cta-focus-border: #7b872e;
   --tsbs-theme-cta-focus-color: var(--tsbs-color-heading);
@@ -368,6 +392,7 @@ h1,
   --tsbs-theme-cta-active-bg: #f5e5b7;
   --tsbs-theme-cta-active-border: #f5e5b7;
   --tsbs-theme-cta-active-color: var(--tsbs-color-heading);
+  --tsbs-theme-cta-soft-hover-bg: #fbf0d2;
   --tsbs-theme-cta-focus-bg: #f5e5b7;
   --tsbs-theme-cta-focus-border: #d7a839;
   --tsbs-theme-cta-focus-color: var(--tsbs-color-heading);
@@ -382,6 +407,7 @@ h1,
   --tsbs-theme-cta-active-bg: #e2b8ba;
   --tsbs-theme-cta-active-border: #e2b8ba;
   --tsbs-theme-cta-active-color: var(--tsbs-color-heading);
+  --tsbs-theme-cta-soft-hover-bg: #edcfd0;
   --tsbs-theme-cta-focus-bg: #e2b8ba;
   --tsbs-theme-cta-focus-border: #72191c;
   --tsbs-theme-cta-focus-color: var(--tsbs-color-heading);
@@ -396,6 +422,7 @@ h1,
   --tsbs-theme-cta-active-bg: #bdcde8;
   --tsbs-theme-cta-active-border: #bdcde8;
   --tsbs-theme-cta-active-color: var(--tsbs-color-heading);
+  --tsbs-theme-cta-soft-hover-bg: #d6e1f2;
   --tsbs-theme-cta-focus-bg: #bdcde8;
   --tsbs-theme-cta-focus-border: #2a3369;
   --tsbs-theme-cta-focus-color: var(--tsbs-color-heading);
