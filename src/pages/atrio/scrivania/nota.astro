@@ -1,6 +1,8 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import NotaModal from '../../../components/PopupComponents/NotaModal.astro';
+import NotaToast from '../../../components/toastComponents/NotaToast.astro';
 
 const { lang = 'it' } = Astro.props;
 ---
@@ -69,6 +71,9 @@ const { lang = 'it' } = Astro.props;
 		</div>
 	</main>
 
+	<NotaModal renderHidden />
+	<NotaToast renderHidden />
+
 	<script>
 		const storageKey = 'tsbs-grimorio-note-draft';
 		const titleInput = document.querySelector<HTMLInputElement>('[data-note-title]');
@@ -126,7 +131,12 @@ const { lang = 'it' } = Astro.props;
 		});
 
 		submitButton?.addEventListener('click', () => {
+			document.dispatchEvent(new CustomEvent('tsbs:nota-modal-open'));
+		});
+
+		document.addEventListener('tsbs:nota-submit-confirm', () => {
 			saveDraft('submitted');
+			document.dispatchEvent(new CustomEvent('tsbs:nota-toast-open'));
 		});
 
 		deleteButton?.addEventListener('click', () => {

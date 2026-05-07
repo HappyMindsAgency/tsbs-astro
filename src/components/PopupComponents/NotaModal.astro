@@ -1,0 +1,195 @@
+---
+interface Props {
+	isOpen?: boolean;
+	renderHidden?: boolean;
+}
+
+const { isOpen = false, renderHidden = false } = Astro.props as Props;
+const shouldRender = isOpen || renderHidden;
+---
+
+{shouldRender && (
+	<div
+		class="nota-modal"
+		data-nota-modal
+		hidden={!isOpen}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="nota-modal-title"
+		aria-describedby="nota-modal-copy"
+	>
+		<div class="nota-modal__backdrop" data-nota-modal-cancel></div>
+
+		<section class="nota-modal__panel">
+			<div class="nota-modal__content">
+				<h2 id="nota-modal-title">Vuoi inviare la tua nota al prefetto?</h2>
+				<p id="nota-modal-copy">Una volta che la tua nota sarà inoltrata non potrai più modificarla, solo eliminarla.</p>
+			</div>
+
+			<div class="nota-modal__actions">
+				<button class="btn tsbs-cta-primary-soft nota-modal__button nota-modal__button--cancel" type="button" data-nota-modal-cancel>
+					Annulla
+				</button>
+				<button class="btn tsbs-cta-primary nota-modal__button nota-modal__button--confirm" type="button" data-nota-modal-confirm>
+					<span>Invia</span>
+					<i class="bi bi-send" aria-hidden="true"></i>
+				</button>
+			</div>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupNotaModal = () => {
+		document.querySelectorAll<HTMLElement>('[data-nota-modal]').forEach((modal) => {
+			if (modal.dataset.notaModalReady === 'true') return;
+			modal.dataset.notaModalReady = 'true';
+
+			const cancelControls = modal.querySelectorAll<HTMLElement>('[data-nota-modal-cancel]');
+			const cancelButton = modal.querySelector<HTMLButtonElement>('.nota-modal__button--cancel');
+			const confirmButton = modal.querySelector<HTMLButtonElement>('[data-nota-modal-confirm]');
+			let previousFocus: HTMLElement | null = null;
+
+			const closeModal = () => {
+				modal.hidden = true;
+
+				if (previousFocus) {
+					previousFocus.focus();
+				}
+			};
+
+			const openModal = () => {
+				previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+				modal.hidden = false;
+				cancelButton?.focus();
+			};
+
+			document.addEventListener('tsbs:nota-modal-open', openModal);
+
+			cancelControls.forEach((control) => {
+				control.addEventListener('click', closeModal);
+			});
+
+			confirmButton?.addEventListener('click', () => {
+				closeModal();
+				document.dispatchEvent(new CustomEvent('tsbs:nota-submit-confirm'));
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !modal.hidden) {
+					closeModal();
+				}
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupNotaModal);
+	setupNotaModal();
+</script>
+
+<style lang="scss">
+	.nota-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 1200;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		padding: 1.875rem;
+	}
+
+	.nota-modal[hidden] {
+		display: none;
+	}
+
+	.nota-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-white) 68%, transparent);
+		backdrop-filter: grayscale(0.65) blur(0.0625rem);
+	}
+
+	.nota-modal__panel {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		gap: 1.5rem;
+		width: min(100%, 22.625rem);
+		padding: 2rem 1rem 1rem;
+		background: var(--tsbs-color-white);
+		border-radius: 0.875rem;
+		box-shadow: 0 1.25rem 3rem rgba(84, 97, 118, 0.16);
+	}
+
+	.nota-modal__content {
+		display: grid;
+		gap: 0.75rem;
+		padding: 0 1rem;
+	}
+
+	.nota-modal__content h2,
+	.nota-modal__content p {
+		margin: 0;
+		font-family: var(--tsbs-font-body);
+	}
+
+	.nota-modal__content h2 {
+		color: var(--tsbs-theme-accent);
+		font-size: 1.5rem;
+		font-weight: 800;
+		line-height: 1.18;
+	}
+
+	.nota-modal__content p {
+		color: var(--tsbs-theme-body);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.35;
+	}
+
+	.nota-modal__actions {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.nota-modal__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.625rem;
+		min-height: 3rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.25rem;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	.nota-modal__button--confirm .bi {
+		font-size: 1.5rem;
+		line-height: 1;
+	}
+
+	@media (max-width: 360px) {
+		.nota-modal {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+
+		.nota-modal__panel {
+			padding-top: 1.5rem;
+		}
+
+		.nota-modal__actions {
+			gap: 0.75rem;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.nota-modal {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.875rem);
+		}
+	}
+</style>
