@@ -629,6 +629,18 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 
 <style lang="scss">
 	.trophies-page {
+		--trophies-header-height: 4.625rem;
+		--trophies-content-top: 2.125rem;
+		--trophies-toolbar-height: 3.75rem;
+		--trophies-workspace-gap: 1.75rem;
+		--trophies-board-max-width: 23.125rem;
+		--trophies-board-bottom-space: calc(var(--tsbs-mobile-nav-height, 0rem) + 1.5rem);
+		--trophies-board-height-space: calc(
+			100dvh - var(--trophies-header-height) - var(--trophies-content-top) - var(--trophies-toolbar-height) -
+				var(--trophies-workspace-gap) - var(--trophies-board-bottom-space)
+		);
+		--trophies-board-size: min(100%, var(--trophies-board-max-width), calc(var(--trophies-board-height-space) * 5 / 8));
+
 		min-height: 100vh;
 		background: var(--tsbs-color-surface);
 	}
@@ -636,7 +648,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 	.trophies-header {
 		display: grid;
 		place-items: center;
-		min-height: 4.625rem;
+		min-height: var(--trophies-header-height);
 		padding: 1.125rem 1.875rem;
 		background: var(--tsbs-theme-accent);
 	}
@@ -650,7 +662,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 	}
 
 	.trophies-content {
-		padding-top: 2.125rem;
+		padding-top: var(--trophies-content-top);
 	}
 
 	.trophy-room {
@@ -662,7 +674,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 	.trophy-workspace {
 		display: grid;
 		justify-items: center;
-		gap: 1.75rem;
+		gap: var(--trophies-workspace-gap);
 		min-width: 0;
 	}
 
@@ -670,8 +682,8 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		width: min(100%, 23.125rem);
-		min-height: 3.75rem;
+		width: var(--trophies-board-size);
+		min-height: var(--trophies-toolbar-height);
 		padding: 0.75rem 0.625rem;
 		background: var(--tsbs-theme-cta-soft-hover-bg);
 		border-radius: 0.5rem;
@@ -717,7 +729,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 
 		position: relative;
 		display: grid;
-		width: min(100%, 23.125rem);
+		width: var(--trophies-board-size);
 		aspect-ratio: 5 / 8;
 		gap: var(--trophy-gap);
 		touch-action: none;
@@ -971,25 +983,27 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 	}
 
 	@media (min-width: 768px) {
-		.trophy-room__toolbar,
-		.trophy-board {
-			width: min(100%, 27rem);
+		.trophies-page {
+			--trophies-board-max-width: 27rem;
 		}
 	}
 
 	@media (min-width: 992px) {
+		.trophies-page {
+			--trophies-header-height: 5.625rem;
+			--trophies-content-top: 3rem;
+			--trophies-toolbar-height: 2rem;
+			--trophies-board-max-width: 38rem;
+			--trophies-board-bottom-space: 1rem;
+		}
+
 		.trophies-header {
 			place-items: center start;
-			min-height: 5.625rem;
 			padding: 0 3rem;
 		}
 
 		.trophies-header h1 {
 			font-size: 2.125rem;
-		}
-
-		.trophies-content {
-			padding-top: 3rem;
 		}
 
 		.trophy-room {
@@ -1052,14 +1066,8 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 			height: 6.5rem;
 		}
 
-		.trophy-room__toolbar,
-		.trophy-board {
-			width: min(100%, 38rem);
-		}
-
 		.trophy-room__toolbar {
 			justify-content: flex-end;
-			min-height: auto;
 			padding: 0;
 			background: transparent;
 			border-radius: 0;
