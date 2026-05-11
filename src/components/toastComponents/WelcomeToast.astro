@@ -129,4 +129,10 @@ const { isOpen = false, theme = '' } = Astro.props;
 			font-size: 6.75rem;
 		}
 	}
+
+	@media (min-width: 992px) {
+		.welcome-toast {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.75rem);
+		}
+	}
 </style>
