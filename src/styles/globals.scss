@@ -2574,6 +2574,11 @@ h1,
 		border-radius: 0.5rem;
 	}
 
+	.desk-recap-card:hover,
+	.desk-recap-card:focus-visible {
+		color: #ffffff;
+	}
+
 	.desk-recap-card .bi {
 		font-size: clamp(2rem, 10vw, 3.375rem);
 		line-height: 1;
@@ -2849,4 +2854,3 @@ h1,
 			min-height: calc(100vh - 5.625rem - 7rem);
 		}
 	}
-
