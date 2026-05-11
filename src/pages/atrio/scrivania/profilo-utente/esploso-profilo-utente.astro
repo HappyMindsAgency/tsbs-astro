@@ -1,0 +1,225 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import Nav from '../../../../components/Nav.astro';
+import trofeoBandiera from '../../../../assets/trofeo-bandiera.png';
+import trofeoCalice from '../../../../assets/trofeo-calice.png';
+import trofeoCandela from '../../../../assets/trofeo-candela.png';
+import trofeoChiave from '../../../../assets/trofeo-chiave.png';
+import trofeoMedaglia from '../../../../assets/trofeo-medaglia.png';
+import trofeoScudo from '../../../../assets/trofeo-scudo.png';
+import trofeoStendardo from '../../../../assets/trofeo-stendardo.png';
+import trofeoTartaruga from '../../../../assets/trofeo-tartaruga.png';
+
+const { lang = 'it' } = Astro.props;
+
+const board = {
+	rows: 8,
+	cols: 5,
+};
+
+const trophies = [
+	{ id: 'tartaruga-1', label: 'Tartaruga', src: trofeoTartaruga.src, row: 1, col: 1, width: 1, height: 1 },
+	{ id: 'chiave-1', label: 'Chiave', src: trofeoChiave.src, row: 1, col: 2, width: 2, height: 1 },
+	{ id: 'stendardo-1', label: 'Stendardo', src: trofeoStendardo.src, row: 1, col: 4, width: 2, height: 2 },
+	{ id: 'scudo-1', label: 'Scudo', src: trofeoScudo.src, row: 2, col: 1, width: 1, height: 1 },
+	{ id: 'calice-1', label: 'Calice', src: trofeoCalice.src, row: 2, col: 2, width: 1, height: 2 },
+	{ id: 'tartaruga-2', label: 'Tartaruga', src: trofeoTartaruga.src, row: 2, col: 3, width: 1, height: 1 },
+	{ id: 'medaglia-1', label: 'Medaglia', src: trofeoMedaglia.src, row: 3, col: 1, width: 1, height: 2 },
+	{ id: 'bandiera-1', label: 'Bandiera', src: trofeoBandiera.src, row: 3, col: 3, width: 2, height: 3 },
+	{ id: 'candela-1', label: 'Candela', src: trofeoCandela.src, row: 4, col: 2, width: 2, height: 3 },
+	{ id: 'medaglia-2', label: 'Medaglia', src: trofeoMedaglia.src, row: 4, col: 5, width: 1, height: 2 },
+];
+
+const cells = Array.from({ length: board.rows * board.cols });
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell profile-exploded-page">
+		<header class="desk-hero profile-exploded-hero" aria-labelledby="profile-exploded-title">
+			<div class="desk-hero__panel profile-exploded-hero__panel">
+				<button class="profile-favorite-button" type="button" aria-label="Aggiungi ai preferiti">
+					<i class="bi bi-heart" aria-hidden="true"></i>
+				</button>
+
+				<p class="desk-academy-pill">Nome Accademia</p>
+
+				<div class="desk-avatar" aria-hidden="true">
+					<i class="bi bi-image"></i>
+				</div>
+
+				<h1 id="profile-exploded-title">Nome Utente</h1>
+				<p class="desk-rank">Adepto - n° trofei</p>
+			</div>
+		</header>
+
+		<div class="container-xl tsbs-app-container profile-exploded-content">
+			<section
+				class="profile-trophy-board"
+				aria-label="Trofei impostati dall'utente"
+				style={`--profile-trophy-rows: ${board.rows}; --profile-trophy-cols: ${board.cols};`}
+			>
+				<div class="profile-trophy-board__grid" aria-hidden="true">
+					{cells.map(() => <span></span>)}
+				</div>
+
+				<div class="profile-trophy-board__pieces">
+					{trophies.map((trophy) => (
+						<article
+							class="profile-trophy-piece"
+							aria-label={`Trofeo ${trophy.label}`}
+							style={`--piece-row: ${trophy.row}; --piece-col: ${trophy.col}; --piece-width: ${trophy.width}; --piece-height: ${trophy.height};`}
+						>
+							<img src={trophy.src} alt="" loading="lazy" draggable="false" />
+						</article>
+					))}
+				</div>
+			</section>
+		</div>
+	</main>
+</Layout>
+
+<style lang="scss">
+	.profile-exploded-page {
+		--desk-accent: var(--tsbs-theme-accent);
+		--profile-board-max-width: 23.125rem;
+		--profile-board-size: min(100%, var(--profile-board-max-width));
+
+		min-height: 100vh;
+		padding-bottom: calc(var(--tsbs-mobile-nav-height) + 1.75rem);
+		background: var(--tsbs-color-white);
+	}
+
+	.profile-exploded-hero {
+		padding-bottom: 2rem;
+	}
+
+	.profile-exploded-hero .desk-avatar {
+		color: #ffffff;
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 58%, #ffffff);
+	}
+
+	.profile-favorite-button {
+		position: absolute;
+		top: 0.625rem;
+		right: 0.625rem;
+		display: grid;
+		place-items: center;
+		width: 1.875rem;
+		height: 1.875rem;
+		padding: 0;
+		color: var(--tsbs-theme-accent);
+		background: #ffffff;
+		border: 0;
+		border-radius: 50%;
+	}
+
+	.profile-favorite-button .bi {
+		font-size: 1.25rem;
+		line-height: 1;
+	}
+
+	.profile-exploded-content {
+		display: grid;
+		justify-items: center;
+		padding-top: 0.375rem;
+	}
+
+	.profile-trophy-board {
+		--profile-trophy-gap: 0.375rem;
+
+		position: relative;
+		display: grid;
+		width: var(--profile-board-size);
+		aspect-ratio: 5 / 8;
+		gap: var(--profile-trophy-gap);
+	}
+
+	.profile-trophy-board,
+	.profile-trophy-board__grid,
+	.profile-trophy-board__pieces {
+		grid-template-columns: repeat(var(--profile-trophy-cols), minmax(0, 1fr));
+		grid-template-rows: repeat(var(--profile-trophy-rows), minmax(0, 1fr));
+	}
+
+	.profile-trophy-board__grid,
+	.profile-trophy-board__pieces {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		gap: var(--profile-trophy-gap);
+		padding: 0.375rem;
+	}
+
+	.profile-trophy-board__grid {
+		background: #e9eef3;
+	}
+
+	.profile-trophy-board__grid span {
+		min-width: 0;
+		min-height: 0;
+		background: #ffffff;
+		border: 1px solid #eef1f4;
+	}
+
+	.profile-trophy-board__pieces {
+		pointer-events: none;
+	}
+
+	.profile-trophy-piece {
+		position: relative;
+		z-index: 1;
+		grid-row: var(--piece-row) / span var(--piece-height);
+		grid-column: var(--piece-col) / span var(--piece-width);
+		display: grid;
+		place-items: center;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+	}
+
+	.profile-trophy-piece img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		user-select: none;
+		-webkit-user-drag: none;
+	}
+
+	.profile-favorite-button:focus-visible {
+		outline: 3px solid color-mix(in srgb, var(--tsbs-theme-accent) 50%, #ffffff);
+		outline-offset: 3px;
+	}
+
+	@media (min-width: 768px) {
+		.profile-exploded-page {
+			--profile-board-max-width: 27rem;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.profile-exploded-page {
+			--profile-board-max-width: 38rem;
+			padding-bottom: 3rem;
+			background: var(--tsbs-color-surface);
+		}
+
+		.profile-exploded-hero {
+			padding-bottom: 3.25rem;
+		}
+
+		.profile-favorite-button {
+			top: 1.25rem;
+			right: 1.25rem;
+			width: 2.25rem;
+			height: 2.25rem;
+		}
+
+		.profile-exploded-content {
+			padding-top: 3rem;
+		}
+	}
+</style>

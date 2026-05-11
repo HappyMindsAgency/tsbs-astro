@@ -1301,6 +1301,46 @@ h1,
 		font-size: 1.625rem;
 	}
 
+	.profile-favorites-page .academy-ranking-card {
+		--profile-academy-accent: var(--tsbs-theme-accent);
+		color: #ffffff;
+		background: var(--profile-academy-accent);
+		border-color: color-mix(in srgb, var(--profile-academy-accent) 86%, #1d1715);
+	}
+
+	.profile-favorites-page .academy-ranking-card.is-academy-arcadia {
+		--profile-academy-accent: var(--tsbs-color-arcadia);
+	}
+
+	.profile-favorites-page .academy-ranking-card.is-academy-arborea {
+		--profile-academy-accent: var(--tsbs-color-arborea);
+	}
+
+	.profile-favorites-page .academy-ranking-card.is-academy-armonia {
+		--profile-academy-accent: var(--tsbs-color-armonia);
+	}
+
+	.profile-favorites-page .academy-ranking-card.is-academy-astraria {
+		--profile-academy-accent: var(--tsbs-color-astraria);
+	}
+
+	.profile-favorites-page .academy-ranking-card .academy-ranking-card__avatar {
+		color: var(--profile-academy-accent);
+		background: var(--tsbs-color-white);
+	}
+
+	.profile-favorites-page .academy-ranking-card .academy-ranking-card__position .bi {
+		color: currentColor;
+	}
+
+	.profile-favorites-page .academy-ranking-card .academy-ranking-card__points {
+		color: var(--tsbs-color-armonia);
+	}
+
+	.profile-favorites-page .academy-ranking-card.is-academy-armonia .academy-ranking-card__points {
+		color: #ffffff;
+	}
+
 	.academy-ranking-load-more {
 		color: #4f5b70;
 	}
