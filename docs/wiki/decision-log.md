@@ -363,6 +363,27 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-11 - Logica Trofei A Matrice Tetris
+
+Decisione:
+- implementare la griglia Trofei come griglia 5 colonne x 8 righe
+- rappresentare ogni trofeo con una matrice 2D in cui `1` indica una cella occupata e `0` una cella libera
+- validare collisioni e fuori griglia solo sulle celle occupate dalla matrice, non sul rettangolo completo dell'immagine
+- mantenere le celle `0` attraversabili e riempibili da altri trofei
+- posizionare la X di rimozione nella prima cella occupata del trofeo, in alto a sinistra
+
+Motivo:
+- ottenere un comportamento piu vicino a Tetris
+- permettere incastri naturali tra trofei con sagome non rettangolari
+- evitare sovrapposizioni logiche mantenendo una soluzione semplice, senza canvas o librerie aggiuntive
+
+Impatto:
+- `src/pages/atrio/scrivania/trofei.astro`
+- `docs/wiki/frontend-design.md`
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)

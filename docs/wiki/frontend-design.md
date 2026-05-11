@@ -258,6 +258,26 @@ Sfida lettura:
 - `DomandaModal.astro` vive in `src/components/PopupComponents/`
 - il design puo riusare il linguaggio visivo di `SceltaDomanda.astro`, adattandolo a un popup/modale compatto
 
+## Griglia Trofei
+
+La pagina Trofei usa una logica di posizionamento stile Tetris.
+
+Regole:
+- la griglia resta 5 colonne x 8 righe
+- ogni trofeo e descritto da una matrice 2D
+- `1` indica una cella occupata dal trofeo
+- `0` indica una cella libera, attraversabile e riempibile da altri trofei
+- collisioni e fuori griglia devono essere calcolati solo sulle celle `1`
+- l'immagine del trofeo resta una rappresentazione visiva, non la fonte della collisione
+- drag e drop devono fare snap alla griglia mantenendo il top-left reale del pezzo
+- la X di rimozione va nella prima cella occupata del trofeo, in alto a sinistra
+- su mobile la palette dei trofei disponibili deve restare sopra al menu di navigazione
+
+Note implementative:
+- evitare canvas, Konva o librerie nuove finche la matrice 2D copre il bisogno
+- mantenere la pagina Astro semplice, con logica locale e pronta a ricevere in futuro i trofei preferiti da Strapi
+- finche la logica finale non e definita, mantenere il commento su inserimento singolo o multiplo dei trofei
+
 ## Animazioni
 
 Libreria prevista:
