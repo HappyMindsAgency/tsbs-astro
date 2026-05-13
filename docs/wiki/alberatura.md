@@ -60,7 +60,7 @@ src/pages/
 │  ├─ trofei.astro
 │  ├─ grimorio/
 │  │  ├─ index.astro
-│  │  └─ [slugGrimorio].astro
+│  │  └─ [slugNota].astro
 │  ├─ utenti-preferiti/
 │  │  ├─ index.astro
 │  │  └─ esploso-profilo-utente.astro
@@ -241,6 +241,20 @@ Il campo `nickname` esiste in Strapi ed e unico, ma prima di implementare questa
 - logiche privacy
 - eventuale distinzione tra profilo personale e preview altri utenti
 
+### Grimorio E Note
+
+La sezione `atrio/scrivania/grimorio/` contiene l'elenco delle note personali e l'esploso della singola nota:
+
+```txt
+atrio/scrivania/grimorio/
+├─ index.astro
+└─ [slugNota].astro
+```
+
+La route dinamica `[slugNota].astro` ospita l'editor/esploso della nota. I blocchi di anteprima del Grimorio presenti in Atrio, Scrivania e Grimorio devono puntare alla nota specifica usando uno slug stabile.
+
+In fase provvisoria, prima del binding Strapi, e accettabile usare uno slug statico come `titolo-della-nota`. Quando arrivera Strapi, lo slug dovra arrivare dal record della nota/grimorio e non da hardcode sparsi.
+
 ### Biblioteca
 
 La sezione `biblioteca/` raccoglie contenuti istituzionali, archivio e ponte con Biblioteca Classense:
@@ -289,7 +303,7 @@ Route dinamiche gia coerenti con campi slug presenti in Strapi:
 accademia/[slugAccademia].astro
 biblioteca/eventi/[slugEvento].astro
 epistole/[slugEpistola].astro
-scrivania/grimorio/[slugGrimorio].astro
+scrivania/grimorio/[slugNota].astro
 ```
 
 Route dinamica da confermare:

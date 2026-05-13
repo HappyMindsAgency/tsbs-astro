@@ -17,6 +17,8 @@ const events = [
 	{ date: '18 APR', time: '17:00', title: 'Lorem ipsum dolor sit amet' },
 ];
 
+const featuredNoteHref = '/atrio/scrivania/grimorio/titolo-della-nota/';
+
 ---
 <Layout lang={lang}>
 	<Nav lang={lang} />
@@ -76,10 +78,10 @@ const events = [
 				<h2 id="grimoire-title" class="tsbs-section-title">Grimorio</h2>
 				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href="/atrio/scrivania/grimorio/">Vai al tuo grimorio →</a>
 			</div>
-			<article class="tsbs-note-pad" aria-label="Grimorio">
-				<a class="tsbs-note-pad__action" href="/atrio/scrivania/nota/" aria-label="Aggiungi nota">
+			<a class="tsbs-note-pad" href={featuredNoteHref} aria-label="Apri nota del Grimorio">
+				<span class="tsbs-note-pad__action" aria-hidden="true">
 					<i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
-				</a>
+				</span>
 				<h2>Titolo della nota</h2>
 				<p>Scrivi qui le tue annotazioni da Adepto</p>
 				<div class="tsbs-note-pad__lines" aria-hidden="true">
@@ -88,7 +90,7 @@ const events = [
 					<span></span>
 					<span></span>
 				</div>
-			</article>
+			</a>
 			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href="/atrio/scrivania/grimorio/">Vai al tuo grimorio →</a>
 		</section>
 

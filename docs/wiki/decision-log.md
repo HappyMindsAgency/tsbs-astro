@@ -44,6 +44,29 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-13 - Note Dentro Grimorio Con Route Dinamica
+
+Decisione:
+- spostare l'esploso/editor della nota sotto `src/pages/atrio/scrivania/grimorio/[slugNota].astro`
+- usare `src/pages/atrio/scrivania/grimorio/index.astro` come elenco/archivio note
+- far puntare i blocchi di anteprima nota di Atrio, Scrivania e Grimorio alla route della nota specifica
+- non introdurre componenti dedicati per la preview o per l'editor in questa fase
+
+Motivo:
+- trattare la nota come contenuto interno al Grimorio, non come sezione parallela alla Scrivania
+- preparare il binding Strapi con slug stabile per ogni nota
+- mantenere l'alberatura semplice e coerente con l'esperienza utente
+
+Impatto:
+- `docs/wiki/alberatura.md`
+- `src/pages/atrio/index.astro`
+- `src/pages/atrio/scrivania/index.astro`
+- `src/pages/atrio/scrivania/grimorio/index.astro`
+- `src/pages/atrio/scrivania/grimorio/[slugNota].astro`
+
+Stato:
+- approvata
+
 ## 2026-04-27 - Creazione Wiki Progetto E Guardrail AI
 
 Decisione:

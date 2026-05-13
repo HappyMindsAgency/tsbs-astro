@@ -1,6 +1,6 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
-import Nav from '../../../components/Nav.astro';
+import Layout from '../../../../layouts/Layout.astro';
+import Nav from '../../../../components/Nav.astro';
 
 const { lang = 'it' } = Astro.props;
 
@@ -9,18 +9,23 @@ const notes = [
 		meta: 'OGGI • PERSONALE',
 		title: 'Etiam vehicula dui ante',
 		text: 'onec et dui nec augue semper placerat. Vestibulum ante ipsum primis in faucibus luctus...',
+		slug: 'etiam-vehicula-dui-ante',
 	},
 	{
 		meta: 'IERI • ACCADEMIA',
 		title: 'Lorem ipsum dolor sit amet',
 		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+		slug: 'lorem-ipsum-dolor-sit-amet',
 	},
 	{
 		meta: 'IERI • ACCADEMIA',
 		title: 'Lorem ipsum dolor sit amet',
 		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+		slug: 'lorem-ipsum-dolor-sit-amet-2',
 	},
 ];
+
+const featuredNoteHref = '/atrio/scrivania/grimorio/titolo-della-nota/';
 ---
 
 <Layout lang={lang}>
@@ -32,10 +37,10 @@ const notes = [
 		</header>
 
 		<div class="container-xl tsbs-app-container grimorio-content">
-			<section class="tsbs-note-pad" aria-labelledby="grimorio-note-title">
-				<a class="tsbs-note-pad__action" href="/atrio/scrivania/nota/" aria-label="Aggiungi nota">
+			<a class="tsbs-note-pad" href={featuredNoteHref} aria-labelledby="grimorio-note-title">
+				<span class="tsbs-note-pad__action" aria-hidden="true">
 					<i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
-				</a>
+				</span>
 				<h2 id="grimorio-note-title">Titolo della nota</h2>
 				<p>Scrivi qui le tue annotazioni da Adepto</p>
 				<div class="tsbs-note-pad__lines" aria-hidden="true">
@@ -44,14 +49,14 @@ const notes = [
 					<span></span>
 					<span></span>
 				</div>
-			</section>
+			</a>
 
 			<section class="grimorio-section" aria-labelledby="grimorio-latest-title">
 				<h2 id="grimorio-latest-title" class="tsbs-section-title">Ultime note</h2>
 
 				<div class="tsbs-note-list">
 					{notes.map((note) => (
-						<article class="tsbs-note-card">
+						<a class="tsbs-note-card" href={`/atrio/scrivania/grimorio/${note.slug}/`}>
 							<div class="tsbs-note-card__copy">
 								<p class="tsbs-note-card__meta">{note.meta}</p>
 								<h3>{note.title}</h3>
@@ -61,7 +66,7 @@ const notes = [
 								<i class="bi bi-share"></i>
 								<i class="bi bi-chevron-right"></i>
 							</div>
-						</article>
+						</a>
 					))}
 				</div>
 
@@ -73,5 +78,3 @@ const notes = [
 		</div>
 	</main>
 </Layout>
-
-
