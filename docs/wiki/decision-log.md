@@ -20,6 +20,30 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-13 - Preferiti Profili Base Con Storage Locale
+
+Decisione:
+- creare una versione base del like profilo con `localStorage`
+- salvare nei preferiti solo identificativi stabili dei profili, non copie complete dei dati profilo
+- centralizzare la logica in `src/lib/profileFavorites.js`
+- usare `src/data/mockProfiles.js` come dataset provvisorio finche non arriva il binding Strapi
+- strutturare la sezione come `src/pages/atrio/scrivania/utenti-preferiti/`
+
+Motivo:
+- permettere subito il toggle like e la lista utenti preferiti senza introdurre backend provvisorio
+- mantenere la UI indipendente dal meccanismo di persistenza
+- rendere piu semplice sostituire `localStorage` con Strapi in seguito
+
+Impatto:
+- `src/lib/profileFavorites.js`
+- `src/data/mockProfiles.js`
+- `src/pages/atrio/scrivania/utenti-preferiti/index.astro`
+- `src/pages/atrio/scrivania/utenti-preferiti/esploso-profilo-utente.astro`
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
 ## 2026-04-27 - Creazione Wiki Progetto E Guardrail AI
 
 Decisione:

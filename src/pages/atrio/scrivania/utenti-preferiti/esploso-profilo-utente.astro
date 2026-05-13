@@ -9,8 +9,10 @@ import trofeoMedaglia from '../../../../assets/trofeo-medaglia.png';
 import trofeoScudo from '../../../../assets/trofeo-scudo.png';
 import trofeoStendardo from '../../../../assets/trofeo-stendardo.png';
 import trofeoTartaruga from '../../../../assets/trofeo-tartaruga.png';
+import { mockProfiles } from '../../../../data/mockProfiles.js';
 
 const { lang = 'it' } = Astro.props;
+const currentProfile = mockProfiles[0];
 
 const board = {
 	rows: 8,
@@ -36,21 +38,28 @@ const cells = Array.from({ length: board.rows * board.cols });
 <Layout lang={lang}>
 	<Nav lang={lang} />
 
-	<main class="tsbs-app-shell profile-exploded-page">
+	<main class="tsbs-app-shell desk-page profile-exploded-page">
 		<header class="desk-hero profile-exploded-hero" aria-labelledby="profile-exploded-title">
 			<div class="desk-hero__panel profile-exploded-hero__panel">
-				<button class="profile-favorite-button" type="button" aria-label="Aggiungi ai preferiti">
+				<button
+					class="profile-favorite-button"
+					type="button"
+					aria-label="Aggiungi ai preferiti"
+					aria-pressed="false"
+					data-profile-favorite-toggle
+					data-profile-id={currentProfile.id}
+				>
 					<i class="bi bi-heart" aria-hidden="true"></i>
 				</button>
 
-				<p class="desk-academy-pill">Nome Accademia</p>
+				<p class="desk-academy-pill">{currentProfile.academyLabel}</p>
 
 				<div class="desk-avatar" aria-hidden="true">
 					<i class="bi bi-image"></i>
 				</div>
 
-				<h1 id="profile-exploded-title">Nome Utente</h1>
-				<p class="desk-rank">Adepto - n° trofei</p>
+				<h1 id="profile-exploded-title">{currentProfile.name}</h1>
+				<p class="desk-rank">{currentProfile.rankLabel}</p>
 			</div>
 		</header>
 
@@ -80,18 +89,58 @@ const cells = Array.from({ length: board.rows * board.cols });
 	</main>
 </Layout>
 
+<script>
+	import { isFavorite, toggleFavorite } from '../../../../lib/profileFavorites.js';
+
+	const favoriteButton = document.querySelector('[data-profile-favorite-toggle]');
+
+	const syncFavoriteButton = () => {
+		if (!favoriteButton) return;
+
+		const profileId = favoriteButton.dataset.profileId;
+		if (!profileId) return;
+
+		const favorite = isFavorite(profileId);
+		const icon = favoriteButton.querySelector('.bi');
+
+		favoriteButton.setAttribute('aria-pressed', String(favorite));
+		favoriteButton.classList.toggle('is-favorite', favorite);
+		favoriteButton.setAttribute('aria-label', favorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti');
+		icon?.classList.toggle('bi-heart', !favorite);
+		icon?.classList.toggle('bi-heart-fill', favorite);
+	};
+
+	favoriteButton?.addEventListener('click', () => {
+		const profileId = favoriteButton.dataset.profileId;
+		if (!profileId) return;
+
+		// Strapi TODO: il click deve continuare a passare solo profileId.
+		// Quando lo storage diventera Strapi, toggleFavorite chiamera l'API invece di localStorage.
+		toggleFavorite(profileId);
+		syncFavoriteButton();
+	});
+
+	syncFavoriteButton();
+</script>
+
 <style lang="scss">
 	.profile-exploded-page {
-		--desk-accent: var(--tsbs-theme-accent);
 		--profile-board-max-width: 23.125rem;
-		--profile-board-size: min(100%, var(--profile-board-max-width));
+		--profile-hero-space: 20.75rem;
+		--profile-content-top: 2rem;
+		--profile-content-bottom: 1rem;
+		--profile-board-height-space: calc(
+			100dvh - var(--profile-hero-space) - var(--profile-content-top) - var(--profile-content-bottom) -
+				var(--tsbs-mobile-nav-height)
+		);
+		--profile-board-size: min(100%, var(--profile-board-max-width), calc(var(--profile-board-height-space) * 5 / 8));
 
 		min-height: 100vh;
-		padding-bottom: calc(var(--tsbs-mobile-nav-height) + 1.75rem);
-		background: var(--tsbs-color-white);
+		padding-bottom: var(--tsbs-mobile-nav-height);
 	}
 
 	.profile-exploded-hero {
+		position: relative;
 		padding-bottom: 2rem;
 	}
 
@@ -102,6 +151,7 @@ const cells = Array.from({ length: board.rows * board.cols });
 
 	.profile-favorite-button {
 		position: absolute;
+		z-index: 2;
 		top: 0.625rem;
 		right: 0.625rem;
 		display: grid;
@@ -113,6 +163,7 @@ const cells = Array.from({ length: board.rows * board.cols });
 		background: #ffffff;
 		border: 0;
 		border-radius: 50%;
+		cursor: pointer;
 	}
 
 	.profile-favorite-button .bi {
@@ -120,10 +171,17 @@ const cells = Array.from({ length: board.rows * board.cols });
 		line-height: 1;
 	}
 
+	.profile-favorite-button.is-favorite {
+		color: var(--tsbs-theme-accent);
+	}
+
 	.profile-exploded-content {
 		display: grid;
+		align-items: start;
 		justify-items: center;
-		padding-top: 0.375rem;
+		min-height: 0;
+		padding-top: var(--profile-content-top);
+		padding-bottom: var(--profile-content-bottom);
 	}
 
 	.profile-trophy-board {
@@ -131,7 +189,7 @@ const cells = Array.from({ length: board.rows * board.cols });
 
 		position: relative;
 		display: grid;
-		width: var(--profile-board-size);
+		width: min(100%, var(--profile-board-max-width), var(--profile-board-size));
 		aspect-ratio: 5 / 8;
 		gap: var(--profile-trophy-gap);
 	}
@@ -197,18 +255,26 @@ const cells = Array.from({ length: board.rows * board.cols });
 	@media (min-width: 768px) {
 		.profile-exploded-page {
 			--profile-board-max-width: 27rem;
+			--profile-hero-space: 20.75rem;
 		}
 	}
 
 	@media (min-width: 992px) {
 		.profile-exploded-page {
 			--profile-board-max-width: 38rem;
-			padding-bottom: 3rem;
-			background: var(--tsbs-color-surface);
+			--profile-hero-space: 22.5rem;
+			--profile-content-top: 2rem;
+			--profile-content-bottom: 2rem;
+			--profile-board-height-space: calc(100dvh - var(--profile-hero-space) - var(--profile-content-top) - var(--profile-content-bottom));
+			padding-bottom: 0;
 		}
 
 		.profile-exploded-hero {
-			padding-bottom: 3.25rem;
+			padding-bottom: 3rem;
+		}
+
+		.profile-exploded-hero__panel {
+			position: static;
 		}
 
 		.profile-favorite-button {
@@ -219,7 +285,7 @@ const cells = Array.from({ length: board.rows * board.cols });
 		}
 
 		.profile-exploded-content {
-			padding-top: 3rem;
+			padding-bottom: 2rem;
 		}
 	}
 </style>

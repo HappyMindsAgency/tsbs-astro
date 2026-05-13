@@ -61,7 +61,9 @@ src/pages/
 │  ├─ grimorio/
 │  │  ├─ index.astro
 │  │  └─ [slugGrimorio].astro
-│  ├─ utenti-preferiti.astro
+│  ├─ utenti-preferiti/
+│  │  ├─ index.astro
+│  │  └─ esploso-profilo-utente.astro
 │  └─ membri/
 │     └─ [nickname].astro
 │
@@ -118,6 +120,26 @@ La pagina `atrio/missioni/[slugMis]/prova/sfida-lettura.astro` gestisce lo step 
 La pagina `atrio/missioni/[slugMis]/esito.astro` gestisce il risultato finale della missione.
 
 La route della singola missione deve restare stabile e non moltiplicarsi in base a categoria o tipologia.
+
+### Utenti Preferiti
+
+La sezione `atrio/scrivania/utenti-preferiti/` contiene:
+
+```txt
+atrio/scrivania/utenti-preferiti/
+├─ index.astro
+└─ esploso-profilo-utente.astro
+```
+
+Nella versione base senza Strapi, il like dei profili usa `localStorage` tramite `src/lib/profileFavorites.js` e salva solo identificativi stabili dei profili.
+
+I dati visuali dei profili arrivano temporaneamente da `src/data/mockProfiles.js`.
+
+Quando arrivera il binding Strapi:
+- sostituire il dataset mock con dati Strapi
+- usare `documentId` o slug univoco come identificativo stabile
+- sostituire l'implementazione interna di `profileFavorites.js` con chiamate API/relazione Strapi tra utente autenticato e profili preferiti
+- non salvare copie complete dei profili nel client
 La variazione di layout deve essere gestita tramite componenti interni scelti in base ai dati Strapi.
 
 Struttura attuale dei componenti prova:
