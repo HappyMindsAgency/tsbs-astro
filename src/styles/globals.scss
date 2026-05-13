@@ -1991,10 +1991,126 @@ h1,
 		}
 
 		.biblioteca-intro {
-			max-width: none;
-			margin: 0;
 			font-size: 1.125rem;
-			text-align: left;
+		}
+	}
+
+// PAGINA BIBLIOTECA - LE ACCADEMIE
+	.biblioteca-academies-page {
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+
+	.biblioteca-academies-content {
+		display: grid;
+		gap: 2rem;
+		margin: 0 auto;
+	}
+
+	.biblioteca-academies-intro {
+		max-width: 25rem;
+		margin: 0 auto;
+		color: var(--tsbs-color-body);
+		font-size: 1rem;
+		line-height: 1.45;
+		text-align: center;
+	}
+
+	.biblioteca-academies-list {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.biblioteca-academy-card {
+		--biblioteca-academy-card-bg: var(--tsbs-theme-accent);
+		display: grid;
+		grid-template-columns: 3.5rem minmax(0, 1fr);
+		align-items: center;
+		gap: 1rem;
+		min-height: 7.5rem;
+		padding: 1.25rem 1rem;
+		color: var(--tsbs-color-white);
+		background: var(--biblioteca-academy-card-bg);
+		border: 0;
+		border-radius: 0.75rem;
+	}
+
+	.biblioteca-academy-card.is-astraria {
+		--biblioteca-academy-card-bg: var(--tsbs-color-astraria);
+	}
+
+	.biblioteca-academy-card.is-arcadia {
+		--biblioteca-academy-card-bg: var(--tsbs-color-arcadia);
+	}
+
+	.biblioteca-academy-card.is-armonia {
+		--biblioteca-academy-card-bg: var(--tsbs-color-armonia);
+	}
+
+	.biblioteca-academy-card.is-arborea {
+		--biblioteca-academy-card-bg: var(--tsbs-color-arborea);
+	}
+
+	.biblioteca-academy-card__icon {
+		display: grid;
+		place-items: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		color: var(--tsbs-color-white);
+		background: color-mix(in srgb, var(--tsbs-color-heading) 28%, transparent);
+		border-radius: 50%;
+	}
+
+	.biblioteca-academy-card__icon .bi {
+		font-size: 2rem;
+		line-height: 1;
+	}
+
+	.biblioteca-academy-card__copy {
+		display: grid;
+		gap: 0.375rem;
+		min-width: 0;
+	}
+
+	.biblioteca-academy-card h3 {
+		margin: 0;
+		color: inherit;
+		font-size: 1.125rem;
+		font-weight: 800;
+		line-height: 1.1;
+	}
+
+	.biblioteca-academy-card p {
+		margin: 0;
+		color: color-mix(in srgb, var(--tsbs-color-white) 82%, transparent);
+		font-size: 0.875rem;
+		line-height: 1.35;
+	}
+
+	@media (min-width: 768px) {
+		.biblioteca-academies-content {
+			width: min(100%, 63rem);
+			gap: 2.5rem;
+			padding-top: 2.75rem;
+		}
+
+		.biblioteca-academies-intro {
+			max-width: 44rem;
+		}
+
+		.biblioteca-academies-list {
+			gap: 1.25rem;
+		}
+
+		.biblioteca-academy-card {
+			min-height: 8rem;
+			padding: 1.375rem 1.25rem;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.biblioteca-academies-intro {
+			font-size: 1.125rem;
 		}
 	}
 
