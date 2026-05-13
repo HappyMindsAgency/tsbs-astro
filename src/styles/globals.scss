@@ -1863,6 +1863,141 @@ h1,
 		}
 	}
 
+// PAGINA BIBLIOTECA
+	.biblioteca-page {
+		--biblioteca-card-bg: color-mix(in srgb, var(--tsbs-color-body) 16%, var(--tsbs-color-white));
+		--biblioteca-card-border: color-mix(in srgb, var(--tsbs-color-body) 62%, var(--tsbs-color-white));
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+
+	.biblioteca-content {
+		display: grid;
+		gap: 2rem;
+		margin: 0 auto;
+	}
+
+	.biblioteca-intro {
+		max-width: 44rem;
+		margin: 0 auto;
+		color: var(--tsbs-color-body);
+		font-size: 1rem;
+		line-height: 1.5;
+		text-align: center;
+	}
+
+	.biblioteca-archive {
+		display: grid;
+		gap: 0.875rem;
+	}
+
+	.biblioteca-archive h2 {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-size: 1.625rem;
+		font-weight: 800;
+	}
+
+	.biblioteca-archive__list {
+		display: grid;
+		gap: 1.25rem;
+	}
+
+	.biblioteca-archive-card {
+		display: grid;
+		grid-template-columns: 4rem minmax(0, 1fr);
+		align-items: center;
+		gap: 1rem;
+		min-height: 6.25rem;
+		padding: 1.125rem 1rem;
+		color: var(--tsbs-color-body);
+		text-decoration: none;
+		background: var(--biblioteca-card-bg);
+		border: 1px solid var(--biblioteca-card-border);
+		border-radius: 0.75rem;
+	}
+
+	.biblioteca-archive-card:hover,
+	.biblioteca-archive-card:focus {
+		color: var(--tsbs-color-body);
+		text-decoration: none;
+		border-color: var(--tsbs-theme-accent);
+	}
+
+	.biblioteca-archive-card__icon {
+		display: grid;
+		place-items: center;
+		width: 3.5rem;
+		height: 3.5rem;
+		color: color-mix(in srgb, var(--tsbs-theme-accent) 58%, var(--tsbs-color-white));
+	}
+
+	.biblioteca-archive-card__icon .bi {
+		font-size: 3rem;
+		line-height: 1;
+	}
+
+	.biblioteca-archive-card__icon img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	.biblioteca-archive-card__copy {
+		display: grid;
+		gap: 0.25rem;
+		min-width: 0;
+	}
+
+	.biblioteca-archive-card__copy strong {
+		color: var(--tsbs-theme-accent);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1.2;
+	}
+
+	.biblioteca-archive-card__copy span {
+		color: var(--tsbs-color-body);
+		font-size: 0.875rem;
+		line-height: 1.35;
+	}
+
+	@media (min-width: 768px) {
+		.biblioteca-content {
+			max-width: calc(58rem + var(--bs-gutter-x));
+			gap: 2.75rem;
+			padding-top: 2.75rem;
+		}
+
+		.biblioteca-archive {
+			gap: 1.5rem;
+		}
+
+		.biblioteca-archive-card {
+			grid-template-columns: 4.25rem minmax(0, 1fr);
+			min-height: 5.625rem;
+			padding: 1rem;
+		}
+
+		.biblioteca-archive-card__icon {
+			width: 3.75rem;
+			height: 3.75rem;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.biblioteca-content {
+			padding-top: 2.75rem;
+		}
+
+		.biblioteca-intro {
+			max-width: none;
+			margin: 0;
+			font-size: 1.125rem;
+			text-align: left;
+		}
+	}
+
 // PAGINA DETTAGLIO EVENTO
 	.event-detail-page {
 		--event-detail-muted: var(--tsbs-color-body);

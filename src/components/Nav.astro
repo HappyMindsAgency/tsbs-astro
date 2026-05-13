@@ -10,7 +10,7 @@ const mobileItems = [
   { label: "Missioni", href: "/atrio/missioni/", icon: "bi-award" },
   { label: "Atrio", href: "/atrio/", icon: "bi-house-door" },
   { label: "Accademia", href: "/atrio/accademia/", icon: "bi-mortarboard" },
-  { label: "Biblioteca", href: "/atrio/eventi/", icon: "bi-archive" },
+  { label: "Biblioteca", href: "/atrio/biblioteca/", icon: "bi-archive", activePaths: ["/atrio/eventi/"] },
 ];
 
 const desktopItems = [
@@ -18,7 +18,7 @@ const desktopItems = [
   { label: "Scrivania", href: "/atrio/scrivania/", icon: "bi-book" },
   { label: "Missioni", href: "/atrio/missioni/", icon: "bi-award" },
   { label: "Accademia", href: "/atrio/accademia/", icon: "bi-mortarboard" },
-  { label: "Biblioteca", href: "/atrio/eventi/", icon: "bi-archive" },
+  { label: "Biblioteca", href: "/atrio/biblioteca/", icon: "bi-archive", activePaths: ["/atrio/eventi/"] },
 ];
 
 const normalizePath = (path: string) => path.replace(/\/+$/, "") || "/";
@@ -27,6 +27,9 @@ const currentPath = normalizePath(pathname);
 // Parte dall'URL corrente e risale l'alberatura finche trova una voce presente nel menu.
 const getActiveHref = (items: typeof mobileItems) => {
   const itemPaths = new Set(items.map((item) => normalizePath(item.href)));
+  const aliasedItem = items.find((item) => item.activePaths?.some((path) => currentPath.startsWith(normalizePath(path))));
+  if (aliasedItem) return normalizePath(aliasedItem.href);
+
   let path = currentPath;
 
   while (path !== "/") {
