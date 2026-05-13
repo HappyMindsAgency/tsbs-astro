@@ -1863,6 +1863,309 @@ h1,
 		}
 	}
 
+// PAGINA DETTAGLIO EVENTO
+	.event-detail-page {
+		--event-detail-muted: var(--tsbs-color-body);
+		--event-detail-card-border: color-mix(in srgb, var(--tsbs-color-body) 70%, var(--tsbs-color-white));
+		--event-detail-card-media: color-mix(in srgb, var(--tsbs-color-body) 18%, var(--tsbs-color-white));
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+
+	.event-detail-header {
+		--missions-header-bg: var(--tsbs-theme-accent);
+	}
+
+	.event-detail {
+		display: grid;
+		gap: 1.75rem;
+		margin: 0 auto;
+		color: var(--event-detail-muted);
+	}
+
+	.event-detail__hero {
+		display: grid;
+		gap: 0.875rem;
+	}
+
+	.event-detail__date,
+	.event-detail__category,
+	.event-detail__heading p,
+	.event-detail__program-meta,
+	.event-detail__program-card p,
+	.event-detail__mission p {
+		margin: 0;
+		color: inherit;
+	}
+
+	.event-detail__date,
+	.event-detail__category {
+		width: fit-content;
+		min-height: 1.4375rem;
+		padding: 0.3125rem 0.625rem;
+		color: var(--tsbs-color-heading);
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1;
+		border-radius: 0.25rem;
+	}
+
+	.event-detail__date {
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 16%, var(--tsbs-color-white));
+	}
+
+	.event-detail__category {
+		order: 2;
+		color: var(--event-detail-muted);
+		font-size: 0.6875rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-white));
+		border-radius: 999rem;
+	}
+
+	.event-detail__heading {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.event-detail__heading h2 {
+		order: 1;
+		margin: 0;
+		color: var(--event-detail-muted);
+		font-size: 1.625rem;
+		font-weight: 700;
+		line-height: 1.15;
+	}
+
+	.event-detail__heading p:not(.event-detail__category) {
+		order: 3;
+		font-size: 1rem;
+		line-height: 1.6;
+	}
+
+	.event-detail__media {
+		position: relative;
+		display: grid;
+		place-items: center;
+		aspect-ratio: 1.86;
+		width: 100%;
+		overflow: hidden;
+		color: var(--tsbs-color-white);
+		background: var(--event-detail-card-media);
+		border: 1px solid var(--event-detail-card-border);
+		border-radius: 0.75rem;
+	}
+
+	.event-detail__media .bi {
+		font-size: 3.375rem;
+		line-height: 1;
+	}
+
+	.event-detail__intro {
+		padding-left: 1rem;
+		color: var(--event-detail-muted);
+		font-size: 1rem;
+		line-height: 1.55;
+		border-left: 2px solid var(--tsbs-theme-accent);
+	}
+
+	.event-detail__intro strong {
+		font-weight: 800;
+	}
+
+	.event-detail__program {
+		display: grid;
+		gap: 1.25rem;
+	}
+
+	.event-detail__program h2 {
+		margin: 0;
+		color: var(--event-detail-muted);
+		font-size: 1.25rem;
+		font-weight: 800;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--tsbs-color-heading);
+	}
+
+	.event-detail__program-list {
+		display: grid;
+		gap: 1.25rem;
+	}
+
+	.event-detail__program-item {
+		position: relative;
+		display: grid;
+		grid-template-columns: 3rem minmax(0, 1fr);
+		gap: 1rem;
+	}
+
+	.event-detail__program-date {
+		position: relative;
+		display: grid;
+		justify-items: center;
+		align-content: start;
+		gap: 0.125rem;
+		min-height: 100%;
+		padding-top: 0.125rem;
+		color: var(--event-detail-muted);
+		text-transform: uppercase;
+	}
+
+	.event-detail__program-item:not(:last-child) .event-detail__program-date {
+		padding-bottom: 1.25rem;
+		margin-bottom: -1.25rem;
+	}
+
+	.event-detail__program-item:not(:last-child) .event-detail__program-date::after {
+		position: absolute;
+		top: 2.375rem;
+		bottom: 0;
+		left: 50%;
+		width: 1px;
+		content: "";
+		background: var(--tsbs-theme-accent);
+		transform: translateX(-50%);
+	}
+
+	.event-detail__program-date strong {
+		font-size: 1.375rem;
+		line-height: 0.9;
+	}
+
+	.event-detail__program-date span {
+		font-size: 0.6875rem;
+		line-height: 1;
+	}
+
+	.event-detail__program-card {
+		display: grid;
+		gap: 0.5rem;
+		min-height: 6.125rem;
+		padding: 1rem 0.875rem;
+		color: var(--event-detail-muted);
+		background: var(--event-detail-card-media);
+		border: 1px solid var(--tsbs-color-heading);
+		border-radius: 0.5rem;
+	}
+
+	.event-detail__program-meta {
+		font-size: 0.75rem;
+		opacity: 0.62;
+		line-height: 1;
+	}
+
+	.event-detail__program-card h3 {
+		margin: 0;
+		color: var(--event-detail-muted);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1.1;
+	}
+
+	.event-detail__program-card p:not(.event-detail__program-meta) {
+		font-size: 0.9375rem;
+		font-style: italic;
+		line-height: 1.25;
+	}
+
+	.event-detail__mission {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		align-items: center;
+		gap: 1rem;
+		padding: 1rem 1.25rem;
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-accent);
+		border-radius: 0.5rem;
+	}
+
+	.event-detail__mission .bi {
+		font-size: 2rem;
+		line-height: 1;
+	}
+
+	.event-detail__mission h2 {
+		margin: 0 0 0.375rem;
+		color: inherit;
+		font-size: 0.875rem;
+		font-weight: 800;
+		line-height: 1.1;
+		text-transform: uppercase;
+	}
+
+	.event-detail__mission p {
+		color: color-mix(in srgb, var(--tsbs-color-white) 78%, transparent);
+		font-size: 1rem;
+		line-height: 1.35;
+	}
+
+	@media (min-width: 768px) {
+		.event-detail {
+			max-width: calc(58rem + var(--bs-gutter-x));
+			gap: 2rem;
+			padding-top: 2.5rem;
+		}
+
+		.event-detail__hero {
+			grid-template-columns: minmax(0, 1fr) auto;
+			align-items: start;
+			column-gap: 1.5rem;
+		}
+
+		.event-detail__date {
+			grid-column: 2;
+			grid-row: 2;
+			margin-top: 0.25rem;
+		}
+
+		.event-detail__heading {
+			grid-column: 1;
+			grid-row: 2;
+		}
+
+		.event-detail__heading h2 {
+			order: 2;
+			font-size: 1.875rem;
+		}
+
+		.event-detail__category {
+			order: 1;
+		}
+
+		.event-detail__heading p:not(.event-detail__category) {
+			order: 3;
+		}
+
+		.event-detail__media {
+			aspect-ratio: 4.45;
+		}
+
+		.event-detail__program-list {
+			gap: 1rem;
+		}
+
+		.event-detail__program-item:not(:last-child) .event-detail__program-date {
+			padding-bottom: 1rem;
+			margin-bottom: -1rem;
+		}
+
+		.event-detail__program-item {
+			grid-template-columns: 2.5rem minmax(0, 1fr);
+			gap: 1rem;
+		}
+
+		.event-detail__program-card {
+			min-height: 6.875rem;
+			padding: 1.125rem 1rem;
+		}
+
+		.event-detail__mission {
+			margin-top: 0.125rem;
+			padding: 1.25rem 1.5rem;
+		}
+	}
+
 	.mission-detail {
 		--mission-detail-accent: var(--tsbs-theme-accent);
 		--mission-detail-muted-accent: #59667a;

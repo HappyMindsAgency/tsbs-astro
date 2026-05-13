@@ -1,0 +1,84 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Nav from '../../../components/Nav.astro';
+
+export const prerender = false;
+
+const { lang = 'it' } = Astro.props;
+
+const programItems = [
+	{
+		day: '04',
+		month: 'Feb',
+		meta: '17:30 • Sala Muratori',
+		speaker: 'Linda Del Sarto',
+		title: '"Tradurre una ferita: versi giovanili di Szymborska"',
+	},
+	{
+		day: '18',
+		month: 'Feb',
+		meta: '17:30 • Sala Muratori',
+		speaker: 'Rosaria Lo Russo',
+		title: '"Io e Anne: Traduzione, performance, vocalita"',
+	},
+];
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell missions-shell event-detail-page">
+		<header class="missions-header event-detail-header">
+			<h1>Eventi</h1>
+		</header>
+
+		<article class="container-xl tsbs-app-container event-detail" aria-labelledby="event-detail-title">
+			<div class="event-detail__hero">
+				<p class="event-detail__date">04 Feb - 21 Mar 2026</p>
+
+				<div class="event-detail__heading">
+					<h2 id="event-detail-title">Titolo dell'evento placeholder per ingombro</h2>
+					<p class="event-detail__category">Categoria evento</p>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sit amet quam felis.</p>
+				</div>
+			</div>
+
+			<div class="event-detail__media" aria-label="Immagine evento">
+				<i class="bi bi-image" aria-hidden="true"></i>
+			</div>
+
+			<p class="event-detail__intro">
+				Un ciclo di conferenze in collaborazione con la <strong>Casa delle Donne di Ravenna.</strong> Parte del progetto "In cerca di guai", finanziato dal Centro per il libro e la lettura.
+			</p>
+
+			<section class="event-detail__program" aria-labelledby="event-program-title">
+				<h2 id="event-program-title" class="tsbs-section-title">Il Programma</h2>
+
+				<div class="event-detail__program-list">
+					{programItems.map((item) => (
+						<article class="event-detail__program-item">
+							<div class="event-detail__program-date" aria-label={`${item.day} ${item.month}`}>
+								<strong>{item.day}</strong>
+								<span>{item.month}</span>
+							</div>
+
+							<div class="event-detail__program-card">
+								<p class="event-detail__program-meta">{item.meta}</p>
+								<h3>{item.speaker}</h3>
+								<p>{item.title}</p>
+							</div>
+						</article>
+					))}
+				</div>
+			</section>
+
+			<section class="event-detail__mission" aria-labelledby="event-mission-title">
+				<i class="bi bi-award" aria-hidden="true"></i>
+				<div>
+					<h2 id="event-mission-title">Missione: Voce poetica</h2>
+					<p>Partecipa ad almeno 2 incontri per ottenere il Badge Esclusivo</p>
+				</div>
+			</section>
+		</article>
+	</main>
+</Layout>
