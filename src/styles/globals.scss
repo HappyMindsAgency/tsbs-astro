@@ -1709,6 +1709,160 @@ h1,
 		}
 	}
 
+// PAGINA EVENTI
+	.events-page {
+		--events-card-border: #8d8f95;
+		--events-card-media: #d9d9d9;
+		--events-date-bg: rgba(29, 23, 21, 0.12);
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+
+	.events-header {
+		--missions-header-bg: var(--tsbs-theme-accent);
+	}
+
+	.events-page .events-header h1 {
+		margin: 0;
+		color: var(--tsbs-color-white);
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.events-content {
+		margin: 0 auto;
+	}
+
+	.events-tabs {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.events-section-title {
+		margin: 0 0 0.5rem;
+		color: var(--tsbs-color-heading);
+		font-size: 1.625rem;
+		font-weight: 700;
+	}
+
+	.events-grid {
+		display: grid;
+		gap: 1.25rem;
+	}
+
+	.events-card {
+		display: grid;
+		gap: 0.5rem;
+		color: var(--tsbs-color-heading);
+		text-decoration: none;
+	}
+
+	.events-card:hover,
+	.events-card:focus {
+		color: var(--tsbs-color-heading);
+		text-decoration: none;
+	}
+
+	.events-card__media {
+		position: relative;
+		display: grid;
+		place-items: center;
+		aspect-ratio: 1.86;
+		overflow: hidden;
+		color: var(--tsbs-color-white);
+		background: var(--events-card-media);
+		border: 1px solid var(--events-card-border);
+		border-radius: 0.75rem;
+	}
+
+	.events-card__media .bi {
+		font-size: 3.375rem;
+		line-height: 1;
+	}
+
+	.events-card__date {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 1.4375rem;
+		max-width: calc(100% - 1rem);
+		padding: 0.25rem 0.5625rem;
+		color: var(--tsbs-color-heading);
+		font-size: 0.6875rem;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		background: var(--events-date-bg);
+		border-radius: 0.25rem;
+	}
+
+	.events-card h3 {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.25;
+	}
+
+	.events-load-more[hidden] {
+		display: none;
+	}
+
+	@media (max-width: 991.98px) {
+		.events-card.is-hidden-mobile {
+			display: none;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.events-tabs {
+			width: min(100%, 36rem);
+		}
+	}
+
+	@media (min-width: 992px) {
+		.events-content {
+			max-width: calc(58rem + var(--bs-gutter-x));
+			padding-top: 2.5rem;
+		}
+
+		.events-page .events-header h1 {
+			font-size: 2.125rem;
+		}
+
+		.events-tabs {
+			width: min(100%, 58rem);
+			margin-bottom: 2rem;
+		}
+
+		.events-section-title {
+			display: none;
+		}
+
+		.events-grid {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			column-gap: 1.5rem;
+			row-gap: 1.625rem;
+		}
+
+		.events-card.is-hidden-desktop {
+			display: none;
+		}
+
+		.events-card__media {
+			aspect-ratio: 1.42;
+		}
+
+		.events-load-more {
+			margin-top: 2rem;
+			margin-right: 0;
+		}
+	}
+
 	.mission-detail {
 		--mission-detail-accent: var(--tsbs-theme-accent);
 		--mission-detail-muted-accent: #59667a;
