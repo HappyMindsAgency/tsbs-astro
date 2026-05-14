@@ -3171,6 +3171,205 @@ h1,
 			padding-top: 2.75rem;
 		}
 	}
+
+// EPISTOLE
+	.epistole-page {
+		--epistole-accent: #546176;
+		--epistole-header-bg: #b8b8b8;
+		--epistole-card-bg: color-mix(in srgb, var(--tsbs-color-body) 9%, var(--tsbs-color-white));
+		--epistole-card-border: #8d8f95;
+		--epistole-muted: #9aa4b4;
+		--missions-header-bg: var(--epistole-header-bg);
+		--tsbs-theme-accent: var(--epistole-accent);
+		--tsbs-theme-cta-bg: #aaa5a5;
+		--tsbs-theme-cta-border: #aaa5a5;
+		--tsbs-theme-cta-color: var(--tsbs-color-heading);
+		--tsbs-theme-cta-hover-bg: #8f8989;
+		--tsbs-theme-cta-hover-border: #8f8989;
+		--tsbs-theme-cta-hover-color: var(--tsbs-color-heading);
+		--tsbs-theme-cta-active-bg: #c8c3c3;
+		--tsbs-theme-cta-active-border: #c8c3c3;
+		--tsbs-theme-cta-active-color: var(--tsbs-color-heading);
+		--tsbs-theme-cta-focus-bg: #c8c3c3;
+		--tsbs-theme-cta-focus-border: #8f8989;
+		--tsbs-theme-cta-focus-color: var(--tsbs-color-heading);
+
+		min-height: 100vh;
+		background: var(--tsbs-color-white);
+	}
+
+	.epistole-page .epistole-header h1 {
+		margin: 0;
+		color: var(--epistole-accent);
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1;
+	}
+
+	.epistole-content {
+		display: grid;
+		gap: 3rem;
+		margin: 0 auto;
+		padding-top: 2.5rem;
+	}
+
+	.epistole-featured {
+		display: grid;
+		gap: 0.75rem;
+		padding: 1.5rem 1.5rem 0.9375rem;
+		background: var(--epistole-card-bg);
+		border: 0;
+		border-radius: 0.875rem;
+	}
+
+	.epistole-featured__copy {
+		display: grid;
+		gap: 0.625rem;
+	}
+
+	.epistole-eyebrow,
+	.epistole-card__meta {
+		margin: 0;
+		color: var(--epistole-muted);
+		font-size: 0.75rem;
+		font-weight: 500;
+		line-height: 1;
+		letter-spacing: 0.08em;
+	}
+
+	.epistole-featured h2,
+	.epistole-card h3 {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-family: var(--tsbs-font-body);
+		font-weight: 800;
+		line-height: 1.15;
+	}
+
+	.epistole-featured h2 {
+		font-size: 1.25rem;
+	}
+
+	.epistole-featured p:not(.epistole-eyebrow) {
+		color: var(--tsbs-color-heading);
+		font-size: 0.9375rem;
+		font-style: italic;
+		line-height: 1.45;
+	}
+
+	.epistole-featured__button {
+		width: 100%;
+		min-height: 2.5rem;
+		padding: 0.625rem 1rem;
+		font-family: var(--tsbs-font-body);
+		font-weight: 700;
+		line-height: 1.1;
+		border-radius: 0.5rem;
+	}
+
+	.epistole-archive {
+		display: grid;
+		gap: 1.125rem;
+	}
+
+	.epistole-archive h2 {
+		margin: 0;
+		color: var(--epistole-accent);
+		font-size: 1.625rem;
+		font-weight: 800;
+		line-height: 1.1;
+	}
+
+	.epistole-list {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.epistole-card {
+		display: grid;
+		gap: 1rem;
+		min-height: 9.375rem;
+		padding: 1.375rem 1.25rem;
+		color: var(--tsbs-color-body);
+		text-decoration: none;
+		background: transparent;
+		border: 1px solid var(--epistole-card-border);
+		border-radius: 0.875rem;
+	}
+
+	.epistole-card:hover,
+	.epistole-card:focus {
+		color: var(--tsbs-color-body);
+		text-decoration: none;
+		border-color: var(--epistole-accent);
+	}
+
+	.epistole-card h3 {
+		color: var(--epistole-accent);
+		font-size: 1.125rem;
+	}
+
+	.epistole-card p:not(.epistole-card__meta) {
+		color: var(--epistole-muted);
+		font-size: 0.9375rem;
+		line-height: 1.55;
+	}
+
+	.epistole-load-more {
+		margin-top: 0.25rem;
+	}
+
+	@media (min-width: 768px) {
+		.epistole-content {
+			max-width: calc(58rem + var(--bs-gutter-x));
+			gap: 2.75rem;
+			padding-top: 2.75rem;
+		}
+
+		.epistole-featured {
+			grid-template-columns: minmax(0, 1fr) minmax(12rem, 18rem);
+			align-items: end;
+			gap: 2rem;
+			padding: 2rem;
+		}
+
+		.epistole-list {
+			gap: 1.25rem;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.epistole-content {
+			max-width: calc(58rem + var(--bs-gutter-x));
+			gap: 2.75rem;
+			padding-top: 2.75rem;
+		}
+
+		.epistole-page .epistole-header h1 {
+			font-size: 2.125rem;
+		}
+
+		.epistole-featured {
+			grid-template-columns: minmax(0, 1fr) minmax(13rem, 18rem);
+			padding: 2rem;
+		}
+
+		.epistole-featured h2 {
+			font-size: 1.5rem;
+		}
+
+		.epistole-archive {
+			gap: 1.5rem;
+		}
+
+		.epistole-list {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.epistole-load-more {
+			margin-right: 0;
+		}
+	}
 // INDEX SCRIVANIA
 .desk-page {
 		--desk-accent: var(--tsbs-theme-accent);

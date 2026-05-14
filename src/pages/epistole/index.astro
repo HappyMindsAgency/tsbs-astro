@@ -1,0 +1,69 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+
+const { lang = 'it' } = Astro.props;
+
+const epistles = [
+	{
+		meta: 'OGGI',
+		title: 'Etiam vehicula dui ante',
+		text: 'onec et dui nec augue semper placerat. Vestibulum ante ipsum primis in faucibus...',
+		slug: 'etiam-vehicula-dui-ante',
+	},
+	{
+		meta: 'IERI',
+		title: 'Lorem ipsum dolor sit amet',
+		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+		slug: 'lorem-ipsum-dolor-sit-amet',
+	},
+	{
+		meta: '16-01-2026',
+		title: 'Lorem ipsum dolor sit amet',
+		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+		slug: 'lorem-ipsum-dolor-sit-amet-2',
+	},
+];
+---
+
+<Layout lang={lang} theme="theme-neutral">
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell missions-shell epistole-page">
+		<header class="missions-header epistole-header">
+			<h1>Epistole</h1>
+		</header>
+
+		<div class="container-xl tsbs-app-container epistole-content">
+			<section class="tsbs-card epistole-featured" aria-labelledby="epistole-featured-title">
+				<div class="epistole-featured__copy">
+					<p class="epistole-eyebrow">L'EPISTOLA</p>
+					<h2 id="epistole-featured-title">Lorem ipsum dolor</h2>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus dignissim magna at magna finibus...</p>
+				</div>
+				<a class="btn tsbs-cta-primary epistole-featured__button" href="/epistole/lorem-ipsum-dolor/">
+					Leggi Epistola
+				</a>
+			</section>
+
+			<section class="epistole-archive" aria-labelledby="epistole-archive-title">
+				<h2 id="epistole-archive-title" class="tsbs-section-title">Archivio Epistole</h2>
+
+				<div class="epistole-list">
+					{epistles.map((epistle) => (
+						<a class="epistole-card" href={`/epistole/${epistle.slug}/`}>
+							<p class="epistole-card__meta">{epistle.meta}</p>
+							<h3>{epistle.title}</h3>
+							<p>{epistle.text}</p>
+						</a>
+					))}
+				</div>
+
+				<button class="missions-load-more epistole-load-more" type="button" aria-controls="epistole-archive-title">
+					<span>Carica altro</span>
+					<i class="bi bi-arrow-right" aria-hidden="true"></i>
+				</button>
+			</section>
+		</div>
+	</main>
+</Layout>

@@ -8,13 +8,13 @@ const pathname = Astro.url.pathname;
 const mobileItems = [
   { label: "Scrivania", href: "/atrio/scrivania/", icon: "bi-book" },
   { label: "Missioni", href: "/atrio/missioni/", icon: "bi-award" },
-  { label: "Atrio", href: "/atrio/", icon: "bi-house-door" },
+  { label: "Atrio", href: "/atrio/", icon: "bi-house-door", activePaths: ["/epistole/"] },
   { label: "Accademia", href: "/atrio/accademia/", icon: "bi-mortarboard" },
   { label: "Biblioteca", href: "/atrio/biblioteca/", icon: "bi-archive", activePaths: ["/atrio/eventi/"] },
 ];
 
 const desktopItems = [
-  { label: "Atrio", href: "/atrio/", icon: "bi-house-door" },
+  { label: "Atrio", href: "/atrio/", icon: "bi-house-door", activePaths: ["/epistole/"] },
   { label: "Scrivania", href: "/atrio/scrivania/", icon: "bi-book" },
   { label: "Missioni", href: "/atrio/missioni/", icon: "bi-award" },
   { label: "Accademia", href: "/atrio/accademia/", icon: "bi-mortarboard" },
