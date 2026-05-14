@@ -23,7 +23,10 @@ const { lang = 'it' } = Astro.props;
 					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna
 					aliqua.
 				</p>
+				<a class="registration-confirmation-continue registration-confirmation-continue--desktop" href="/atrio/">Prosegui</a>
 			</section>
+
+			<a class="registration-confirmation-continue registration-confirmation-continue--mobile" href="/atrio/">Prosegui</a>
 		</div>
 	</main>
 </Layout>
@@ -31,6 +34,9 @@ const { lang = 'it' } = Astro.props;
 <style lang="scss">
 	.registration-confirmation-page {
 		--confirmation-panel: var(--tsbs-color-neutral-soft);
+		--confirmation-button: var(--tsbs-global-cta-var1-bg);
+		--confirmation-button-hover: var(--tsbs-global-cta-var1-hover-bg);
+		--confirmation-button-active: var(--tsbs-global-cta-var1-active-bg);
 		--confirmation-page-padding-y: clamp(2rem, 7vw, 3.875rem);
 		--confirmation-page-padding-x: clamp(0.4375rem, 2vw, 0.9375rem);
 		--confirmation-page-padding-bottom: calc(clamp(3.5rem, 14vw, 5rem) + env(safe-area-inset-bottom));
@@ -87,6 +93,42 @@ const { lang = 'it' } = Astro.props;
 		line-height: 1.22;
 	}
 
+	:global(.registration-confirmation-page .registration-confirmation-continue) {
+		display: grid;
+		place-items: center;
+		min-height: 3rem;
+		padding: 0.75rem 1rem;
+		color: #ffffff;
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		text-align: center;
+		text-decoration: none;
+		background: var(--confirmation-button);
+		border-radius: 0.3125rem;
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue--mobile) {
+		position: absolute;
+		right: clamp(1rem, 5vw, 2rem);
+		bottom: clamp(1.5rem, 7vw, 2.75rem);
+		left: clamp(1rem, 5vw, 2rem);
+		z-index: 1;
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue--desktop) {
+		display: none;
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue:hover) {
+		color: #ffffff;
+		background: var(--confirmation-button-hover);
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue:active) {
+		background: var(--confirmation-button-active);
+	}
+
 	@media (min-width: 768px) {
 		.registration-confirmation-page {
 			--confirmation-page-padding-y: clamp(1.0625rem, 1.2vw, 1.75rem);
@@ -122,6 +164,16 @@ const { lang = 'it' } = Astro.props;
 		.registration-confirmation-panel p {
 			font-size: 1.25rem;
 			line-height: 1.3;
+		}
+
+		:global(.registration-confirmation-page .registration-confirmation-continue--mobile) {
+			display: none;
+		}
+
+		:global(.registration-confirmation-page .registration-confirmation-continue--desktop) {
+			display: grid;
+			width: min(100%, 20rem);
+			margin-top: 2rem;
 		}
 	}
 
