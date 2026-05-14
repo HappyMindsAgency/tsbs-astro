@@ -86,6 +86,7 @@
   --tsbs-space-2xl: 3rem;
 
   --tsbs-mobile-nav-height: 4.5rem;
+  --tsbs-mobile-nav-viewport-height: calc(var(--tsbs-mobile-nav-height) + env(safe-area-inset-bottom));
   --tsbs-desktop-nav-width: 16rem;
 
   --bs-body-font-family: var(--tsbs-font-body);
@@ -467,6 +468,21 @@ h1,
   --bs-gutter-x: 1.875rem;
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+
+@media (max-width: 991.98px) {
+  body:has(.tsbs-app-shell) {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  body:has(.tsbs-app-shell) .tsbs-app-shell {
+    height: calc(100dvh - var(--tsbs-mobile-nav-viewport-height));
+    min-height: 0;
+    padding-bottom: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @media (min-width: 992px) {
