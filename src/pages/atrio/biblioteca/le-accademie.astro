@@ -9,21 +9,25 @@ const academies = [
 		name: 'Astraria',
 		theme: 'astraria',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		href: '/atrio/accademia/',
 	},
 	{
 		name: 'Arcadia',
 		theme: 'arcadia',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		href: '/atrio/accademia/',
 	},
 	{
 		name: 'Armonia',
 		theme: 'armonia',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		href: '/atrio/accademia/',
 	},
 	{
 		name: 'Arborea',
 		theme: 'arborea',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		href: '/atrio/accademia/',
 	},
 ];
 ---
@@ -45,7 +49,7 @@ const academies = [
 
 			<div class="biblioteca-academies-list" aria-label="Elenco Accademie">
 				{academies.map((academy) => (
-					<article class={`biblioteca-academy-card is-${academy.theme}`}>
+					<a class={`biblioteca-academy-card is-${academy.theme}`} href={academy.href}>
 						<span class="biblioteca-academy-card__icon" aria-hidden="true">
 							<i class="bi bi-image"></i>
 						</span>
@@ -53,7 +57,7 @@ const academies = [
 							<h3>{academy.name}</h3>
 							<p>{academy.text}</p>
 						</div>
-					</article>
+					</a>
 				))}
 			</div>
 		</section>

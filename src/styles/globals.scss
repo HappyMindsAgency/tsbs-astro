@@ -1119,9 +1119,17 @@ h1,
 		min-height: 4.625rem;
 		padding: 0.875rem 1rem;
 		color: #4f5b70;
+		text-decoration: none;
 		background: #f5f5f5;
-		border: 1px solid #9ea2aa;
+		border: 2px solid var(--tsbs-theme-accent);
 		border-radius: 0.875rem;
+	}
+
+	.academy-ranking-card:hover,
+	.academy-ranking-card:focus {
+		color: #4f5b70;
+		text-decoration: none;
+		border-color: var(--tsbs-theme-accent);
 	}
 
 	.academy-ranking-card.is-current {
@@ -1502,7 +1510,7 @@ h1,
 		.academy-ranking-card.is-current {
 			color: #4f5b70;
 			background: #f5f5f5;
-			border-color: #9ea2aa;
+			border-color: var(--tsbs-theme-accent);
 		}
 
 		.academy-ranking-card.is-current .academy-ranking-card__avatar {
@@ -2030,9 +2038,16 @@ h1,
 		min-height: 7.5rem;
 		padding: 1.25rem 1rem;
 		color: var(--tsbs-color-white);
+		text-decoration: none;
 		background: var(--biblioteca-academy-card-bg);
 		border: 0;
 		border-radius: 0.75rem;
+	}
+
+	.biblioteca-academy-card:hover,
+	.biblioteca-academy-card:focus {
+		color: var(--tsbs-color-white);
+		text-decoration: none;
 	}
 
 	.biblioteca-academy-card.is-astraria {

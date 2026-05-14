@@ -3,6 +3,7 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 
 const { lang = 'it' } = Astro.props;
+const profileHref = '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/';
 
 const rankingRows = [
 	{ position: '24', initials: 'Tu', name: 'Adepto Mario', points: 24, current: true },
@@ -39,7 +40,7 @@ const rankingRows = [
 
 				<div class="academy-ranking-list">
 					{rankingRows.map((row, index) => (
-						<article class={`academy-ranking-card ${row.current ? 'is-current' : ''} ${index > 12 ? 'is-hidden' : ''}`} data-academy-ranking-card>
+						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''} ${index > 12 ? 'is-hidden' : ''}`} href={profileHref} data-academy-ranking-card>
 							<div class="academy-ranking-card__position">
 								{row.medal ? (
 									<i class={`bi bi-award-fill is-${row.medal}`} aria-hidden="true"></i>
@@ -54,7 +55,7 @@ const rankingRows = [
 								<strong>{row.points}</strong>
 								<i class="bi bi-trophy" aria-hidden="true"></i>
 							</p>
-						</article>
+						</a>
 					))}
 				</div>
 
