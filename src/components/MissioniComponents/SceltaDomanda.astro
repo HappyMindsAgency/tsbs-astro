@@ -1,5 +1,5 @@
 ---
-import TestNotPassed from '../toastComponents/TestNotPassed.astro';
+import TestPassed from '../toastComponents/TestPassed.astro';
 
 const { missione = null, lang = 'it', slugMis = '' } = Astro.props;
 
@@ -77,7 +77,7 @@ const firstQuestion = questions[0];
 		</form>
 	</div>
 
-	<TestNotPassed renderHidden={true} />
+	<TestPassed renderHidden={true} />
 </article>
 
 <script define:vars={{ questions }}>

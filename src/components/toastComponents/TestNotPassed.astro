@@ -6,6 +6,7 @@ const {
 	message = 'Missione non completata questa volta. Riprova e conquista il trofeo alla prossima sfida.',
 	secondaryMessage = 'Ogni lettura e comunque un passo avanti.',
 	buttonLabel = 'Ritenta',
+	buttonHref = '/atrio/',
 } = Astro.props;
 
 const shouldRender = isOpen || renderHidden;
@@ -27,7 +28,7 @@ const shouldRender = isOpen || renderHidden;
 			</div>
 
 			<div class="test-result-toast__footer">
-				<button class="btn tsbs-cta-primary test-result-toast__button" type="button" data-test-result-toast-close>{buttonLabel}</button>
+				<a class="btn tsbs-cta-primary test-result-toast__button" href={buttonHref}>{buttonLabel}</a>
 			</div>
 		</section>
 	</div>
@@ -124,6 +125,9 @@ const shouldRender = isOpen || renderHidden;
 	}
 
 	.test-result-toast__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		width: 100%;
 		min-height: 3rem;
 		font-family: var(--tsbs-font-body);
