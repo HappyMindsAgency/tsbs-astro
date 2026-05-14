@@ -3174,25 +3174,10 @@ h1,
 
 // EPISTOLE
 	.epistole-page {
-		--epistole-accent: #546176;
-		--epistole-header-bg: #b8b8b8;
 		--epistole-card-bg: color-mix(in srgb, var(--tsbs-color-body) 9%, var(--tsbs-color-white));
 		--epistole-card-border: #8d8f95;
 		--epistole-muted: #9aa4b4;
-		--missions-header-bg: var(--epistole-header-bg);
-		--tsbs-theme-accent: var(--epistole-accent);
-		--tsbs-theme-cta-bg: #aaa5a5;
-		--tsbs-theme-cta-border: #aaa5a5;
-		--tsbs-theme-cta-color: var(--tsbs-color-heading);
-		--tsbs-theme-cta-hover-bg: #8f8989;
-		--tsbs-theme-cta-hover-border: #8f8989;
-		--tsbs-theme-cta-hover-color: var(--tsbs-color-heading);
-		--tsbs-theme-cta-active-bg: #c8c3c3;
-		--tsbs-theme-cta-active-border: #c8c3c3;
-		--tsbs-theme-cta-active-color: var(--tsbs-color-heading);
-		--tsbs-theme-cta-focus-bg: #c8c3c3;
-		--tsbs-theme-cta-focus-border: #8f8989;
-		--tsbs-theme-cta-focus-color: var(--tsbs-color-heading);
+		--missions-header-bg: var(--tsbs-theme-accent);
 
 		min-height: 100vh;
 		background: var(--tsbs-color-white);
@@ -3200,7 +3185,7 @@ h1,
 
 	.epistole-page .epistole-header h1 {
 		margin: 0;
-		color: var(--epistole-accent);
+		color: var(--tsbs-color-white);
 		font-size: 2rem;
 		font-weight: 700;
 		line-height: 1;
@@ -3274,7 +3259,7 @@ h1,
 
 	.epistole-archive h2 {
 		margin: 0;
-		color: var(--epistole-accent);
+		color: var(--tsbs-theme-accent);
 		font-size: 1.625rem;
 		font-weight: 800;
 		line-height: 1.1;
@@ -3301,11 +3286,11 @@ h1,
 	.epistole-card:focus {
 		color: var(--tsbs-color-body);
 		text-decoration: none;
-		border-color: var(--epistole-accent);
+		border-color: var(--tsbs-theme-accent);
 	}
 
 	.epistole-card h3 {
-		color: var(--epistole-accent);
+		color: var(--tsbs-theme-accent);
 		font-size: 1.125rem;
 	}
 
