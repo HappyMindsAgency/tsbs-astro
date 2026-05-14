@@ -120,6 +120,11 @@ Colore globale body:
 - hex: `#666666`
 - uso: testo body e contenuti testuali principali
 
+Colore neutro soft globale:
+- hex: `#EFE9E3`
+- token: `--tsbs-color-neutral-soft`
+- uso: superfici neutre molto leggere, come pannelli o card riutilizzabili in contesti non legati alle Accademie
+
 Colore globale heading:
 - hex: `#1D1715`
 - uso: titoli principali pagina e titoli di sezione

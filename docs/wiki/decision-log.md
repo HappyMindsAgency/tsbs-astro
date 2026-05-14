@@ -20,6 +20,24 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-14 - Token Neutro Soft Globale
+
+Decisione:
+- aggiungere il token globale `--tsbs-color-neutral-soft` con valore `#EFE9E3`
+- usare il token per superfici neutre molto leggere, come pannelli e card non legati alle Accademie
+
+Motivo:
+- evitare hardcode locali per sfondi neutri soft richiesti dal design
+- mantenere riutilizzabile la cromia neutra su future schermate condivise
+
+Impatto:
+- `src/styles/globals.scss`
+- `src/pages/landing/login/index.astro`
+- `docs/wiki/frontend-design.md`
+
+Stato:
+- approvata
+
 ## 2026-05-13 - Preferiti Profili Base Con Storage Locale
 
 Decisione:
