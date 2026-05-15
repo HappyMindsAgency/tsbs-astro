@@ -23,7 +23,7 @@ const { lang = 'it' } = Astro.props;
 					Inserisci i dati per la registrazione o effettua il <a href="/landing/login/">log in</a>
 				</p>
 
-				<form class="sign-in-form" action="#" method="post">
+				<form class="sign-in-form" action="/landing/signin/conferma-registrazione/" method="post" data-sign-in-form>
 					<div class="sign-in-field">
 						<label for="sign-in-name">Nome</label>
 						<input id="sign-in-name" name="name" type="text" autocomplete="given-name" />
@@ -137,6 +137,28 @@ const { lang = 'it' } = Astro.props;
 
 	initSignInPasswordToggleState();
 	document.addEventListener('astro:page-load', initSignInPasswordToggleState);
+
+	const initSignInFormRedirect = () => {
+		document.querySelectorAll('[data-sign-in-form]').forEach((form) => {
+			if (!(form instanceof HTMLFormElement) || form.dataset.redirectBound === 'true') {
+				return;
+			}
+
+			form.dataset.redirectBound = 'true';
+			form.addEventListener('submit', (event) => {
+				event.preventDefault();
+
+				if (!form.reportValidity()) {
+					return;
+				}
+
+				window.location.assign(form.action);
+			});
+		});
+	};
+
+	initSignInFormRedirect();
+	document.addEventListener('astro:page-load', initSignInFormRedirect);
 </script>
 
 <style lang="scss">

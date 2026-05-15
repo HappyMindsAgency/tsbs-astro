@@ -88,7 +88,7 @@ const academySlides = Array.from({ length: 4 }, (_, index) => ({
 				<p>
 					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque.
 				</p>
-				<a class="onboarding-signup__button" href="/landing/sign-in/">Iscriviti</a>
+				<a class="onboarding-signup__button" href="/landing/signin/">Iscriviti</a>
 			</section>
 		</div>
 	</main>
@@ -504,7 +504,7 @@ const academySlides = Array.from({ length: 4 }, (_, index) => ({
 		font-weight: 700;
 		line-height: 1.2;
 		text-decoration: none;
-		background: color-mix(in srgb, var(--onboarding-accent) 58%, #546176);
+		background: var(--tsbs-global-cta-var1-bg);
 		border-radius: var(--tsbs-radius-sm);
 	}
 
@@ -512,6 +512,10 @@ const academySlides = Array.from({ length: 4 }, (_, index) => ({
 	.onboarding-signup__button:focus-visible {
 		color: var(--tsbs-color-white);
 		background: var(--tsbs-global-cta-var1-hover-bg);
+	}
+
+	.onboarding-signup__button:active {
+		background: var(--tsbs-global-cta-var1-active-bg);
 	}
 
 	@media (max-width: 374.98px) {
