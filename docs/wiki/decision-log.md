@@ -449,6 +449,25 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-15 - Trofei Posizionabili Una Sola Volta
+
+Decisione:
+- ogni trofeo disponibile puo essere selezionato e posizionato una sola volta nella griglia personale
+- dopo il posizionamento, il trofeo corrispondente nella lista `Trofei disponibili` deve apparire oscurato e non deve essere cliccabile o trascinabile
+- se il trofeo viene rimosso dalla griglia o viene usato `Reset`, torna disponibile nella lista
+
+Motivo:
+- rendere chiaro all'utente quali trofei sono gia stati caricati nella stanza personale
+- evitare duplicazioni dello stesso trofeo nella griglia
+- mantenere una logica semplice e coerente con il catalogo trofei
+
+Impatto:
+- `src/pages/atrio/scrivania/trofei.astro`
+- `docs/wiki/frontend-design.md`
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)

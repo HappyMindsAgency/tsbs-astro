@@ -276,12 +276,13 @@ Regole:
 - l'immagine del trofeo resta una rappresentazione visiva, non la fonte della collisione
 - drag e drop devono fare snap alla griglia mantenendo il top-left reale del pezzo
 - la X di rimozione va nella prima cella occupata del trofeo, in alto a sinistra
+- ogni trofeo puo essere selezionato e posizionato una sola volta nella griglia
+- dopo il posizionamento, il relativo elemento in `Trofei disponibili` deve risultare oscurato e non riselezionabile
 - su mobile la palette dei trofei disponibili deve restare sopra al menu di navigazione
 
 Note implementative:
 - evitare canvas, Konva o librerie nuove finche la matrice 2D copre il bisogno
 - mantenere la pagina Astro semplice, con logica locale e pronta a ricevere in futuro i trofei preferiti da Strapi
-- finche la logica finale non e definita, mantenere il commento su inserimento singolo o multiplo dei trofei
 
 ## Animazioni
 

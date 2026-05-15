@@ -228,6 +228,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 		const rows = Number(room.dataset.rows ?? 8);
 		const cols = Number(room.dataset.cols ?? 5);
 		const catalog = JSON.parse(room.dataset.catalog ?? '[]') as TrophyDefinition[];
+		const paletteItems = Array.from(room.querySelectorAll<HTMLButtonElement>('[data-trophy-source]'));
 		let placedTrophies: PlacedTrophy[] = [];
 		let instanceCount = 0;
 		let dragState: DragState | null = null;
@@ -393,12 +394,34 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 			});
 		};
 
+		const syncPaletteAvailability = () => {
+			const placedIds = new Set(placedTrophies.map((trophy) => trophy.id));
+
+			paletteItems.forEach((item) => {
+				const definition = catalog.find((trophy) => trophy.id === item.dataset.trophySource);
+				if (!definition) return;
+
+				const isPlaced = placedIds.has(definition.id);
+				item.disabled = isPlaced;
+				item.classList.toggle('is-used', isPlaced);
+				item.setAttribute('aria-disabled', String(isPlaced));
+				item.setAttribute(
+					'aria-label',
+					isPlaced ? `Trofeo ${definition.label} gia posizionato` : `Aggiungi trofeo ${definition.label}`
+				);
+			});
+		};
+
 		const syncView = () => {
 			renderPieces();
+			syncPaletteAvailability();
 		};
 
 		const addTrophy = (definition: TrophyDefinition, candidate?: CandidatePosition) => {
-			// decidere se i trofei possono essere inseriti una solo vaolta o più volte
+			if (placedTrophies.some((trophy) => trophy.id === definition.id)) {
+				return;
+			}
+
 			const position = candidate ?? findFirstAvailablePosition(definition);
 
 			if (!position || !isValidPlacement(definition, position)) {
@@ -495,6 +518,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 
 				if (state.hasMoved && candidate && isValidPlacement(state.trophy, candidate)) {
 					addTrophy(state.trophy, candidate);
+					suppressPaletteClick = false;
 					palette.classList.remove('is-open');
 				}
 				return;
@@ -522,6 +546,8 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 			if (!definition) return;
 
 			item.addEventListener('click', () => {
+				if (item.disabled) return;
+
 				if (suppressPaletteClick) {
 					suppressPaletteClick = false;
 					return;
@@ -532,6 +558,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 
 			item.addEventListener('pointerdown', (event) => {
 				if (event.button !== 0) return;
+				if (item.disabled || placedTrophies.some((trophy) => trophy.id === definition.id)) return;
 
 				item.setPointerCapture(event.pointerId);
 				const rect = item.getBoundingClientRect();
@@ -604,7 +631,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 			});
 		}
 
-		room.querySelectorAll<HTMLButtonElement>('[data-trophy-source]').forEach(bindPaletteItem);
+		paletteItems.forEach(bindPaletteItem);
 
 		menuButton?.addEventListener('click', () => {
 			palette.classList.add('is-open');
@@ -955,6 +982,14 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 		border: 1px solid #e0e4e8;
 		border-radius: 0.5rem;
 		touch-action: none;
+	}
+
+	.trophy-palette__item.is-used,
+	.trophy-palette__item:disabled {
+		cursor: not-allowed;
+		filter: grayscale(0.65);
+		opacity: 0.42;
+		box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tsbs-theme-accent) 12%, transparent);
 	}
 
 	:global(.trophy-drag-ghost) {
