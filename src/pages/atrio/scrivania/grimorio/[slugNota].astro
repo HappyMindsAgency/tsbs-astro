@@ -76,6 +76,13 @@ const { lang = 'it' } = Astro.props;
 
 	<script>
 		const storageKey = 'tsbs-grimorio-note-draft';
+		const noteStorage = (() => {
+			try {
+				return window.localStorage;
+			} catch {
+				return null;
+			}
+		})();
 		const titleInput = document.querySelector<HTMLInputElement>('[data-note-title]');
 		const bodyEditor = document.querySelector<HTMLElement>('[data-note-body]');
 		const saveButton = document.querySelector<HTMLButtonElement>('[data-note-save]');
@@ -91,7 +98,7 @@ const { lang = 'it' } = Astro.props;
 
 		const saveDraft = (status = 'draft') => {
 			const draft = { ...getDraft(), status };
-			localStorage.setItem(storageKey, JSON.stringify(draft));
+			noteStorage?.setItem(storageKey, JSON.stringify(draft));
 			return draft;
 		};
 
@@ -100,14 +107,14 @@ const { lang = 'it' } = Astro.props;
 			bodyEditor.classList.toggle('is-empty', bodyEditor.textContent?.trim().length === 0);
 		};
 
-		const savedDraft = localStorage.getItem(storageKey);
+		const savedDraft = noteStorage?.getItem(storageKey);
 		if (savedDraft) {
 			try {
 				const draft = JSON.parse(savedDraft);
 				if (titleInput && draft.title) titleInput.value = draft.title;
 				if (bodyEditor && draft.body) bodyEditor.innerHTML = draft.body;
 			} catch {
-				localStorage.removeItem(storageKey);
+				noteStorage?.removeItem(storageKey);
 			}
 		}
 
@@ -143,11 +150,10 @@ const { lang = 'it' } = Astro.props;
 			const shouldDelete = window.confirm('Eliminare questa nota?');
 			if (!shouldDelete) return;
 
-			localStorage.removeItem(storageKey);
+			noteStorage?.removeItem(storageKey);
 			if (titleInput) titleInput.value = 'Titolo della nota';
 			if (bodyEditor) bodyEditor.innerHTML = '';
 			updatePlaceholder();
 		});
 	</script>
 </Layout>
-

@@ -3647,14 +3647,16 @@ h1,
 // NOTA
 .note-page__content {
 		display: grid;
-		padding-top: 2.375rem;
-		padding-bottom: 2rem;
+		height: calc(100dvh - var(--tsbs-mobile-nav-viewport-height) - 5.25rem);
+		min-height: 0;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
 	}
 
 	.note-editor {
 		display: grid;
-		grid-template-rows: auto auto minmax(24rem, 1fr) auto;
-		min-height: calc(100vh - var(--tsbs-mobile-nav-height) - 5.25rem - 4.375rem);
+		grid-template-rows: auto auto minmax(0, 1fr) auto;
+		min-height: 0;
 		overflow: hidden;
 		background: #f5f5f5;
 		border: 1px solid #8d8f95;
@@ -3688,8 +3690,8 @@ h1,
 	.note-editor__icon-button {
 		display: grid;
 		place-items: center;
-		width: 2rem;
-		height: 2rem;
+		width: 2.75rem;
+		height: 2.75rem;
 		padding: 0;
 		color: var(--tsbs-theme-accent);
 		background: transparent;
@@ -3803,11 +3805,13 @@ h1,
 
 	@media (min-width: 768px) {
 		.note-page__content {
+			height: auto;
 			padding-top: 3rem;
 		}
 
 		.note-editor {
 			grid-template-rows: auto auto minmax(28rem, 1fr) auto;
+			min-height: calc(100vh - var(--tsbs-mobile-nav-height) - 5.25rem - 5rem);
 		}
 	}
 
