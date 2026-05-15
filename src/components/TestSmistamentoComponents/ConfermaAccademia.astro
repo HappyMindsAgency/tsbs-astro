@@ -1,0 +1,119 @@
+---
+const { selectedAcademy = 'arborea', lang = 'it' } = Astro.props;
+
+const academies = [
+	{ id: 'astraria', name: 'Astraria', theme: 'theme-astraria' },
+	{ id: 'arcadia', name: 'Arcadia', theme: 'theme-arcadia' },
+	{ id: 'armonia', name: 'Armonia', theme: 'theme-armonia' },
+	{ id: 'arborea', name: 'Arborea', theme: 'theme-arborea' },
+];
+
+const normalizedAcademy = academies.some((academy) => academy.id === selectedAcademy)
+	? selectedAcademy
+	: 'arborea';
+---
+
+<article class="mission-proof-question sorting-academy-choice" data-lang={lang} aria-label="Scelta Accademia">
+	<header class="mission-proof-question__header">
+		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
+			<h1 class="mission-proof-question__title mission-component-title">
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+			</h1>
+		</div>
+	</header>
+
+	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
+		<div class="choice-question__form sorting-academy-choice__form">
+			<fieldset class="choice-question__fieldset sorting-academy-choice__fieldset">
+				<legend>Scegli una sola risposta</legend>
+
+				<div class="choice-question__answers sorting-academy-choice__answers">
+					{academies.map((academy) => (
+						<label class={`choice-question__answer sorting-academy-choice__answer ${academy.theme}`} for={`academy-${academy.id}`}>
+							<input
+								id={`academy-${academy.id}`}
+								type="radio"
+								name="academy"
+								value={academy.id}
+								checked={academy.id === normalizedAcademy}
+							/>
+							<span class="choice-question__answer-label">{academy.name}</span>
+						</label>
+					))}
+				</div>
+			</fieldset>
+
+			{academies.map((academy) => (
+				<a
+					class={`btn tsbs-cta-primary mission-proof-question__cta choice-question__cta sorting-academy-choice__cta sorting-academy-choice__cta--${academy.id}`}
+					href={`/landing/test-smistamento/?step=risultato&academy=${academy.id}`}
+				>
+					Scegli
+				</a>
+			))}
+		</div>
+	</div>
+</article>
+
+<style lang="scss">
+	.sorting-academy-choice {
+		--sorting-selected-accent: var(--tsbs-theme-accent);
+	}
+
+	.sorting-academy-choice__answer {
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-accent);
+		border-color: transparent;
+	}
+
+	.sorting-academy-choice__answer:has(input:checked) {
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-accent);
+		border-color: transparent;
+	}
+
+	.sorting-academy-choice__answer:hover,
+	.sorting-academy-choice__answer:has(input:focus-visible) {
+		border-color: transparent;
+		box-shadow: 0 0.875rem 1.75rem color-mix(in srgb, var(--tsbs-theme-accent) 28%, transparent);
+	}
+
+	.sorting-academy-choice__form:has(#academy-astraria:checked) {
+		--sorting-selected-accent: var(--tsbs-color-astraria);
+	}
+
+	.sorting-academy-choice__form:has(#academy-arcadia:checked) {
+		--sorting-selected-accent: var(--tsbs-color-arcadia);
+	}
+
+	.sorting-academy-choice__form:has(#academy-armonia:checked) {
+		--sorting-selected-accent: var(--tsbs-color-armonia);
+	}
+
+	.sorting-academy-choice__form:has(#academy-arborea:checked) {
+		--sorting-selected-accent: var(--tsbs-color-arborea);
+	}
+
+	.sorting-academy-choice__cta {
+		display: none !important;
+		align-items: center;
+		justify-content: center;
+		--bs-btn-bg: var(--sorting-selected-accent);
+		--bs-btn-border-color: var(--sorting-selected-accent);
+		--bs-btn-hover-bg: color-mix(in srgb, var(--sorting-selected-accent) 82%, #000000);
+		--bs-btn-hover-border-color: color-mix(in srgb, var(--sorting-selected-accent) 82%, #000000);
+		--bs-btn-active-bg: color-mix(in srgb, var(--sorting-selected-accent) 30%, var(--tsbs-color-white));
+		--bs-btn-active-border-color: var(--sorting-selected-accent);
+		--bs-btn-active-color: var(--tsbs-color-heading);
+		--bs-btn-focus-bg: color-mix(in srgb, var(--sorting-selected-accent) 30%, var(--tsbs-color-white));
+		--bs-btn-focus-border-color: var(--sorting-selected-accent);
+		--bs-btn-focus-color: var(--tsbs-color-heading);
+	}
+
+	.sorting-academy-choice__form:has(#academy-astraria:checked) .sorting-academy-choice__cta--astraria,
+	.sorting-academy-choice__form:has(#academy-arcadia:checked) .sorting-academy-choice__cta--arcadia,
+	.sorting-academy-choice__form:has(#academy-armonia:checked) .sorting-academy-choice__cta--armonia,
+	.sorting-academy-choice__form:has(#academy-arborea:checked) .sorting-academy-choice__cta--arborea {
+		display: inline-flex !important;
+	}
+</style>

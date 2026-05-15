@@ -1,0 +1,307 @@
+---
+import onboardingVector from '../../assets/onboarding-vector.png';
+
+type AcademyKey = 'astraria' | 'arcadia' | 'armonia' | 'arborea';
+
+const academyLabels: Record<AcademyKey, string> = {
+	astraria: 'Astraria',
+	arcadia: 'Arcadia',
+	armonia: 'Armonia',
+	arborea: 'Arborea',
+};
+
+const normalizeAcademy = (value: unknown): AcademyKey => {
+	if (typeof value !== 'string') {
+		return 'arborea';
+	}
+
+	const normalized = value.toLowerCase().trim();
+	return normalized in academyLabels ? normalized as AcademyKey : 'arborea';
+};
+
+const { academy = 'arborea', lang = 'it' } = Astro.props;
+const currentAcademy = normalizeAcademy(academy);
+const academyName = academyLabels[currentAcademy];
+const resultBaseUrl = '/landing/test-smistamento/';
+const confirmHref = `${resultBaseUrl}?step=scelta-avatar&academy=${encodeURIComponent(currentAcademy)}`;
+const chooseHref = `${resultBaseUrl}?step=conferma-accademia&academy=${encodeURIComponent(currentAcademy)}`;
+---
+
+<section class="sorting-result-page" data-academy={currentAcademy} data-lang={lang} aria-labelledby="sorting-result-title">
+	<article class="sorting-result">
+		<div class="sorting-result__visual" aria-hidden="true">
+			<div class="sorting-result__media-icon">
+				<i class="bi bi-image"></i>
+			</div>
+
+			<img
+				class="sorting-result__avatar"
+				src={onboardingVector.src}
+				width={onboardingVector.width}
+				height={onboardingVector.height}
+				alt=""
+				loading="eager"
+			/>
+		</div>
+
+		<div class="sorting-result__panel">
+			<h1 id="sorting-result-title">
+				<span class="sorting-result__title-light">Benvenut* in</span>
+				<span class="sorting-result__title-bold">Accademia {academyName}</span>
+			</h1>
+			<p class="fw-bold">
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque.
+			</p>
+
+			<div class="sorting-result__actions">
+				<a class="btn tsbs-cta-primary mission-proof-question__cta sorting-result__button" href={confirmHref}>Conferma</a>
+				<a class="sorting-result__link" href={chooseHref}>oppure Scegli l’Accademia</a>
+			</div>
+		</div>
+	</article>
+</section>
+
+<style lang="scss">
+	.sorting-result-page {
+		--sorting-result-accent: var(--tsbs-theme-accent);
+		--sorting-result-muted: var(--tsbs-color-body);
+		--sorting-result-soft: color-mix(in srgb, var(--sorting-result-accent) 13%, var(--tsbs-color-surface));
+		--sorting-result-photo-bg: color-mix(in srgb, var(--tsbs-color-neutral) 10%, var(--tsbs-color-white));
+		--sorting-result-line: color-mix(in srgb, var(--sorting-result-accent) 18%, var(--tsbs-color-white));
+		--sorting-result-panel: var(--tsbs-color-surface);
+		--sorting-result-shadow: 0 1.125rem 3rem color-mix(in srgb, var(--sorting-result-accent) 14%, transparent);
+
+		display: grid;
+		place-items: stretch center;
+		min-height: 100vh;
+		min-height: 100svh;
+		padding: 0;
+		color: var(--sorting-result-muted);
+		background: var(--sorting-result-photo-bg);
+	}
+
+	.sorting-result {
+		position: relative;
+		display: grid;
+		width: 100%;
+		min-height: 100vh;
+		min-height: 100svh;
+		overflow: hidden;
+		background: var(--sorting-result-photo-bg);
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
+	}
+
+	.sorting-result__visual {
+		position: fixed;
+		inset: 0;
+		z-index: 4;
+		min-height: 100%;
+		overflow: visible;
+		pointer-events: none;
+	}
+
+	.sorting-result__media-icon {
+		position: fixed;
+		top: 18svh;
+		left: 50%;
+		display: grid;
+		place-items: center;
+		width: 4rem;
+		aspect-ratio: 1;
+		color: var(--tsbs-color-white);
+		font-size: 1.75rem;
+		background: color-mix(in srgb, var(--tsbs-color-heading) 64%, transparent);
+		border-radius: 50%;
+		transform: translateX(-50%);
+	}
+
+	.sorting-result__avatar {
+		position: fixed;
+		right: clamp(2.75rem, 13vw, 4.25rem);
+		bottom: clamp(17rem, 48vw, 18.5rem);
+		z-index: 5;
+		width: min(27vw, 5.75rem);
+		height: auto;
+		filter: saturate(0) brightness(0.64);
+		opacity: 0.9;
+		pointer-events: none;
+	}
+
+	.sorting-result__panel {
+		position: fixed;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 3;
+		display: grid;
+		gap: 0.875rem;
+		width: 100vw;
+		padding: 2rem 1.5rem calc(1.75rem + env(safe-area-inset-bottom));
+		background: var(--sorting-result-panel);
+		border-radius: 1.25rem 1.25rem 0 0;
+	}
+
+	.sorting-result__eyebrow {
+		margin: 0;
+		color: color-mix(in srgb, var(--sorting-result-accent) 78%, var(--tsbs-color-body));
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1.2;
+		text-transform: uppercase;
+	}
+
+	.sorting-result__panel h1 {
+		margin: 0;
+		color: var(--sorting-result-accent);
+		font-family: var(--tsbs-font-heading-academy);
+		font-size: clamp(1.75rem, 8vw, 2.25rem);
+		font-weight: 300;
+		line-height: 1.06;
+		letter-spacing: 0;
+	}
+
+	.sorting-result__title-light,
+	.sorting-result__title-bold {
+		display: block;
+		color: var(--sorting-result-accent);
+	}
+
+	.sorting-result__title-light {
+		font-weight: 300;
+	}
+
+	.sorting-result__title-bold {
+		font-weight: 700;
+	}
+
+	.sorting-result__panel p:not(.sorting-result__eyebrow) {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-size: 0.9375rem;
+		line-height: 1.35;
+	}
+
+	.sorting-result__actions {
+		display: grid;
+		gap: 0.875rem;
+		justify-items: center;
+		margin-top: 0.375rem;
+	}
+
+	.sorting-result__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		min-height: 3rem;
+		padding: 0.75rem 1rem;
+	}
+
+	.sorting-result__link {
+		color: color-mix(in srgb, var(--sorting-result-accent) 80%, var(--tsbs-color-heading));
+		font-size: 0.9375rem;
+		font-weight: 600;
+		line-height: 1.25;
+		text-align: center;
+		text-decoration: none;
+	}
+
+	.sorting-result__link:hover,
+	.sorting-result__link:focus-visible {
+		color: var(--tsbs-theme-cta-hover-bg);
+		text-decoration: underline;
+		text-underline-offset: 0.18em;
+	}
+
+	@media (max-width: 374.98px) {
+		.sorting-result__panel {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.sorting-result-page {
+			place-items: center;
+			padding: 0;
+		}
+
+		.sorting-result {
+			display: block;
+			width: 100%;
+			min-height: 100vh;
+			min-height: 100svh;
+			overflow: hidden;
+			background: var(--sorting-result-photo-bg);
+		}
+
+		.sorting-result__visual {
+			position: fixed;
+			inset: 0;
+			z-index: 4;
+			min-height: 100%;
+			overflow: visible;
+			pointer-events: none;
+		}
+
+		.sorting-result__avatar {
+			position: absolute;
+			right: max(8rem, calc((100vw - min(69rem, calc(100vw - 12rem))) / 2 + 8rem));
+			bottom: clamp(18.75rem, 31vh, 23rem);
+			width: clamp(6.25rem, 7.5vw, 8.5rem);
+			transform: none;
+		}
+
+		.sorting-result__media-icon {
+			position: absolute;
+			top: clamp(7.5rem, 20vh, 14rem);
+			left: 50%;
+			width: 4.5rem;
+			color: var(--tsbs-color-white);
+			font-size: 2rem;
+			background: color-mix(in srgb, var(--tsbs-color-heading) 64%, transparent);
+			border-radius: 50%;
+			transform: translateX(-50%);
+		}
+
+		.sorting-result__panel {
+			position: absolute;
+			right: auto;
+			bottom: clamp(3.5rem, 8vh, 6rem);
+			left: 50%;
+			width: min(69rem, calc(100vw - 12rem));
+			align-content: center;
+			justify-items: center;
+			min-height: 20rem;
+			padding: clamp(2.75rem, 4vw, 4rem) clamp(3rem, 7vw, 6rem);
+			text-align: center;
+			border-radius: 1.25rem;
+			transform: translateX(-50%);
+		}
+
+		.sorting-result__button {
+			width: min(100%, 20rem);
+			justify-self: center;
+		}
+
+		.sorting-result__actions {
+			width: min(100%, 20rem);
+			justify-items: stretch;
+		}
+
+		.sorting-result__link {
+			text-align: center;
+		}
+
+		.sorting-result__panel h1 {
+			max-width: 24rem;
+			font-size: clamp(1.875rem, 2.35vw, 2.25rem);
+		}
+
+		.sorting-result__panel p:not(.sorting-result__eyebrow) {
+			max-width: 49rem;
+		}
+	}
+</style>

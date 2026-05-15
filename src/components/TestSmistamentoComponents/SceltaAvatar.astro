@@ -1,0 +1,388 @@
+---
+import avatar01 from "../../assets/avatar-01.svg";
+import avatar02 from "../../assets/avatar-02.svg";
+import avatar03 from "../../assets/avatar-03.svg";
+import avatar04 from "../../assets/avatar-04.svg";
+import avatar05 from "../../assets/avatar-05.svg";
+import avatar06 from "../../assets/avatar-06.svg";
+import avatar07 from "../../assets/avatar-07.svg";
+import avatar08 from "../../assets/avatar-08.svg";
+import avatar09 from "../../assets/avatar-09.svg";
+
+const avatars = [
+  avatar01,
+  avatar02,
+  avatar03,
+  avatar04,
+  avatar05,
+  avatar06,
+  avatar07,
+  avatar08,
+  avatar09,
+];
+---
+
+<section class="scelta-avatar" aria-labelledby="scelta-avatar-title">
+  <div class="scelta-avatar__inner">
+    <header class="scelta-avatar__header">
+      <h1 id="scelta-avatar-title">Scegli il tuo Volto</h1>
+      <p>Lorem ipsum dolor sit amet</p>
+    </header>
+
+    <form class="scelta-avatar__form" action="/atrio/">
+      <div class="scelta-avatar__preview" aria-live="polite">
+        {
+          avatars.map((avatar, index) => (
+            <img
+              class={`scelta-avatar__preview-image scelta-avatar__preview-image--${index + 1}`}
+              src={avatar.src}
+              width={avatar.width}
+              height={avatar.height}
+              alt={`Avatar ${index + 1}`}
+              loading={index === 0 ? "eager" : "lazy"}
+              decoding="async"
+            />
+          ))
+        }
+      </div>
+
+      <p class="scelta-avatar__username">Lorem Ipsum</p>
+
+      <fieldset class="scelta-avatar__fieldset">
+        <legend class="visually-hidden">Seleziona un avatar</legend>
+
+        <div class="scelta-avatar__grid">
+          {
+            avatars.map((avatar, index) => {
+              const avatarNumber = index + 1;
+              const avatarId = `avatar-${avatarNumber}`;
+
+              return (
+                <label class={`scelta-avatar__option scelta-avatar__option--${avatarNumber}`} for={avatarId}>
+                  <input
+                    id={avatarId}
+                    class="visually-hidden"
+                    type="radio"
+                    name="avatar"
+                    value={avatarId}
+                    checked={index === 0}
+                  />
+                  <span class="scelta-avatar__thumb">
+                    <img
+                      src={avatar.src}
+                      width={avatar.width}
+                      height={avatar.height}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
+                  <span class="visually-hidden">Avatar {avatarNumber}</span>
+                </label>
+              );
+            })
+          }
+        </div>
+      </fieldset>
+
+      <a class="btn tsbs-cta-primary mission-proof-question__cta scelta-avatar__cta" href="/atrio/">
+        Conferma la scelta
+      </a>
+    </form>
+  </div>
+</section>
+
+<style>
+  .scelta-avatar {
+    --scelta-avatar-preview-size: min(42vw, 9.75rem);
+    --scelta-avatar-preview-image-padding: 1.875rem;
+    --scelta-avatar-preview-space: 1rem;
+    --scelta-avatar-username-space: 1.5rem;
+    --scelta-avatar-card-size: auto;
+    --scelta-avatar-card-image-padding: 1.35rem;
+    --scelta-avatar-grid-gap: 0.75rem;
+    --scelta-avatar-grid-space: 1.75rem;
+
+    min-height: 100%;
+    padding: clamp(2rem, 8vw, 4rem) var(--bs-gutter-x, 1rem);
+    background: var(--tsbs-color-surface);
+  }
+
+  .scelta-avatar__inner {
+    width: min(100%, 26rem);
+    margin: 0 auto;
+  }
+
+  .scelta-avatar__header {
+    margin-bottom: 1.75rem;
+    text-align: left;
+  }
+
+  .scelta-avatar__header h1 {
+    margin-bottom: 0.75rem;
+    font-family: var(--tsbs-font-body);
+    font-size: clamp(1.875rem, 8vw, 2.5rem);
+    font-weight: 600;
+    line-height: 1.12;
+    color: var(--tsbs-theme-accent);
+  }
+
+  .scelta-avatar__header p {
+    max-width: 18rem;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.45;
+    color: var(--tsbs-color-body);
+  }
+
+  .scelta-avatar__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .scelta-avatar__preview {
+    position: relative;
+    width: var(--scelta-avatar-preview-size);
+    aspect-ratio: 1;
+    margin-bottom: var(--scelta-avatar-preview-space);
+    overflow: hidden;
+    border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 72%, transparent);
+    border-radius: 50%;
+    background: var(--tsbs-color-neutral-soft);
+  }
+
+  .scelta-avatar__preview-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: var(--scelta-avatar-preview-image-padding);
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .scelta-avatar__preview-image--1 {
+    opacity: 1;
+  }
+
+  .scelta-avatar__username {
+    margin: 0 0 var(--scelta-avatar-username-space);
+    font-family: var(--tsbs-font-body);
+    font-size: 1.375rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--tsbs-theme-heading);
+  }
+
+  .scelta-avatar__fieldset {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .scelta-avatar__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--scelta-avatar-grid-gap);
+    width: min(100%, 20rem);
+    margin: 0 auto var(--scelta-avatar-grid-space);
+  }
+
+  .scelta-avatar__option {
+    position: relative;
+    width: var(--scelta-avatar-card-size);
+    cursor: pointer;
+  }
+
+  .scelta-avatar__thumb {
+    display: block;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 22%, transparent);
+    border-radius: 50%;
+    background: var(--tsbs-color-neutral-soft);
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  .scelta-avatar__thumb img {
+    width: 100%;
+    height: 100%;
+    padding: var(--scelta-avatar-card-image-padding);
+    object-fit: contain;
+  }
+
+  .scelta-avatar__option:hover .scelta-avatar__thumb,
+  .scelta-avatar__option:has(input:focus-visible) .scelta-avatar__thumb {
+    border-color: var(--tsbs-theme-accent);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--tsbs-theme-accent) 18%, transparent);
+    transform: translateY(-0.125rem);
+  }
+
+  .scelta-avatar__option:has(input:checked) .scelta-avatar__thumb {
+    border-color: var(--tsbs-theme-accent);
+  }
+
+  .scelta-avatar__option:has(input:checked)::after {
+    position: absolute;
+    top: -0.125rem;
+    right: -0.125rem;
+    display: grid;
+    place-items: center;
+    width: 1.625rem;
+    aspect-ratio: 1;
+    color: var(--tsbs-theme-accent);
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+    content: "✓";
+    background: var(--tsbs-color-white);
+    border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 72%, transparent);
+    border-radius: 50%;
+  }
+
+  .scelta-avatar__form:has(#avatar-1:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-2:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-3:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-4:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-5:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-6:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-7:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-8:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-9:checked) .scelta-avatar__preview-image {
+    opacity: 0;
+  }
+
+  .scelta-avatar__form:has(#avatar-1:checked) .scelta-avatar__preview-image--1,
+  .scelta-avatar__form:has(#avatar-2:checked) .scelta-avatar__preview-image--2,
+  .scelta-avatar__form:has(#avatar-3:checked) .scelta-avatar__preview-image--3,
+  .scelta-avatar__form:has(#avatar-4:checked) .scelta-avatar__preview-image--4,
+  .scelta-avatar__form:has(#avatar-5:checked) .scelta-avatar__preview-image--5,
+  .scelta-avatar__form:has(#avatar-6:checked) .scelta-avatar__preview-image--6,
+  .scelta-avatar__form:has(#avatar-7:checked) .scelta-avatar__preview-image--7,
+  .scelta-avatar__form:has(#avatar-8:checked) .scelta-avatar__preview-image--8,
+  .scelta-avatar__form:has(#avatar-9:checked) .scelta-avatar__preview-image--9 {
+    opacity: 1;
+  }
+
+  .scelta-avatar__cta {
+    margin-top: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .scelta-avatar {
+      --scelta-avatar-preview-size: clamp(5.75rem, 14.5vh, 10rem);
+      --scelta-avatar-preview-image-padding: clamp(1.35rem, 3.8vh, 2.625rem);
+      --scelta-avatar-preview-space: clamp(0.5rem, 2.2vh, 1.5rem);
+      --scelta-avatar-username-space: clamp(0.75rem, 4.7vh, 3.25rem);
+      --scelta-avatar-card-size: clamp(4.75rem, 11.75vh, 8rem);
+      --scelta-avatar-card-image-padding: clamp(1.15rem, 3.4vh, 2.375rem);
+      --scelta-avatar-grid-gap: clamp(0.5rem, 2.9vh, 2rem);
+      --scelta-avatar-grid-space: clamp(0.75rem, 6.8vh, 5rem);
+
+      display: grid;
+      align-items: start;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      padding-top: clamp(0.75rem, 7.75vh, 5.5rem);
+      padding-bottom: clamp(0.75rem, 4vh, 3rem);
+      overflow: hidden;
+    }
+
+    .scelta-avatar__inner {
+      width: min(100%, 53.375rem);
+    }
+
+    .scelta-avatar__header {
+      margin-bottom: clamp(0.75rem, 4.7vh, 3.25rem);
+    }
+
+    .scelta-avatar__header h1 {
+      margin-bottom: clamp(0.5rem, 1.45vh, 1rem);
+      font-size: clamp(2.5rem, 2.5vw, 3rem);
+      line-height: 1.15;
+      color: var(--tsbs-theme-accent);
+    }
+
+    .scelta-avatar__header p {
+      max-width: none;
+      font-size: clamp(0.875rem, 1.45vh, 1rem);
+      color: var(--tsbs-color-body);
+    }
+
+    .scelta-avatar__preview {
+      background: color-mix(in srgb, var(--tsbs-theme-accent) 16%, var(--tsbs-color-white));
+    }
+
+    .scelta-avatar__username {
+      font-size: 1.25rem;
+      color: color-mix(in srgb, var(--tsbs-theme-accent) 72%, var(--tsbs-color-heading));
+    }
+
+    .scelta-avatar__grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: min(100%, 48rem);
+    }
+
+    .scelta-avatar__option {
+      flex: 0 0 var(--scelta-avatar-card-size);
+    }
+
+    .scelta-avatar__option--1 {
+      order: 1;
+    }
+
+    .scelta-avatar__option--3 {
+      order: 2;
+    }
+
+    .scelta-avatar__option--2 {
+      order: 3;
+    }
+
+    .scelta-avatar__option--4 {
+      order: 4;
+    }
+
+    .scelta-avatar__option--5 {
+      order: 5;
+    }
+
+    .scelta-avatar__option--6 {
+      order: 6;
+    }
+
+    .scelta-avatar__option--9 {
+      order: 7;
+    }
+
+    .scelta-avatar__option--7 {
+      order: 8;
+    }
+
+    .scelta-avatar__option--8 {
+      order: 9;
+    }
+
+    .scelta-avatar__option:has(input:checked)::after {
+      top: -0.25rem;
+      right: -0.25rem;
+      width: 2rem;
+      font-size: 1.25rem;
+    }
+
+    .scelta-avatar__cta {
+      margin-top: 0;
+      width: min(100%, 25rem);
+    }
+  }
+</style>
