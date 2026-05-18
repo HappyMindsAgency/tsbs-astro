@@ -20,6 +20,25 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-18 - Accento Neutro Per Box Test Smistamento
+
+Decisione:
+- aggiungere il token globale `--tsbs-color-neutral-accent` con valore `#B89A7E`
+- aggiungere la variante `--tsbs-color-neutral-accent-soft`
+- usare l'accento neutro per i box di risposta default del test smistamento
+
+Motivo:
+- evitare hardcode locali su una cromia neutra ricorrente
+- rendere i box default del test smistamento coerenti con gli accenti globali neutri
+
+Impatto:
+- `src/styles/globals.scss`
+- `src/components/TestSmistamentoComponents/TestSmistamento.astro`
+- `docs/wiki/frontend-design.md`
+
+Stato:
+- approvata
+
 ## 2026-05-14 - Token Neutro Soft Globale
 
 Decisione:

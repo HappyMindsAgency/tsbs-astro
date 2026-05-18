@@ -98,6 +98,14 @@ const firstQuestion = questions[0];
 		gap: 1.25rem;
 	}
 
+	.sorting-test .choice-question__answer {
+		background: var(--tsbs-color-neutral-accent);
+	}
+
+	.sorting-test .choice-question__answer:has(input:checked) {
+		background: var(--tsbs-color-neutral);
+	}
+
 	.sorting-test__cta {
 		display: inline-flex;
 		align-items: center;

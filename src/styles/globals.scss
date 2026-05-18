@@ -18,6 +18,8 @@
   --tsbs-color-heading: #1d1715;
   --tsbs-color-body: #666666;
   --tsbs-color-neutral: #3d2116;
+  --tsbs-color-neutral-accent: #b89a7e;
+  --tsbs-color-neutral-accent-soft: color-mix(in srgb, var(--tsbs-color-neutral-accent) 28%, var(--tsbs-color-white));
   --tsbs-color-neutral-soft: #efe9e3;
   --tsbs-color-surface: #fffbf2;
   --tsbs-color-white: #f5f5f5;
@@ -50,10 +52,10 @@
 
   --tsbs-global-cta-var2-bg: #b89b7f;
   --tsbs-global-cta-var2-border: #b89b7f;
-  --tsbs-global-cta-var2-color: var(--tsbs-color-text);
+  --tsbs-global-cta-var2-color: var(--tsbs-color-white);
   --tsbs-global-cta-var2-hover-bg: #9a7d63;
   --tsbs-global-cta-var2-hover-border: #9a7d63;
-  --tsbs-global-cta-var2-hover-color: var(--tsbs-color-text);
+  --tsbs-global-cta-var2-hover-color: var(--tsbs-color-white);
   --tsbs-global-cta-var2-active-bg: #d4bca4;
   --tsbs-global-cta-var2-active-border: #d4bca4;
   --tsbs-global-cta-var2-active-color: var(--tsbs-color-text);

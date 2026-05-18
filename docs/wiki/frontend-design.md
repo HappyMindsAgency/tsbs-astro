@@ -125,6 +125,12 @@ Colore neutro soft globale:
 - token: `--tsbs-color-neutral-soft`
 - uso: superfici neutre molto leggere, come pannelli o card riutilizzabili in contesti non legati alle Accademie
 
+Accento neutro globale:
+- hex: `#B89A7E`
+- token: `--tsbs-color-neutral-accent`
+- variante soft: `--tsbs-color-neutral-accent-soft`
+- uso: superfici e stati neutri di maggiore presenza visiva, come box di risposta default del test smistamento
+
 Colore globale heading:
 - hex: `#1D1715`
 - uso: titoli principali pagina e titoli di sezione
@@ -147,8 +153,8 @@ Colore globale pagine neutre:
 - CTA var1 hover: `#2A1509`
 - CTA var1 active: `#6B3A28`
 - CTA var1 focus: background `#6B3A28`, border `1px solid #3E2016`
-- CTA var2 default: `#B89B7F`
-- CTA var2 hover: `#9A7D63`
+- CTA var2 default: background `#B89B7F`, testo `#F5F5F5`
+- CTA var2 hover: background `#9A7D63`, testo `#F5F5F5`
 - CTA var2 active: `#D4BCA4`
 - CTA var2 focus: background `#D4BCA4`, border `1px solid #B89B7F`
 
