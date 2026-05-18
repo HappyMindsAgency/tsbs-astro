@@ -5,8 +5,9 @@ import Nav from '../../../components/Nav.astro';
 const { lang = 'it' } = Astro.props;
 const profileHref = '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/';
 
+const currentRankingRow = { position: '24', initials: 'Tu', name: 'Adepto Mario', points: 24 };
+
 const rankingRows = [
-	{ position: '24', initials: 'Tu', name: 'Adepto Mario', points: 24, current: true },
 	{ position: 'I', medal: 'gold', initials: 'G', name: 'Adepto 1', points: 50 },
 	{ position: 'II', medal: 'silver', initials: 'L', name: 'Adepto 2', points: 45 },
 	{ position: 'III', medal: 'bronze', initials: 'S', name: 'Adepto 3', points: 43 },
@@ -57,6 +58,19 @@ const rankingRows = [
 							</p>
 						</a>
 					))}
+
+					<a class="academy-ranking-card is-current" href={profileHref} data-academy-ranking-card>
+						<div class="academy-ranking-card__position">
+							<span>{currentRankingRow.position}</span>
+							<span class="academy-ranking-card__roman"></span>
+						</div>
+						<div class="academy-ranking-card__avatar" aria-hidden="true">{currentRankingRow.initials}</div>
+						<p class="academy-ranking-card__name">{currentRankingRow.name}</p>
+						<p class="academy-ranking-card__points">
+							<strong>{currentRankingRow.points}</strong>
+							<i class="bi bi-trophy" aria-hidden="true"></i>
+						</p>
+					</a>
 				</div>
 
 				<div class="academy-ranking-load-more-row d-lg-flex justify-content-lg-end">

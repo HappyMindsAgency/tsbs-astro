@@ -1526,21 +1526,6 @@ h1,
 			padding: 1rem 1.5rem;
 		}
 
-		.academy-ranking-card.is-current {
-			color: #4f5b70;
-			background: #f5f5f5;
-			border-color: var(--tsbs-theme-accent);
-		}
-
-		.academy-ranking-card.is-current .academy-ranking-card__avatar {
-			color: #ffffff;
-			background: var(--tsbs-theme-accent);
-		}
-
-		.academy-ranking-card.is-current .academy-ranking-card__points {
-			color: #4f5b70;
-		}
-
 		.academy-ranking-card__points {
 			color: #4f5b70;
 			font-size: 1.125rem;
