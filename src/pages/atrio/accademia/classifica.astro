@@ -41,7 +41,7 @@ const rankingRows = [
 
 				<div class="academy-ranking-list">
 					{rankingRows.map((row, index) => (
-						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''} ${index > 12 ? 'is-hidden' : ''}`} href={profileHref} data-academy-ranking-card>
+						<a class={`academy-ranking-card ${index > 12 ? 'is-hidden' : ''}`} href={profileHref} data-academy-ranking-card>
 							<div class="academy-ranking-card__position">
 								{row.medal ? (
 									<i class={`bi bi-award-fill is-${row.medal}`} aria-hidden="true"></i>
