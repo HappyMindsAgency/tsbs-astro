@@ -164,8 +164,38 @@ const { isOpen = false, theme = '' } = Astro.props;
 	}
 
 	@media (min-width: 992px) {
-		.welcome-toast {
-			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.75rem);
+		.welcome-toast__panel {
+			width: min(100%, 35.5rem);
+		}
+
+		.welcome-toast__body {
+			grid-template-columns: 10rem minmax(0, 1fr);
+			gap: 1.75rem;
+			padding: 2.75rem 2.5rem 2.25rem;
+		}
+
+		.welcome-toast__avatar .bi {
+			font-size: 11rem;
+		}
+
+		.welcome-toast__title {
+			margin-bottom: 0.875rem;
+			font-size: 1.5rem;
+			line-height: 1.14;
+		}
+
+		.welcome-toast__content p {
+			font-size: 1.125rem;
+			line-height: 1.48;
+		}
+
+		.welcome-toast__footer {
+			padding: 1.25rem 1.5rem 1.5rem;
+		}
+
+		.welcome-toast__button {
+			padding: 1rem 1.25rem;
+			font-size: 1.125rem;
 		}
 	}
 </style>
