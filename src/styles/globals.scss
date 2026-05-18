@@ -2874,6 +2874,7 @@ h1,
 
 	.mission-proof-question {
 		--mission-proof-question-accent: var(--tsbs-theme-accent);
+		--mission-proof-question-answer-bg: color-mix(in srgb, var(--mission-proof-question-accent) 28%, var(--tsbs-color-white));
 		--mission-proof-question-header: var(--mission-proof-question-accent);
 		display: grid;
 		grid-template-rows: auto 1fr;
@@ -3041,7 +3042,7 @@ h1,
 		color: var(--tsbs-color-heading);
 		text-align: center;
 		cursor: pointer;
-		background: #cfcfcf;
+		background: var(--mission-proof-question-answer-bg);
 		border: 1px solid transparent;
 		border-radius: var(--tsbs-radius-md);
 	}
