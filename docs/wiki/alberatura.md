@@ -60,8 +60,10 @@ src/pages/
 │  ├─ trofei.astro
 │  ├─ grimorio/
 │  │  ├─ index.astro
-│  │  └─ [slugGrimorio].astro
-│  ├─ utenti-preferiti.astro
+│  │  └─ [slugNota].astro
+│  ├─ utenti-preferiti/
+│  │  ├─ index.astro
+│  │  └─ esploso-profilo-utente.astro
 │  └─ membri/
 │     └─ [nickname].astro
 │
@@ -118,6 +120,26 @@ La pagina `atrio/missioni/[slugMis]/prova/sfida-lettura.astro` gestisce lo step 
 La pagina `atrio/missioni/[slugMis]/esito.astro` gestisce il risultato finale della missione.
 
 La route della singola missione deve restare stabile e non moltiplicarsi in base a categoria o tipologia.
+
+### Utenti Preferiti
+
+La sezione `atrio/scrivania/utenti-preferiti/` contiene:
+
+```txt
+atrio/scrivania/utenti-preferiti/
+├─ index.astro
+└─ esploso-profilo-utente.astro
+```
+
+Nella versione base senza Strapi, il like dei profili usa `localStorage` tramite `src/lib/profileFavorites.js` e salva solo identificativi stabili dei profili.
+
+I dati visuali dei profili arrivano temporaneamente da `src/data/mockProfiles.js`.
+
+Quando arrivera il binding Strapi:
+- sostituire il dataset mock con dati Strapi
+- usare `documentId` o slug univoco come identificativo stabile
+- sostituire l'implementazione interna di `profileFavorites.js` con chiamate API/relazione Strapi tra utente autenticato e profili preferiti
+- non salvare copie complete dei profili nel client
 La variazione di layout deve essere gestita tramite componenti interni scelti in base ai dati Strapi.
 
 Struttura attuale dei componenti prova:
@@ -219,6 +241,20 @@ Il campo `nickname` esiste in Strapi ed e unico, ma prima di implementare questa
 - logiche privacy
 - eventuale distinzione tra profilo personale e preview altri utenti
 
+### Grimorio E Note
+
+La sezione `atrio/scrivania/grimorio/` contiene l'elenco delle note personali e l'esploso della singola nota:
+
+```txt
+atrio/scrivania/grimorio/
+├─ index.astro
+└─ [slugNota].astro
+```
+
+La route dinamica `[slugNota].astro` ospita l'editor/esploso della nota. I blocchi di anteprima del Grimorio presenti in Atrio, Scrivania e Grimorio devono puntare alla nota specifica usando uno slug stabile.
+
+In fase provvisoria, prima del binding Strapi, e accettabile usare uno slug statico come `titolo-della-nota`. Quando arrivera Strapi, lo slug dovra arrivare dal record della nota/grimorio e non da hardcode sparsi.
+
 ### Biblioteca
 
 La sezione `biblioteca/` raccoglie contenuti istituzionali, archivio e ponte con Biblioteca Classense:
@@ -267,7 +303,7 @@ Route dinamiche gia coerenti con campi slug presenti in Strapi:
 accademia/[slugAccademia].astro
 biblioteca/eventi/[slugEvento].astro
 epistole/[slugEpistola].astro
-scrivania/grimorio/[slugGrimorio].astro
+scrivania/grimorio/[slugNota].astro
 ```
 
 Route dinamica da confermare:

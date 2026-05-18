@@ -20,6 +20,90 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-18 - Accento Neutro Per Box Test Smistamento
+
+Decisione:
+- aggiungere il token globale `--tsbs-color-neutral-accent` con valore `#B89A7E`
+- aggiungere la variante `--tsbs-color-neutral-accent-soft`
+- usare l'accento neutro per i box di risposta default del test smistamento
+
+Motivo:
+- evitare hardcode locali su una cromia neutra ricorrente
+- rendere i box default del test smistamento coerenti con gli accenti globali neutri
+
+Impatto:
+- `src/styles/globals.scss`
+- `src/components/TestSmistamentoComponents/TestSmistamento.astro`
+- `docs/wiki/frontend-design.md`
+
+Stato:
+- approvata
+
+## 2026-05-14 - Token Neutro Soft Globale
+
+Decisione:
+- aggiungere il token globale `--tsbs-color-neutral-soft` con valore `#EFE9E3`
+- usare il token per superfici neutre molto leggere, come pannelli e card non legati alle Accademie
+
+Motivo:
+- evitare hardcode locali per sfondi neutri soft richiesti dal design
+- mantenere riutilizzabile la cromia neutra su future schermate condivise
+
+Impatto:
+- `src/styles/globals.scss`
+- `src/pages/landing/login/index.astro`
+- `docs/wiki/frontend-design.md`
+
+Stato:
+- approvata
+
+## 2026-05-13 - Preferiti Profili Base Con Storage Locale
+
+Decisione:
+- creare una versione base del like profilo con `localStorage`
+- salvare nei preferiti solo identificativi stabili dei profili, non copie complete dei dati profilo
+- centralizzare la logica in `src/lib/profileFavorites.js`
+- usare `src/data/mockProfiles.js` come dataset provvisorio finche non arriva il binding Strapi
+- strutturare la sezione come `src/pages/atrio/scrivania/utenti-preferiti/`
+
+Motivo:
+- permettere subito il toggle like e la lista utenti preferiti senza introdurre backend provvisorio
+- mantenere la UI indipendente dal meccanismo di persistenza
+- rendere piu semplice sostituire `localStorage` con Strapi in seguito
+
+Impatto:
+- `src/lib/profileFavorites.js`
+- `src/data/mockProfiles.js`
+- `src/pages/atrio/scrivania/utenti-preferiti/index.astro`
+- `src/pages/atrio/scrivania/utenti-preferiti/esploso-profilo-utente.astro`
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
+## 2026-05-13 - Note Dentro Grimorio Con Route Dinamica
+
+Decisione:
+- spostare l'esploso/editor della nota sotto `src/pages/atrio/scrivania/grimorio/[slugNota].astro`
+- usare `src/pages/atrio/scrivania/grimorio/index.astro` come elenco/archivio note
+- far puntare i blocchi di anteprima nota di Atrio, Scrivania e Grimorio alla route della nota specifica
+- non introdurre componenti dedicati per la preview o per l'editor in questa fase
+
+Motivo:
+- trattare la nota come contenuto interno al Grimorio, non come sezione parallela alla Scrivania
+- preparare il binding Strapi con slug stabile per ogni nota
+- mantenere l'alberatura semplice e coerente con l'esperienza utente
+
+Impatto:
+- `docs/wiki/alberatura.md`
+- `src/pages/atrio/index.astro`
+- `src/pages/atrio/scrivania/index.astro`
+- `src/pages/atrio/scrivania/grimorio/index.astro`
+- `src/pages/atrio/scrivania/grimorio/[slugNota].astro`
+
+Stato:
+- approvata
+
 ## 2026-04-27 - Creazione Wiki Progetto E Guardrail AI
 
 Decisione:
@@ -359,6 +443,46 @@ Impatto:
 - `docs/wiki/alberatura.md`
 - `src/components/PopupComponents/DomandaModal.astro`
 - `src/pages/atrio/missioni/[slugMis]/sfida-lettura.astro`
+
+Stato:
+- approvata
+
+## 2026-05-11 - Logica Trofei A Matrice Tetris
+
+Decisione:
+- implementare la griglia Trofei come griglia 5 colonne x 8 righe
+- rappresentare ogni trofeo con una matrice 2D in cui `1` indica una cella occupata e `0` una cella libera
+- validare collisioni e fuori griglia solo sulle celle occupate dalla matrice, non sul rettangolo completo dell'immagine
+- mantenere le celle `0` attraversabili e riempibili da altri trofei
+- posizionare la X di rimozione nella prima cella occupata del trofeo, in alto a sinistra
+
+Motivo:
+- ottenere un comportamento piu vicino a Tetris
+- permettere incastri naturali tra trofei con sagome non rettangolari
+- evitare sovrapposizioni logiche mantenendo una soluzione semplice, senza canvas o librerie aggiuntive
+
+Impatto:
+- `src/pages/atrio/scrivania/trofei.astro`
+- `docs/wiki/frontend-design.md`
+
+Stato:
+- approvata
+
+## 2026-05-15 - Trofei Posizionabili Una Sola Volta
+
+Decisione:
+- ogni trofeo disponibile puo essere selezionato e posizionato una sola volta nella griglia personale
+- dopo il posizionamento, il trofeo corrispondente nella lista `Trofei disponibili` deve apparire oscurato e non deve essere cliccabile o trascinabile
+- se il trofeo viene rimosso dalla griglia o viene usato `Reset`, torna disponibile nella lista
+
+Motivo:
+- rendere chiaro all'utente quali trofei sono gia stati caricati nella stanza personale
+- evitare duplicazioni dello stesso trofeo nella griglia
+- mantenere una logica semplice e coerente con il catalogo trofei
+
+Impatto:
+- `src/pages/atrio/scrivania/trofei.astro`
+- `docs/wiki/frontend-design.md`
 
 Stato:
 - approvata

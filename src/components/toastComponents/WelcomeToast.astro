@@ -3,7 +3,7 @@ const { isOpen = false, theme = '' } = Astro.props;
 ---
 
 {isOpen && (
-		<div class={`welcome-toast tsbs-toast ${theme}`} data-welcome-toast role="dialog" aria-modal="true" aria-labelledby="welcome-toast-title">
+	<div class={`welcome-toast tsbs-toast ${theme}`} data-welcome-toast role="dialog" aria-modal="true" aria-labelledby="welcome-toast-title">
 		<div class="welcome-toast__backdrop" data-welcome-toast-close></div>
 		<div class="welcome-toast__panel">
 			<div class="welcome-toast__body">
@@ -11,7 +11,10 @@ const { isOpen = false, theme = '' } = Astro.props;
 					<i class="bi bi-person-fill"></i>
 				</div>
 				<div class="welcome-toast__content">
-					<h2 id="welcome-toast-title">Benvenut* Adept*</h2>
+					<h2 id="welcome-toast-title" class="welcome-toast__title">
+						<span class="welcome-toast__title-light">Benvenut*</span>
+						<span class="welcome-toast__title-accent">Adept*</span>
+					</h2>
 					<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id, porta sapien.</p>
 				</div>
 			</div>
@@ -71,9 +74,9 @@ const { isOpen = false, theme = '' } = Astro.props;
 	}
 
 	.welcome-toast__body {
-		display: grid;
-		grid-template-columns: 7.25rem minmax(0, 1fr);
-		gap: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
 		align-items: center;
 		padding: 2rem 1.875rem 1.5rem;
 	}
@@ -85,19 +88,37 @@ const { isOpen = false, theme = '' } = Astro.props;
 	}
 
 	.welcome-toast__avatar .bi {
-		font-size: 8.5rem;
+		font-size: 7rem;
 		line-height: 1;
 	}
-		.welcome-toast__content h2 {
-			margin: 0 0 0.625rem;
-		}
 
-		.welcome-toast__content p {
-			margin: 0;
-			color: var(--tsbs-theme-body);
-			font-size: 1rem;
-			line-height: 1.42;
-		}
+	.welcome-toast__content {
+		width: 100%;
+	}
+
+	.welcome-toast__title {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 0.35rem;
+		margin: 0 0 0.625rem;
+		color: var(--tsbs-theme-accent);
+		font-family: var(--tsbs-font-heading-academy);
+		font-size: 1.25rem;
+		font-weight: 700;
+		line-height: 1.12;
+		letter-spacing: 0;
+	}
+
+	.welcome-toast__title-accent {
+		color: inherit;
+	}
+
+	.welcome-toast__content p {
+		margin: 0;
+		color: var(--tsbs-theme-body);
+		font-size: 1rem;
+		line-height: 1.42;
+	}
 
 	.welcome-toast__footer {
 		padding: 1rem;
@@ -119,14 +140,50 @@ const { isOpen = false, theme = '' } = Astro.props;
 		}
 
 		.welcome-toast__body {
-			grid-template-columns: 5.5rem minmax(0, 1fr);
 			gap: 0.875rem;
 			padding-right: 1rem;
 			padding-left: 1rem;
 		}
 
 		.welcome-toast__avatar .bi {
-			font-size: 6.75rem;
+			font-size: 5.75rem;
+		}
+	}
+
+	@media (min-width: 576px) {
+		.welcome-toast__body {
+			display: grid;
+			grid-template-columns: 7.25rem minmax(0, 1fr);
+			gap: 1.25rem;
+			align-items: center;
+		}
+
+		.welcome-toast__avatar .bi {
+			font-size: 8.5rem;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.welcome-toast__panel {
+			width: min(100%, 35.5rem);
+		}
+
+		.welcome-toast__body {
+			grid-template-columns: 8.75rem minmax(0, 1fr);
+			gap: 1.75rem;
+			padding: 2.75rem 2.5rem 2.25rem;
+		}
+
+		.welcome-toast__title {
+			margin-bottom: 0.875rem;
+		}
+
+		.welcome-toast__footer {
+			padding: 1.25rem 1.5rem 1.5rem;
+		}
+
+		.welcome-toast__button {
+			padding: 1rem 1.25rem;
 		}
 	}
 </style>

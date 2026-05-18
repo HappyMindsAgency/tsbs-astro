@@ -1,0 +1,189 @@
+---
+interface Props {
+	isOpen?: boolean;
+	renderHidden?: boolean;
+}
+
+const { isOpen = false, renderHidden = true } = Astro.props as Props;
+const shouldRender = isOpen || renderHidden;
+---
+
+{shouldRender && (
+	<div
+		class="trophy-instructions-modal"
+		data-trophy-instructions-modal
+		hidden={!isOpen}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="trophy-instructions-title"
+		aria-describedby="trophy-instructions-copy"
+	>
+		<div class="trophy-instructions-modal__backdrop" data-trophy-instructions-close></div>
+
+		<section class="trophy-instructions-modal__panel">
+			<div class="trophy-instructions-modal__content">
+				<h2 id="trophy-instructions-title">Istruzioni</h2>
+				<div id="trophy-instructions-copy">
+					<ul>
+						<li><strong>Click/Tap</strong> su una forma qui per aggiungerla</li>
+						<li><strong>Trascina</strong> le forme sulla griglia per spostarle</li>
+						<li><strong>Desktop:</strong> Passa il mouse su una forma → click <span aria-hidden="true">✖</span></li>
+						<li><strong>Mobile:</strong> Tap su una forma → tap sul pulsante <span aria-hidden="true">✖</span></li>
+						<li><span class="trophy-instructions-modal__dot trophy-instructions-modal__dot--valid" aria-hidden="true"></span> Verde = posizione valida durante drag</li>
+						<li><span class="trophy-instructions-modal__dot trophy-instructions-modal__dot--invalid" aria-hidden="true"></span> Rosso = posizione non valida o sovrapposizione</li>
+					</ul>
+				</div>
+			</div>
+
+			<button class="btn tsbs-cta-primary trophy-instructions-modal__button" type="button" data-trophy-instructions-close>
+				Chiudi
+			</button>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupTrophyInstructionsModal = () => {
+		document.querySelectorAll<HTMLElement>('[data-trophy-instructions-modal]').forEach((modal) => {
+			if (modal.dataset.trophyInstructionsReady === 'true') return;
+			modal.dataset.trophyInstructionsReady = 'true';
+
+			const closeControls = modal.querySelectorAll<HTMLElement>('[data-trophy-instructions-close]');
+			const closeButton = modal.querySelector<HTMLButtonElement>('.trophy-instructions-modal__button');
+			let previousFocus: HTMLElement | null = null;
+
+			const closeModal = () => {
+				modal.hidden = true;
+
+				if (previousFocus) {
+					previousFocus.focus();
+				}
+			};
+
+			const openModal = () => {
+				previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+				modal.hidden = false;
+				closeButton?.focus();
+			};
+
+			document.addEventListener('tsbs:trophy-instructions-open', openModal);
+
+			closeControls.forEach((control) => {
+				control.addEventListener('click', closeModal);
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !modal.hidden) {
+					closeModal();
+				}
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupTrophyInstructionsModal);
+	setupTrophyInstructionsModal();
+</script>
+
+<style lang="scss">
+	.trophy-instructions-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 1200;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		padding: 1.875rem;
+	}
+
+	.trophy-instructions-modal[hidden] {
+		display: none;
+	}
+
+	.trophy-instructions-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-white) 68%, transparent);
+		backdrop-filter: grayscale(0.65) blur(0.0625rem);
+	}
+
+	.trophy-instructions-modal__panel {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		gap: 1.5rem;
+		width: min(100%, 24rem);
+		padding: 2rem 1rem 1rem;
+		background: var(--tsbs-color-white);
+		border-radius: 0.875rem;
+		box-shadow: 0 1.25rem 3rem rgba(84, 97, 118, 0.16);
+	}
+
+	.trophy-instructions-modal__content {
+		display: grid;
+		gap: 1rem;
+		padding: 0 1rem;
+	}
+
+	.trophy-instructions-modal__content h2 {
+		margin: 0;
+		color: var(--tsbs-theme-accent);
+		font-family: var(--tsbs-font-body);
+		font-size: 1.5rem;
+		font-weight: 800;
+		line-height: 1.18;
+	}
+
+	.trophy-instructions-modal__content ul {
+		display: grid;
+		gap: 0.625rem;
+		padding-left: 1rem;
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.35;
+	}
+
+	.trophy-instructions-modal__dot {
+		display: inline-block;
+		width: 0.875rem;
+		height: 0.875rem;
+		margin-right: 0.25rem;
+		vertical-align: -0.125rem;
+		border-radius: 50%;
+	}
+
+	.trophy-instructions-modal__dot--valid {
+		background: #2e9e43;
+	}
+
+	.trophy-instructions-modal__dot--invalid {
+		background: #d64236;
+	}
+
+	.trophy-instructions-modal__button {
+		justify-self: stretch;
+		min-height: 3rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.25rem;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	@media (max-width: 360px) {
+		.trophy-instructions-modal {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.trophy-instructions-modal {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.875rem);
+		}
+	}
+
+</style>

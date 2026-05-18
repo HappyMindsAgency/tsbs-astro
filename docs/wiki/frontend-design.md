@@ -120,6 +120,17 @@ Colore globale body:
 - hex: `#666666`
 - uso: testo body e contenuti testuali principali
 
+Colore neutro soft globale:
+- hex: `#EFE9E3`
+- token: `--tsbs-color-neutral-soft`
+- uso: superfici neutre molto leggere, come pannelli o card riutilizzabili in contesti non legati alle Accademie
+
+Accento neutro globale:
+- hex: `#B89A7E`
+- token: `--tsbs-color-neutral-accent`
+- variante soft: `--tsbs-color-neutral-accent-soft`
+- uso: superfici e stati neutri di maggiore presenza visiva, come box di risposta default del test smistamento
+
 Colore globale heading:
 - hex: `#1D1715`
 - uso: titoli principali pagina e titoli di sezione
@@ -142,8 +153,8 @@ Colore globale pagine neutre:
 - CTA var1 hover: `#2A1509`
 - CTA var1 active: `#6B3A28`
 - CTA var1 focus: background `#6B3A28`, border `1px solid #3E2016`
-- CTA var2 default: `#B89B7F`
-- CTA var2 hover: `#9A7D63`
+- CTA var2 default: background `#B89B7F`, testo `#F5F5F5`
+- CTA var2 hover: background `#9A7D63`, testo `#F5F5F5`
 - CTA var2 active: `#D4BCA4`
 - CTA var2 focus: background `#D4BCA4`, border `1px solid #B89B7F`
 
@@ -257,6 +268,27 @@ Sfida lettura:
 - il popup per la domanda aperta dopo la selezione di un libro letto si chiama `DomandaModal.astro`
 - `DomandaModal.astro` vive in `src/components/PopupComponents/`
 - il design puo riusare il linguaggio visivo di `SceltaDomanda.astro`, adattandolo a un popup/modale compatto
+
+## Griglia Trofei
+
+La pagina Trofei usa una logica di posizionamento stile Tetris.
+
+Regole:
+- la griglia resta 5 colonne x 8 righe
+- ogni trofeo e descritto da una matrice 2D
+- `1` indica una cella occupata dal trofeo
+- `0` indica una cella libera, attraversabile e riempibile da altri trofei
+- collisioni e fuori griglia devono essere calcolati solo sulle celle `1`
+- l'immagine del trofeo resta una rappresentazione visiva, non la fonte della collisione
+- drag e drop devono fare snap alla griglia mantenendo il top-left reale del pezzo
+- la X di rimozione va nella prima cella occupata del trofeo, in alto a sinistra
+- ogni trofeo puo essere selezionato e posizionato una sola volta nella griglia
+- dopo il posizionamento, il relativo elemento in `Trofei disponibili` deve risultare oscurato e non riselezionabile
+- su mobile la palette dei trofei disponibili deve restare sopra al menu di navigazione
+
+Note implementative:
+- evitare canvas, Konva o librerie nuove finche la matrice 2D copre il bisogno
+- mantenere la pagina Astro semplice, con logica locale e pronta a ricevere in futuro i trofei preferiti da Strapi
 
 ## Animazioni
 

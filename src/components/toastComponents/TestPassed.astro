@@ -6,6 +6,7 @@ const {
 	message = 'Hai completando questa missione, ottieni:',
 	trophyLabel = 'Trofeo "Topo da biblioteca"',
 	buttonLabel = 'Colleziona',
+	buttonHref = '/atrio/scrivania/trofei/',
 } = Astro.props;
 
 const shouldRender = isOpen || renderHidden;
@@ -30,10 +31,10 @@ const shouldRender = isOpen || renderHidden;
 			</div>
 
 			<div class="test-result-toast__footer">
-				<button class="btn tsbs-cta-primary test-result-toast__button" type="button" data-test-result-toast-close>
+				<a class="btn tsbs-cta-primary test-result-toast__button" href={buttonHref}>
 					<span>{buttonLabel}</span>
 					<i class="bi bi-check-lg" aria-hidden="true"></i>
-				</button>
+				</a>
 			</div>
 		</section>
 	</div>
@@ -156,5 +157,11 @@ const shouldRender = isOpen || renderHidden;
 		font-weight: 800;
 		line-height: 1;
 		border-radius: 0.25rem;
+	}
+
+	@media (min-width: 992px) {
+		.test-result-toast {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.75rem);
+		}
 	}
 </style>

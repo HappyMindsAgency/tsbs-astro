@@ -1,0 +1,85 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import Nav from '../../../../components/Nav.astro';
+import { mockProfiles } from '../../../../data/mockProfiles.js';
+
+const { lang = 'it' } = Astro.props;
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell academy-page academy-ranking-page profile-favorites-page">
+		<header class="missions-header academy-ranking-header">
+			<h1>Utenti preferiti</h1>
+		</header>
+
+		<div class="container-xl tsbs-app-container academy-ranking-page__content">
+			<section class="academy-section" aria-label="Utenti preferiti">
+				<p class="profile-favorites-empty" data-profile-favorites-empty hidden>
+					In questa pagina, trovi tutti gli utenti preferiti. Attualmente non ci sono utenti preferiti.
+				</p>
+
+				<div class="academy-ranking-list" data-profile-favorites-list>
+					{mockProfiles.map((row) => (
+						<article class={`academy-ranking-card is-academy-${row.academy}`} data-profile-favorite-card data-profile-id={row.id} hidden>
+							<div class="academy-ranking-card__position">
+								{row.medal ? (
+									<i class={`bi bi-award-fill is-${row.medal}`} aria-hidden="true"></i>
+								) : (
+									<span>{row.position}</span>
+								)}
+								<span class="academy-ranking-card__roman">{row.medal ? row.position : ''}</span>
+							</div>
+							<div class="academy-ranking-card__avatar" aria-hidden="true">{row.initials}</div>
+							<p class="academy-ranking-card__name">{row.name}</p>
+							<p class="academy-ranking-card__points">
+								<strong>{row.points}</strong>
+								<i class="bi bi-trophy" aria-hidden="true"></i>
+							</p>
+						</article>
+					))}
+				</div>
+			</section>
+		</div>
+	</main>
+</Layout>
+
+<script>
+	import { getFavorites } from '../../../../lib/profileFavorites.js';
+
+	const favoriteCards = document.querySelectorAll('[data-profile-favorite-card]');
+	const emptyState = document.querySelector('[data-profile-favorites-empty]');
+
+	const renderFavoriteProfiles = () => {
+		const favoriteIds = new Set(getFavorites());
+		let visibleCount = 0;
+
+		favoriteCards.forEach((card) => {
+			const shouldShow = favoriteIds.has(card.dataset.profileId ?? '');
+			card.hidden = !shouldShow;
+
+			if (shouldShow) {
+				visibleCount += 1;
+			}
+		});
+
+		if (emptyState) {
+			emptyState.hidden = visibleCount > 0;
+		}
+	};
+
+	renderFavoriteProfiles();
+	window.addEventListener('storage', renderFavoriteProfiles);
+	window.addEventListener('tsbs:profile-favorites-change', renderFavoriteProfiles);
+</script>
+
+<style lang="scss">
+	.profile-favorites-empty {
+		margin: 0;
+		color: var(--tsbs-theme-body);
+		font-size: 1rem;
+		font-weight: 500;
+		line-height: 1.4;
+	}
+</style>

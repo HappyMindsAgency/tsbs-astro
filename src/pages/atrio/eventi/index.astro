@@ -1,0 +1,128 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Nav from '../../../components/Nav.astro';
+
+const { lang = 'it' } = Astro.props;
+
+const eventTabs = [
+	{ id: 'society', label: 'Society' },
+	{ id: 'biblioteca', label: 'Biblioteca' },
+];
+
+const events = [
+	{ date: '15 Gen', slug: 'lorem-ipsum-dolor-15-gen' },
+	{ date: '07 Feb', slug: 'lorem-ipsum-dolor-07-feb' },
+	{ date: '03 Mar - 12 Apr', slug: 'lorem-ipsum-dolor-mar-apr' },
+	{ date: '20 Apr', slug: 'lorem-ipsum-dolor-20-apr' },
+	{ date: '05 Mag', slug: 'lorem-ipsum-dolor-05-mag' },
+	{ date: '18 Mag - 02 Giu', slug: 'lorem-ipsum-dolor-mag-giu' },
+	{ date: '10 Giu', slug: 'lorem-ipsum-dolor-10-giu' },
+	{ date: '25 Giu', slug: 'lorem-ipsum-dolor-25-giu' },
+	{ date: '01 Lug - 15 Lug', slug: 'lorem-ipsum-dolor-lug' },
+	{ date: '22 Lug', slug: 'lorem-ipsum-dolor-22-lug' },
+	{ date: '04 Ago', slug: 'lorem-ipsum-dolor-04-ago' },
+	{ date: '18 Ago - 25 Ago', slug: 'lorem-ipsum-dolor-ago' },
+];
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell events-page">
+		<header class="missions-header events-header">
+			<h1>Eventi</h1>
+		</header>
+
+		<section class="container-xl tsbs-app-container events-content" aria-labelledby="events-title">
+			<ul class="nav missions-tabs events-tabs" id="events-tabs" role="tablist" aria-label="Tipologia eventi">
+				{eventTabs.map((tab, index) => (
+					<li class="nav-item missions-tabs__item" role="presentation">
+						<button
+							class={`nav-link missions-tabs__button ${index === 0 ? 'active' : ''}`}
+							id={`${tab.id}-tab`}
+							data-bs-toggle="tab"
+							data-bs-target={`#${tab.id}`}
+							type="button"
+							role="tab"
+							aria-controls={tab.id}
+							aria-selected={index === 0 ? 'true' : 'false'}
+						>
+							{tab.label}
+						</button>
+					</li>
+				))}
+			</ul>
+
+			<div class="tab-content events-tab-content" id="events-tabs-content">
+				{eventTabs.map((tab, tabIndex) => (
+					<div
+						class={`tab-pane fade ${tabIndex === 0 ? 'show active' : ''}`}
+						id={tab.id}
+						role="tabpanel"
+						aria-labelledby={`${tab.id}-tab`}
+						tabindex="0"
+					>
+						<h2 id={tabIndex === 0 ? 'events-title' : undefined} class="tsbs-section-title events-section-title">Eventi</h2>
+
+						<div class="events-grid">
+							{events.map((event, index) => (
+								<a
+									class={`events-card ${index > 8 ? 'is-hidden-desktop' : ''} ${index > 2 ? 'is-hidden-mobile' : ''}`}
+									href={`/atrio/eventi/${event.slug}/`}
+									data-event-card
+								>
+									<div class="events-card__media">
+										<span class="events-card__date">{event.date}</span>
+										<i class="bi bi-image" aria-hidden="true"></i>
+									</div>
+									<h3>Lorem ipsum dolor sit amet</h3>
+								</a>
+							))}
+						</div>
+
+						<button class="missions-load-more events-load-more" type="button" data-events-load-more aria-controls={tab.id}>
+							<span>Carica altro</span>
+							<i class="bi bi-arrow-right" aria-hidden="true"></i>
+						</button>
+					</div>
+				))}
+			</div>
+		</section>
+	</main>
+
+	<script>
+		const syncEventPane = (pane: Element) => {
+			const button = pane.querySelector<HTMLButtonElement>('[data-events-load-more]');
+			const hiddenCards = pane.querySelectorAll<HTMLElement>('[data-event-card].is-hidden-mobile, [data-event-card].is-hidden-desktop');
+
+			if (!button) return;
+
+			button.hidden = hiddenCards.length === 0;
+		};
+
+		document.querySelectorAll('.events-tab-content .tab-pane').forEach(syncEventPane);
+
+		document.querySelectorAll('[data-bs-toggle="tab"]').forEach((tabButton) => {
+			tabButton.addEventListener('shown.bs.tab', (event) => {
+				const target = event.target instanceof HTMLElement ? event.target.dataset.bsTarget : '';
+				if (!target) return;
+
+				const pane = document.querySelector(target);
+				if (pane) syncEventPane(pane);
+			});
+		});
+
+		document.querySelectorAll<HTMLButtonElement>('[data-events-load-more]').forEach((button) => {
+			button.addEventListener('click', () => {
+				const pane = button.closest('.tab-pane');
+				if (!pane) return;
+
+				pane.querySelectorAll<HTMLElement>('[data-event-card]').forEach((card) => {
+					card.classList.remove('is-hidden-mobile', 'is-hidden-desktop');
+				});
+
+				button.hidden = true;
+			});
+		});
+	</script>
+</Layout>

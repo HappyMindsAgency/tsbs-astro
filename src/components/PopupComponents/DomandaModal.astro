@@ -1,4 +1,16 @@
 ---
+interface Answer {
+	label: string;
+	description: string;
+}
+
+interface Props {
+	isOpen?: boolean;
+	question?: string;
+	answers?: Answer[];
+	buttonLabel?: string;
+}
+
 const {
 	isOpen = false,
 	question = 'Scegli una sola risposta',
@@ -9,7 +21,7 @@ const {
 		{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
 	],
 	buttonLabel = 'Conferma',
-} = Astro.props;
+} = Astro.props as Props;
 ---
 
 <div
@@ -52,16 +64,16 @@ const {
 
 <script>
 	const setupQuestionModal = () => {
-		document.querySelectorAll('[data-question-modal]').forEach((modal) => {
+		document.querySelectorAll<HTMLElement>('[data-question-modal]').forEach((modal) => {
 			if (modal.dataset.questionModalReady === 'true') return;
 			modal.dataset.questionModalReady = 'true';
 
-			const form = modal.querySelector('[data-question-modal-form]');
-			const submit = modal.querySelector('[data-question-modal-submit]');
-			const answers = modal.querySelectorAll('input[name="domanda-modal-risposta"]');
-			const closeControls = modal.querySelectorAll('[data-question-modal-close]');
-			let activeInput = null;
-			let previousFocus = null;
+			const form = modal.querySelector<HTMLFormElement>('[data-question-modal-form]');
+			const submit = modal.querySelector<HTMLButtonElement>('[data-question-modal-submit]');
+			const answers = modal.querySelectorAll<HTMLInputElement>('input[name="domanda-modal-risposta"]');
+			const closeControls = modal.querySelectorAll<HTMLElement>('[data-question-modal-close]');
+			let activeInput: HTMLInputElement | null = null;
+			let previousFocus: HTMLElement | null = null;
 
 			if (!form || !submit) return;
 
@@ -72,7 +84,7 @@ const {
 				submit.hidden = true;
 			};
 
-			const closeModal = ({ undoSelection = true } = {}) => {
+			const closeModal = ({ undoSelection = true }: { undoSelection?: boolean } = {}) => {
 				modal.hidden = true;
 
 				if (undoSelection && activeInput) {
@@ -82,25 +94,28 @@ const {
 				resetAnswers();
 				activeInput = null;
 
-				if (previousFocus && typeof previousFocus.focus === 'function') {
+				if (previousFocus) {
 					previousFocus.focus();
 				}
 			};
 
-			const openModal = (input) => {
+			const openModal = (input: HTMLInputElement | null) => {
 				activeInput = input || null;
-				previousFocus = document.activeElement;
+				previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 				resetAnswers();
 				modal.hidden = false;
 
-				const closeButton = modal.querySelector('.question-modal__close');
-				if (closeButton && typeof closeButton.focus === 'function') {
+				const closeButton = modal.querySelector<HTMLButtonElement>('.question-modal__close');
+				if (closeButton) {
 					closeButton.focus();
 				}
 			};
 
 			document.addEventListener('tsbs:question-modal-open', (event) => {
-				openModal(event.detail?.input);
+				if (!(event instanceof CustomEvent)) return;
+
+				const input = event.detail?.input instanceof HTMLInputElement ? event.detail.input : null;
+				openModal(input);
 			});
 
 			closeControls.forEach((control) => {
@@ -161,7 +176,7 @@ const {
 		max-height: min(42rem, calc(100dvh - 2rem));
 		overflow-y: auto;
 		justify-self: center;
-		padding: 3.5rem 1.25rem 1.5rem;
+		padding: 2.75rem 1.25rem 1.5rem;
 		background: var(--tsbs-color-surface);
 		border: 1px solid color-mix(in srgb, var(--question-modal-accent) 18%, var(--tsbs-color-white));
 		border-radius: 0.875rem;
@@ -177,10 +192,16 @@ const {
 		width: 2.25rem;
 		height: 2.25rem;
 		padding: 0;
-		color: var(--question-modal-accent);
-		background: color-mix(in srgb, var(--question-modal-accent) 10%, var(--tsbs-color-white));
-		border: 1px solid color-mix(in srgb, var(--question-modal-accent) 18%, var(--tsbs-color-white));
+		color: var(--tsbs-color-white);
+		background: var(--question-modal-accent);
+		border: 1px solid var(--question-modal-accent);
 		border-radius: 999rem;
+	}
+
+	.question-modal__close:hover {
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-cta-hover-bg);
+		border-color: var(--tsbs-theme-cta-hover-border);
 	}
 
 	.question-modal__close:focus-visible {
@@ -207,7 +228,7 @@ const {
 
 	.question-modal__fieldset legend {
 		float: none;
-		padding: 0 2.25rem 0 0;
+		padding: 0 2.25rem 0.75rem 0;
 		margin: 0;
 		color: var(--tsbs-color-heading);
 		font-size: 1rem;
@@ -294,7 +315,7 @@ const {
 		}
 
 		.question-modal__panel {
-			padding: 3.75rem 2.5rem 2.5rem;
+			padding: 3rem 2.5rem 2.5rem;
 		}
 
 		.question-modal__form {
@@ -308,6 +329,12 @@ const {
 
 		.question-modal__answer {
 			width: 100%;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.question-modal {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 2rem);
 		}
 	}
 </style>

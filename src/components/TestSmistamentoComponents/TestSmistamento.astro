@@ -1,0 +1,115 @@
+---
+const { lang = 'it' } = Astro.props;
+
+const questions = [
+	{
+		question: 'Lorem ipsum dolor sit amet?',
+		answers: [
+			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+		],
+	},
+	{
+		question: 'Sed do eiusmod tempor incididunt?',
+		answers: [
+			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+		],
+	},
+	{
+		question: 'Ut labore et dolore magna aliqua?',
+		answers: [
+			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
+		],
+	},
+];
+
+const firstQuestion = questions[0];
+---
+
+<article class="mission-proof-question choice-question sorting-test" data-sorting-test data-lang={lang} aria-label="Lorem ipsum">
+	<header class="mission-proof-question__header">
+		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
+			<p class="mission-proof-question__eyebrow">Lorem ipsum</p>
+			<h1 class="mission-proof-question__title mission-component-title">Lorem ipsum dolor sit amet</h1>
+		</div>
+	</header>
+
+	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
+		<div class="choice-question__form sorting-test__form">
+			<fieldset class="choice-question__fieldset">
+				<legend>{firstQuestion.question}</legend>
+
+				<p class="sorting-test__progress" data-sorting-test-progress>
+					Domanda 1 di {questions.length}
+				</p>
+
+				<div class="choice-question__answers" data-sorting-test-answers>
+					{firstQuestion.answers.map((answer, index) => (
+						<label class="choice-question__answer" for={`sorting-answer-0-${index}`}>
+							<input id={`sorting-answer-0-${index}`} type="radio" name="risposta-smistamento" value={answer.label} />
+							<span class="choice-question__answer-label">{answer.label}</span>
+							<span class="choice-question__answer-description">{answer.description}</span>
+						</label>
+					))}
+				</div>
+			</fieldset>
+
+			<a class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta sorting-test__cta" href="/landing/test-smistamento/?step=risultato&academy=arborea">
+				Prosegui
+			</a>
+		</div>
+	</div>
+</article>
+
+<style lang="scss">
+	.sorting-test {
+		--mission-proof-question-accent: var(--tsbs-color-neutral);
+		--mission-proof-question-header: var(--tsbs-color-neutral);
+		--tsbs-theme-cta-bg: var(--tsbs-global-cta-var1-bg);
+		--tsbs-theme-cta-border: var(--tsbs-global-cta-var1-border);
+		--tsbs-theme-cta-hover-bg: var(--tsbs-global-cta-var1-hover-bg);
+		--tsbs-theme-cta-hover-border: var(--tsbs-global-cta-var1-hover-border);
+		--tsbs-theme-cta-active-bg: var(--tsbs-global-cta-var1-active-bg);
+		--tsbs-theme-cta-active-border: var(--tsbs-global-cta-var1-active-border);
+		--tsbs-theme-cta-focus-bg: var(--tsbs-global-cta-var1-focus-bg);
+		--tsbs-theme-cta-focus-border: var(--tsbs-global-cta-var1-focus-border);
+	}
+
+	.sorting-test__form {
+		gap: 3rem;
+	}
+
+	.sorting-test__progress {
+		margin: 0;
+		color: var(--tsbs-theme-body);
+		font-size: 0.875rem;
+		line-height: 1.4;
+	}
+
+	.sorting-test .choice-question__fieldset {
+		gap: 1.25rem;
+	}
+
+	.sorting-test .choice-question__answer {
+		background: var(--tsbs-color-neutral-accent);
+	}
+
+	.sorting-test .choice-question__answer:has(input:checked) {
+		background: var(--tsbs-color-neutral);
+	}
+
+	.sorting-test__cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+</style>

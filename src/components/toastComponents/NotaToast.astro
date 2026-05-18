@@ -1,0 +1,137 @@
+---
+interface Props {
+	isOpen?: boolean;
+	renderHidden?: boolean;
+}
+
+const { isOpen = false, renderHidden = false } = Astro.props as Props;
+const shouldRender = isOpen || renderHidden;
+---
+
+{shouldRender && (
+	<div
+		class="nota-toast tsbs-toast"
+		data-nota-toast
+		hidden={!isOpen}
+		role="status"
+		aria-live="polite"
+		aria-labelledby="nota-toast-title"
+	>
+		<div class="nota-toast__backdrop"></div>
+
+		<section class="nota-toast__panel">
+			<div class="nota-toast__icon" aria-hidden="true">
+				<i class="bi bi-send"></i>
+			</div>
+			<h2 id="nota-toast-title">Nota inviata!</h2>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupNotaToast = () => {
+		document.querySelectorAll<HTMLElement>('[data-nota-toast]').forEach((toast) => {
+			if (toast.dataset.notaToastReady === 'true') return;
+			toast.dataset.notaToastReady = 'true';
+
+			let closeTimer: number | undefined;
+
+			const closeToast = () => {
+				toast.hidden = true;
+
+				if (closeTimer) {
+					window.clearTimeout(closeTimer);
+				}
+			};
+
+			const openToast = () => {
+				if (closeTimer) {
+					window.clearTimeout(closeTimer);
+				}
+
+				toast.hidden = false;
+				closeTimer = window.setTimeout(closeToast, 2200);
+			};
+
+			document.addEventListener('tsbs:nota-toast-open', openToast);
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !toast.hidden) {
+					closeToast();
+				}
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupNotaToast);
+	setupNotaToast();
+</script>
+
+<style lang="scss">
+	.nota-toast {
+		position: fixed;
+		inset: 0;
+		z-index: 1210;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		padding: 1.875rem;
+		pointer-events: none;
+	}
+
+	.nota-toast[hidden] {
+		display: none;
+	}
+
+	.nota-toast__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-white) 68%, transparent);
+		backdrop-filter: grayscale(0.65) blur(0.0625rem);
+	}
+
+	.nota-toast__panel {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		justify-items: center;
+		gap: 1.125rem;
+		width: min(100%, 22.625rem);
+		padding: 1.5rem 1.25rem 1.75rem;
+		background: var(--tsbs-color-white);
+		border-radius: 0.875rem;
+		box-shadow: 0 1.25rem 3rem rgba(84, 97, 118, 0.16);
+	}
+
+	.nota-toast__icon {
+		display: grid;
+		place-items: center;
+		width: 3.5rem;
+		aspect-ratio: 1;
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-accent);
+		border-radius: 999rem;
+	}
+
+	.nota-toast__icon .bi {
+		font-size: 2rem;
+		line-height: 1;
+		transform: translateX(-0.0625rem);
+	}
+
+	.nota-toast__panel h2 {
+		margin: 0;
+		color: var(--tsbs-theme-accent);
+		font-family: var(--tsbs-font-body);
+		font-size: 1.5rem;
+		font-weight: 800;
+		line-height: 1.15;
+		text-align: center;
+	}
+
+	@media (min-width: 992px) {
+		.nota-toast {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.875rem);
+		}
+	}
+</style>

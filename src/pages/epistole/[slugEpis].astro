@@ -1,0 +1,29 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+
+export const prerender = false;
+
+const { lang = 'it' } = Astro.props;
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell epistle-detail-page">
+		<article class="container-xl tsbs-app-container epistle-detail" aria-labelledby="epistle-detail-title">
+			<h1 id="epistle-detail-title" class="tsbs-accent-title epistle-detail__title">Lorem ipsum dolor</h1>
+
+			<div class="epistle-detail__body">
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus dignissim magna at magna finibus, vitae elementum
+					lectus tempor. Aenean placerat eros turpis, nec posuere massa fermentum malesuada.
+				</p>
+				<p>
+					Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id, porta sapien.
+					Integer vitae lacus sed ipsum facilisis luctus.
+				</p>
+			</div>
+		</article>
+	</main>
+</Layout>

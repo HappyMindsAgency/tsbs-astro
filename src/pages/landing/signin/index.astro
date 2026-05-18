@@ -1,0 +1,717 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import signInHero from '../../../assets/sign-in-hero.png';
+import italianCities from '../../../data/italianCities.json';
+
+const { lang = 'it' } = Astro.props;
+---
+
+<Layout lang={lang} theme="theme-neutral">
+	<main class="sign-in-page">
+		<div class="sign-in-stage">
+			<img
+				class="sign-in-visual"
+				src={signInHero.src}
+				width={signInHero.width}
+				height={signInHero.height}
+				alt=""
+				aria-hidden="true"
+			/>
+
+			<section class="sign-in-panel" aria-labelledby="sign-in-title">
+				<h1 id="sign-in-title">Crea un account</h1>
+				<p class="sign-in-intro">
+					Inserisci i dati per la registrazione o effettua il <a href="/landing/login/">log in</a>
+				</p>
+
+				<form class="sign-in-form" action="/landing/signin/conferma-registrazione/" method="post" data-sign-in-form>
+					<div class="sign-in-field">
+						<label for="sign-in-name">Nome</label>
+						<input id="sign-in-name" name="name" type="text" autocomplete="given-name" />
+					</div>
+
+					<div class="sign-in-field">
+						<label for="sign-in-surname">Cognome</label>
+						<input id="sign-in-surname" name="surname" type="text" autocomplete="family-name" />
+					</div>
+
+					<div class="sign-in-field">
+						<label for="sign-in-username">Username*</label>
+						<input id="sign-in-username" name="username" type="text" autocomplete="username" required />
+					</div>
+
+					<div class="sign-in-field">
+						<label for="sign-in-email">Email*</label>
+						<input id="sign-in-email" name="email" type="email" autocomplete="email" required />
+					</div>
+
+					<div class="sign-in-field">
+						<label for="sign-in-password">Password*</label>
+						<div class="sign-in-password">
+							<input
+								id="sign-in-password"
+								name="password"
+								type="password"
+								autocomplete="new-password"
+								minlength="8"
+								required
+							/>
+							<button type="button" class="sign-in-password__toggle" aria-label="Mostra password" data-sign-in-password-toggle>
+								<i class="bi bi-eye"></i>
+							</button>
+						</div>
+						<p class="sign-in-help">
+							<i class="bi bi-info-circle" aria-hidden="true"></i>
+							Minimo 8 caratteri, almeno una maiuscola e un numero.
+						</p>
+					</div>
+
+					<div class="sign-in-field">
+						<label for="sign-in-city">Città</label>
+						<div class="sign-in-city" data-city-autocomplete>
+							<input
+								id="sign-in-city"
+								name="cityName"
+								type="text"
+								autocomplete="address-level2"
+								aria-autocomplete="list"
+								aria-expanded="false"
+								aria-controls="sign-in-city-results"
+								data-city-input
+							/>
+							<input id="sign-in-city-code" name="cityIstatCode" type="hidden" data-city-code />
+							<div id="sign-in-city-results" class="sign-in-city__results" role="listbox" data-city-results hidden></div>
+						</div>
+					</div>
+
+					<div class="sign-in-consents">
+						<label class="sign-in-check">
+							<input type="checkbox" name="marketing" />
+							<span>Sì, consapevolmente vorrei essere bombardato da email marketing</span>
+						</label>
+
+						<label class="sign-in-check">
+							<input type="checkbox" name="age_confirm" required />
+							<span>Dichiaro di aver compiuto <strong>14 anni</strong> di età o di avere il consenso dei miei genitori/tutori*</span>
+						</label>
+
+						<label class="sign-in-check">
+							<input type="checkbox" name="terms" required />
+							<span>
+								Dichiaro di aver letto e accettato i <a href="#">Termini di Servizio</a> e la <a href="#">Privacy Policy</a> della web app.*
+							</span>
+						</label>
+					</div>
+
+					<button type="submit" class="sign-in-submit">Crea il tuo account</button>
+				</form>
+
+				<a class="sign-in-back" href="/landing/login/">Torna indietro</a>
+			</section>
+		</div>
+	</main>
+</Layout>
+
+<script type="application/json" id="italian-cities-data" set:html={JSON.stringify(italianCities)}></script>
+
+<script>
+	type ItalianCity = {
+		cityName: string;
+		cityIstatCode: string;
+		province: string;
+	};
+
+	const signInPasswordWindow = window as Window & { tsbsSignInPasswordToggleReady?: boolean };
+
+	if (!signInPasswordWindow.tsbsSignInPasswordToggleReady) {
+		signInPasswordWindow.tsbsSignInPasswordToggleReady = true;
+
+		document.addEventListener('click', (event) => {
+			const target = event.target;
+			const toggle = target instanceof Element ? target.closest('[data-sign-in-password-toggle]') : null;
+			const password = document.querySelector('#sign-in-password');
+
+			if (!(toggle instanceof HTMLButtonElement) || !(password instanceof HTMLInputElement)) {
+				return;
+			}
+
+			const isHidden = password.type === 'password';
+			password.type = isHidden ? 'text' : 'password';
+			toggle.setAttribute('aria-label', isHidden ? 'Nascondi password' : 'Mostra password');
+			toggle.setAttribute('aria-pressed', String(isHidden));
+			const icon = toggle.querySelector('.bi');
+			icon?.classList.toggle('bi-eye', !isHidden);
+			icon?.classList.toggle('bi-eye-slash', isHidden);
+		});
+	}
+
+	const initSignInPasswordToggleState = () => {
+		const toggle = document.querySelector('[data-sign-in-password-toggle]');
+
+		if (!(toggle instanceof HTMLButtonElement)) {
+			return;
+		}
+
+		toggle.setAttribute('aria-pressed', 'false');
+	};
+
+	initSignInPasswordToggleState();
+	document.addEventListener('astro:page-load', initSignInPasswordToggleState);
+
+	const normalizeCitySearch = (value: string) =>
+		value
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.toLowerCase()
+			.trim();
+
+	const getItalianCities = () => {
+		const data = document.querySelector('#italian-cities-data');
+
+		if (!(data instanceof HTMLScriptElement) || !data.textContent) {
+			return [];
+		}
+
+		try {
+			return JSON.parse(data.textContent) as ItalianCity[];
+		} catch {
+			return [];
+		}
+	};
+
+	const initCityAutocomplete = () => {
+		const cities = getItalianCities();
+
+		document.querySelectorAll('[data-city-autocomplete]').forEach((autocomplete) => {
+			if (!(autocomplete instanceof HTMLElement) || autocomplete.dataset.cityAutocompleteBound === 'true') {
+				return;
+			}
+
+			const input = autocomplete.querySelector('[data-city-input]');
+			const code = autocomplete.querySelector('[data-city-code]');
+			const results = autocomplete.querySelector('[data-city-results]');
+
+			if (!(input instanceof HTMLInputElement) || !(code instanceof HTMLInputElement) || !(results instanceof HTMLElement)) {
+				return;
+			}
+
+			autocomplete.dataset.cityAutocompleteBound = 'true';
+			let activeIndex = -1;
+			let currentMatches: ItalianCity[] = [];
+
+			const closeResults = () => {
+				results.hidden = true;
+				results.innerHTML = '';
+				input.setAttribute('aria-expanded', 'false');
+				activeIndex = -1;
+			};
+
+			const syncActiveOption = () => {
+				results.querySelectorAll('[data-city-option]').forEach((option, index) => {
+					option.classList.toggle('is-active', index === activeIndex);
+				});
+			};
+
+			const selectCity = (city: ItalianCity) => {
+				input.value = city.cityName;
+				code.value = city.cityIstatCode;
+				input.setCustomValidity('');
+				closeResults();
+			};
+
+			const renderResults = () => {
+				const query = normalizeCitySearch(input.value);
+				code.value = '';
+
+				if (query.length < 2) {
+					input.setCustomValidity('');
+					closeResults();
+					return;
+				}
+
+				currentMatches = cities
+					.map((city) => ({
+						city,
+						normalizedName: normalizeCitySearch(city.cityName),
+					}))
+					.filter((item) => item.normalizedName.includes(query))
+					.sort((first, second) => {
+						const firstStartsWithQuery = first.normalizedName.startsWith(query);
+						const secondStartsWithQuery = second.normalizedName.startsWith(query);
+
+						if (firstStartsWithQuery !== secondStartsWithQuery) {
+							return firstStartsWithQuery ? -1 : 1;
+						}
+
+						return first.city.cityName.localeCompare(second.city.cityName, 'it');
+					})
+					.slice(0, 8)
+					.map((item) => item.city);
+
+				if (currentMatches.length === 0) {
+					results.innerHTML = '<p class="sign-in-city__empty">Nessuna città trovata.</p>';
+					results.hidden = false;
+					input.setAttribute('aria-expanded', 'true');
+					input.setCustomValidity('Seleziona una città valida dall’elenco.');
+					return;
+				}
+
+				results.innerHTML = currentMatches
+					.map(
+						(city, index) =>
+							`<button class="sign-in-city__option" type="button" role="option" data-city-option data-city-index="${index}"><span>${city.cityName} (${city.province})</span></button>`,
+					)
+					.join('');
+				results.hidden = false;
+				input.setAttribute('aria-expanded', 'true');
+				input.setCustomValidity('Seleziona una città valida dall’elenco.');
+			};
+
+			input.addEventListener('input', renderResults);
+
+			input.addEventListener('blur', () => {
+				window.setTimeout(() => {
+					if (input.value.trim() === '') {
+						input.setCustomValidity('');
+						code.value = '';
+					}
+
+					closeResults();
+				}, 140);
+			});
+
+			input.addEventListener('keydown', (event) => {
+				if (results.hidden || currentMatches.length === 0) {
+					return;
+				}
+
+				if (event.key === 'ArrowDown') {
+					event.preventDefault();
+					activeIndex = Math.min(activeIndex + 1, currentMatches.length - 1);
+					syncActiveOption();
+				}
+
+				if (event.key === 'ArrowUp') {
+					event.preventDefault();
+					activeIndex = Math.max(activeIndex - 1, 0);
+					syncActiveOption();
+				}
+
+				if (event.key === 'Enter' && activeIndex >= 0) {
+					event.preventDefault();
+					selectCity(currentMatches[activeIndex]);
+				}
+
+				if (event.key === 'Escape') {
+					closeResults();
+				}
+			});
+
+			results.addEventListener('click', (event) => {
+				const target = event.target;
+				const option = target instanceof Element ? target.closest('[data-city-option]') : null;
+
+				if (!(option instanceof HTMLButtonElement)) {
+					return;
+				}
+
+				const index = Number.parseInt(option.dataset.cityIndex ?? '', 10);
+				const city = currentMatches[index];
+
+				if (city) {
+					selectCity(city);
+				}
+			});
+		});
+	};
+
+	initCityAutocomplete();
+	document.addEventListener('astro:page-load', initCityAutocomplete);
+
+	const initSignInFormRedirect = () => {
+		document.querySelectorAll('[data-sign-in-form]').forEach((form) => {
+			if (!(form instanceof HTMLFormElement) || form.dataset.redirectBound === 'true') {
+				return;
+			}
+
+			form.dataset.redirectBound = 'true';
+			form.addEventListener('submit', (event) => {
+				event.preventDefault();
+
+				if (!form.reportValidity()) {
+					return;
+				}
+
+				window.location.assign(form.action);
+			});
+		});
+	};
+
+	initSignInFormRedirect();
+	document.addEventListener('astro:page-load', initSignInFormRedirect);
+</script>
+
+<style lang="scss">
+	.sign-in-page {
+		--sign-in-text: var(--tsbs-color-heading);
+		--sign-in-muted: var(--tsbs-color-body);
+		--sign-in-border: #546176;
+		--sign-in-panel: var(--tsbs-color-neutral-soft);
+		--sign-in-control: #ffffff;
+		--sign-in-button: var(--tsbs-global-cta-var1-bg);
+		--sign-in-button-hover: var(--tsbs-global-cta-var1-hover-bg);
+		--sign-in-button-active: var(--tsbs-global-cta-var1-active-bg);
+		--sign-in-page-padding-y: clamp(2rem, 7vw, 3.875rem);
+		--sign-in-page-padding-x: clamp(0.9375rem, 4vw, 1.875rem);
+		--sign-in-page-padding-bottom: calc(clamp(3.5rem, 14vw, 5rem) + env(safe-area-inset-bottom));
+		--sign-in-submit-margin-top: clamp(1.75rem, 8vw, 2.75rem);
+
+		min-height: 100vh;
+		padding: var(--sign-in-page-padding-y) var(--sign-in-page-padding-x) var(--sign-in-page-padding-bottom);
+		color: var(--sign-in-text);
+		background: var(--tsbs-color-surface);
+	}
+
+	.sign-in-stage {
+		display: grid;
+		gap: 2.25rem;
+	}
+
+	.sign-in-visual {
+		width: 100%;
+		aspect-ratio: 416 / 297;
+		object-fit: contain;
+	}
+
+	.sign-in-panel {
+		display: grid;
+		gap: 0;
+		width: 100%;
+		padding: 0 0.9375rem;
+		color: var(--sign-in-text);
+	}
+
+	.sign-in-panel h1 {
+		margin: 0 0 0.625rem;
+		color: var(--sign-in-text);
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1.1;
+	}
+
+	.sign-in-intro {
+		margin: 0;
+		color: var(--sign-in-text);
+		font-size: 1rem;
+		line-height: 1.4;
+	}
+
+	.sign-in-intro a,
+	.sign-in-back,
+	.sign-in-check a {
+		color: var(--sign-in-text);
+		font-weight: 700;
+		text-decoration: underline;
+		text-underline-offset: 0.125rem;
+	}
+
+	.sign-in-form {
+		display: grid;
+		gap: 1.5rem;
+		margin-top: 1.125rem;
+	}
+
+	.sign-in-field {
+		display: grid;
+		gap: 0.375rem;
+		align-content: start;
+	}
+
+	.sign-in-field label {
+		color: var(--sign-in-muted);
+		font-size: 0.875rem;
+		line-height: 1.2;
+	}
+
+	.sign-in-field input,
+	.sign-in-field select {
+		width: 100%;
+		height: 3rem;
+		padding: 0.625rem 0.875rem;
+		color: var(--tsbs-color-heading);
+		font: inherit;
+		line-height: 1.2;
+		background-color: var(--sign-in-control);
+		border: 1px solid var(--sign-in-border);
+		border-radius: 0.3125rem;
+	}
+
+	.sign-in-field select {
+		padding-right: 2.75rem;
+		appearance: none;
+		background-image: linear-gradient(45deg, transparent 50%, var(--sign-in-border) 50%),
+			linear-gradient(135deg, var(--sign-in-border) 50%, transparent 50%);
+		background-position:
+			calc(100% - 1.4rem) 50%,
+			calc(100% - 1rem) 50%;
+		background-size: 0.45rem 0.45rem, 0.45rem 0.45rem;
+		background-repeat: no-repeat;
+	}
+
+	.sign-in-city {
+		position: relative;
+	}
+
+	.sign-in-city__results {
+		position: absolute;
+		top: calc(100% + 0.5rem);
+		right: 0;
+		left: 0;
+		z-index: 5;
+		display: grid;
+		gap: 0.25rem;
+		max-height: 17.5rem;
+		overflow: hidden;
+		overflow-y: auto;
+		padding: 0.375rem;
+		background: #aa8767;
+		border: 0;
+		border-radius: 0.5rem;
+	}
+
+	.sign-in-city__results :global(.sign-in-city__option) {
+		appearance: none;
+		display: block;
+		width: 100%;
+		padding: 0.875rem;
+		color: var(--sign-in-muted);
+		font-family: var(--tsbs-font-body);
+		font-size: 0.875rem;
+		font-weight: 400;
+		line-height: 1.2;
+		text-align: left;
+		background: #ffffff;
+		border: 0;
+		border-radius: 0.5rem;
+	}
+
+	.sign-in-city__results :global(.sign-in-city__option:hover),
+	.sign-in-city__results :global(.sign-in-city__option.is-active) {
+		color: var(--sign-in-text);
+		background: #fffbf2;
+	}
+
+	.sign-in-city__results :global(.sign-in-city__option span) {
+		display: block;
+		min-width: 0;
+	}
+
+	.sign-in-city__results :global(.sign-in-city__empty) {
+		padding: 0.875rem;
+		color: var(--sign-in-muted);
+		font-size: 0.875rem;
+		line-height: 1.2;
+		text-align: center;
+		background: #ffffff;
+		border: 0;
+	}
+
+	.sign-in-password {
+		position: relative;
+	}
+
+	.sign-in-password input {
+		padding-right: 3rem;
+	}
+
+	.sign-in-password__toggle {
+		position: absolute;
+		top: 50%;
+		right: 0.625rem;
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		padding: 0;
+		color: var(--sign-in-border);
+		background: transparent;
+		border: 0;
+		transform: translateY(-50%);
+	}
+
+	.sign-in-password__toggle .bi {
+		font-size: 1.25rem;
+		line-height: 1;
+	}
+
+	.sign-in-help {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		margin: -0.25rem 0 -0.5rem;
+		color: var(--sign-in-muted);
+		font-size: 0.75rem;
+		line-height: 1.2;
+	}
+
+	.sign-in-help .bi {
+		font-size: 0.75rem;
+	}
+
+	.sign-in-consents {
+		display: grid;
+		gap: 1rem;
+		margin-top: 1.25rem;
+	}
+
+	.sign-in-check {
+		display: grid;
+		grid-template-columns: 1.25rem 1fr;
+		gap: 0.625rem;
+		align-items: start;
+		margin: 0;
+		color: var(--sign-in-text);
+		font-size: 0.875rem;
+		line-height: 1.35;
+	}
+
+	.sign-in-check input {
+		position: relative;
+		width: 1.25rem;
+		height: 1.25rem;
+		margin: 0.125rem 0 0;
+		appearance: none;
+		background: var(--sign-in-control);
+		border: 1px solid var(--sign-in-border);
+		border-radius: 0.1875rem;
+	}
+
+	.sign-in-check input:checked {
+		background: var(--sign-in-button);
+		border-color: var(--sign-in-button);
+	}
+
+	.sign-in-check input:checked::after {
+		content: "";
+		position: absolute;
+		top: 0.15rem;
+		left: 0.4rem;
+		width: 0.375rem;
+		height: 0.6875rem;
+		border: solid #ffffff;
+		border-width: 0 0.125rem 0.125rem 0;
+		transform: rotate(45deg);
+	}
+
+	.sign-in-check input:focus-visible {
+		outline: 0.1875rem solid color-mix(in srgb, var(--sign-in-button) 28%, transparent);
+		outline-offset: 0.125rem;
+	}
+
+	.sign-in-check span {
+		min-width: 0;
+	}
+
+	.sign-in-submit {
+		width: calc(100% - 3.125rem);
+		min-height: 3rem;
+		margin: var(--sign-in-submit-margin-top) auto 0;
+		padding: 0.75rem 1rem;
+		color: #ffffff;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		background: var(--sign-in-button);
+		border: 0;
+		border-radius: 0.3125rem;
+	}
+
+	.sign-in-submit:hover {
+		background: var(--sign-in-button-hover);
+	}
+
+	.sign-in-submit:active {
+		background: var(--sign-in-button-active);
+	}
+
+	.sign-in-back {
+		justify-self: center;
+		margin-top: 1.25rem;
+		font-size: 1rem;
+		line-height: 1.2;
+	}
+
+	@media (min-width: 768px) {
+		.sign-in-page {
+			--sign-in-page-padding-y: clamp(1.0625rem, 1.2vw, 1.75rem);
+			--sign-in-page-padding-x: clamp(1.875rem, 5vw, 4.5rem);
+			--sign-in-page-padding-bottom: clamp(1.0625rem, 1.2vw, 1.75rem);
+			--sign-in-submit-margin-top: 1.75rem;
+
+			display: grid;
+			place-items: center;
+		}
+
+		.sign-in-stage {
+			position: relative;
+			display: grid;
+			place-items: center;
+			width: min(100%, 80.9375rem);
+			min-height: calc(100vh - 2.125rem);
+		}
+
+		.sign-in-visual {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			aspect-ratio: auto;
+			object-fit: contain;
+			object-position: center;
+			background: #ffffff;
+			border-radius: 0.5rem;
+		}
+
+		.sign-in-panel {
+			position: relative;
+			z-index: 1;
+			width: min(100%, 52rem);
+			padding: 1.9375rem 5rem 1.875rem;
+			background: var(--sign-in-panel);
+			border-radius: 1.125rem;
+		}
+
+		.sign-in-form {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			column-gap: 1.25rem;
+			gap: 1.125rem;
+			margin-top: 1.5rem;
+		}
+
+		.sign-in-consents {
+			grid-column: 1 / -1;
+			margin-top: 0.875rem;
+		}
+
+		.sign-in-submit {
+			grid-column: 1 / -1;
+			width: min(100%, 20rem);
+		}
+
+		.sign-in-back {
+			margin-top: 1.125rem;
+		}
+	}
+
+	@media (max-width: 374.98px) {
+		.sign-in-panel {
+			padding-right: 0.5rem;
+			padding-left: 0.5rem;
+		}
+
+		.sign-in-submit {
+			width: 100%;
+		}
+	}
+</style>
