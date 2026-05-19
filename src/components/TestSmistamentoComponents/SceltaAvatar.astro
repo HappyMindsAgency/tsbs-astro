@@ -1,13 +1,16 @@
 ---
-import avatar01 from "../../assets/avatar-01.svg";
-import avatar02 from "../../assets/avatar-02.svg";
-import avatar03 from "../../assets/avatar-03.svg";
-import avatar04 from "../../assets/avatar-04.svg";
-import avatar05 from "../../assets/avatar-05.svg";
-import avatar06 from "../../assets/avatar-06.svg";
-import avatar07 from "../../assets/avatar-07.svg";
-import avatar08 from "../../assets/avatar-08.svg";
-import avatar09 from "../../assets/avatar-09.svg";
+import avatar01 from "../../assets/Avatar_01_tartaruga.svg";
+import avatar02 from "../../assets/Avatar_02_ampolla.svg";
+import avatar03 from "../../assets/Avatar_03_fantasma.svg";
+import avatar04 from "../../assets/Avatar_04_candela.svg";
+import avatar05 from "../../assets/Avatar_05_penna_calamaio.svg";
+import avatar06 from "../../assets/Avatar_06_pavone.svg";
+import avatar07 from "../../assets/Avatar_07_libro.svg";
+import avatar08 from "../../assets/Avatar_08_piccione.svg";
+import avatar09 from "../../assets/Avatar_09_gatto1.svg";
+import avatar10 from "../../assets/Avatar_10_gatto2.svg";
+import avatar11 from "../../assets/Avatar_11_gatto3.svg";
+import avatar12 from "../../assets/Avatar_12_gatto4.svg";
 
 const avatars = [
   avatar01,
@@ -19,6 +22,9 @@ const avatars = [
   avatar07,
   avatar08,
   avatar09,
+  avatar10,
+  avatar11,
+  avatar12,
 ];
 ---
 
@@ -96,6 +102,7 @@ const avatars = [
   .scelta-avatar {
     --scelta-avatar-preview-size: min(42vw, 9.75rem);
     --scelta-avatar-preview-image-padding: 1.875rem;
+    --scelta-avatar-image-scale: 1.34;
     --scelta-avatar-preview-space: 1rem;
     --scelta-avatar-username-space: 1.5rem;
     --scelta-avatar-card-size: auto;
@@ -150,7 +157,7 @@ const avatars = [
     overflow: hidden;
     border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 72%, transparent);
     border-radius: 50%;
-    background: var(--tsbs-color-neutral-soft);
+    background: color-mix(in srgb, var(--tsbs-theme-accent) 16%, var(--tsbs-color-white));
   }
 
   .scelta-avatar__preview-image {
@@ -158,9 +165,10 @@ const avatars = [
     inset: 0;
     width: 100%;
     height: 100%;
-    padding: var(--scelta-avatar-preview-image-padding);
+    padding: calc(var(--scelta-avatar-preview-image-padding) * 0.15);
     object-fit: contain;
     opacity: 0;
+    transform: scale(var(--scelta-avatar-image-scale));
     transition: opacity 180ms ease;
   }
 
@@ -180,7 +188,7 @@ const avatars = [
   .scelta-avatar__fieldset {
     width: 100%;
     margin: 0;
-    padding: 0;
+    padding: calc(var(--scelta-avatar-card-image-padding) * 0.12);
     border: 0;
   }
 
@@ -214,8 +222,9 @@ const avatars = [
   .scelta-avatar__thumb img {
     width: 100%;
     height: 100%;
-    padding: var(--scelta-avatar-card-image-padding);
+    padding: 0;
     object-fit: contain;
+    transform: scale(var(--scelta-avatar-image-scale));
   }
 
   .scelta-avatar__option:hover .scelta-avatar__thumb,
@@ -255,7 +264,10 @@ const avatars = [
   .scelta-avatar__form:has(#avatar-6:checked) .scelta-avatar__preview-image,
   .scelta-avatar__form:has(#avatar-7:checked) .scelta-avatar__preview-image,
   .scelta-avatar__form:has(#avatar-8:checked) .scelta-avatar__preview-image,
-  .scelta-avatar__form:has(#avatar-9:checked) .scelta-avatar__preview-image {
+  .scelta-avatar__form:has(#avatar-9:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-10:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-11:checked) .scelta-avatar__preview-image,
+  .scelta-avatar__form:has(#avatar-12:checked) .scelta-avatar__preview-image {
     opacity: 0;
   }
 
@@ -267,7 +279,10 @@ const avatars = [
   .scelta-avatar__form:has(#avatar-6:checked) .scelta-avatar__preview-image--6,
   .scelta-avatar__form:has(#avatar-7:checked) .scelta-avatar__preview-image--7,
   .scelta-avatar__form:has(#avatar-8:checked) .scelta-avatar__preview-image--8,
-  .scelta-avatar__form:has(#avatar-9:checked) .scelta-avatar__preview-image--9 {
+  .scelta-avatar__form:has(#avatar-9:checked) .scelta-avatar__preview-image--9,
+  .scelta-avatar__form:has(#avatar-10:checked) .scelta-avatar__preview-image--10,
+  .scelta-avatar__form:has(#avatar-11:checked) .scelta-avatar__preview-image--11,
+  .scelta-avatar__form:has(#avatar-12:checked) .scelta-avatar__preview-image--12 {
     opacity: 1;
   }
 
@@ -279,12 +294,13 @@ const avatars = [
     .scelta-avatar {
       --scelta-avatar-preview-size: clamp(5.75rem, 14.5vh, 10rem);
       --scelta-avatar-preview-image-padding: clamp(1.35rem, 3.8vh, 2.625rem);
+      --scelta-avatar-image-scale: 1.36;
       --scelta-avatar-preview-space: clamp(0.5rem, 2.2vh, 1.5rem);
       --scelta-avatar-username-space: clamp(0.75rem, 4.7vh, 3.25rem);
-      --scelta-avatar-card-size: clamp(4.75rem, 11.75vh, 8rem);
+      --scelta-avatar-card-size: clamp(4.25rem, 10vh, 6.75rem);
       --scelta-avatar-card-image-padding: clamp(1.15rem, 3.4vh, 2.375rem);
-      --scelta-avatar-grid-gap: clamp(0.5rem, 2.9vh, 2rem);
-      --scelta-avatar-grid-space: clamp(0.75rem, 6.8vh, 5rem);
+      --scelta-avatar-grid-gap: clamp(0.5rem, 1.65vh, 1rem);
+      --scelta-avatar-grid-space: clamp(0.75rem, 4.8vh, 3.5rem);
 
       display: grid;
       align-items: start;
@@ -317,60 +333,20 @@ const avatars = [
       color: var(--tsbs-color-body);
     }
 
-    .scelta-avatar__preview {
-      background: color-mix(in srgb, var(--tsbs-theme-accent) 16%, var(--tsbs-color-white));
-    }
-
     .scelta-avatar__username {
       font-size: 1.25rem;
       color: color-mix(in srgb, var(--tsbs-theme-accent) 72%, var(--tsbs-color-heading));
     }
 
     .scelta-avatar__grid {
-      display: flex;
-      flex-wrap: wrap;
+      grid-template-columns: repeat(6, var(--scelta-avatar-card-size));
       justify-content: center;
-      width: min(100%, 48rem);
+      width: calc((var(--scelta-avatar-card-size) * 6) + (var(--scelta-avatar-grid-gap) * 5));
+      max-width: 100%;
     }
 
     .scelta-avatar__option {
-      flex: 0 0 var(--scelta-avatar-card-size);
-    }
-
-    .scelta-avatar__option--1 {
-      order: 1;
-    }
-
-    .scelta-avatar__option--3 {
-      order: 2;
-    }
-
-    .scelta-avatar__option--2 {
-      order: 3;
-    }
-
-    .scelta-avatar__option--4 {
-      order: 4;
-    }
-
-    .scelta-avatar__option--5 {
-      order: 5;
-    }
-
-    .scelta-avatar__option--6 {
-      order: 6;
-    }
-
-    .scelta-avatar__option--9 {
-      order: 7;
-    }
-
-    .scelta-avatar__option--7 {
-      order: 8;
-    }
-
-    .scelta-avatar__option--8 {
-      order: 9;
+      width: var(--scelta-avatar-card-size);
     }
 
     .scelta-avatar__option:has(input:checked)::after {

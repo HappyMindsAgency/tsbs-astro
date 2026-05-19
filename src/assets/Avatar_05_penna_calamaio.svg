@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #c8dfee;
+      }
+
+      .cls-3, .cls-4 {
+        fill: beige;
+      }
+
+      .cls-5 {
+        isolation: isolate;
+      }
+
+      .cls-6 {
+        fill: #1a1a1a;
+      }
+
+      .cls-4, .cls-2 {
+        mix-blend-mode: multiply;
+      }
+    </style>
+  </defs>
+  <g class="cls-5">
+    <g id="penna_e_calamaio" data-name="penna e calamaio">
+      <g id="calamaio">
+        <g id="calamaio-2" data-name="calamaio">
+          <rect class="cls-1" x="248.47" y="344.8" width="39.68" height="11.67"/>
+          <path class="cls-1" d="M299.94,336.91c0,6.36-11.97,9.51-31.52,9.51s-31.74-3.54-31.74-9.9"/>
+          <rect class="cls-1" x="220.85" y="356.47" width="94.92" height="53.68"/>
+        </g>
+        <rect id="inchiostro" class="cls-6" x="226.7" y="362.14" width="83.17" height="42.88"/>
+        <path id="ombra_calamaio" data-name="ombra calamaio" class="cls-2" d="M248.47,344.8s20.65,3.77,39.68,0c0,0,0,18.41-39.68,0Z"/>
+      </g>
+      <g id="penna">
+        <g id="penna-2" data-name="penna">
+          <g id="piuma">
+            <path id="piuma-2" data-name="piuma" class="cls-3" d="M181.79,323.3s-10.74-56.17,21.56-112.64c1.4-2.45,5.13-1.59,5.29,1.23l-1.01,11.21c-.04.4.5.57.7.22,7.83-14.65,67.77-122.84,133.17-125.67,2.18-.09,3.47,2.42,2.15,4.16-8.7,11.46-31.79,43.98-29.52,63.57,2.37,20.41-46.86,63.51-63.04,74.93-.75.53-.26,1.72.64,1.56,6.82-1.2,14.54-7.65,27.61-7.96,15.05-.36-4.58,12.83-15.33,19.45-4.69,2.89-9.18,6.06-13.45,9.55-17.54,14.33-61.01,50.89-64.3,64.11"/>
+            <path id="ombra_piuma" data-name="ombra piuma" class="cls-4" d="M300.11,136.64s-44.1,87.11-56.45,105.3-54.35,77.38-54.35,77.38c-4.82-1.68,77.35-148.78,110.8-182.68Z"/>
+          </g>
+          <g id="pennino">
+            <path id="pennino-2" data-name="pennino" class="cls-1" d="M153.31,387.86c6.12-18.41,55.26-160.24,145.81-251.05.5-.5,1.29.17.88.74-17.96,24.84-89.58,125.66-110.69,181.76,0,0-11.37,32.22-12.38,50.17-.07,1.3-1.02,2.37-2.3,2.61-3.82.72-12.04,3.71-20.78,16.03-.2.28-.65.07-.54-.26Z"/>
+            <ellipse class="cls-1" cx="184.3" cy="321.23" rx="4.03" ry="6.69" transform="translate(-176.45 405.02) rotate(-73.23)"/>
+          </g>
+        </g>
+        <path id="ombra_pennino" data-name="ombra pennino" class="cls-2" d="M178.98,322.64s2.21,2.39,8.23,2.91l-2.06,6.53s-5.25,1.77-6.17-9.44Z"/>
+      </g>
+    </g>
+  </g>
+</svg>
