@@ -215,443 +215,450 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 		originCol?: number;
 	};
 
-	const rooms = document.querySelectorAll<HTMLElement>('[data-trophy-room]');
+	const setupTrophyRooms = () => {
+		const rooms = document.querySelectorAll<HTMLElement>('[data-trophy-room]');
 
-	rooms.forEach((room) => {
-		const board = room.querySelector<HTMLElement>('[data-trophy-board]');
-		const piecesLayer = room.querySelector<HTMLElement>('[data-trophy-pieces]');
-		const palette = room.querySelector<HTMLElement>('[data-trophy-palette]');
-		const menuButton = room.querySelector<HTMLButtonElement>('[data-trophy-menu]');
-		const closeButton = room.querySelector<HTMLButtonElement>('[data-trophy-close]');
-		const instructionsButton = room.querySelector<HTMLButtonElement>('[data-trophy-instructions-trigger]');
-		const resetButton = room.querySelector<HTMLButtonElement>('[data-trophy-reset]');
-		const rows = Number(room.dataset.rows ?? 8);
-		const cols = Number(room.dataset.cols ?? 5);
-		const catalog = JSON.parse(room.dataset.catalog ?? '[]') as TrophyDefinition[];
-		const paletteItems = Array.from(room.querySelectorAll<HTMLButtonElement>('[data-trophy-source]'));
-		let placedTrophies: PlacedTrophy[] = [];
-		let instanceCount = 0;
-		let dragState: DragState | null = null;
-		let suppressPaletteClick = false;
-		let suppressBoardClick = false;
-		let selectedInstanceId = '';
+		rooms.forEach((room) => {
+			if (room.dataset.trophyReady === 'true') return;
+			room.dataset.trophyReady = 'true';
 
-		if (!board || !piecesLayer || !palette) return;
+			const board = room.querySelector<HTMLElement>('[data-trophy-board]');
+			const piecesLayer = room.querySelector<HTMLElement>('[data-trophy-pieces]');
+			const palette = room.querySelector<HTMLElement>('[data-trophy-palette]');
+			const menuButton = room.querySelector<HTMLButtonElement>('[data-trophy-menu]');
+			const closeButton = room.querySelector<HTMLButtonElement>('[data-trophy-close]');
+			const instructionsButton = room.querySelector<HTMLButtonElement>('[data-trophy-instructions-trigger]');
+			const resetButton = room.querySelector<HTMLButtonElement>('[data-trophy-reset]');
+			const rows = Number(room.dataset.rows ?? 8);
+			const cols = Number(room.dataset.cols ?? 5);
+			const catalog = JSON.parse(room.dataset.catalog ?? '[]') as TrophyDefinition[];
+			const paletteItems = Array.from(room.querySelectorAll<HTMLButtonElement>('[data-trophy-source]'));
+			let placedTrophies: PlacedTrophy[] = [];
+			let instanceCount = 0;
+			let dragState: DragState | null = null;
+			let suppressPaletteClick = false;
+			let suppressBoardClick = false;
+			let selectedInstanceId = '';
 
-		const getMetrics = () => {
-			const rect = piecesLayer.getBoundingClientRect();
-			const styles = window.getComputedStyle(piecesLayer);
-			const gap = Number.parseFloat(styles.columnGap || styles.gap || '0');
-			const paddingLeft = Number.parseFloat(styles.paddingLeft || '0');
-			const paddingTop = Number.parseFloat(styles.paddingTop || '0');
-			const paddingRight = Number.parseFloat(styles.paddingRight || '0');
-			const paddingBottom = Number.parseFloat(styles.paddingBottom || '0');
-			const gridWidth = rect.width - paddingLeft - paddingRight;
-			const gridHeight = rect.height - paddingTop - paddingBottom;
-			const cellWidth = (gridWidth - gap * (cols - 1)) / cols;
-			const cellHeight = (gridHeight - gap * (rows - 1)) / rows;
+			if (!board || !piecesLayer || !palette) return;
 
-			return { rect, gap, paddingLeft, paddingTop, gridWidth, gridHeight, cellWidth, cellHeight };
-		};
+			const getMetrics = () => {
+				const rect = piecesLayer.getBoundingClientRect();
+				const styles = window.getComputedStyle(piecesLayer);
+				const gap = Number.parseFloat(styles.columnGap || styles.gap || '0');
+				const paddingLeft = Number.parseFloat(styles.paddingLeft || '0');
+				const paddingTop = Number.parseFloat(styles.paddingTop || '0');
+				const paddingRight = Number.parseFloat(styles.paddingRight || '0');
+				const paddingBottom = Number.parseFloat(styles.paddingBottom || '0');
+				const gridWidth = rect.width - paddingLeft - paddingRight;
+				const gridHeight = rect.height - paddingTop - paddingBottom;
+				const cellWidth = (gridWidth - gap * (cols - 1)) / cols;
+				const cellHeight = (gridHeight - gap * (rows - 1)) / rows;
 
-		const getMatrixSize = (trophy: TrophyDefinition) => ({
-			width: trophy.matrix[0]?.length ?? trophy.width,
-			height: trophy.matrix.length || trophy.height,
-		});
+				return { rect, gap, paddingLeft, paddingTop, gridWidth, gridHeight, cellWidth, cellHeight };
+			};
 
-		// La collisione considera solo le celle 1 della matrice, non il rettangolo visivo dell'immagine.
-		const getOccupiedCells = (trophy: TrophyDefinition, position: CandidatePosition) => {
-			const cells: CandidatePosition[] = [];
+			const getMatrixSize = (trophy: TrophyDefinition) => ({
+				width: trophy.matrix[0]?.length ?? trophy.width,
+				height: trophy.matrix.length || trophy.height,
+			});
 
-			trophy.matrix.forEach((matrixRow, rowOffset) => {
-				matrixRow.forEach((cell, colOffset) => {
-					if (cell !== 1) return;
+			// La collisione considera solo le celle 1 della matrice, non il rettangolo visivo dell'immagine.
+			const getOccupiedCells = (trophy: TrophyDefinition, position: CandidatePosition) => {
+				const cells: CandidatePosition[] = [];
 
-					cells.push({
-						row: position.row + rowOffset,
-						col: position.col + colOffset,
+				trophy.matrix.forEach((matrixRow, rowOffset) => {
+					matrixRow.forEach((cell, colOffset) => {
+						if (cell !== 1) return;
+
+						cells.push({
+							row: position.row + rowOffset,
+							col: position.col + colOffset,
+						});
 					});
 				});
-			});
 
-			return cells;
-		};
-
-		const isValidPlacement = (trophy: TrophyDefinition, candidate: CandidatePosition, excludeInstanceId?: string) => {
-			const activeCells = getOccupiedCells(trophy, candidate);
-			const isOutOfBounds = activeCells.some((cell) => cell.row < 0 || cell.row >= rows || cell.col < 0 || cell.col >= cols);
-
-			if (isOutOfBounds) {
-				return false;
-			}
-
-			const occupiedKeys = new Set(activeCells.map((cell) => `${cell.row},${cell.col}`));
-
-			return placedTrophies.every((placed) => {
-				if (placed.instanceId === excludeInstanceId) return true;
-
-				return getOccupiedCells(placed, placed).every((cell) => !occupiedKeys.has(`${cell.row},${cell.col}`));
-			});
-		};
-
-		const getCandidateFromPointer = (event: PointerEvent, trophy: TrophyDefinition, offsetX = 0, offsetY = 0): CandidatePosition | null => {
-			const { rect, gap, paddingLeft, paddingTop, gridWidth, gridHeight, cellWidth, cellHeight } = getMetrics();
-			// Lo snap parte dal top-left reale del pezzo, mantenendo stabile il drag anche se il puntatore non e nell'angolo.
-			const x = event.clientX - offsetX - rect.left - paddingLeft;
-			const y = event.clientY - offsetY - rect.top - paddingTop;
-			const matrixSize = getMatrixSize(trophy);
-			const pieceWidth = matrixSize.width * cellWidth + (matrixSize.width - 1) * gap;
-			const pieceHeight = matrixSize.height * cellHeight + (matrixSize.height - 1) * gap;
-			const isInsideBoard =
-				x + pieceWidth >= 0 &&
-				x <= gridWidth &&
-				y + pieceHeight >= 0 &&
-				y <= gridHeight;
-
-			if (!isInsideBoard) return null;
-
-			return {
-				row: Math.round(y / (cellHeight + gap)),
-				col: Math.round(x / (cellWidth + gap)),
+				return cells;
 			};
-		};
 
-		const findFirstAvailablePosition = (trophy: TrophyDefinition): CandidatePosition | null => {
-			for (let row = 0; row < rows; row += 1) {
-				for (let col = 0; col < cols; col += 1) {
-					const candidate = { row, col };
+			const isValidPlacement = (trophy: TrophyDefinition, candidate: CandidatePosition, excludeInstanceId?: string) => {
+				const activeCells = getOccupiedCells(trophy, candidate);
+				const isOutOfBounds = activeCells.some((cell) => cell.row < 0 || cell.row >= rows || cell.col < 0 || cell.col >= cols);
 
-					if (isValidPlacement(trophy, candidate)) {
-						return candidate;
+				if (isOutOfBounds) {
+					return false;
+				}
+
+				const occupiedKeys = new Set(activeCells.map((cell) => `${cell.row},${cell.col}`));
+
+				return placedTrophies.every((placed) => {
+					if (placed.instanceId === excludeInstanceId) return true;
+
+					return getOccupiedCells(placed, placed).every((cell) => !occupiedKeys.has(`${cell.row},${cell.col}`));
+				});
+			};
+
+			const getCandidateFromPointer = (event: PointerEvent, trophy: TrophyDefinition, offsetX = 0, offsetY = 0): CandidatePosition | null => {
+				const { rect, gap, paddingLeft, paddingTop, gridWidth, gridHeight, cellWidth, cellHeight } = getMetrics();
+				// Lo snap parte dal top-left reale del pezzo, mantenendo stabile il drag anche se il puntatore non e nell'angolo.
+				const x = event.clientX - offsetX - rect.left - paddingLeft;
+				const y = event.clientY - offsetY - rect.top - paddingTop;
+				const matrixSize = getMatrixSize(trophy);
+				const pieceWidth = matrixSize.width * cellWidth + (matrixSize.width - 1) * gap;
+				const pieceHeight = matrixSize.height * cellHeight + (matrixSize.height - 1) * gap;
+				const isInsideBoard =
+					x + pieceWidth >= 0 &&
+					x <= gridWidth &&
+					y + pieceHeight >= 0 &&
+					y <= gridHeight;
+
+				if (!isInsideBoard) return null;
+
+				return {
+					row: Math.round(y / (cellHeight + gap)),
+					col: Math.round(x / (cellWidth + gap)),
+				};
+			};
+
+			const findFirstAvailablePosition = (trophy: TrophyDefinition): CandidatePosition | null => {
+				for (let row = 0; row < rows; row += 1) {
+					for (let col = 0; col < cols; col += 1) {
+						const candidate = { row, col };
+
+						if (isValidPlacement(trophy, candidate)) {
+							return candidate;
+						}
 					}
 				}
-			}
 
-			return null;
-		};
+				return null;
+			};
 
-		const createPieceElement = (trophy: PlacedTrophy) => {
-			const matrixSize = getMatrixSize(trophy);
-			// La X resta nella prima cella occupata, cosi non cade su celle vuote riempibili da altri trofei.
-			const firstOccupiedCell = getOccupiedCells(trophy, { row: 0, col: 0 })[0] ?? { row: 0, col: 0 };
-			const piece = document.createElement('button');
-			piece.className = 'trophy-piece';
-			piece.type = 'button';
-			piece.dataset.trophyPiece = trophy.instanceId;
-			piece.dataset.trophyId = trophy.id;
-			piece.dataset.width = String(matrixSize.width);
-			piece.dataset.height = String(matrixSize.height);
-			piece.setAttribute('aria-label', `Trofeo ${trophy.label}`);
-			piece.style.setProperty('--piece-row', String(trophy.row + 1));
-			piece.style.setProperty('--piece-col', String(trophy.col + 1));
-			piece.style.setProperty('--piece-width', String(matrixSize.width));
-			piece.style.setProperty('--piece-height', String(matrixSize.height));
-			piece.style.setProperty('--remove-col', String(firstOccupiedCell.col + 1));
-			piece.style.setProperty('--remove-row', String(firstOccupiedCell.row + 1));
+			const createPieceElement = (trophy: PlacedTrophy) => {
+				const matrixSize = getMatrixSize(trophy);
+				// La X resta nella prima cella occupata, cosi non cade su celle vuote riempibili da altri trofei.
+				const firstOccupiedCell = getOccupiedCells(trophy, { row: 0, col: 0 })[0] ?? { row: 0, col: 0 };
+				const piece = document.createElement('button');
+				piece.className = 'trophy-piece';
+				piece.type = 'button';
+				piece.dataset.trophyPiece = trophy.instanceId;
+				piece.dataset.trophyId = trophy.id;
+				piece.dataset.width = String(matrixSize.width);
+				piece.dataset.height = String(matrixSize.height);
+				piece.setAttribute('aria-label', `Trofeo ${trophy.label}`);
+				piece.style.setProperty('--piece-row', String(trophy.row + 1));
+				piece.style.setProperty('--piece-col', String(trophy.col + 1));
+				piece.style.setProperty('--piece-width', String(matrixSize.width));
+				piece.style.setProperty('--piece-height', String(matrixSize.height));
+				piece.style.setProperty('--remove-col', String(firstOccupiedCell.col + 1));
+				piece.style.setProperty('--remove-row', String(firstOccupiedCell.row + 1));
 
-			const img = document.createElement('img');
-			img.src = trophy.src;
-			img.alt = '';
-			img.draggable = false;
-			piece.append(img);
+				const img = document.createElement('img');
+				img.src = trophy.src;
+				img.alt = '';
+				img.draggable = false;
+				piece.append(img);
 
-			// Hitbox separata: solo le celle occupate sono cliccabili/draggabili, le celle 0 restano attraversabili.
-			const hitbox = document.createElement('span');
-			hitbox.className = 'trophy-piece__hitbox';
-			hitbox.setAttribute('aria-hidden', 'true');
-			hitbox.style.setProperty('--piece-width', String(matrixSize.width));
-			hitbox.style.setProperty('--piece-height', String(matrixSize.height));
-			trophy.matrix.forEach((matrixRow, rowIndex) => {
-				matrixRow.forEach((cell, colIndex) => {
-					if (cell !== 1) return;
+				// Hitbox separata: solo le celle occupate sono cliccabili/draggabili, le celle 0 restano attraversabili.
+				const hitbox = document.createElement('span');
+				hitbox.className = 'trophy-piece__hitbox';
+				hitbox.setAttribute('aria-hidden', 'true');
+				hitbox.style.setProperty('--piece-width', String(matrixSize.width));
+				hitbox.style.setProperty('--piece-height', String(matrixSize.height));
+				trophy.matrix.forEach((matrixRow, rowIndex) => {
+					matrixRow.forEach((cell, colIndex) => {
+						if (cell !== 1) return;
 
-					const activeCell = document.createElement('span');
-					activeCell.className = 'trophy-piece__cell';
-					activeCell.style.setProperty('--cell-row', String(rowIndex + 1));
-					activeCell.style.setProperty('--cell-col', String(colIndex + 1));
-					hitbox.append(activeCell);
+						const activeCell = document.createElement('span');
+						activeCell.className = 'trophy-piece__cell';
+						activeCell.style.setProperty('--cell-row', String(rowIndex + 1));
+						activeCell.style.setProperty('--cell-col', String(colIndex + 1));
+						hitbox.append(activeCell);
+					});
 				});
-			});
-			piece.append(hitbox);
+				piece.append(hitbox);
 
-			const remove = document.createElement('span');
-			remove.className = 'trophy-piece__remove';
-			remove.setAttribute('aria-hidden', 'true');
-			remove.innerHTML = '<i class="bi bi-x-lg"></i>';
-			piece.append(remove);
+				const remove = document.createElement('span');
+				remove.className = 'trophy-piece__remove';
+				remove.setAttribute('aria-hidden', 'true');
+				remove.innerHTML = '<i class="bi bi-x-lg"></i>';
+				piece.append(remove);
 
-			return piece;
-		};
+				return piece;
+			};
 
-		const renderPieces = () => {
-			piecesLayer.replaceChildren();
+			const renderPieces = () => {
+				piecesLayer.replaceChildren();
 
-			placedTrophies.forEach((trophy) => {
-				const piece = createPieceElement(trophy);
-				piece.classList.toggle('is-selected', trophy.instanceId === selectedInstanceId);
-				piecesLayer.append(piece);
-				bindBoardPiece(piece, trophy);
-			});
-		};
+				placedTrophies.forEach((trophy) => {
+					const piece = createPieceElement(trophy);
+					piece.classList.toggle('is-selected', trophy.instanceId === selectedInstanceId);
+					piecesLayer.append(piece);
+					bindBoardPiece(piece, trophy);
+				});
+			};
 
-		const syncPaletteAvailability = () => {
-			const placedIds = new Set(placedTrophies.map((trophy) => trophy.id));
+			const syncPaletteAvailability = () => {
+				const placedIds = new Set(placedTrophies.map((trophy) => trophy.id));
 
-			paletteItems.forEach((item) => {
+				paletteItems.forEach((item) => {
+					const definition = catalog.find((trophy) => trophy.id === item.dataset.trophySource);
+					if (!definition) return;
+
+					const isPlaced = placedIds.has(definition.id);
+					item.disabled = isPlaced;
+					item.classList.toggle('is-used', isPlaced);
+					item.setAttribute('aria-disabled', String(isPlaced));
+					item.setAttribute(
+						'aria-label',
+						isPlaced ? `Trofeo ${definition.label} gia posizionato` : `Aggiungi trofeo ${definition.label}`
+					);
+				});
+			};
+
+			const syncView = () => {
+				renderPieces();
+				syncPaletteAvailability();
+			};
+
+			const addTrophy = (definition: TrophyDefinition, candidate?: CandidatePosition) => {
+				if (placedTrophies.some((trophy) => trophy.id === definition.id)) {
+					return;
+				}
+
+				const position = candidate ?? findFirstAvailablePosition(definition);
+
+				if (!position || !isValidPlacement(definition, position)) {
+					return;
+				}
+
+				instanceCount += 1;
+				placedTrophies = [
+					...placedTrophies,
+					{
+						...definition,
+						instanceId: `${definition.id}-${instanceCount}`,
+						row: position.row,
+						col: position.col,
+					},
+				];
+				selectedInstanceId = '';
+				syncView();
+			};
+
+			const removeTrophy = (instanceId: string) => {
+				placedTrophies = placedTrophies.filter((trophy) => trophy.instanceId !== instanceId);
+				if (selectedInstanceId === instanceId) {
+					selectedInstanceId = '';
+				}
+				syncView();
+			};
+
+			const moveTrophy = (instanceId: string, candidate: CandidatePosition) => {
+				const placed = placedTrophies.find((trophy) => trophy.instanceId === instanceId);
+				if (!placed || !isValidPlacement(placed, candidate, instanceId)) return;
+
+				placedTrophies = placedTrophies.map((trophy) =>
+					trophy.instanceId === instanceId
+						? {
+								...trophy,
+								row: candidate.row,
+								col: candidate.col,
+							}
+						: trophy
+				);
+				syncView();
+			};
+
+			const startDrag = (state: DragState) => {
+				dragState = state;
+				state.piece.classList.add('is-dragging');
+				window.addEventListener('pointermove', updateDrag);
+				window.addEventListener('pointerup', endDrag);
+				window.addEventListener('pointercancel', endDrag);
+			};
+
+			const updateDrag = (event: PointerEvent) => {
+				if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+				dragState.currentX = event.clientX;
+				dragState.currentY = event.clientY;
+				const deltaX = event.clientX - dragState.startX;
+				const deltaY = event.clientY - dragState.startY;
+				dragState.hasMoved = dragState.hasMoved || Math.hypot(deltaX, deltaY) > 6;
+
+				if (!dragState.hasMoved) return;
+
+				dragState.piece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+				const candidate = getCandidateFromPointer(event, dragState.trophy, dragState.offsetX, dragState.offsetY);
+				const isValid = Boolean(candidate && isValidPlacement(dragState.trophy, candidate, dragState.instanceId));
+
+				dragState.piece.classList.toggle('is-valid', isValid);
+				dragState.piece.classList.toggle('is-invalid', !isValid);
+			};
+
+			const endDrag = (event: PointerEvent) => {
+				if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+				const state = dragState;
+				const candidate = getCandidateFromPointer(event, state.trophy, state.offsetX, state.offsetY);
+
+				state.piece.classList.remove('is-dragging', 'is-valid', 'is-invalid');
+				state.piece.style.transform = '';
+				dragState = null;
+				window.removeEventListener('pointermove', updateDrag);
+				window.removeEventListener('pointerup', endDrag);
+				window.removeEventListener('pointercancel', endDrag);
+
+				if (state.source === 'palette') {
+					if (state.isGhost) {
+						state.piece.remove();
+					}
+
+					if (state.hasMoved) {
+						suppressPaletteClick = true;
+					}
+
+					if (state.hasMoved && candidate && isValidPlacement(state.trophy, candidate)) {
+						addTrophy(state.trophy, candidate);
+						suppressPaletteClick = false;
+						palette.classList.remove('is-open');
+					}
+					return;
+				}
+
+				if (!state.instanceId) return;
+
+				if (!state.hasMoved) {
+					return;
+				}
+
+				suppressBoardClick = true;
+
+				if (!candidate) {
+					return;
+				}
+
+				if (isValidPlacement(state.trophy, candidate, state.instanceId)) {
+					moveTrophy(state.instanceId, candidate);
+				}
+			};
+
+			const bindPaletteItem = (item: HTMLButtonElement) => {
 				const definition = catalog.find((trophy) => trophy.id === item.dataset.trophySource);
 				if (!definition) return;
 
-				const isPlaced = placedIds.has(definition.id);
-				item.disabled = isPlaced;
-				item.classList.toggle('is-used', isPlaced);
-				item.setAttribute('aria-disabled', String(isPlaced));
-				item.setAttribute(
-					'aria-label',
-					isPlaced ? `Trofeo ${definition.label} gia posizionato` : `Aggiungi trofeo ${definition.label}`
-				);
-			});
-		};
+				item.addEventListener('click', () => {
+					if (item.disabled) return;
 
-		const syncView = () => {
-			renderPieces();
-			syncPaletteAvailability();
-		};
+					if (suppressPaletteClick) {
+						suppressPaletteClick = false;
+						return;
+					}
 
-		const addTrophy = (definition: TrophyDefinition, candidate?: CandidatePosition) => {
-			if (placedTrophies.some((trophy) => trophy.id === definition.id)) {
-				return;
-			}
-
-			const position = candidate ?? findFirstAvailablePosition(definition);
-
-			if (!position || !isValidPlacement(definition, position)) {
-				return;
-			}
-
-			instanceCount += 1;
-			placedTrophies = [
-				...placedTrophies,
-				{
-					...definition,
-					instanceId: `${definition.id}-${instanceCount}`,
-					row: position.row,
-					col: position.col,
-				},
-			];
-			selectedInstanceId = '';
-			syncView();
-		};
-
-		const removeTrophy = (instanceId: string) => {
-			placedTrophies = placedTrophies.filter((trophy) => trophy.instanceId !== instanceId);
-			if (selectedInstanceId === instanceId) {
-				selectedInstanceId = '';
-			}
-			syncView();
-		};
-
-		const moveTrophy = (instanceId: string, candidate: CandidatePosition) => {
-			const placed = placedTrophies.find((trophy) => trophy.instanceId === instanceId);
-			if (!placed || !isValidPlacement(placed, candidate, instanceId)) return;
-
-			placedTrophies = placedTrophies.map((trophy) =>
-				trophy.instanceId === instanceId
-					? {
-							...trophy,
-							row: candidate.row,
-							col: candidate.col,
-						}
-					: trophy
-			);
-			syncView();
-		};
-
-		const startDrag = (state: DragState) => {
-			dragState = state;
-			state.piece.classList.add('is-dragging');
-			window.addEventListener('pointermove', updateDrag);
-			window.addEventListener('pointerup', endDrag);
-			window.addEventListener('pointercancel', endDrag);
-		};
-
-		const updateDrag = (event: PointerEvent) => {
-			if (!dragState || dragState.pointerId !== event.pointerId) return;
-
-			dragState.currentX = event.clientX;
-			dragState.currentY = event.clientY;
-			const deltaX = event.clientX - dragState.startX;
-			const deltaY = event.clientY - dragState.startY;
-			dragState.hasMoved = dragState.hasMoved || Math.hypot(deltaX, deltaY) > 6;
-
-			if (!dragState.hasMoved) return;
-
-			dragState.piece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-			const candidate = getCandidateFromPointer(event, dragState.trophy, dragState.offsetX, dragState.offsetY);
-			const isValid = Boolean(candidate && isValidPlacement(dragState.trophy, candidate, dragState.instanceId));
-
-			dragState.piece.classList.toggle('is-valid', isValid);
-			dragState.piece.classList.toggle('is-invalid', !isValid);
-		};
-
-		const endDrag = (event: PointerEvent) => {
-			if (!dragState || dragState.pointerId !== event.pointerId) return;
-
-			const state = dragState;
-			const candidate = getCandidateFromPointer(event, state.trophy, state.offsetX, state.offsetY);
-
-			state.piece.classList.remove('is-dragging', 'is-valid', 'is-invalid');
-			state.piece.style.transform = '';
-			dragState = null;
-			window.removeEventListener('pointermove', updateDrag);
-			window.removeEventListener('pointerup', endDrag);
-			window.removeEventListener('pointercancel', endDrag);
-
-			if (state.source === 'palette') {
-				if (state.isGhost) {
-					state.piece.remove();
-				}
-
-				if (state.hasMoved) {
-					suppressPaletteClick = true;
-				}
-
-				if (state.hasMoved && candidate && isValidPlacement(state.trophy, candidate)) {
-					addTrophy(state.trophy, candidate);
-					suppressPaletteClick = false;
-					palette.classList.remove('is-open');
-				}
-				return;
-			}
-
-			if (!state.instanceId) return;
-
-			if (!state.hasMoved) {
-				return;
-			}
-
-			suppressBoardClick = true;
-
-			if (!candidate) {
-				return;
-			}
-
-			if (isValidPlacement(state.trophy, candidate, state.instanceId)) {
-				moveTrophy(state.instanceId, candidate);
-			}
-		};
-
-		const bindPaletteItem = (item: HTMLButtonElement) => {
-			const definition = catalog.find((trophy) => trophy.id === item.dataset.trophySource);
-			if (!definition) return;
-
-			item.addEventListener('click', () => {
-				if (item.disabled) return;
-
-				if (suppressPaletteClick) {
-					suppressPaletteClick = false;
-					return;
-				}
-
-				addTrophy(definition);
-			});
-
-			item.addEventListener('pointerdown', (event) => {
-				if (event.button !== 0) return;
-				if (item.disabled || placedTrophies.some((trophy) => trophy.id === definition.id)) return;
-
-				item.setPointerCapture(event.pointerId);
-				const rect = item.getBoundingClientRect();
-				const dragGhost = item.cloneNode(true) as HTMLElement;
-				dragGhost.classList.add('trophy-drag-ghost');
-				dragGhost.style.left = `${rect.left}px`;
-				dragGhost.style.top = `${rect.top}px`;
-				dragGhost.style.width = `${rect.width}px`;
-				dragGhost.style.height = `${rect.height}px`;
-				document.body.append(dragGhost);
-
-				startDrag({
-					source: 'palette',
-					piece: dragGhost,
-					trophy: definition,
-					isGhost: true,
-					pointerId: event.pointerId,
-					startX: event.clientX,
-					startY: event.clientY,
-					offsetX: event.clientX - rect.left,
-					offsetY: event.clientY - rect.top,
-					currentX: event.clientX,
-					currentY: event.clientY,
-					hasMoved: false,
+					addTrophy(definition);
 				});
+
+				item.addEventListener('pointerdown', (event) => {
+					if (event.button !== 0) return;
+					if (item.disabled || placedTrophies.some((trophy) => trophy.id === definition.id)) return;
+
+					item.setPointerCapture(event.pointerId);
+					const rect = item.getBoundingClientRect();
+					const dragGhost = item.cloneNode(true) as HTMLElement;
+					dragGhost.classList.add('trophy-drag-ghost');
+					dragGhost.style.left = `${rect.left}px`;
+					dragGhost.style.top = `${rect.top}px`;
+					dragGhost.style.width = `${rect.width}px`;
+					dragGhost.style.height = `${rect.height}px`;
+					document.body.append(dragGhost);
+
+					startDrag({
+						source: 'palette',
+						piece: dragGhost,
+						trophy: definition,
+						isGhost: true,
+						pointerId: event.pointerId,
+						startX: event.clientX,
+						startY: event.clientY,
+						offsetX: event.clientX - rect.left,
+						offsetY: event.clientY - rect.top,
+						currentX: event.clientX,
+						currentY: event.clientY,
+						hasMoved: false,
+					});
+				});
+			};
+
+			function bindBoardPiece(piece: HTMLButtonElement, trophy: PlacedTrophy) {
+				piece.addEventListener('click', (event) => {
+					if (suppressBoardClick) {
+						suppressBoardClick = false;
+						return;
+					}
+
+					if ((event.target as HTMLElement).closest('.trophy-piece__remove')) {
+						removeTrophy(trophy.instanceId);
+						return;
+					}
+
+					selectedInstanceId = selectedInstanceId === trophy.instanceId ? '' : trophy.instanceId;
+					syncView();
+				});
+
+				piece.addEventListener('pointerdown', (event) => {
+					if (event.button !== 0) return;
+
+					if ((event.target as HTMLElement).closest('.trophy-piece__remove')) {
+						return;
+					}
+
+					piece.setPointerCapture(event.pointerId);
+					const rect = piece.getBoundingClientRect();
+					startDrag({
+						source: 'board',
+						piece,
+						trophy,
+						instanceId: trophy.instanceId,
+						pointerId: event.pointerId,
+						startX: event.clientX,
+						startY: event.clientY,
+						offsetX: event.clientX - rect.left,
+						offsetY: event.clientY - rect.top,
+						currentX: event.clientX,
+						currentY: event.clientY,
+						hasMoved: false,
+						originRow: trophy.row,
+						originCol: trophy.col,
+					});
+				});
+			}
+
+			paletteItems.forEach(bindPaletteItem);
+
+			menuButton?.addEventListener('click', () => {
+				palette.classList.add('is-open');
 			});
-		};
 
-		function bindBoardPiece(piece: HTMLButtonElement, trophy: PlacedTrophy) {
-			piece.addEventListener('click', (event) => {
-				if (suppressBoardClick) {
-					suppressBoardClick = false;
-					return;
-				}
+			closeButton?.addEventListener('click', () => {
+				palette.classList.remove('is-open');
+			});
 
-				if ((event.target as HTMLElement).closest('.trophy-piece__remove')) {
-					removeTrophy(trophy.instanceId);
-					return;
-				}
+			instructionsButton?.addEventListener('click', () => {
+				document.dispatchEvent(new CustomEvent('tsbs:trophy-instructions-open'));
+			});
 
-				selectedInstanceId = selectedInstanceId === trophy.instanceId ? '' : trophy.instanceId;
+			resetButton?.addEventListener('click', () => {
+				placedTrophies = [];
 				syncView();
 			});
 
-			piece.addEventListener('pointerdown', (event) => {
-				if (event.button !== 0) return;
-
-				if ((event.target as HTMLElement).closest('.trophy-piece__remove')) {
-					return;
-				}
-
-				piece.setPointerCapture(event.pointerId);
-				const rect = piece.getBoundingClientRect();
-				startDrag({
-					source: 'board',
-					piece,
-					trophy,
-					instanceId: trophy.instanceId,
-					pointerId: event.pointerId,
-					startX: event.clientX,
-					startY: event.clientY,
-					offsetX: event.clientX - rect.left,
-					offsetY: event.clientY - rect.top,
-					currentX: event.clientX,
-					currentY: event.clientY,
-					hasMoved: false,
-					originRow: trophy.row,
-					originCol: trophy.col,
-				});
-			});
-		}
-
-		paletteItems.forEach(bindPaletteItem);
-
-		menuButton?.addEventListener('click', () => {
-			palette.classList.add('is-open');
-		});
-
-		closeButton?.addEventListener('click', () => {
-			palette.classList.remove('is-open');
-		});
-
-		instructionsButton?.addEventListener('click', () => {
-			document.dispatchEvent(new CustomEvent('tsbs:trophy-instructions-open'));
-		});
-
-		resetButton?.addEventListener('click', () => {
-			placedTrophies = [];
 			syncView();
 		});
+	};
 
-		syncView();
-	});
+	document.addEventListener('astro:page-load', setupTrophyRooms);
 </script>
 
 <style lang="scss">
