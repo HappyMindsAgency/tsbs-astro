@@ -90,6 +90,9 @@
   --tsbs-mobile-nav-height: 4.5rem;
   --tsbs-mobile-nav-viewport-height: calc(var(--tsbs-mobile-nav-height) + env(safe-area-inset-bottom));
   --tsbs-desktop-nav-width: 16rem;
+  --tsbs-page-pattern-image: url("../assets/Arborea-pattern-the-secret-bookish-society.webp");
+  --tsbs-page-pattern-overlay: linear-gradient(rgba(255, 250, 240, 0.9), rgba(255, 250, 240, 0.9));
+  --tsbs-page-pattern-size: 180px 180px;
 
   --bs-body-font-family: var(--tsbs-font-body);
   --bs-body-font-size: var(--tsbs-font-size-body);
@@ -120,7 +123,11 @@ body {
   font-size: var(--tsbs-font-size-body);
   line-height: var(--tsbs-line-height-body);
   text-rendering: optimizeLegibility;
-  background-color: var(--tsbs-color-white);
+  background-color: #fffaf0;
+  background-image: var(--tsbs-page-pattern-overlay), var(--tsbs-page-pattern-image);
+  background-repeat: repeat;
+  background-position: top left;
+  background-size: var(--tsbs-page-pattern-size);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -995,6 +1002,13 @@ h1,
 		justify-items: center;
 		padding: 4.375rem 1rem 1.5rem;
 		overflow: hidden;
+		background-color: #fffaf0;
+		background-image:
+			linear-gradient(rgba(255, 250, 240, 0.8), rgba(255, 250, 240, 0.8)),
+			var(--tsbs-page-pattern-image);
+		background-repeat: repeat;
+		background-position: top left;
+		background-size: var(--tsbs-page-pattern-size);
 	}
 
 	.academy-hero__content {
@@ -3956,3 +3970,12 @@ h1,
 			min-height: calc(100vh - 5.625rem - 7rem);
 		}
 	}
+
+// SFONDO GLOBALE APP
+.tsbs-app-shell {
+	background-color: #fffaf0;
+	background-image: var(--tsbs-page-pattern-overlay), var(--tsbs-page-pattern-image);
+	background-repeat: repeat;
+	background-position: top left;
+	background-size: var(--tsbs-page-pattern-size);
+}
