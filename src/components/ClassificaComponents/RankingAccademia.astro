@@ -1,10 +1,21 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../Nav.astro';
+import arboreaPattern from '../../assets/Arborea-pattern-the-secret-bookish-society.webp';
+import arcadiaPattern from '../../assets/Arcadia-pattern-the-secret-bookish-society.webp';
+import armoniaPattern from '../../assets/Armonia-pattern-the-secret-bookish-society.webp';
+import astrariaPattern from '../../assets/Astraria-pattern-the-secret-bookish-society.webp';
 import trophyIcon from '../../assets/trofei-icona-scrivania.png';
 
 const { lang = 'it', academy = 'arborea', showBoxCronache = false, showUserRank = false } = Astro.props;
 const academyTheme = ['astraria', 'arcadia', 'armonia', 'arborea'].includes(academy) ? academy : 'arborea';
+const academyPatterns = {
+	astraria: astrariaPattern,
+	arcadia: arcadiaPattern,
+	armonia: armoniaPattern,
+	arborea: arboreaPattern,
+};
+const academyPattern = academyPatterns[academyTheme];
 const profileHref = '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/';
 
 // Binding futuro:
@@ -39,7 +50,7 @@ const chronicleRows = [
 <Layout lang={lang}>
 	<Nav lang={lang} />
 
-	<main class={`tsbs-app-shell academy-page academy-ranking-page theme-${academyTheme}`} data-academy={academyTheme}>
+	<main class={`tsbs-app-shell academy-page academy-ranking-page theme-${academyTheme}`} data-academy={academyTheme} style={`--tsbs-page-pattern-image: url(${academyPattern.src});`}>
 		<header class="missions-header academy-ranking-header">
 			<h1>Classifica</h1>
 		</header>

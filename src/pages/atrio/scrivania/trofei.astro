@@ -669,7 +669,11 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 		--trophies-board-size: min(100%, var(--trophies-board-max-width), calc(var(--trophies-board-height-space) * 5 / 8));
 
 		min-height: 100vh;
-		background: var(--tsbs-color-surface);
+		background-color: #fffaf0;
+		background-image: var(--tsbs-page-pattern-overlay), var(--tsbs-page-pattern-image);
+		background-repeat: repeat;
+		background-position: top left;
+		background-size: var(--tsbs-page-pattern-size);
 	}
 
 	.trophies-header {
