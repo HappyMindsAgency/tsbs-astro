@@ -20,6 +20,7 @@ Questo file raccoglie le informazioni backend note e le regole operative per Str
 - Non introdurre automazioni non richieste.
 - Non inventare campi, stati o flussi non confermati.
 - Ogni modifica strutturale deve essere annotata in `docs/wiki/decision-log.md`.
+- In fase di binding, controllare anche i commenti presenti nei file Astro/componenti: possono indicare logiche provvisorie da collegare all'utente loggato o ai dati Strapi.
 
 ## Collection Customizzate Previste
 
