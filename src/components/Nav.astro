@@ -1,24 +1,22 @@
 ---
 const { lang = "it", deactivateAll = false } = Astro.props;
 
-console.log("in Nav deactivateAll ", deactivateAll);
-
 const pathname = Astro.url.pathname;
 
 const mobileItems = [
-  { label: "Scrivania", href: "/atrio/scrivania/", icon: "bi-book" },
-  { label: "Missioni", href: "/atrio/missioni/", icon: "bi-award" },
-  { label: "Atrio", href: "/atrio/", icon: "bi-house-door", activePaths: ["/epistole/"] },
-  { label: "Accademia", href: "/atrio/accademia/", icon: "bi-mortarboard" },
-  { label: "Biblioteca", href: "/atrio/biblioteca/", icon: "bi-archive", activePaths: ["/atrio/eventi/"] },
+  { id: "scrivania", label: "Scrivania", href: "/atrio/scrivania/", icon: "bi-book" },
+  { id: "missioni", label: "Missioni", href: "/atrio/missioni/", icon: "bi-award" },
+  { id: "atrio", label: "Atrio", href: "/atrio/", icon: "bi-house-door", activePaths: ["/epistole/"] },
+  { id: "accademia", label: "Accademia", href: "/atrio/accademia/", icon: "bi-mortarboard" },
+  { id: "biblioteca", label: "Biblioteca", href: "/atrio/biblioteca/", icon: "bi-archive", activePaths: ["/atrio/eventi/"] },
 ];
 
 const desktopItems = [
-  { label: "Atrio", href: "/atrio/", icon: "bi-house-door", activePaths: ["/epistole/"] },
-  { label: "Scrivania", href: "/atrio/scrivania/", icon: "bi-book" },
-  { label: "Missioni", href: "/atrio/missioni/", icon: "bi-award" },
-  { label: "Accademia", href: "/atrio/accademia/", icon: "bi-mortarboard" },
-  { label: "Biblioteca", href: "/atrio/biblioteca/", icon: "bi-archive", activePaths: ["/atrio/eventi/"] },
+  { id: "atrio", label: "Atrio", href: "/atrio/", icon: "bi-house-door", activePaths: ["/epistole/"] },
+  { id: "scrivania", label: "Scrivania", href: "/atrio/scrivania/", icon: "bi-book" },
+  { id: "missioni", label: "Missioni", href: "/atrio/missioni/", icon: "bi-award" },
+  { id: "accademia", label: "Accademia", href: "/atrio/accademia/", icon: "bi-mortarboard" },
+  { id: "biblioteca", label: "Biblioteca", href: "/atrio/biblioteca/", icon: "bi-archive", activePaths: ["/atrio/eventi/"] },
 ];
 
 const normalizePath = (path: string) => path.replace(/\/+$/, "") || "/";
@@ -45,6 +43,7 @@ const getActiveHref = (items: typeof mobileItems) => {
 
 const activeMobileHref = getActiveHref(mobileItems);
 const activeDesktopHref = getActiveHref(desktopItems);
+const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, href, activePaths }));
 ---
 
 <nav class="tsbs-mobile-nav" aria-label="Menu principale" data-lang={lang}>
@@ -54,6 +53,7 @@ const activeDesktopHref = getActiveHref(desktopItems);
         <a
           class={`tsbs-mobile-nav__link ${normalizePath(item.href) === activeMobileHref ? "is-active" : ""} ${deactivateAll ? "pe-none" : ""}`}
           href={item.href}
+          data-nav-section={item.id}
           aria-current={normalizePath(item.href) === activeMobileHref ? "page" : undefined}
           aria-disabled={deactivateAll ? "true" : undefined}
         >
@@ -74,6 +74,7 @@ const activeDesktopHref = getActiveHref(desktopItems);
           <a
             class={`tsbs-desktop-nav__link ${normalizePath(item.href) === activeDesktopHref ? "is-active" : ""} ${deactivateAll ? "pe-none" : ""}`}
             href={item.href}
+            data-nav-section={item.id}
             aria-current={normalizePath(item.href) === activeDesktopHref ? "page" : undefined}
             aria-disabled={deactivateAll ? "true" : undefined}
           >
@@ -85,6 +86,88 @@ const activeDesktopHref = getActiveHref(desktopItems);
     </ul>
   </nav>
 </aside>
+
+<script define:vars={{ navContextItems, deactivateAll }} data-astro-rerun>
+  const navContextStorageKey = "tsbs.activeNavContext";
+  const navContextLinks = Array.from(document.querySelectorAll("[data-nav-section]"));
+  const navIsDeactivated = Boolean(deactivateAll);
+  const normalizeNavPath = (path) => path.replace(/\/+$/, "") || "/";
+  const navSections = navContextItems.map((item) => ({
+    ...item,
+    href: normalizeNavPath(item.href),
+    activePaths: (item.activePaths || []).map(normalizeNavPath),
+  }));
+  const validNavSections = new Set(navSections.map((item) => item.id));
+
+  const getNavSectionFromPath = (pathname) => {
+    const currentPath = normalizeNavPath(pathname);
+    const aliasedItem = navSections.find((item) => item.activePaths.some((path) => currentPath.startsWith(path)));
+    if (aliasedItem) return aliasedItem.id;
+
+    let path = currentPath;
+
+    while (path !== "/") {
+      const matchedItem = navSections.find((item) => item.href === path);
+      if (matchedItem) return matchedItem.id;
+
+      path = normalizeNavPath(path.split("/").slice(0, -1).join("/"));
+    }
+
+    return "";
+  };
+
+  const setActiveNavSection = (section) => {
+    navContextLinks.forEach((link) => {
+      const isActive = link.dataset.navSection === section;
+      link.classList.toggle("is-active", isActive);
+
+      if (isActive) {
+        link.setAttribute("aria-current", "page");
+      } else {
+        link.removeAttribute("aria-current");
+      }
+    });
+  };
+
+  const getStoredNavSection = () => {
+    try {
+      const storedSection = sessionStorage.getItem(navContextStorageKey);
+      return storedSection && validNavSections.has(storedSection) ? storedSection : "";
+    } catch {
+      return "";
+    }
+  };
+
+  const storeNavSection = (section) => {
+    if (!validNavSections.has(section)) return;
+
+    try {
+      sessionStorage.setItem(navContextStorageKey, section);
+    } catch {
+      // Se lo storage non e disponibile, la nav resta comunque coerente con l'URL.
+    }
+  };
+
+  if (!navIsDeactivated) {
+    const fallbackSection = getNavSectionFromPath(window.location.pathname);
+    const activeSection = getStoredNavSection() || fallbackSection;
+
+    if (activeSection) {
+      setActiveNavSection(activeSection);
+      storeNavSection(activeSection);
+    }
+
+    navContextLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        const section = link.dataset.navSection;
+        if (!section) return;
+
+        storeNavSection(section);
+        setActiveNavSection(section);
+      });
+    });
+  }
+</script>
 
 <style lang="scss">
   .tsbs-mobile-nav,

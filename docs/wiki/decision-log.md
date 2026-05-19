@@ -39,6 +39,28 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-19 - Contesto Navigazione Persistente Menu Atrio
+
+Decisione:
+- la sidebar e la mobile nav non rappresentano sempre la sezione tecnica dell'URL
+- il menu principale rappresenta il contesto principale di navigazione dell'utente
+- il contesto viene impostato dai click sulle voci del menu principale e resta attivo durante la navigazione interna
+- in assenza di un contesto salvato, il contesto viene dedotto dalla URL corrente
+- con Astro ClientRouter, la logica del menu deve rieseguirsi dopo ogni navigazione client-side
+- il contesto puo essere resettato in futuro su logout o cambio sessione
+
+Motivo:
+- mantenere coerente l'orientamento visivo quando l'utente parte da una sezione, per esempio Scrivania, e apre una pagina tecnicamente collocata in un'altra area, per esempio Classifica Accademia
+- evitare query param o configurazioni manuali sui singoli link interni
+- preservare una logica semplice e centralizzata nel componente di navigazione
+
+Impatto:
+- `src/components/Nav.astro`
+- navigazione principale Atrio, Scrivania, Missioni, Accademia, Biblioteca
+
+Stato:
+- approvata
+
 ## 2026-05-14 - Token Neutro Soft Globale
 
 Decisione:
