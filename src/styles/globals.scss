@@ -2044,7 +2044,7 @@ h1,
 	.biblioteca-academy-card {
 		--biblioteca-academy-card-bg: var(--tsbs-theme-accent);
 		display: grid;
-		grid-template-columns: 3.5rem minmax(0, 1fr);
+		grid-template-columns: 4.25rem minmax(0, 1fr);
 		align-items: center;
 		gap: 1rem;
 		min-height: 7.5rem;
@@ -2081,16 +2081,18 @@ h1,
 	.biblioteca-academy-card__icon {
 		display: grid;
 		place-items: center;
-		width: 3.5rem;
-		height: 3.5rem;
-		color: var(--tsbs-color-white);
-		background: color-mix(in srgb, var(--tsbs-color-heading) 28%, transparent);
+		width: 4.25rem;
+		height: 4.25rem;
+		padding: 0.5rem;
+		background: #ffffff;
 		border-radius: 50%;
 	}
 
-	.biblioteca-academy-card__icon .bi {
-		font-size: 2rem;
-		line-height: 1;
+	.biblioteca-academy-card__icon img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
 	.biblioteca-academy-card__copy {
@@ -2130,8 +2132,15 @@ h1,
 		}
 
 		.biblioteca-academy-card {
+			grid-template-columns: 5rem minmax(0, 1fr);
 			min-height: 8rem;
 			padding: 1.375rem 1.25rem;
+		}
+
+		.biblioteca-academy-card__icon {
+			width: 5rem;
+			height: 5rem;
+			padding: 0.5625rem;
 		}
 	}
 
