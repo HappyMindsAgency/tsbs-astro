@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../Nav.astro';
+import trophyIcon from '../../assets/trofei-icona-scrivania.png';
 
 const { lang = 'it', academy = 'arborea', showBoxCronache = false, showUserRank = false } = Astro.props;
 const academyTheme = ['astraria', 'arcadia', 'armonia', 'arborea'].includes(academy) ? academy : 'arborea';
@@ -54,11 +55,20 @@ const chronicleRows = [
 						<a class={`academy-ranking-card ${index > 12 ? 'is-hidden' : ''}`} href={profileHref} data-academy-ranking-card>
 							<div class="academy-ranking-card__position">
 								{row.medal ? (
-									<i class={`bi bi-award-fill is-${row.medal}`} aria-hidden="true"></i>
+									<img
+										class={`academy-ranking-card__medal-icon is-${row.medal}`}
+										src={trophyIcon.src}
+										width={trophyIcon.width}
+										height={trophyIcon.height}
+										alt=""
+										aria-hidden="true"
+										loading="lazy"
+										decoding="async"
+									/>
 								) : (
 									<span>{row.position}</span>
 								)}
-								<span class="academy-ranking-card__roman">{row.medal ? row.position : ''}</span>
+								<span class={`academy-ranking-card__roman ${row.medal ? `is-${row.medal}` : ''}`}>{row.medal ? row.position : ''}</span>
 							</div>
 							<div class="academy-ranking-card__avatar" aria-hidden="true">{row.initials}</div>
 							<p class="academy-ranking-card__name">{row.name}</p>

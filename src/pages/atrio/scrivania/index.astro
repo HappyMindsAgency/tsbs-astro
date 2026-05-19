@@ -1,6 +1,9 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import classificaIcon from '../../../assets/03_classifica_bianco_scrivania.svg';
+import grimorioIcon from '../../../assets/02_grimorio_bianco_scrivania.svg';
+import trofeiIcon from '../../../assets/01_trofei_bianco_scrivania.svg';
 
 const { lang = 'it' } = Astro.props;
 
@@ -59,15 +62,42 @@ const featuredNoteHref = '/atrio/scrivania/grimorio/titolo-della-nota/';
 
 				<div class="desk-recap-grid">
 					<a class="desk-recap-card" href="/atrio/scrivania/trofei/">
-						<i class="bi bi-award" aria-hidden="true"></i>
+						<img
+							class="desk-recap-card__icon"
+							src={trofeiIcon.src}
+							width={trofeiIcon.width}
+							height={trofeiIcon.height}
+							alt=""
+							aria-hidden="true"
+							loading="lazy"
+							decoding="async"
+						/>
 						<span>Trofei</span>
 					</a>
 					<a class="desk-recap-card" href="/atrio/accademia/classifica/">
-						<i class="bi bi-bar-chart" aria-hidden="true"></i>
+						<img
+							class="desk-recap-card__icon"
+							src={classificaIcon.src}
+							width={classificaIcon.width}
+							height={classificaIcon.height}
+							alt=""
+							aria-hidden="true"
+							loading="lazy"
+							decoding="async"
+						/>
 						<span>Classifica Accademia</span>
 					</a>
 					<a class="desk-recap-card" href="/atrio/scrivania/grimorio/">
-						<i class="bi bi-book" aria-hidden="true"></i>
+						<img
+							class="desk-recap-card__icon"
+							src={grimorioIcon.src}
+							width={grimorioIcon.width}
+							height={grimorioIcon.height}
+							alt=""
+							aria-hidden="true"
+							loading="lazy"
+							decoding="async"
+						/>
 						<span>Grimorio</span>
 					</a>
 				</div>

@@ -1175,8 +1175,16 @@ h1,
 		font-size: 1rem;
 	}
 
+	.academy-ranking-card__medal-icon {
+		display: block;
+		width: 1rem;
+		height: 1rem;
+		object-fit: contain;
+	}
+
 	.academy-ranking-card__roman {
 		font-size: 0.875rem;
+		font-weight: 900;
 	}
 
 	.academy-ranking-card__position .is-gold {
@@ -3605,6 +3613,12 @@ h1,
 		line-height: 1;
 	}
 
+	.desk-recap-card__icon {
+		width: clamp(2.3rem, 10.925vw, 3.88125rem);
+		height: clamp(2.3rem, 10.925vw, 3.88125rem);
+		object-fit: contain;
+	}
+
 	.desk-recap-card span {
 		color: #ffffff;
 		font-size: 0.875rem;
@@ -3694,6 +3708,16 @@ h1,
 		.desk-recap-card {
 			color: #ffffff;
 			background: var(--desk-accent);
+		}
+
+		.desk-recap-card__icon {
+			width: clamp(3rem, 7.92vw, 5.0625rem);
+			height: clamp(3rem, 7.92vw, 5.0625rem);
+		}
+
+		.desk-recap-card span {
+			font-size: 1.0625rem;
+			line-height: 1.1;
 		}
 
 	}
