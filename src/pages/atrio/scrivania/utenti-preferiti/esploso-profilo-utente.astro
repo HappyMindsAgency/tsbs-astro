@@ -265,20 +265,31 @@ const cells = Array.from({ length: board.rows * board.cols });
 
 	@media (min-width: 992px) {
 		.profile-exploded-page {
-			--profile-board-max-width: 38rem;
-			--profile-hero-space: 22.5rem;
+			--profile-board-max-width: 44rem;
+			--profile-hero-space: 0rem;
 			--profile-content-top: 2rem;
 			--profile-content-bottom: 2rem;
-			--profile-board-height-space: calc(100dvh - var(--profile-hero-space) - var(--profile-content-top) - var(--profile-content-bottom));
+			--profile-sidebar-width: clamp(20rem, 28vw, 30rem);
+			--profile-board-height-space: calc(100dvh - var(--profile-content-top) - var(--profile-content-bottom));
+
+			display: grid;
+			grid-template-columns: var(--profile-sidebar-width) minmax(0, 1fr);
+			align-items: stretch;
 			padding-bottom: 0;
 		}
 
 		.profile-exploded-hero {
-			padding-bottom: 3rem;
+			display: grid;
+			align-items: center;
+			min-height: 100vh;
+			padding: 3rem 2rem;
+			background: var(--desk-accent);
 		}
 
 		.profile-exploded-hero__panel {
 			position: static;
+			width: 100%;
+			min-height: 0;
 		}
 
 		.profile-favorite-button {
@@ -289,6 +300,9 @@ const cells = Array.from({ length: board.rows * board.cols });
 		}
 
 		.profile-exploded-content {
+			width: 100%;
+			min-height: 100vh;
+			padding-top: var(--profile-content-top);
 			padding-bottom: 2rem;
 		}
 	}

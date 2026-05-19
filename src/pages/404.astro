@@ -1,0 +1,101 @@
+---
+import Layout from '../layouts/Layout.astro';
+import bg404 from '../assets/bg-404.svg';
+
+const { lang = 'it' } = Astro.props;
+---
+
+<Layout lang={lang} theme="theme-neutral">
+	<main class="not-found-page" aria-labelledby="not-found-title">
+		<section class="not-found-content">
+			<p class="not-found-kicker">Errore 404</p>
+			<h1 id="not-found-title" class="not-found-title">Quisque quis finibus arcu.</h1>
+			<p class="not-found-intro">
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus tempor nulla in
+				viverra tempus. Quisque quis finibus arcu. Interdum et malesuada fames ac ante ipsum
+				primis in faucibus.
+			</p>
+			<a class="btn global-cta-var2 not-found-cta" href="/atrio/">Torna in biblioteca</a>
+		</section>
+	</main>
+</Layout>
+
+<style lang="scss" define:vars={{ bg404: `url(${bg404.src})` }}>
+	.not-found-page {
+		--not-found-title: #461901;
+		--not-found-copy: #7b3306;
+
+		display: grid;
+		min-height: 100vh;
+		min-height: 100dvh;
+		padding: clamp(2.5rem, 8vw, 5rem) clamp(0.9375rem, 4vw, 2rem);
+		place-items: center;
+		text-align: center;
+		background-color: var(--tsbs-color-white);
+		background-image: var(--bg404);
+		background-position: center;
+		background-size: cover;
+	}
+
+	.not-found-content {
+		width: min(100%, 35rem);
+		margin-inline: auto;
+	}
+
+	.not-found-kicker {
+		margin-bottom: clamp(0.5rem, 1.4vw, 0.75rem);
+		color: var(--not-found-copy);
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(0.875rem, 2.8vw, 1.35rem);
+		font-weight: 400;
+		line-height: 1.2;
+		letter-spacing: 0.34em;
+		text-transform: uppercase;
+	}
+
+	.not-found-title {
+		max-width: 30rem;
+		margin: 0 auto;
+		color: var(--not-found-title);
+		font-family: Georgia, "Times New Roman", serif;
+		font-size: clamp(2.5rem, 12vw, 4.125rem);
+		font-weight: 600;
+		line-height: 1.12;
+	}
+
+	.not-found-intro {
+		max-width: 32rem;
+		margin: clamp(1.5rem, 3vw, 1.875rem) auto 0;
+		color: var(--not-found-copy);
+		font-family: var(--tsbs-font-body);
+		font-size: clamp(0.95rem, 2.4vw, 1rem);
+		line-height: 1.55;
+	}
+
+	.not-found-cta {
+		min-width: min(100%, 12.875rem);
+		margin-top: clamp(2rem, 4vw, 2.375rem);
+		padding: 0.75rem 1.5rem;
+		border-radius: 0.5rem;
+		font-family: var(--tsbs-font-body);
+		font-size: 0.8125rem;
+		line-height: 1.2;
+		text-decoration: none;
+		text-transform: uppercase;
+	}
+
+	@media (max-width: 575.98px) {
+		.not-found-page {
+			align-items: center;
+			background-size: auto 100%;
+		}
+
+		.not-found-title {
+			max-width: 18rem;
+		}
+
+		.not-found-intro {
+			max-width: 20rem;
+		}
+	}
+</style>
