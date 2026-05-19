@@ -1020,9 +1020,30 @@ h1,
 		filter: drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--tsbs-theme-accent) 22%, transparent));
 	}
 
+	.academy-hero__mobile-logo {
+		position: absolute;
+		top: 3.5rem;
+		left: 50%;
+		display: grid;
+		place-items: center;
+		width: 4.25rem;
+		height: 4.25rem;
+		padding: 0.5rem;
+		background: #ffffff;
+		border-radius: 50%;
+		transform: translateX(-50%);
+	}
+
+	.academy-hero__mobile-logo img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
 	.academy-hero__mobile-copy {
 		position: absolute;
-		inset: 7.125rem 2.125rem auto;
+		inset: 8.25rem 2.125rem auto;
 		display: grid;
 		justify-items: center;
 		gap: 0.875rem;
@@ -1444,17 +1465,17 @@ h1,
 
 		.academy-hero__icon {
 			place-items: center;
-			width: 6rem;
-			height: 6rem;
+			width: 7.2rem;
+			height: 7.2rem;
 			margin-bottom: 1.5rem;
-			color: #ffffff;
-			background: #777777;
-			border-radius: 50%;
+			background: transparent;
 		}
 
-		.academy-hero__icon .bi {
-			font-size: 2.875rem;
-			line-height: 1;
+		.academy-hero__icon img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
 		}
 
 		.academy-hero__desktop-copy {

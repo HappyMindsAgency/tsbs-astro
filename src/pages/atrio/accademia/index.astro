@@ -1,7 +1,8 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
-import academyCrest from '../../../assets/accademia-astraria-stemma.png';
+import arboreaBanner from '../../../assets/Arborea-accademia-stendardo-the-secret-bookish-society.webp';
+import arboreaLogo from '../../../assets/Arborea-logo-the-secret-bookish-society.png';
 import trophyIcon from '../../../assets/trofei-icona-scrivania.png';
 
 const { lang = 'it' } = Astro.props;
@@ -27,17 +28,34 @@ const chronicleRows = [
 
 	<main class="tsbs-app-shell academy-page">
 		<section class="academy-hero" aria-labelledby="academy-title">
-			<img class="academy-hero__crest academy-hero__crest--left" src={academyCrest.src} alt="" aria-hidden="true" />
+			<img class="academy-hero__crest academy-hero__crest--left" src={arboreaBanner.src} alt="" aria-hidden="true" />
 
 			<div class="academy-hero__content">
 				<div class="academy-hero__icon" aria-hidden="true">
-					<i class="bi bi-image"></i>
+					<img
+						src={arboreaLogo.src}
+						width={arboreaLogo.width}
+						height={arboreaLogo.height}
+						alt=""
+						loading="eager"
+						decoding="async"
+					/>
 				</div>
 
 				<div class="academy-hero__mobile-crest">
-					<img src={academyCrest.src} alt="" aria-hidden="true" />
+					<img src={arboreaBanner.src} alt="" aria-hidden="true" />
+					<span class="academy-hero__mobile-logo" aria-hidden="true">
+						<img
+							src={arboreaLogo.src}
+							width={arboreaLogo.width}
+							height={arboreaLogo.height}
+							alt=""
+							loading="eager"
+							decoding="async"
+						/>
+					</span>
 					<div class="academy-hero__mobile-copy">
-						<h1 id="academy-title">Astraria</h1>
+						<h1 id="academy-title">Arborea</h1>
 						<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
 						<p class="academy-members">
 							<i class="bi bi-people" aria-hidden="true"></i>
@@ -47,7 +65,7 @@ const chronicleRows = [
 				</div>
 
 				<div class="academy-hero__desktop-copy">
-					<h1>Astraria</h1>
+					<h1>Arborea</h1>
 					<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
 					<p class="academy-members">
 						<i class="bi bi-people" aria-hidden="true"></i>
@@ -56,7 +74,7 @@ const chronicleRows = [
 				</div>
 			</div>
 
-			<img class="academy-hero__crest academy-hero__crest--right" src={academyCrest.src} alt="" aria-hidden="true" />
+			<img class="academy-hero__crest academy-hero__crest--right" src={arboreaBanner.src} alt="" aria-hidden="true" />
 		</section>
 
 		<div class="container-xl tsbs-app-container academy-content">
