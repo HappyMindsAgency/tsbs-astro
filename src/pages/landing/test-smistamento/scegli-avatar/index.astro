@@ -1,0 +1,28 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import SceltaAvatar from '../../../../components/TestSmistamentoComponents/SceltaAvatar.astro';
+
+type AcademyKey = 'astraria' | 'arcadia' | 'armonia' | 'arborea';
+
+const { lang = 'it' } = Astro.props;
+
+const academies: AcademyKey[] = ['astraria', 'arcadia', 'armonia', 'arborea'];
+const requestedAcademy = Astro.url.searchParams.get('academy');
+const academy = requestedAcademy && academies.includes(requestedAcademy as AcademyKey)
+	? requestedAcademy
+	: undefined;
+const theme = academy ? `theme-${academy}` : 'theme-neutral';
+---
+
+<Layout lang={lang} theme={theme}>
+	<main class="test-smistamento-page">
+		<SceltaAvatar lang={lang} academy={academy} selectedAcademy={academy} />
+	</main>
+</Layout>
+
+<style lang="scss">
+	.test-smistamento-page {
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+</style>

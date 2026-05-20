@@ -23,7 +23,7 @@ const { academy = 'arborea', lang = 'it' } = Astro.props;
 const currentAcademy = normalizeAcademy(academy);
 const academyName = academyLabels[currentAcademy];
 const resultBaseUrl = '/landing/test-smistamento/';
-const confirmHref = `${resultBaseUrl}?step=scelta-avatar&academy=${encodeURIComponent(currentAcademy)}`;
+const confirmHref = `${resultBaseUrl}scegli-avatar/?academy=${encodeURIComponent(currentAcademy)}`;
 const chooseHref = `${resultBaseUrl}?step=conferma-accademia&academy=${encodeURIComponent(currentAcademy)}`;
 ---
 

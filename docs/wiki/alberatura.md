@@ -31,7 +31,7 @@ src/pages/
 │  │  └─ index.astro
 │  ├─ appartenenza/
 │  │  └─ index.astro
-│  └─ scelta-avatar/
+│  └─ scegli-avatar/
 │     └─ index.astro
 │
 ├─ dashboard-welcome-accademia/

@@ -38,6 +38,25 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-20 - Route Dedicata Scelta Avatar
+
+Decisione:
+- rendere lo step di scelta avatar una route dedicata con slug pubblico `scegli-avatar`
+- mantenere `academy` come parametro di stato della route
+- lasciare temporaneamente compatibile lo step tecnico `scelta-avatar` su query param
+
+Motivo:
+- usare URL leggibili per gli step principali del flusso di test smistamento
+- separare lo slug pubblico dal nome tecnico del componente `SceltaAvatar`
+
+Impatto:
+- `src/pages/landing/test-smistamento/scegli-avatar/index.astro`
+- `src/components/TestSmistamentoComponents/RisultatoSmistamento.astro`
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
 ## 2026-05-18 - Accento Neutro Per Box Test Smistamento
 
 Decisione:
