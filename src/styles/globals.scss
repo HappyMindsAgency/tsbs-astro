@@ -380,6 +380,7 @@ h1,
 }
 
 .theme-arborea {
+  --tsbs-page-pattern-image: url("../assets/Arborea-pattern-the-secret-bookish-society.webp");
   --tsbs-theme-accent: var(--tsbs-color-arborea);
   --tsbs-theme-cta-bg: #7b872e;
   --tsbs-theme-cta-border: #7b872e;
@@ -395,6 +396,7 @@ h1,
 }
 
 .theme-armonia {
+  --tsbs-page-pattern-image: url("../assets/Armonia-pattern-the-secret-bookish-society.webp");
   --tsbs-theme-accent: var(--tsbs-color-armonia);
   --tsbs-theme-cta-bg: #d7a839;
   --tsbs-theme-cta-border: #d7a839;
@@ -410,6 +412,7 @@ h1,
 }
 
 .theme-arcadia {
+  --tsbs-page-pattern-image: url("../assets/Arcadia-pattern-the-secret-bookish-society.webp");
   --tsbs-theme-accent: var(--tsbs-color-arcadia);
   --tsbs-theme-cta-bg: #72191c;
   --tsbs-theme-cta-border: #72191c;
@@ -425,6 +428,7 @@ h1,
 }
 
 .theme-astraria {
+  --tsbs-page-pattern-image: url("../assets/Astraria-pattern-the-secret-bookish-society.webp");
   --tsbs-theme-accent: var(--tsbs-color-astraria);
   --tsbs-theme-cta-bg: #2a3369;
   --tsbs-theme-cta-border: #2a3369;

@@ -7,7 +7,13 @@ import armoniaPattern from '../../assets/Armonia-pattern-the-secret-bookish-soci
 import astrariaPattern from '../../assets/Astraria-pattern-the-secret-bookish-society.webp';
 import trophyIcon from '../../assets/trofei-icona-scrivania.png';
 
-const { lang = 'it', academy = 'arborea', showBoxCronache = false, showUserRank = false } = Astro.props;
+const {
+	lang = 'it',
+	academy = 'arborea',
+	showBoxCronache = false,
+	showUserRank = false,
+	useLocalAcademyTheme = true,
+} = Astro.props;
 const academyTheme = ['astraria', 'arcadia', 'armonia', 'arborea'].includes(academy) ? academy : 'arborea';
 const academyPatterns = {
 	astraria: astrariaPattern,
@@ -16,6 +22,8 @@ const academyPatterns = {
 	arborea: arboreaPattern,
 };
 const academyPattern = academyPatterns[academyTheme];
+const localAcademyThemeClass = useLocalAcademyTheme ? ` theme-${academyTheme}` : '';
+const localAcademyPatternStyle = useLocalAcademyTheme ? `--tsbs-page-pattern-image: url(${academyPattern.src});` : undefined;
 const profileHref = '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/';
 
 // Binding futuro:
@@ -50,7 +58,7 @@ const chronicleRows = [
 <Layout lang={lang}>
 	<Nav lang={lang} />
 
-	<main class={`tsbs-app-shell academy-page academy-ranking-page theme-${academyTheme}`} data-academy={academyTheme} style={`--tsbs-page-pattern-image: url(${academyPattern.src});`}>
+	<main class={`tsbs-app-shell academy-page academy-ranking-page${localAcademyThemeClass}`} data-academy={academyTheme} style={localAcademyPatternStyle}>
 		<header class="missions-header academy-ranking-header">
 			<h1>Classifica</h1>
 		</header>
