@@ -20,6 +20,29 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-20 - Maintenance Mode Hardcoded Con Futuro Switch Vercel
+
+Decisione:
+- introdurre una maintenance mode gestita da `src/middleware.ts`
+- usare inizialmente una costante hardcoded `MAINTENANCE_MODE_ENABLED`
+- documentare la futura evoluzione tramite variabile ambiente `MAINTENANCE_MODE`
+- mantenere `/api` e `/api/*` escluse dalla maintenance mode
+- usare `/maintenance` come pagina pubblica di web app in costruzione
+
+Motivo:
+- permettere di mostrare una pagina di attesa senza modificare la home o stravolgere il routing
+- preparare un interruttore gestibile da Vercel senza cambiare codice a ogni attivazione
+- mantenere accessibili API e bypass team durante la maintenance
+
+Impatto:
+- `src/middleware.ts`
+- `src/pages/maintenance.astro`
+- `docs/wiki/maintenance.md`
+- deploy Vercel e gestione environment variable
+
+Stato:
+- approvata
+
 ## 2026-05-20 - Rinomina URL Registrazione
 
 Decisione:

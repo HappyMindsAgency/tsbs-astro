@@ -60,6 +60,12 @@ Regole UI e front-end.
 
 Da consultare quando si lavora su layout, componenti, pagine, SCSS/CSS, responsive, cromie, Figma o stati interattivi.
 
+### [Maintenance Mode](./maintenance.md)
+
+Logica operativa della maintenance mode, bypass e futura gestione tramite variabile ambiente Vercel.
+
+Da consultare quando si lavora su `src/middleware.ts`, pagina `/maintenance`, deploy Vercel o variabili ambiente legate alla visibilita pubblica della web app.
+
 ## Workflow Aggiornamento Wiki
 
 ### Cambiamenti Strutturali
@@ -103,3 +109,4 @@ Non serve collegare tutto con tutto. I backlink devono aiutare il flusso di lavo
 - [AI Context](./ai-context.md)
 - [Decision Log](./decision-log.md)
 - [Alberatura](./alberatura.md)
+- [Maintenance Mode](./maintenance.md)
