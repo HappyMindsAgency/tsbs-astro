@@ -1,0 +1,135 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+export const prerender = false;
+
+const { lang = 'it' } = Astro.props;
+---
+
+<Layout lang={lang} theme="theme-neutral">
+	<main class="maintenance-page">
+		<section class="maintenance-content" aria-labelledby="maintenance-title">
+			<p class="maintenance-eyebrow">The Secret Bookish Society</p>
+			<h1 id="maintenance-title">
+				<span>Web app</span>
+				<span>in costruzione</span>
+			</h1>
+			<p class="maintenance-lead">
+				Stiamo segretamente costruendo una web app, resta aggiornato per entrare
+				a far parte della società segreta.
+			</p>
+			<div class="maintenance-status" aria-label="Stato del sito">
+				<span class="maintenance-status__mark" aria-hidden="true"></span>
+				<span>Ingresso in preparazione</span>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<style lang="scss">
+	:global(body:has(.maintenance-page)) {
+		background-color: var(--tsbs-color-surface);
+		background-image: none;
+	}
+
+	.maintenance-page {
+		display: grid;
+		min-height: 100dvh;
+		place-items: center;
+		padding: clamp(2rem, 8vw, 5rem) 1rem;
+		background:
+			linear-gradient(
+				145deg,
+				color-mix(in srgb, var(--tsbs-color-neutral-soft) 54%, transparent) 0%,
+				transparent 42%
+			),
+			var(--tsbs-color-surface);
+	}
+
+	.maintenance-content {
+		position: relative;
+		width: min(100%, 42rem);
+		padding: clamp(2rem, 7vw, 4.5rem);
+		overflow: hidden;
+		background: color-mix(in srgb, var(--tsbs-color-white) 78%, var(--tsbs-color-surface));
+		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral-accent) 34%, transparent);
+		border-radius: var(--tsbs-radius-md);
+		box-shadow: 0 1.5rem 4rem color-mix(in srgb, var(--tsbs-color-neutral) 12%, transparent);
+	}
+
+	.maintenance-content::before {
+		position: absolute;
+		top: 0;
+		right: clamp(1.5rem, 6vw, 3.5rem);
+		width: 1px;
+		height: clamp(4rem, 18vw, 8rem);
+		background: var(--tsbs-color-neutral-accent);
+		content: "";
+	}
+
+	.maintenance-eyebrow {
+		margin-bottom: 1rem;
+		color: var(--tsbs-color-neutral);
+		font-family: var(--tsbs-font-cta);
+		font-size: clamp(1rem, 2vw, 1.25rem);
+		line-height: 1.2;
+	}
+
+	.maintenance-content h1 {
+		max-width: 100%;
+		margin: 0 0 1.25rem;
+		color: var(--tsbs-color-heading);
+		font-size: clamp(1.65rem, 6.75vw, 4.125rem);
+		font-weight: 700;
+		line-height: 0.92;
+		text-transform: uppercase;
+	}
+
+	.maintenance-content h1 span {
+		display: block;
+		overflow-wrap: anywhere;
+	}
+
+	.maintenance-lead {
+		max-width: 33rem;
+		color: var(--tsbs-color-body);
+		font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+		line-height: 1.55;
+	}
+
+	.maintenance-status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-top: clamp(1.5rem, 5vw, 2.25rem);
+		padding: 0.8rem 1rem;
+		color: var(--tsbs-color-neutral);
+		font-size: 0.95rem;
+		font-weight: 600;
+		background: color-mix(in srgb, var(--tsbs-color-neutral-soft) 72%, var(--tsbs-color-white));
+		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral-accent) 42%, transparent);
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.maintenance-status__mark {
+		width: 0.75rem;
+		height: 0.75rem;
+		background: var(--tsbs-color-neutral-accent);
+		border-radius: 999px;
+		box-shadow: 0 0 0 0.35rem var(--tsbs-color-neutral-accent-soft);
+	}
+
+	@media (max-width: 575.98px) {
+		.maintenance-page {
+			padding: 1rem;
+		}
+
+		.maintenance-content {
+			padding: clamp(2rem, 10vw, 3rem);
+		}
+
+		.maintenance-status {
+			align-items: flex-start;
+		}
+	}
+</style>
