@@ -20,6 +20,24 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-20 - Rinomina URL Registrazione
+
+Decisione:
+- rinominare il percorso di iscrizione da `sign-in` a `registrazione`
+- rinominare il percorso di conferma registrazione da `conferma-registrazione` a `registrazione-completata`
+
+Motivo:
+- usare slug italiani coerenti con lo scope attuale della web app
+- mantenere chiaro il flusso di registrazione lato utente
+
+Impatto:
+- link interni landing e onboarding
+- form di registrazione
+- alberatura delle pagine Astro
+
+Stato:
+- approvata
+
 ## 2026-05-18 - Accento Neutro Per Box Test Smistamento
 
 Decisione:

@@ -20,9 +20,9 @@ src/pages/
 │
 ├─ chiamata/
 │  ├─ index.astro
-│  ├─ sign-in/
+│  ├─ registrazione/
 │  │  └─ index.astro
-│  └─ sign-in-conferma/
+│  └─ registrazione-completata/
 │     └─ index.astro
 │
 ├─ test-smistamento/
