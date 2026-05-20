@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const { lang = 'it' } = Astro.props;
+---
+
+<Layout lang={lang} theme="theme-neutral">
+	<main class="tsbs-simple-confirmation-page">
+		<section class="container-xl tsbs-simple-confirmation-page__content" aria-labelledby="registration-completed-title">
+			<h1 id="registration-completed-title" class="tsbs-simple-confirmation-page__title">Lorem ipsum</h1>
+			<p class="tsbs-simple-confirmation-page__intro">
+				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae nibh sed lorem facilisis dictum.
+			</p>
+			<a class="btn global-cta-var1 tsbs-simple-confirmation-page__cta" href="/landing/test-smistamento/">Lorem ipsum</a>
+		</section>
+	</main>
+</Layout>

@@ -511,6 +511,77 @@ h1,
   }
 }
 
+// Pagine neutre informative.
+body:has(.tsbs-legal-page) {
+  background-color: var(--tsbs-color-surface);
+  background-image: none;
+}
+
+.tsbs-legal-page,
+.tsbs-simple-confirmation-page {
+  min-height: 100vh;
+  color: var(--tsbs-color-body);
+  background: var(--tsbs-color-surface);
+}
+
+.tsbs-legal-page__content {
+  display: grid;
+  gap: clamp(1.5rem, 6vw, 2.5rem);
+  max-width: 48rem;
+  padding-top: clamp(3rem, 12vw, 6rem);
+  padding-bottom: clamp(3.5rem, 12vw, 7rem);
+}
+
+.tsbs-legal-page__header,
+.tsbs-legal-page__body,
+.tsbs-simple-confirmation-page__content {
+  display: grid;
+  gap: 1rem;
+}
+
+.tsbs-legal-page__title,
+.tsbs-simple-confirmation-page__title {
+  margin: 0;
+  color: var(--tsbs-color-neutral-accent);
+  font-size: clamp(2rem, 12vw, 3rem);
+}
+
+.tsbs-legal-page__body {
+  color: var(--tsbs-color-body);
+}
+
+.tsbs-legal-page__body h2 {
+  margin: 0;
+  color: var(--tsbs-color-neutral-accent);
+  font-size: clamp(1.25rem, 6vw, 1.5rem);
+}
+
+.tsbs-legal-page__body p {
+  color: var(--tsbs-color-body);
+}
+
+.tsbs-simple-confirmation-page {
+  display: grid;
+  place-items: center;
+  padding: clamp(3rem, 12vw, 6rem) 0;
+}
+
+.tsbs-simple-confirmation-page__content {
+  justify-items: center;
+  max-width: 42rem;
+  text-align: center;
+}
+
+.tsbs-simple-confirmation-page__intro {
+  max-width: 32rem;
+  color: var(--tsbs-color-body);
+}
+
+.tsbs-simple-confirmation-page__cta {
+  min-width: min(100%, 12rem);
+  margin-top: 0.75rem;
+}
+
 // Scala tipografica mobile first.
 @media (max-width: 575.98px) {
   :root {
@@ -3976,10 +4047,15 @@ h1,
 	}
 
 // SFONDO GLOBALE APP
-.tsbs-app-shell {
-	background-color: #fffaf0;
-	background-image: var(--tsbs-page-pattern-overlay), var(--tsbs-page-pattern-image);
-	background-repeat: repeat;
-	background-position: top left;
-	background-size: var(--tsbs-page-pattern-size);
-}
+	.tsbs-app-shell {
+		background-color: #fffaf0;
+		background-image: var(--tsbs-page-pattern-overlay), var(--tsbs-page-pattern-image);
+		background-repeat: repeat;
+		background-position: top left;
+		background-size: var(--tsbs-page-pattern-size);
+	}
+
+	.tsbs-app-shell.tsbs-legal-page {
+		background-color: var(--tsbs-color-surface);
+		background-image: none;
+	}

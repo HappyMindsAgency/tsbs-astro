@@ -1,0 +1,37 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+
+const { lang = 'it' } = Astro.props;
+---
+
+<Layout lang={lang} theme="">
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell tsbs-legal-page">
+		<article class="container-xl tsbs-legal-page__content" aria-labelledby="terms-title">
+			<header class="tsbs-legal-page__header">
+				<h1 id="terms-title" class="tsbs-legal-page__title">Termini e condizioni</h1>
+			</header>
+
+			<div class="tsbs-legal-page__body">
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae nibh sed lorem facilisis dictum. Sed
+					venenatis, arcu a fermentum feugiat, lorem ipsum consequat augue, vitae cursus lorem ipsum et nisl.
+				</p>
+
+				<h2>Lorem ipsum</h2>
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non ligula vitae neque tempor laoreet. Nulla
+					facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
+				</p>
+
+				<h2>Lorem ipsum</h2>
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent dictum, sem at dignissim gravida, lectus
+					lectus cursus tortor, in pulvinar risus lorem vitae lorem.
+				</p>
+			</div>
+		</article>
+	</main>
+</Layout>
