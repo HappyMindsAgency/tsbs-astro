@@ -96,6 +96,21 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-20 - Rinomina Route Accademie Biblioteca
+
+Decisione:
+- rinominare la pagina Biblioteca da `/atrio/biblioteca/le-accademie/` a `/atrio/biblioteca/accademie/`
+
+Motivo:
+- rendere lo slug piu semplice e coerente con la voce di contenuto `Accademie`
+
+Impatto:
+- `src/pages/atrio/biblioteca/accademie.astro`
+- link interno dalla pagina Biblioteca
+
+Stato:
+- approvata
+
 ## 2026-05-18 - Accento Neutro Per Box Test Smistamento
 
 Decisione:
