@@ -49,7 +49,7 @@ src/pages/
 │        │  └─ sfida-lettura.astro
 │        └─ esito.astro
 │
-├─ accademia/
+├─ sala-accademia/
 │  ├─ index.astro
 │  ├─ classifica.astro
 │  └─ [slugAccademia].astro
@@ -300,7 +300,7 @@ Missioni               -> collection Missione + Partecipazione Missione
 Route dinamiche gia coerenti con campi slug presenti in Strapi:
 
 ```txt
-accademia/[slugAccademia].astro
+sala-accademia/[slugAccademia].astro
 biblioteca/eventi/[slugEvento].astro
 epistole/[slugEpistola].astro
 scrivania/grimorio/[slugNota].astro

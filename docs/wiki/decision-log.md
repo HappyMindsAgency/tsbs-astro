@@ -57,6 +57,26 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-20 - Rinomina Route Accademia In Sala Accademia
+
+Decisione:
+- rinominare la sezione pubblica da `/atrio/accademia/` a `/atrio/sala-accademia/`
+- mantenere per ora le sottopagine statiche esistenti, come `classifica` e le classifiche per accademia
+- rimandare la forma `/atrio/sala-accademia-[slugAccademia]/` al binding Strapi
+
+Motivo:
+- allineare lo slug alla nomenclatura narrativa della web app
+- separare la rinomina della sezione base dalla futura gestione dinamica per accademia
+
+Impatto:
+- `src/pages/atrio/sala-accademia/`
+- `src/components/Nav.astro`
+- link interni verso la classifica Accademia
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
 ## 2026-05-18 - Accento Neutro Per Box Test Smistamento
 
 Decisione:
