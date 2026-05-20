@@ -69,7 +69,7 @@ src/pages/
 │
 ├─ biblioteca/
 │  ├─ index.astro
-│  ├─ eventi/
+│  ├─ eventi-biblioteca-classense/
 │  │  ├─ index.astro
 │  │  └─ [slugEvento].astro
 │  ├─ archivio/
@@ -261,7 +261,7 @@ La sezione `biblioteca/` raccoglie contenuti istituzionali, archivio e ponte con
 
 ```txt
 biblioteca/
-├─ eventi/
+├─ eventi-biblioteca-classense/
 ├─ archivio/
 └─ accademie/
 ```
@@ -301,7 +301,7 @@ Route dinamiche gia coerenti con campi slug presenti in Strapi:
 
 ```txt
 sala-accademia/[slugAccademia].astro
-biblioteca/eventi/[slugEvento].astro
+biblioteca/eventi-biblioteca-classense/[slugEvento].astro
 epistole/[slugEpistola].astro
 scrivania/grimorio/[slugNota].astro
 ```

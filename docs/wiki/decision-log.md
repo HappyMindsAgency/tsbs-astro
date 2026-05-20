@@ -77,6 +77,25 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-20 - Rinomina Route Eventi Biblioteca Classense
+
+Decisione:
+- rinominare la sezione eventi da `/atrio/eventi/` a `/atrio/eventi-biblioteca-classense/`
+- mantenere le pagine dettaglio evento sotto la nuova sezione
+
+Motivo:
+- rendere esplicito che gli eventi provengono dalla Biblioteca Classense
+- allineare URL e contenuto istituzionale della sezione Biblioteca
+
+Impatto:
+- `src/pages/atrio/eventi-biblioteca-classense/`
+- `src/components/Nav.astro`
+- link interni dall'Atrio e dalla lista eventi
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
 ## 2026-05-18 - Accento Neutro Per Box Test Smistamento
 
 Decisione:
