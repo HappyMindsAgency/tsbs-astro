@@ -48,10 +48,12 @@ const { lang = 'it' } = Astro.props;
 <script>
 	import { getFavorites } from '../../../../lib/profileFavorites.js';
 
-	const favoriteCards = document.querySelectorAll('[data-profile-favorite-card]');
-	const emptyState = document.querySelector('[data-profile-favorites-empty]');
-
 	const renderFavoriteProfiles = () => {
+		const favoriteCards = document.querySelectorAll('[data-profile-favorite-card]');
+		const emptyState = document.querySelector('[data-profile-favorites-empty]');
+
+		if (!favoriteCards.length && !emptyState) return;
+
 		const favoriteIds = new Set(getFavorites());
 		let visibleCount = 0;
 
@@ -70,6 +72,7 @@ const { lang = 'it' } = Astro.props;
 	};
 
 	renderFavoriteProfiles();
+	document.addEventListener('astro:page-load', renderFavoriteProfiles);
 	window.addEventListener('storage', renderFavoriteProfiles);
 	window.addEventListener('tsbs:profile-favorites-change', renderFavoriteProfiles);
 </script>

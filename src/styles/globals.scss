@@ -3595,7 +3595,7 @@ body:has(.tsbs-legal-page) {
 		border-radius: 0.875rem;
 	}
 
-	.desk-menu-button {
+	.desk-favorites-button {
 		position: absolute;
 		top: 0.625rem;
 		right: 0.625rem;
@@ -3605,12 +3605,13 @@ body:has(.tsbs-legal-page) {
 		height: 1.5rem;
 		padding: 0;
 		color: var(--desk-accent);
+		text-decoration: none;
 		background: #ffffff;
 		border: 0;
 		border-radius: 50%;
 	}
 
-	.desk-menu-button .bi {
+	.desk-favorites-button .bi {
 		font-size: 1rem;
 		line-height: 1;
 	}
@@ -3765,11 +3766,13 @@ body:has(.tsbs-legal-page) {
 
 	@media (min-width: 992px) {
 		.desk-hero {
+			position: relative;
 			padding: 3rem 3rem 3.25rem;
 			background: var(--desk-accent);
 		}
 
 		.desk-hero__panel {
+			position: static;
 			width: min(100%, 48rem);
 			min-height: 16.25rem;
 			padding: 0;
@@ -3779,8 +3782,15 @@ body:has(.tsbs-legal-page) {
 			box-shadow: none;
 		}
 
-		.desk-menu-button {
-			display: none;
+		.desk-favorites-button {
+			top: 2rem;
+			right: 3rem;
+			width: 2.625rem;
+			height: 2.625rem;
+		}
+
+		.desk-favorites-button .bi {
+			font-size: 1.25rem;
 		}
 
 		.desk-avatar {
