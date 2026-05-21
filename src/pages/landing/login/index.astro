@@ -3,6 +3,19 @@ import Layout from '../../../layouts/Layout.astro';
 import loginHero from '../../../assets/login-hero.png';
 
 const { lang = 'it' } = Astro.props;
+
+// Gestione messaggi di errore
+const error = Astro.url.searchParams.get('error');
+const identifier = Astro.url.searchParams.get('identifier') || '';
+
+const errorMessages: Record<string, string> = {
+	missing_credentials: "Per favore, inserisci sia l'identificativo che la password.",
+	invalid_credentials: "Le chiavi fornite non aprono questa porta. Controlla le tue credenziali.",
+	session_config_error: "C'è stato un problema nel forgiare la tua sessione. Riprova o contatta un Bibliotecario.",
+	internal_server_error: "Un'ombra oscura ha interrotto il collegamento. Riprova più tardi.",
+};
+
+const errorMessage = error ? (errorMessages[error] || "Si è verificato un errore arcano imprevisto.") : null;
 ---
 
 <Layout lang={lang} theme="theme-neutral">
@@ -29,16 +42,23 @@ const { lang = 'it' } = Astro.props;
 					Non hai ancora risposto alla Chiamata? <a href="#">Registrati.</a>
 				</p>
 
+				{errorMessage && (
+					<div class="login-error-box" role="alert">
+						<i class="bi bi-exclamation-circle-fill"></i>
+						<span>{errorMessage}</span>
+					</div>
+				)}
+
 				<form class="login-form" action="/api/login" method="post">
 					<div class="login-field">
 						<label for="login-identifier">Username/Email</label>
-						<input id="login-identifier" name="identifier" type="text" autocomplete="username" />
+						<input id="login-identifier" name="identifier" type="text" autocomplete="username" value={identifier} required />
 					</div>
 
 					<div class="login-field">
 						<label for="login-password">Password</label>
 						<div class="login-password">
-							<input id="login-password" name="password" type="password" autocomplete="current-password" />
+							<input id="login-password" name="password" type="password" autocomplete="current-password" required />
 							<button type="button" class="login-password__toggle" aria-label="Mostra password" data-password-toggle>
 								<i class="bi bi-eye"></i>
 							</button>
@@ -241,6 +261,13 @@ const { lang = 'it' } = Astro.props;
 		margin-top: 1rem;
 		font-size: 1rem;
 		line-height: 1.2;
+	}
+
+	.login-error-box {
+		color: #dc3545;
+		display: flex;
+		align-items: center;
+		gap: 8px; 
 	}
 
 	@media (min-width: 768px) {
