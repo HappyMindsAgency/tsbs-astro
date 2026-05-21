@@ -48,19 +48,28 @@ export const onRequest = defineMiddleware((context, next) => {
 	const hasValidBypass = searchParams.get(BYPASS_QUERY_PARAM) === BYPASS_QUERY_VALUE;
 
 	if (hasValidBypass) {
-		context.cookies.set(BYPASS_COOKIE_NAME, BYPASS_QUERY_VALUE, {
-			httpOnly: true,
-			maxAge: BYPASS_COOKIE_MAX_AGE,
-			path: '/',
-			sameSite: 'lax',
-			secure: context.url.protocol === 'https:',
-		});
-
 		const base = getRequestBase(context);
 		const bypassTarget = getBypassRedirectUrl(context.url);
 		bypassTarget.host = base.host;
 		bypassTarget.protocol = base.protocol;
-		return Response.redirect(bypassTarget, 302);
+
+		const isSecure = base.protocol === 'https:';
+		const cookieValue = [
+			`${BYPASS_COOKIE_NAME}=${BYPASS_QUERY_VALUE}`,
+			'Path=/',
+			`Max-Age=${BYPASS_COOKIE_MAX_AGE}`,
+			'HttpOnly',
+			'SameSite=Lax',
+			...(isSecure ? ['Secure'] : []),
+		].join('; ');
+
+		return new Response(null, {
+			status: 302,
+			headers: {
+				Location: bypassTarget.toString(),
+				'Set-Cookie': cookieValue,
+			},
+		});
 	}
 
 	if (!MAINTENANCE_MODE_ENABLED) {
