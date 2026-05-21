@@ -13,6 +13,7 @@ const errorMessages: Record<string, string> = {
 	invalid_credentials: "Le chiavi fornite non aprono questa porta. Controlla le tue credenziali.",
 	session_config_error: "C'è stato un problema nel forgiare la tua sessione. Riprova o contatta un Bibliotecario.",
 	internal_server_error: "Un'ombra oscura ha interrotto il collegamento. Riprova più tardi.",
+	invalid_identifier_format: "L'identificativo fornito non segue i canoni della Società. Verifica che sia un nome utente o un'email corretta.",
 };
 
 const errorMessage = error ? (errorMessages[error] || "Si è verificato un errore arcano imprevisto.") : null;
@@ -52,7 +53,16 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 				<form class="login-form" action="/api/login" method="post">
 					<div class="login-field">
 						<label for="login-identifier">Username/Email</label>
-						<input id="login-identifier" name="identifier" type="text" autocomplete="username" value={identifier} required />
+						<input
+							id="login-identifier"
+							name="identifier"
+							type="text"
+							autocomplete="username"
+							value={identifier}
+							required
+							pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$|^[a-zA-Z0-9_.-]{3,}$"
+							title="Inserisci un'email valida o un nome utente di almeno 3 caratteri senza spazi."
+						/>
 					</div>
 
 					<div class="login-field">

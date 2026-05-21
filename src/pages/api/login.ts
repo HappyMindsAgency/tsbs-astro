@@ -18,6 +18,19 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 			return Response.redirect(`${baseUrl}/landing/login?error=missing_credentials&identifier=${encodeURIComponent(identifier || '')}`, 303);
 		}
 
+		// TODO: Matchare i veri valori presenti su strapi
+		// TODO: Da spostare su register una volta creato il form di registrazione
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const usernameRegex = /^[a-zA-Z0-9_.-]{3,}$/; // Username: min 3 caratteri, alfanumerico, punti, trattini o underscore
+
+		const isEmail = identifier.includes('@');
+		const isValidFormat = isEmail ? emailRegex.test(identifier) : usernameRegex.test(identifier);
+
+		if (!isValidFormat) {
+			console.warn('Validazione fallita: Formato identificativo non valido.', identifier);
+			return Response.redirect(`${baseUrl}/landing/login?error=invalid_identifier_format&identifier=${encodeURIComponent(identifier)}`, 303);
+		}
+
 		const strapiAuthUrl = `${STRAPI_API_BASE_URL}/auth/local`;
 		const requestBody = { identifier, password };
 
@@ -63,7 +76,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		}
 
 	} catch (error) {
-		console.error('CRITICAL ERROR in Astro login API:', error);
+		if (import.meta.env.NODE_ENV === 'production') {
+			console.error('CRITICAL ERROR in Astro login API: An unexpected error occurred.');
+		} else {
+			console.error('CRITICAL ERROR in Astro login API:', error);
+		}
 		// .clone() è necessario perchè il body di una request può essere letto solo una volta
 		// .catch(() => null) è necessario perchè se la request non ha un body formData() fallisce assegnamo al form un valore nullo e continuiamo l'esecuzione
 		const formData = await request.clone().formData().catch(() => null);
