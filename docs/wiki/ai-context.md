@@ -23,7 +23,13 @@ Frontend:
 - SCSS/CSS
 - Bootstrap, mobile first
 - Bootstrap Icons
-- Deploy su Vercel
+- Deploy su Vercel (produzione)
+
+Guardrail Vercel:
+- l'ambiente di produzione e Vercel, che usa un proxy davanti all'app
+- per costruire URL assoluti lato server usare sempre `x-forwarded-host` e `x-forwarded-proto` dagli header HTTP
+- non affidarsi a `context.url.host` o `context.url.protocol` come unica fonte: possono restituire `localhost` in produzione
+- tutti i redirect, cookie e header HTTP devono essere compatibili con il proxy Vercel
 
 Backend:
 - Strapi / Strapi Cloud
