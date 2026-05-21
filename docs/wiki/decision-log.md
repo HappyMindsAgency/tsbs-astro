@@ -623,6 +623,25 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-21 - Ambiente Di Produzione Vercel E Guardrail HTTP
+
+Decisione:
+- l'ambiente di produzione del frontend e Vercel
+- tutte le modifiche al middleware, routing, redirect, cookie e header HTTP devono tenere conto del comportamento di Vercel
+- usare sempre `x-forwarded-host` e `x-forwarded-proto` per ricavare l'host e il protocollo reali nelle request server-side
+- non usare `context.url.host` o `context.url.protocol` come unica fonte per costruire URL assoluti di redirect
+
+Motivo:
+- Vercel inserisce un proxy davanti all'app; `context.url` puo restituire `localhost` come host anche in produzione
+- bug riscontrato: maintenance mode reindirizzava a `localhost/maintenance` invece del dominio Vercel corretto
+
+Impatto:
+- `src/middleware.ts`
+- qualsiasi logica di redirect, cookie `secure`, o costruzione URL assoluti lato server
+
+Stato:
+- approvata
+
 ## Vedi Anche
 
 - [Index Wiki](./index.md)
