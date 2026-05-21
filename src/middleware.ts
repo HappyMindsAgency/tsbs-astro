@@ -34,6 +34,15 @@ function getBypassRedirectUrl(url: URL) {
 	return getCleanBypassUrl(url);
 }
 
+function getRequestBase(context: Parameters<Parameters<typeof defineMiddleware>[0]>[0]): URL {
+	const host = context.request.headers.get('x-forwarded-host') || context.request.headers.get('host');
+	const proto = context.request.headers.get('x-forwarded-proto') || context.url.protocol.replace(':', '');
+	if (host) {
+		return new URL(`${proto}://${host}`);
+	}
+	return new URL(`${context.url.protocol}//${context.url.host}`);
+}
+
 export const onRequest = defineMiddleware((context, next) => {
 	const { pathname, searchParams } = context.url;
 	const hasValidBypass = searchParams.get(BYPASS_QUERY_PARAM) === BYPASS_QUERY_VALUE;
@@ -47,7 +56,11 @@ export const onRequest = defineMiddleware((context, next) => {
 			secure: context.url.protocol === 'https:',
 		});
 
-		return Response.redirect(getBypassRedirectUrl(context.url), 302);
+		const base = getRequestBase(context);
+		const bypassTarget = getBypassRedirectUrl(context.url);
+		bypassTarget.host = base.host;
+		bypassTarget.protocol = base.protocol;
+		return Response.redirect(bypassTarget, 302);
 	}
 
 	if (!MAINTENANCE_MODE_ENABLED) {
@@ -63,5 +76,6 @@ export const onRequest = defineMiddleware((context, next) => {
 		return next();
 	}
 
-	return Response.redirect(new URL(MAINTENANCE_PATH, context.url), 302);
+	const base = getRequestBase(context);
+	return Response.redirect(new URL(MAINTENANCE_PATH, base), 302);
 });
