@@ -1,69 +1,67 @@
 import type { APIRoute } from 'astro';
 
-export const POST: APIRoute = async ({ request }) => {
-  // Recuperiamo l'URL di base (es. http://localhost:4321) per gestire i redirect futuri
+// Definizione dell'URL base dell'API Strapi.
+const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL
+
+export const POST: APIRoute = async ({ request, cookies }) => {
+	// Recuperiamo l'URL di base dell'applicazione Astro per gestire i redirect futuri.
 	const baseUrl = new URL(request.url).origin;
 
-	console.log('\n====== [ASTRO API] INIZIO TENTATIVO DI LOGIN ======');
-	console.log(`Base url: ${baseUrl}`);
-
 	try {
-    // 1. ESTRAZIONE DATI
-    const formData = await request.formData();
-    const identifier = formData.get('identifier')?.toString()?.trim();
-    const password = formData.get('password')?.toString();
+		const formData = await request.formData();
+		const identifier = formData.get('identifier')?.toString()?.trim();
+		const password = formData.get('password')?.toString();
 
-    console.log('1. Dati estratti dal Form HTML:');
-    console.log(`   - Identifier (email/username): [${identifier}]`);
-    console.log(`   - Password inserita (lunghezza): ${password ? password.length : 0} caratteri`);
+		if (!identifier || !password) {
+			console.warn('Validazione fallita: Campi incompleti.');
+			return Response.redirect(`${baseUrl}/?error=Campi_obbligatori`, 303);
+		}
 
-    // Validazione di sicurezza minimale
-    if (!identifier || !password) {
-		console.warn('Validazione fallita: Campi incompleti.');
-		return Response.redirect(`${baseUrl}/?error=Campi_obbligatori`, 303);
-    }
+		const strapiAuthUrl = `${STRAPI_API_BASE_URL}/auth/local`;
+		const requestBody = { identifier, password };
 
-    // 2. PREPARAZIONE E INVIO RICHIESTA A STRAPI
-    const strapiUrl = 'http://localhost:1337/api/auth/local';
-    const requestBody = { identifier, password };
+		const strapiResponse = await fetch(strapiAuthUrl, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(requestBody), // Uso corretto di JSON.stringify
+		});
 
-    console.log(`2. Invio richiesta POST a Strapi -> ${strapiUrl}`);
-    console.log('   Payload inviato (in chiaro per controllo Strapi):', JSON.stringify(requestBody));
+		const data = await strapiResponse.json();
 
-    const strapiResponse = await fetch(strapiUrl, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(requestBody),
-    });
+		if (!strapiResponse.ok) {
+			console.error('Strapi authentication failed!');
+			const errorMessage = data.error?.message || 'Credenziali_non_valide';
+			return Response.redirect(`${baseUrl}/?error=${encodeURIComponent(errorMessage)}`, 303);
+		}
 
-    console.log(`3. Risposta ricevuta da Strapi. Status: ${strapiResponse.status} ${strapiResponse.statusText}`);
+		const jwt = data.jwt;
+		const user = data.user;
 
-    const data = await strapiResponse.json();
+		if (jwt && user) {
+			const maxAgeInSeconds = 7 * 24 * 60 * 60;
 
-    // 4. GESTIONE ERRORI STRAPI (Status diverso da 2xx)
-    if (!strapiResponse.ok) {
-		console.error('Strapi ha rifiutato le credenziali!');
-		console.error('   Dettaglio Errore Strapi:', JSON.stringify(data.error));
+			// - httpOnly: Impedisce l'accesso tramite JavaScript (protezione XSS).
+			// - secure: Il cookie viene inviato solo su connessioni HTTPS (essenziale in produzione).
+			// - sameSite: 'lax' per mitigare attacchi CSRF.
+			// - path: '/'; il cookie è valido per tutto il sito.
+			cookies.set('jwt', jwt, {
+				httpOnly: true,
+				secure: import.meta.env.NODE_ENV === 'production', // Attiva 'secure' solo in produzione
+				sameSite: 'lax',
+				path: '/',
+				maxAge: maxAgeInSeconds,
+			});
 
-		const errorMessage = data.error?.message || 'Credenziali_non_valide';
-      // Ridirigiamo l'utente alla pagina del form passando l'errore nell'URL
-		return Response.redirect(`${baseUrl}/?error=${encodeURIComponent(errorMessage)}`, 303);
-    }
-
-    // 5. LOGIN CON SUCCESSO
-    console.log('Strapi ha autenticato l utente con successo!');
-    console.log(`   - JWT ottenuto: ${data.jwt ? data.jwt.substring(0, 15) + '...' : 'NON PRESENTE'}`);
-    console.log(`   - ID Utente Strapi: ${data.user?.id}`);
-    console.log(`   - Email Utente Strapi: ${data.user?.email}`);
-    console.log('===================================================\n');
-
-    return Response.redirect(`${baseUrl}/atrio`, 303);
+			return Response.redirect(`${baseUrl}/atrio`, 303);
+		} else {
+			console.error('Strapi response was OK, but JWT or User data is missing.');
+			return Response.redirect(`${baseUrl}/?error=Errore_configurazione_sessione`, 303);
+		}
 
 	} catch (error) {
-		// Gestione di crash di rete o del server Strapi spento
-		console.error('ERRORE CRITICO nel server Astro:', error);
+		console.error('CRITICAL ERROR in Astro login API:', error);
 		return Response.redirect(`${baseUrl}/?error=Errore_interno_server`, 303);
 	}
 };
