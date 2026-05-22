@@ -1,0 +1,104 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+---
+<Layout title="Recupera Password">
+  <main class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Recupera la tua Password</h1>
+    <p class="mb-4">Inserisci l'indirizzo email associato al tuo account e ti invieremo un link per reimpostare la password.</p>
+
+    <!-- Modificato: Aggiunto ID al form e rimosso action/method per gestirli via JS -->
+    <form id="resetPasswordForm" class="space-y-4">
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          autocomplete="email"
+        />
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          Invia Richiesta di Reset
+        </button>
+      </div>
+    </form>
+
+    <!-- Elemento opzionale per mostrare messaggi di feedback all'utente -->
+    <div id="formMessage" class="mt-4 text-center text-sm"></div>
+  </main>
+</Layout>
+
+<style>
+  .container {
+    max-width: 600px; /* Example max width */
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('resetPasswordForm') as HTMLFormElement | null;
+    const messageDiv = document.getElementById('formMessage') as HTMLDivElement | null;
+
+    if (!form || !messageDiv) {
+      console.error('Form or message element not found.');
+      return;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault(); // Impedisce l'invio standard del form
+
+      const emailInput = document.getElementById('email') as HTMLInputElement | null;
+      const email = emailInput?.value;
+
+      if (!email) {
+        displayMessage('Per favore, inserisci un indirizzo email valido.', 'error');
+        return;
+      }
+
+      // Prepara i dati in formato JSON
+      const requestBody = {
+        email: email
+      };
+
+      try {
+        const response = await fetch('/api/auth/reset-password/request', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json', // Specifica che stiamo inviando JSON
+          },
+          body: JSON.stringify(requestBody), // Converte l'oggetto JavaScript in stringa JSON
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          // Successo (anche se l'email non è stata realmente inviata, restituiamo successo)
+          displayMessage(result.message || 'Se un account con quella  email esiste, riceverai istruzioni per il reset.', 'success');
+          // Opzionalmente, puoi pulire il campo email o reindirizzare l'utente
+          // form.reset();
+        } else {
+          // Errore dal backend (es. 400, 500)
+          displayMessage(result.message || 'Si è verificato un errore inaspettato.', 'error');
+        }
+      } catch (error) {
+        // Errore di rete o durante il parsing della risposta
+        console.error('Errore durante la richiesta di reset password:', error);
+        displayMessage('Si è verificato un errore di rete. Riprova più tardi.', 'error');
+      }
+    });
+
+    // Funzione helper per mostrare messaggi
+    function displayMessage(message: string, type: 'success' | 'error') {
+      if (!messageDiv) return;
+      messageDiv.textContent = message;
+      messageDiv.className = `mt-4 text-center text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
+    }
+  });
+</script>
