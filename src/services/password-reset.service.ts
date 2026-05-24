@@ -2,6 +2,7 @@
 import crypto from 'crypto';
 import { EmailService } from './email.service';
 import { StrapiService } from './strapi.service';
+import { AuthService } from './auth.service';
 import { logger } from './logger';
 
 interface PasswordResetConfig {
@@ -15,18 +16,22 @@ interface PasswordResetResult {
     userId?: number;
 }
 
+// TODO: Usare authService al posto di strapiService
 export class PasswordResetService {
     private emailService: EmailService;
     private strapiService: StrapiService;
     private config: PasswordResetConfig;
+    private authService: AuthService;
 
     constructor(
         emailService: EmailService,
         strapiService: StrapiService,
+        authService: AuthService,
         config: PasswordResetConfig
     ) {
         this.emailService = emailService;
         this.strapiService = strapiService;
+        this.authService = authService;
         this.config = config;
     }
 

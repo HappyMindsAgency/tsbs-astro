@@ -4,6 +4,7 @@ import { EmailService } from '../../../../services/email.service';
 import { StrapiService } from '../../../../services/strapi.service';
 import { PasswordResetService } from '../../../../services/password-reset.service';
 import { logger } from '../../../../services/logger';
+import { AuthService } from '../../../../services/auth.service';
 
 // Configuration
 const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL || 'http://localhost:1337';
@@ -37,9 +38,12 @@ function initializeServices(): PasswordResetService {
             apiToken: STRAPI_API_TOKEN,
         });
 
+        const authService = new AuthService(STRAPI_API_BASE_URL, STRAPI_API_TOKEN);
+
         passwordResetService = new PasswordResetService(
             emailService,
             strapiService,
+            authService,
             {
                 tokenExpiryMinutes: TOKEN_EXPIRY_MINUTES,
                 resetLinkBase: `${STRAPI_API_BASE_URL.replace('/api', '')}/auth/reset-password`,

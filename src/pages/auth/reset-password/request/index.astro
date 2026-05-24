@@ -42,63 +42,58 @@ import Layout from '../../../../layouts/Layout.astro';
 </style>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('resetPasswordForm') as HTMLFormElement | null;
-    const messageDiv = document.getElementById('formMessage') as HTMLDivElement | null;
+// Rimuovi il vecchio document.addEventListener('DOMContentLoaded', ...)
 
-    if (!form || !messageDiv) {
-      console.error('Form or message element not found.');
-      return;
-    }
+function initPasswordReset() {
+  const form = document.getElementById('resetPasswordForm');
+  const messageDiv = document.getElementById('formMessage');
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault(); // Impedisce l'invio standard del form
+  if (!form || !messageDiv) return;
 
-      const emailInput = document.getElementById('email') as HTMLInputElement | null;
-      const email = emailInput?.value;
-
-      if (!email) {
-        displayMessage('Per favore, inserisci un indirizzo email valido.', 'error');
-        return;
-      }
-
-      // Prepara i dati in formato JSON
-      const requestBody = {
-        email: email
-      };
-
-      try {
-        const response = await fetch('/api/auth/reset-password/request', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json', // Specifica che stiamo inviando JSON
-          },
-          body: JSON.stringify(requestBody), // Converte l'oggetto JavaScript in stringa JSON
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          // Successo (anche se l'email non è stata realmente inviata, restituiamo successo)
-          displayMessage(result.message || 'Se un account con quella  email esiste, riceverai istruzioni per il reset.', 'success');
-          // Opzionalmente, puoi pulire il campo email o reindirizzare l'utente
-          // form.reset();
-        } else {
-          // Errore dal backend (es. 400, 500)
-          displayMessage(result.message || 'Si è verificato un errore inaspettato.', 'error');
-        }
-      } catch (error) {
-        // Errore di rete o durante il parsing della risposta
-        console.error('Errore durante la richiesta di reset password:', error);
-        displayMessage('Si è verificato un errore di rete. Riprova più tardi.', 'error');
-      }
-    });
-
-    // Funzione helper per mostrare messaggi
-    function displayMessage(message: string, type: 'success' | 'error') {
-      if (!messageDiv) return;
+  function displayMessage(message: string, type: 'success' | 'error') {
+    if (messageDiv) {
       messageDiv.textContent = message;
       messageDiv.className = `mt-4 text-center text-sm ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
     }
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const emailInput = document.getElementById('email') as HTMLInputElement;
+    const email = emailInput?.value;
+
+    if (!email) {
+      displayMessage('Per favore, inserisci un indirizzo email valido.', 'error');
+      return;
+    }
+
+    const requestBody = { email: email.trim() };
+
+    try {
+      const response = await fetch('/api/auth/reset-password/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.indexOf('application/json') !== -1) {
+        const result = await response.json();
+        if (response.ok) {
+          displayMessage(result.message || 'Se un account con quella email esiste, riceverai istruzioni per il reset.', 'success');
+        } else {
+          displayMessage(result.message || 'Si è verificato un errore inaspettato.', 'error');
+        }
+      } else {
+        displayMessage('Si è verificato un errore di rete o del server. Riprova più tardi.', 'error');
+      }
+    } catch (error) {
+      displayMessage('Si è verificato un errore di rete. Riprova più tardi.', 'error');
+    }
   });
+}
+
+// Gestisce sia il caricamento iniziale che le transizioni di pagina di Astro
+document.addEventListener('astro:page-load', initPasswordReset);
 </script>

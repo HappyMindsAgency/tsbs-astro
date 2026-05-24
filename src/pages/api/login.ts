@@ -1,16 +1,17 @@
+// src/pages/api/login.ts
 import type { APIRoute } from 'astro';
 import { LoginError, isValidIdentifier, redirectWithLoginError, redirectToAtrio, setAuthCookie, AuthServiceError } from '../../utils/auth.utils';
-import { authenticateUser } from '../../services/auth.service';
+// Rimosso: import { authenticateUser } from '../../lib/authService';
+import { AuthService } from '../../services/auth.service'; 
 
 const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL
+const STRAPI_API_TOKEN = import.meta.env.STRAPI_API_TOKEN; 
 
 export const POST: APIRoute = async ({ request, cookies }) => {
 	const baseUrl = new URL(request.url).origin;
 	let identifier = '';
 
 	try {
-		// simula internal_server_error
-		// throw new Error("Simulated Crash");
 		const formData = await request.formData();
 		identifier = formData.get('identifier')?.toString()?.trim() || '';
 		const password = formData.get('password')?.toString();
@@ -27,14 +28,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 			return redirectWithLoginError(baseUrl, LoginError.INVALID_IDENTIFIER_FORMAT, identifier);
 		}
 
-		// Chiama il servizio di autenticazione per effettuare la chiamata API a Strapi
-		const { jwt, user } = await authenticateUser(identifier, password, STRAPI_API_BASE_URL);
+		const authService = new AuthService(STRAPI_API_BASE_URL, STRAPI_API_TOKEN);
+		const { jwt, user } = await authService.authenticateUser(identifier, password);
 
 		// simula session_config_error
 		// jwt = ''; // Simula una risposta di Strapi senza JWT
 		if (jwt && user) {
             setAuthCookie(cookies, jwt);
-
 			return redirectToAtrio(baseUrl);
 		} else {
 			console.error('Strapi response was OK, but JWT or User data is missing.');
