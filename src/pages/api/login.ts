@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { LoginError, isValidIdentifier, redirectWithLoginError, redirectToAtrio, setAuthCookie, AuthServiceError } from '../../lib/auth-utils';
-import { authenticateUser } from '../../lib/authService';
+import { LoginError, isValidIdentifier, redirectWithLoginError, redirectToAtrio, setAuthCookie, AuthServiceError } from '../../utils/auth.utils';
+import { authenticateUser } from '../../services/auth.service';
 
 const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL
 
