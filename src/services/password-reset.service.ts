@@ -1,7 +1,6 @@
 // src/services/password-reset.service.ts
 import crypto from 'crypto';
 import { EmailService } from './email.service';
-import { StrapiService } from './strapi.service';
 import { AuthService } from './auth.service';
 import { logger } from './logger';
 
@@ -16,21 +15,17 @@ interface PasswordResetResult {
     userId?: number;
 }
 
-// TODO: Usare authService al posto di strapiService
 export class PasswordResetService {
     private emailService: EmailService;
-    private strapiService: StrapiService;
     private config: PasswordResetConfig;
     private authService: AuthService;
 
     constructor(
         emailService: EmailService,
-        strapiService: StrapiService,
         authService: AuthService,
         config: PasswordResetConfig
     ) {
         this.emailService = emailService;
-        this.strapiService = strapiService;
         this.authService = authService;
         this.config = config;
     }
@@ -46,7 +41,7 @@ export class PasswordResetService {
         }
 
         // 1. Find user in Strapi
-        const user = await this.strapiService.getUserByEmail(email);
+        const user = await this.authService.getUserByEmail(email);
         if (!user) {
             logger.info(`[PasswordResetService] User not found for email: ${email}`);
             // Return generic message to avoid email enumeration
@@ -59,7 +54,7 @@ export class PasswordResetService {
         logger.info(`[PasswordResetService] Token generated for user ${user.id}`);
 
         // 3. Update user in Strapi with token
-        const updateSuccess = await this.strapiService.updateUserResetToken(
+        const updateSuccess = await this.authService.updateUserResetToken(
             user.id,
             token,
             expiryDate

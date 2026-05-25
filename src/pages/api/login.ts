@@ -1,11 +1,10 @@
 // src/pages/api/login.ts
 import type { APIRoute } from 'astro';
 import { LoginError, isValidIdentifier, redirectWithLoginError, redirectToAtrio, setAuthCookie, AuthServiceError } from '../../utils/auth.utils';
-// Rimosso: import { authenticateUser } from '../../lib/authService';
 import { AuthService } from '../../services/auth.service'; 
 
 const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL
-const STRAPI_API_TOKEN = import.meta.env.STRAPI_API_TOKEN; 
+const STRAPI_API = import.meta.env.STRAPI_API; 
 
 export const POST: APIRoute = async ({ request, cookies }) => {
 	const baseUrl = new URL(request.url).origin;
@@ -16,19 +15,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		identifier = formData.get('identifier')?.toString()?.trim() || '';
 		const password = formData.get('password')?.toString();
 
-		// Validazione campi obbligatori
 		if (!identifier || !password) {
 			console.warn('Validazione fallita: Campi incompleti.');
 			return redirectWithLoginError(baseUrl, LoginError.MISSING_CREDENTIALS, identifier);
 		}
 
-		// Validazione formato email/username
 		if (!isValidIdentifier(identifier)) {
 			console.warn('Validazione fallita: Formato identificativo non valido.', identifier);
 			return redirectWithLoginError(baseUrl, LoginError.INVALID_IDENTIFIER_FORMAT, identifier);
 		}
 
-		const authService = new AuthService(STRAPI_API_BASE_URL, STRAPI_API_TOKEN);
+		const authService = new AuthService(STRAPI_API_BASE_URL, STRAPI_API);
 		const { jwt, user } = await authService.authenticateUser(identifier, password);
 
 		// simula session_config_error
