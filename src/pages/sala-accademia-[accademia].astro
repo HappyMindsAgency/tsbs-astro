@@ -1,0 +1,208 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import arcadiaBanner from '../assets/Arcadia-accademia-stendardo-the-secret-bookish-society.webp';
+import arcadiaLogo from '../assets/Arcadia-logo-the-secret-bookish-society.png';
+import arboreaBanner from '../assets/Arborea-accademia-stendardo-the-secret-bookish-society.webp';
+import arboreaLogo from '../assets/Arborea-logo-the-secret-bookish-society.png';
+import armoniaBanner from '../assets/Armonia-accademia-stendardo-the-secret-bookish-society.webp';
+import armoniaLogo from '../assets/Armonia-logo-the-secret-bookish-society.png';
+import astrariaLogo from '../assets/Astraria-logo-the-secret-bookish-society.png';
+import trophyIcon from '../assets/trofei-icona-scrivania.png';
+
+const { lang = 'it' } = Astro.props;
+const { accademia = 'arborea' } = Astro.params;
+const profileHref = '/scrivania/utenti-preferiti/esploso-profilo-utente/';
+type AcademyKey = 'arcadia' | 'arborea' | 'armonia' | 'astraria';
+
+const fallbackAcademy: AcademyKey = 'arborea';
+
+const academies: Record<AcademyKey, {
+	name: string;
+	logo: ImageMetadata;
+	banner: ImageMetadata;
+}> = {
+	arcadia: {
+		name: 'Arcadia',
+		logo: arcadiaLogo,
+		banner: arcadiaBanner,
+	},
+	arborea: {
+		name: 'Arborea',
+		logo: arboreaLogo,
+		banner: arboreaBanner,
+	},
+	armonia: {
+		name: 'Armonia',
+		logo: armoniaLogo,
+		banner: armoniaBanner,
+	},
+	astraria: {
+		name: 'Astraria',
+		logo: astrariaLogo,
+		banner: arboreaBanner,
+	},
+};
+
+const isAcademyKey = (value: string): value is AcademyKey => value in academies;
+const academyKey = isAcademyKey(accademia) ? accademia : fallbackAcademy;
+const academy = academies[academyKey];
+const rankingHref = '/classifica-generale/';
+
+const rankingRows = [
+	{ position: 'I', medal: 'gold', initials: 'G', name: 'Adepto 1', points: 50 },
+	{ position: 'II', medal: 'silver', initials: 'L', name: 'Adepto 2', points: 45 },
+	{ position: 'III', medal: 'bronze', initials: 'S', name: 'Adepto 3', points: 43 },
+	{ position: '4', initials: 'M', name: 'Adepto 4', points: 39 },
+	{ position: '24', initials: 'Tu', name: 'Adepto Mario', points: 10, current: true },
+];
+
+const chronicleRows = [
+	{ meta: 'OGGI • ADEPTO 3' },
+	{ meta: 'IERI • ADEPTO 15' },
+	{ meta: 'LUN • ADEPTO 8' },
+];
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class={`tsbs-app-shell academy-page theme-${academyKey}`} data-academy={academyKey}>
+		<section class="academy-hero" aria-labelledby="academy-title">
+			<img class="academy-hero__crest academy-hero__crest--left" src={academy.banner.src} alt="" aria-hidden="true" />
+
+			<div class="academy-hero__content">
+				<div class="academy-hero__icon" aria-hidden="true">
+					<img
+						src={academy.logo.src}
+						width={academy.logo.width}
+						height={academy.logo.height}
+						alt=""
+						loading="eager"
+						decoding="async"
+					/>
+				</div>
+
+				<div class="academy-hero__mobile-crest">
+					<img src={academy.banner.src} alt="" aria-hidden="true" />
+					<span class="academy-hero__mobile-logo" aria-hidden="true">
+						<img
+							src={academy.logo.src}
+							width={academy.logo.width}
+							height={academy.logo.height}
+							alt=""
+							loading="eager"
+							decoding="async"
+						/>
+					</span>
+					<div class="academy-hero__mobile-copy">
+						<h1 id="academy-title">{academy.name}</h1>
+						<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
+						<p class="academy-members">
+							<i class="bi bi-people" aria-hidden="true"></i>
+							<span>142 Adepti</span>
+						</p>
+					</div>
+				</div>
+
+				<div class="academy-hero__desktop-copy">
+					<h1>{academy.name}</h1>
+					<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
+					<p class="academy-members">
+						<i class="bi bi-people" aria-hidden="true"></i>
+						<span>142 Adepti</span>
+					</p>
+				</div>
+			</div>
+
+			<img class="academy-hero__crest academy-hero__crest--right" src={academy.banner.src} alt="" aria-hidden="true" />
+		</section>
+
+		<div class="container-xl tsbs-app-container academy-content">
+			<section class="academy-section" aria-labelledby="academy-ranking-title">
+				<div class="academy-section__head">
+					<h2 id="academy-ranking-title" class="tsbs-section-title">Classifica</h2>
+					<a class="missions-load-more academy-ranking-more academy-section__link--desktop" href={rankingHref}>
+						<span>Vedi tutta la classifica</span>
+						<i class="bi bi-arrow-right" aria-hidden="true"></i>
+					</a>
+				</div>
+
+				<div class="academy-ranking-list">
+					{rankingRows.map((row) => (
+						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''}`} href={profileHref}>
+							<div class="academy-ranking-card__position">
+								{row.medal ? (
+									<img
+										class={`academy-ranking-card__medal-icon is-${row.medal}`}
+										src={trophyIcon.src}
+										width={trophyIcon.width}
+										height={trophyIcon.height}
+										alt=""
+										aria-hidden="true"
+										loading="lazy"
+										decoding="async"
+									/>
+								) : (
+									<span>{row.position}</span>
+								)}
+								<span class={`academy-ranking-card__roman ${row.medal ? `is-${row.medal}` : ''}`}>{row.medal ? row.position : ''}</span>
+							</div>
+							<div class="academy-ranking-card__avatar" aria-hidden="true">{row.initials}</div>
+							<p class="academy-ranking-card__name">{row.name}</p>
+							<p class="academy-ranking-card__points">
+								<strong>{row.points}</strong>
+								<i class="bi bi-trophy" aria-hidden="true"></i>
+							</p>
+						</a>
+					))}
+				</div>
+
+				<a class="missions-load-more academy-ranking-more academy-section__link--mobile" href={rankingHref}>
+					<span>Vedi tutta la classifica</span>
+					<i class="bi bi-arrow-right" aria-hidden="true"></i>
+				</a>
+			</section>
+
+			<section class="academy-section academy-chronicles" aria-labelledby="academy-chronicles-title">
+				<h2 id="academy-chronicles-title" class="tsbs-section-title">Cronache dell'ordine</h2>
+
+				<div class="academy-chronicles-list">
+					{chronicleRows.map((row, index) => (
+						<article class={`academy-note-card ${index > 1 ? 'is-hidden' : ''}`} data-academy-note-card>
+							<div>
+								<p class="academy-note-card__meta">{row.meta}</p>
+								<h3>Titolo della nota</h3>
+								<p>Adepti della Civetta, la Sala Dantesca richiede la vostra attenzione. Nuovi indizi sono apparsi...</p>
+							</div>
+							<i class="bi bi-chevron-right" aria-hidden="true"></i>
+						</article>
+					))}
+				</div>
+
+				<button class="missions-load-more academy-load-more" type="button" data-load-more aria-controls="academy-chronicles-title">
+					<span>Carica altro</span>
+					<i class="bi bi-arrow-right" aria-hidden="true"></i>
+				</button>
+			</section>
+		</div>
+	</main>
+
+	<script>
+		const academyLoadMore = document.querySelector<HTMLButtonElement>('.academy-load-more[data-load-more]');
+		const academyHiddenCards = document.querySelectorAll<HTMLElement>('[data-academy-note-card].is-hidden');
+
+		if (academyLoadMore && academyHiddenCards.length === 0) {
+			academyLoadMore.hidden = true;
+		}
+
+		academyLoadMore?.addEventListener('click', () => {
+			document.querySelectorAll<HTMLElement>('[data-academy-note-card].is-hidden').forEach((card) => {
+				card.classList.remove('is-hidden');
+			});
+
+			academyLoadMore.hidden = true;
+			academyLoadMore.dataset.expanded = 'true';
+		});
+	</script>
+</Layout>
