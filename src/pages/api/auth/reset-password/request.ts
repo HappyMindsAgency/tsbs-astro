@@ -1,14 +1,13 @@
 // src/pages/api/auth/reset-password/request.ts
 import type { APIRoute } from 'astro';
 import { EmailService } from '../../../../services/email.service';
-import { StrapiService } from '../../../../services/strapi.service';
 import { PasswordResetService } from '../../../../services/password-reset.service';
 import { logger } from '../../../../services/logger';
 import { AuthService } from '../../../../services/auth.service';
 
 // Configuration
 const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL || 'http://localhost:1337';
-const STRAPI_API_TOKEN = import.meta.env.STRAPI_API_TOKEN;
+const STRAPI_API = import.meta.env.STRAPI_API;
 const SMTP_HOST = import.meta.env.SMTP_HOST;
 const SMTP_PORT = parseInt(import.meta.env.SMTP_PORT || '587');
 const SMTP_USERNAME = import.meta.env.SMTP_USERNAME;
@@ -16,7 +15,7 @@ const SMTP_PASSWORD = import.meta.env.SMTP_PASSWORD;
 const DEFAULT_FROM_EMAIL = import.meta.env.DEFAULT_FROM_EMAIL;
 const TOKEN_EXPIRY_MINUTES = 15;
 
-// Initialize services once (consider using a singleton pattern in production)
+// Initialize services once (consider using a singleton pattern)
 let passwordResetService: PasswordResetService | null = null;
 
 function initializeServices(): PasswordResetService {
@@ -33,16 +32,10 @@ function initializeServices(): PasswordResetService {
             fromEmail: DEFAULT_FROM_EMAIL,
         });
 
-        const strapiService = new StrapiService({
-            baseUrl: STRAPI_API_BASE_URL,
-            apiToken: STRAPI_API_TOKEN,
-        });
-
-        const authService = new AuthService(STRAPI_API_BASE_URL, STRAPI_API_TOKEN);
+        const authService = new AuthService(STRAPI_API_BASE_URL, STRAPI_API);
 
         passwordResetService = new PasswordResetService(
             emailService,
-            strapiService,
             authService,
             {
                 tokenExpiryMinutes: TOKEN_EXPIRY_MINUTES,
@@ -70,7 +63,6 @@ export const POST: APIRoute = async ({ request }) => {
     logger.info('[PasswordResetAPI] POST request received');
 
     try {
-        // 1. Parse request body
         let requestBody: RequestBody;
         try {
             requestBody = await request.json();
@@ -79,20 +71,17 @@ export const POST: APIRoute = async ({ request }) => {
             return createErrorResponse('Invalid request body.', 400);
         }
 
-        // 2. Validate email parameter
         const email = typeof requestBody.email === 'string' ? requestBody.email.trim() : '';
         if (!email) {
             logger.warn('[PasswordResetAPI] Email parameter missing or invalid');
             return createErrorResponse('Email is required and must be a string.', 400);
         }
 
-        // 3. Initialize services
         const service = initializeServices();
 
-        // 4. Process password reset request
         const result = await service.requestPasswordReset(email);
 
-        // 5. Return response (always generic for security)
+        // Return response (always generic for security)
         return createSuccessResponse(result.message);
     } catch (error) {
         logger.error('[PasswordResetAPI] Unexpected error:', error);

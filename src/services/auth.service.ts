@@ -20,7 +20,7 @@ export class AuthService {
         this.strapiApiBaseUrl = strapiApiBaseUrl;
         this.strapiApiToken = strapiApiToken;
         if (!this.strapiApiToken) {
-            console.error('[AuthService] STRAPI_API_TOKEN is not set. Authentication will fail.');
+            console.error('[AuthService] STRAPI_API is not set. Authentication will fail.');
             throw new Error('Server configuration error: Strapi API token missing.');
         }
         console.log('[AuthService] Initialized.');
@@ -78,7 +78,7 @@ export class AuthService {
         }
     }
 
-    async findUserByEmail(email: string): Promise<StrapiUser | null> {
+    async getUserByEmail(email: string): Promise<StrapiUser | null> {
         console.log(`[AuthService] Looking up user by email: ${email}`);
         const lookupUrl = `${this.strapiApiBaseUrl}/users?filters[email][$eq]=${encodeURIComponent(email)}`;
         
