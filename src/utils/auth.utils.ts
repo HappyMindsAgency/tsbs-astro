@@ -80,8 +80,6 @@ export class AuthServiceError extends Error {
         this.code = code;
     }
 }
-<<<<<<< Updated upstream
-=======
 
 // ---------------------------------------------------------------------------
 // Registrazione
@@ -132,4 +130,3 @@ export function isStrongPassword(password: string): boolean {
 export function isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
->>>>>>> Stashed changes
