@@ -24,7 +24,16 @@ const { lang = 'it' } = Astro.props;
 					Inserisci i dati per la registrazione o effettua il <a href="/login/">log in</a>
 				</p>
 
+<<<<<<< Updated upstream:src/pages/registrazione.astro
 				<form class="sign-in-form" action="/registrazione-completata/" method="post" data-sign-in-form>
+=======
+				<div class="sign-in-error-box" role="alert" data-sign-in-error hidden>
+					<i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+					<span data-sign-in-error-message></span>
+				</div>
+
+				<form class="sign-in-form" action="/landing/registrazione/registrazione-completata/" method="post" data-sign-in-form>
+>>>>>>> Stashed changes:src/pages/landing/registrazione/index.astro
 					<div class="sign-in-field">
 						<label for="sign-in-name">Nome</label>
 						<input id="sign-in-name" name="name" type="text" autocomplete="given-name" />
@@ -328,27 +337,97 @@ const { lang = 'it' } = Astro.props;
 	initCityAutocomplete();
 	document.addEventListener('astro:page-load', initCityAutocomplete);
 
-	const initSignInFormRedirect = () => {
+	// Mappa codici errore API → messaggi in italiano
+	const registrationErrorMessages: Record<string, string> = {
+		missing_fields: 'Compila tutti i campi obbligatori per proseguire.',
+		invalid_email: "Il formato dell'email non è valido.",
+		invalid_nickname: 'Lo username deve contenere almeno 3 caratteri (lettere, numeri, punti, trattini o underscore).',
+		nickname_blacklisted: 'Questo username non è disponibile. Scegline un altro.',
+		weak_password: 'La password deve contenere almeno 8 caratteri, una maiuscola e un numero.',
+		already_taken: 'Email o username già in uso. Prova con credenziali diverse o accedi.',
+		internal_server_error: 'Si è verificato un errore imprevisto. Riprova più tardi.',
+	};
+
+	// Blacklist client-side (specchio di src/data/nicknameBlacklist.ts).
+	// La validazione server-side in /api/auth/register resta la fonte di verità.
+	const clientBlacklist = ['admin', 'administrator', 'moderator', 'strapi', 'sistema', 'support', 'supporto', 'staff', 'bot', 'root', 'superuser', 'tsbs', 'thesecretbookishsociety'];
+
+	const showFormError = (message: string) => {
+		const box = document.querySelector('[data-sign-in-error]');
+		const span = document.querySelector('[data-sign-in-error-message]');
+		if (!(box instanceof HTMLElement) || !(span instanceof HTMLElement)) return;
+		span.textContent = message;
+		box.hidden = false;
+		box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+	};
+
+	const clearFormError = () => {
+		const box = document.querySelector('[data-sign-in-error]');
+		if (box instanceof HTMLElement) box.hidden = true;
+	};
+
+	const initSignInFormSubmit = () => {
 		document.querySelectorAll('[data-sign-in-form]').forEach((form) => {
-			if (!(form instanceof HTMLFormElement) || form.dataset.redirectBound === 'true') {
+			if (!(form instanceof HTMLFormElement) || form.dataset.submitBound === 'true') {
 				return;
 			}
 
-			form.dataset.redirectBound = 'true';
-			form.addEventListener('submit', (event) => {
+			form.dataset.submitBound = 'true';
+
+			form.addEventListener('submit', async (event) => {
 				event.preventDefault();
+				clearFormError();
 
 				if (!form.reportValidity()) {
 					return;
 				}
 
-				window.location.assign(form.action);
+				const formData = new FormData(form);
+				const username = (formData.get('username') as string | null)?.trim() ?? '';
+
+				// Controllo blacklist client-side (pre-volo, per UX immediata)
+				if (clientBlacklist.includes(username.toLowerCase())) {
+					showFormError(registrationErrorMessages['nickname_blacklisted']);
+					return;
+				}
+
+				const submitButton = form.querySelector<HTMLButtonElement>('[type="submit"]');
+				if (submitButton) submitButton.disabled = true;
+
+				try {
+					const response = await fetch('/api/auth/register', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							username,
+							email: formData.get('email'),
+							password: formData.get('password'),
+							name: formData.get('name'),
+							surname: formData.get('surname'),
+							// cityName e cityIstatCode non sono presenti nel modello Membro: ignorati.
+						}),
+					});
+
+					const result = await response.json();
+
+					if (response.ok && result.success) {
+						window.location.assign('/landing/registrazione/registrazione-completata/');
+						return;
+					}
+
+					const errorCode = (result.error as string | undefined) ?? 'internal_server_error';
+					showFormError(registrationErrorMessages[errorCode] ?? registrationErrorMessages['internal_server_error']);
+				} catch {
+					showFormError(registrationErrorMessages['internal_server_error']);
+				} finally {
+					if (submitButton) submitButton.disabled = false;
+				}
 			});
 		});
 	};
 
-	initSignInFormRedirect();
-	document.addEventListener('astro:page-load', initSignInFormRedirect);
+	initSignInFormSubmit();
+	document.addEventListener('astro:page-load', initSignInFormSubmit);
 </script>
 
 <style lang="scss">
@@ -404,6 +483,26 @@ const { lang = 'it' } = Astro.props;
 		color: var(--sign-in-text);
 		font-size: 1rem;
 		line-height: 1.4;
+	}
+
+	.sign-in-error-box {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		margin-top: 1rem;
+		padding: 0.75rem 0.875rem;
+		color: #c0392b;
+		font-size: 0.875rem;
+		line-height: 1.35;
+		background: color-mix(in srgb, #c0392b 8%, transparent);
+		border: 1px solid color-mix(in srgb, #c0392b 30%, transparent);
+		border-radius: 0.375rem;
+
+		.bi {
+			flex-shrink: 0;
+			margin-top: 0.1rem;
+			font-size: 0.9375rem;
+		}
 	}
 
 	.sign-in-intro a,

@@ -1,6 +1,6 @@
 // src/services/auth.service.ts
 
-import { LoginError, AuthServiceError } from '../utils/auth.utils';
+import { LoginError, AuthServiceError, RegistrationError, RegistrationServiceError } from '../utils/auth.utils';
 import { logger } from './logger';
 
 interface StrapiUser {
@@ -113,6 +113,119 @@ export class AuthService {
         } catch (error: any) {
             console.error(`[AuthService] Error during Strapi user lookup for email ${email}:`, error);
             throw new Error('Failed to look up user.');
+        }
+    }
+
+    /**
+     * Registra un nuovo utente tramite l'API Strapi (/auth/local/register).
+     * In caso di successo restituisce JWT e dati utente.
+     *
+     * @param username Il nome utente scelto.
+     * @param email L'email dell'utente.
+     * @param password La password scelta.
+     * @returns Un oggetto contenente il token JWT e i dati dell'utente.
+     * @throws RegistrationServiceError in caso di fallimento.
+     *
+     * TODO: Aggiungere campi extra (name, surname, city, marketing) una volta
+     * confermati i campi obbligatori e il modello User su Strapi.
+     */
+    async registerUser(username: string, email: string, password: string): Promise<{ jwt: string; user: any }> {
+        logger.info('[AuthService] Registering new user...');
+        const strapiRegisterUrl = `${this.strapiApiBaseUrl}/auth/local/register`;
+
+        try {
+            const response = await fetch(strapiRegisterUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                const message: string = data?.error?.message || '';
+                logger.warn(`[AuthService] Strapi registration failed: ${message}`);
+
+                // Strapi restituisce "Email or Username are already taken" per duplicati.
+                if (message.toLowerCase().includes('already taken')) {
+                    throw new RegistrationServiceError(RegistrationError.ALREADY_TAKEN);
+                }
+
+                throw new RegistrationServiceError(RegistrationError.INTERNAL_SERVER_ERROR);
+            }
+
+            const { jwt, user } = data;
+
+            if (!jwt || !user) {
+                logger.error('[AuthService] Strapi registration OK but JWT or User missing.');
+                throw new RegistrationServiceError(RegistrationError.INTERNAL_SERVER_ERROR);
+            }
+
+            logger.info('[AuthService] User registered successfully.');
+            return { jwt, user };
+        } catch (error) {
+            if (error instanceof RegistrationServiceError) throw error;
+            logger.error('[AuthService] Unexpected error during registration:', error);
+            throw new RegistrationServiceError(RegistrationError.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Crea il record Membro su Strapi e lo collega all'utente appena registrato.
+     * Usa il token admin (STRAPI_API) perché l'utente non è ancora autenticato nel sistema.
+     *
+     * @param userId L'ID dello User Strapi appena creato.
+     * @param nickname Il nickname scelto (corrisponde a User.username).
+     * @param email L'email dell'utente.
+     * @param nome Il nome (opzionale).
+     * @param cognome Il cognome (opzionale).
+     * @returns true se la creazione ha avuto successo, false altrimenti.
+     *
+     * TODO: Aggiungere externalAuthId una volta chiarito:
+     *   - cos'è (codice generato? assegnato? da quale sistema?)
+     *   - se viene creato qui, durante l'onboarding o manualmente
+     *   - formato esatto (6 caratteri: numerico? alfanumerico?)
+     */
+    async createMembro(
+        userId: number,
+        nickname: string,
+        email: string,
+        nome: string,
+        cognome: string,
+    ): Promise<boolean> {
+        logger.info(`[AuthService] Creating Membro for user ${userId}...`);
+        const url = `${this.strapiApiBaseUrl}/membri`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.strapiApiToken}`,
+                },
+                body: JSON.stringify({
+                    data: {
+                        nickname,
+                        email,
+                        nome: nome || null,
+                        cognome: cognome || null,
+                        attivo: true,
+                        user: userId,
+                    },
+                }),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                logger.error(`[AuthService] Membro creation failed: ${response.status}`, { errorText });
+                return false;
+            }
+
+            logger.info(`[AuthService] Membro created for user ${userId}.`);
+            return true;
+        } catch (error) {
+            logger.error('[AuthService] Unexpected error during Membro creation:', error);
+            return false;
         }
     }
 

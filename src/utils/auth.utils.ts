@@ -80,3 +80,56 @@ export class AuthServiceError extends Error {
         this.code = code;
     }
 }
+<<<<<<< Updated upstream
+=======
+
+// ---------------------------------------------------------------------------
+// Registrazione
+// ---------------------------------------------------------------------------
+
+/**
+ * Codici di errore per la procedura di registrazione.
+ */
+export const RegistrationError = {
+    MISSING_FIELDS: 'missing_fields',
+    INVALID_EMAIL: 'invalid_email',
+    INVALID_NICKNAME: 'invalid_nickname',
+    NICKNAME_BLACKLISTED: 'nickname_blacklisted',
+    WEAK_PASSWORD: 'weak_password',
+    ALREADY_TAKEN: 'already_taken',
+    INTERNAL_SERVER_ERROR: 'internal_server_error',
+} as const;
+
+export type RegistrationErrorCode = typeof RegistrationError[keyof typeof RegistrationError];
+
+export class RegistrationServiceError extends Error {
+    public code: RegistrationErrorCode;
+
+    constructor(code: RegistrationErrorCode) {
+        super(code);
+        this.name = 'RegistrationServiceError';
+        this.code = code;
+    }
+}
+
+/**
+ * Valida il formato di un username (solo lettere, numeri, punti, trattini, underscore — min 3 caratteri).
+ */
+export function isValidUsername(username: string): boolean {
+    return /^[a-zA-Z0-9_.-]{3,}$/.test(username);
+}
+
+/**
+ * Valida la forza della password: minimo 8 caratteri, almeno una maiuscola e un numero.
+ */
+export function isStrongPassword(password: string): boolean {
+    return /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(password);
+}
+
+/**
+ * Valida il formato di un'email.
+ */
+export function isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+>>>>>>> Stashed changes
