@@ -1,5 +1,5 @@
 // src/services/password-reset.service.ts
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import { EmailService } from './email.service';
 import { AuthService } from './auth.service';
 import { logger } from './logger';
