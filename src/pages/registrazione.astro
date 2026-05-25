@@ -24,16 +24,13 @@ const { lang = 'it' } = Astro.props;
 					Inserisci i dati per la registrazione o effettua il <a href="/login/">log in</a>
 				</p>
 
-<<<<<<< Updated upstream:src/pages/registrazione.astro
 				<form class="sign-in-form" action="/registrazione-completata/" method="post" data-sign-in-form>
-=======
 				<div class="sign-in-error-box" role="alert" data-sign-in-error hidden>
 					<i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
 					<span data-sign-in-error-message></span>
 				</div>
 
 				<form class="sign-in-form" action="/landing/registrazione/registrazione-completata/" method="post" data-sign-in-form>
->>>>>>> Stashed changes:src/pages/landing/registrazione/index.astro
 					<div class="sign-in-field">
 						<label for="sign-in-name">Nome</label>
 						<input id="sign-in-name" name="name" type="text" autocomplete="given-name" />

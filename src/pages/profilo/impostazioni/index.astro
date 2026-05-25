@@ -283,11 +283,18 @@ const { lang = 'it' } = Astro.props;
 		width: fit-content;
 		min-height: 2.75rem;
 		padding: 0.625rem 0.875rem;
-		color: var(--tsbs-color-neutral);
+		color: var(--tsbs-color-white);
 		text-decoration: none;
-		background: var(--tsbs-color-neutral-soft);
-		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 14%, var(--tsbs-color-white));
+		background: var(--profile-current-academy-accent);
+		border: 1px solid var(--profile-current-academy-accent);
 		border-radius: var(--tsbs-radius-md);
+	}
+
+	.profile-settings__back-link:hover,
+	.profile-settings__back-link:focus {
+		color: var(--tsbs-theme-cta-hover-color);
+		background: var(--tsbs-theme-cta-hover-bg);
+		border-color: var(--tsbs-theme-cta-hover-border);
 	}
 
 	.profile-settings__layout,
