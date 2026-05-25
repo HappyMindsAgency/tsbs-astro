@@ -36,12 +36,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 	try {
 		const strapiUrl = `${STRAPI_API_BASE_URL}/auth/change-password`;
 
-		// DEBUG — rimuovere prima del deploy in produzione
-		const jwtPayload = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64').toString());
-		console.log('[ChangePasswordAPI][DEBUG] URL:', strapiUrl);
-		console.log('[ChangePasswordAPI][DEBUG] JWT user ID:', jwtPayload.id);
-		console.log('[ChangePasswordAPI][DEBUG] currentPassword:', currentPassword);
-		console.log('[ChangePasswordAPI][DEBUG] password (nuova):', password);
 
 		const strapiResponse = await fetch(strapiUrl, {
 			method: 'POST',
@@ -53,10 +47,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		});
 
 		const data = await strapiResponse.json();
-
-		// DEBUG — risposta completa di Strapi
-		console.log('[ChangePasswordAPI][DEBUG] Strapi status:', strapiResponse.status);
-		console.log('[ChangePasswordAPI][DEBUG] Strapi response:', JSON.stringify(data, null, 2));
 
 		if (!strapiResponse.ok) {
 			const message = data?.error?.message ?? 'Errore durante il cambio password.';
