@@ -654,13 +654,19 @@ body:has(.tsbs-legal-page) {
 		.dashboard-menu-button {
 			display: grid;
 			place-items: center;
-			width: 1.75rem;
-			height: 1.75rem;
+			flex: 0 0 auto;
+			width: 3rem;
+			height: 3rem;
 			padding: 0;
-			color: var(--tsbs-theme-accent);
-			background: var(--tsbs-color-white);
+			color: var(--tsbs-color-white);
+			background: var(--tsbs-theme-accent);
 			border: 0;
 			border-radius: 50%;
+		}
+
+		.dashboard-menu-button .bi {
+			font-size: 1.75rem;
+			line-height: 1;
 		}
 
 		.dashboard-epistle {
@@ -964,6 +970,7 @@ body:has(.tsbs-legal-page) {
 			.dashboard-header {
 				min-height: 5.625rem;
 				padding-left: 3rem;
+				padding-right: 3rem;
 				margin-right: -3rem;
 				margin-left: -3rem;
 				background: var(--tsbs-color-white);
@@ -975,8 +982,7 @@ body:has(.tsbs-legal-page) {
 				height: 3rem;
 			}
 
-			.dashboard-avatar .bi,
-			.dashboard-menu-button {
+			.dashboard-avatar .bi {
 				display: none;
 			}
 

@@ -1,6 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
 
-const MAINTENANCE_MODE_ENABLED = true;
+const MAINTENANCE_MODE_ENABLED = false;
 const MAINTENANCE_PATH = '/maintenance';
 const API_PATH = '/api';
 const BYPASS_QUERY_PARAM = 'bypass';
