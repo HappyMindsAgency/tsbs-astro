@@ -30,7 +30,7 @@ const { lang = 'it' } = Astro.props;
 					<span data-sign-in-error-message></span>
 				</div>
 
-				<form class="sign-in-form" action="/landing/registrazione/registrazione-completata/" method="post" data-sign-in-form>
+				<form class="sign-in-form" action="/registrazione-completata/" method="post" data-sign-in-form>
 					<div class="sign-in-field">
 						<label for="sign-in-name">Nome</label>
 						<input id="sign-in-name" name="name" type="text" autocomplete="given-name" />
@@ -408,7 +408,7 @@ const { lang = 'it' } = Astro.props;
 					const result = await response.json();
 
 					if (response.ok && result.success) {
-						window.location.assign('/landing/registrazione/registrazione-completata/');
+						window.location.assign('/registrazione-completata/');
 						return;
 					}
 
