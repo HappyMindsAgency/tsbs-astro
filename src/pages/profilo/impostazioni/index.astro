@@ -4,13 +4,6 @@ import AvatarProfiloModal from '../../../components/PopupComponents/AvatarProfil
 import avatar01 from '../../../assets/Avatar_01_tartaruga.svg';
 
 const { lang = 'it' } = Astro.props;
-
-const academies = [
-	{ id: 'arborea', label: 'Arborea', accent: 'var(--tsbs-color-arborea)' },
-	{ id: 'armonia', label: 'Armonia', accent: 'var(--tsbs-color-armonia)' },
-	{ id: 'arcadia', label: 'Arcadia', accent: 'var(--tsbs-color-arcadia)' },
-	{ id: 'astraria', label: 'Astraria', accent: 'var(--tsbs-color-astraria)' },
-];
 ---
 
 <Layout lang={lang} theme="theme-neutral">
@@ -32,7 +25,7 @@ const academies = [
 
 			<div class="profile-settings__layout">
 				<aside class="profile-settings__summary" aria-labelledby="profile-summary-title">
-					<div class="profile-settings__avatar" aria-hidden="true">
+					<div class="profile-settings__avatar">
 						<img
 							src={avatar01.src}
 							width={avatar01.width}
@@ -42,6 +35,9 @@ const academies = [
 							decoding="async"
 							data-profile-avatar-current
 						/>
+						<button class="profile-settings__avatar-edit" type="button" data-avatar-profile-modal-open aria-label="Scegli nuovo avatar">
+							<i class="bi bi-pencil" aria-hidden="true"></i>
+						</button>
 					</div>
 					<div>
 						<h2 id="profile-summary-title">Username</h2>
@@ -60,40 +56,21 @@ const academies = [
 				</aside>
 
 				<form class="profile-settings__form" action="#" method="post">
-					<section class="profile-settings-card" aria-labelledby="academy-title">
+					<section class="profile-settings-card" aria-labelledby="username-title">
 						<div class="profile-settings-card__head">
 							<span class="profile-settings-card__icon" aria-hidden="true">
-								<i class="bi bi-bookmark-star"></i>
+								<i class="bi bi-person"></i>
 							</span>
 							<div>
-								<h2 id="academy-title">Cambia accademia</h2>
+								<h2 id="username-title">Scegli nuovo username</h2>
 								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 							</div>
 						</div>
-						<div class="profile-settings-academies">
-							{academies.map((academy) => (
-								<label class="profile-settings-academy" style={`--profile-academy-accent: ${academy.accent};`}>
-									<input type="radio" name="academy" value={academy.id} checked={academy.id === 'arborea'} />
-									<span>{academy.label}</span>
-								</label>
-							))}
-						</div>
-					</section>
-
-					<section class="profile-settings-card" aria-labelledby="avatar-title">
-						<div class="profile-settings-card__head">
-							<span class="profile-settings-card__icon" aria-hidden="true">
-								<i class="bi bi-person-bounding-box"></i>
-							</span>
-							<div>
-								<h2 id="avatar-title">Cambia avatar</h2>
-								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-							</div>
-						</div>
-						<div class="profile-settings-upload">
-							<button class="profile-settings-upload__button" type="button" data-avatar-profile-modal-open>
-								Scegli avatar
-							</button>
+						<div class="profile-settings-fields">
+							<label>
+								<span>Nuovo username</span>
+								<input name="username" type="text" autocomplete="username" value="Username" />
+							</label>
 						</div>
 					</section>
 
@@ -167,7 +144,10 @@ const academies = [
 	.profile-settings-page {
 		--profile-current-academy-accent: var(--tsbs-color-arborea);
 
-		background: var(--tsbs-color-surface);
+		min-height: 100vh;
+		min-height: 100dvh;
+		background-color: var(--tsbs-color-surface);
+		background-image: none;
 	}
 
 	.profile-settings {
@@ -244,6 +224,7 @@ const academies = [
 	}
 
 	.profile-settings__avatar {
+		position: relative;
 		display: grid;
 		place-items: center;
 		width: 5rem;
@@ -259,6 +240,35 @@ const academies = [
 		height: 82%;
 		object-fit: contain;
 		transform: scale(1.18);
+	}
+
+	.profile-settings__avatar-edit {
+		position: absolute;
+		right: -0.25rem;
+		bottom: -0.25rem;
+		display: grid;
+		place-items: center;
+		width: 1.75rem;
+		aspect-ratio: 1;
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-color-neutral);
+		border: 1px solid var(--tsbs-color-white);
+		border-radius: 50%;
+		box-shadow: 0 0.25rem 0.75rem rgba(41, 31, 24, 0.16);
+	}
+
+	.profile-settings__avatar-edit .bi {
+		font-size: 0.75rem;
+		line-height: 1;
+	}
+
+	.profile-settings__avatar-edit:hover {
+		background: var(--tsbs-global-cta-var1-hover-bg);
+	}
+
+	.profile-settings__avatar-edit:focus-visible {
+		outline: 0.1875rem solid var(--tsbs-color-focus);
+		outline-offset: 0.1875rem;
 	}
 
 	.profile-settings__summary h2,
@@ -326,34 +336,9 @@ const academies = [
 		font-size: 1.25rem;
 	}
 
-	.profile-settings-card p,
-	.profile-settings-upload__hint {
+	.profile-settings-card p {
 		color: var(--tsbs-color-body);
 		font-size: 0.9375rem;
-	}
-
-	.profile-settings-upload {
-		display: grid;
-		gap: 0.5rem;
-	}
-
-	.profile-settings-upload__button {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: fit-content;
-		min-height: 2.75rem;
-		padding: 0.625rem 1rem;
-		color: var(--tsbs-color-white);
-		background: var(--tsbs-color-neutral);
-		border: 1px solid var(--tsbs-color-neutral);
-		border-radius: var(--tsbs-radius-sm);
-	}
-
-	.profile-settings-upload__button:hover {
-		color: var(--tsbs-color-white);
-		background: var(--tsbs-global-cta-var1-hover-bg);
-		border-color: var(--tsbs-global-cta-var1-hover-border);
 	}
 
 	.profile-settings-fields {
@@ -379,48 +364,6 @@ const academies = [
 		background: #ffffff;
 		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 18%, var(--tsbs-color-white));
 		border-radius: var(--tsbs-radius-sm);
-	}
-
-	.profile-settings-academies {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.75rem;
-	}
-
-	.profile-settings-academy {
-		position: relative;
-		display: grid;
-		min-height: 3rem;
-		cursor: pointer;
-	}
-
-	.profile-settings-academy input {
-		position: absolute;
-		inset: 0;
-		opacity: 0;
-		cursor: pointer;
-	}
-
-	.profile-settings-academy span {
-		display: grid;
-		place-items: center;
-		padding: 0.625rem;
-		color: var(--tsbs-color-neutral);
-		font-weight: 600;
-		text-align: center;
-		background: var(--tsbs-color-neutral-soft);
-		border: 1px solid transparent;
-		border-radius: var(--tsbs-radius-sm);
-	}
-
-	.profile-settings-academy input:checked + span {
-		color: var(--tsbs-color-white);
-		background: var(--profile-academy-accent);
-	}
-
-	.profile-settings-academy input:focus-visible + span {
-		outline: 0.1875rem solid var(--tsbs-color-focus);
-		outline-offset: 0.1875rem;
 	}
 
 	.profile-settings-actions {
@@ -460,8 +403,7 @@ const academies = [
 		.profile-settings__layout {
 			grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
 			grid-template-areas:
-				"summary academy"
-				"summary avatar"
+				"summary username"
 				"summary password"
 				". actions";
 			align-items: stretch;
@@ -473,14 +415,10 @@ const academies = [
 		}
 
 		.profile-settings__form .profile-settings-card:nth-of-type(1) {
-			grid-area: academy;
+			grid-area: username;
 		}
 
 		.profile-settings__form .profile-settings-card:nth-of-type(2) {
-			grid-area: avatar;
-		}
-
-		.profile-settings__form .profile-settings-card:nth-of-type(3) {
 			grid-area: password;
 		}
 
@@ -502,10 +440,6 @@ const academies = [
 
 		.profile-settings-fields--password {
 			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-
-		.profile-settings-academies {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
 		}
 	}
 </style>
