@@ -98,6 +98,7 @@ const { lang = 'it' } = Astro.props;
 								<input name="confirm-password" type="password" autocomplete="new-password" />
 							</label>
 						</div>
+						<p class="profile-settings-fields__error" data-password-error hidden></p>
 					</section>
 
 					<div class="profile-settings-actions">
@@ -138,6 +139,92 @@ const { lang = 'it' } = Astro.props;
 
 	document.addEventListener('astro:page-load', setupProfileAvatarPicker);
 	setupProfileAvatarPicker();
+
+	// --- Cambio password ---
+
+	const setupPasswordChange = () => {
+		const form = document.querySelector<HTMLFormElement>('.profile-settings__form');
+		if (!form) return;
+
+		// Guardia contro doppia inizializzazione (astro:page-load + chiamata diretta)
+		if (form.dataset.passwordChangeReady === 'true') return;
+		form.dataset.passwordChangeReady = 'true';
+
+		const currentPwInput = form.querySelector<HTMLInputElement>('[name="current-password"]');
+		const newPwInput = form.querySelector<HTMLInputElement>('[name="new-password"]');
+		const confirmPwInput = form.querySelector<HTMLInputElement>('[name="confirm-password"]');
+		const errorEl = document.querySelector<HTMLElement>('[data-password-error]');
+		const submitBtn = form.querySelector<HTMLButtonElement>('[type="submit"]');
+
+		if (!currentPwInput || !newPwInput || !confirmPwInput) return;
+
+		const showError = (message: string) => {
+			if (!errorEl) return;
+			errorEl.textContent = message;
+			errorEl.hidden = false;
+		};
+
+		const clearError = () => {
+			if (!errorEl) return;
+			errorEl.textContent = '';
+			errorEl.hidden = true;
+		};
+
+		form.addEventListener('submit', async (e) => {
+			e.preventDefault();
+			clearError();
+
+			const currentPassword = currentPwInput.value.trim();
+			const password = newPwInput.value;
+			const passwordConfirmation = confirmPwInput.value;
+
+			// Se tutti e tre i campi sono vuoti non fare nulla (il form gestisce anche altri pannelli)
+			if (!currentPassword && !password && !passwordConfirmation) return;
+
+			// Validazione client-side
+			if (!currentPassword || !password || !passwordConfirmation) {
+				showError('Compila tutti i campi per cambiare la password.');
+				return;
+			}
+			if (password !== passwordConfirmation) {
+				showError('La nuova password e la conferma non coincidono.');
+				return;
+			}
+			if (password.length < 8) {
+				showError('La nuova password deve contenere almeno 8 caratteri.');
+				return;
+			}
+
+			if (submitBtn) submitBtn.disabled = true;
+
+			try {
+				const res = await fetch('/api/auth/change-password', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ currentPassword, password, passwordConfirmation }),
+				});
+
+				const data = await res.json();
+
+				if (!res.ok) {
+					showError(data.message ?? 'Errore durante il cambio password.');
+					return;
+				}
+
+				// Successo: svuota i campi
+				currentPwInput.value = '';
+				newPwInput.value = '';
+				confirmPwInput.value = '';
+			} catch {
+				showError('Errore di rete. Riprova più tardi.');
+			} finally {
+				if (submitBtn) submitBtn.disabled = false;
+			}
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupPasswordChange);
+	setupPasswordChange();
 </script>
 
 <style lang="scss">
@@ -364,6 +451,54 @@ const { lang = 'it' } = Astro.props;
 		background: #ffffff;
 		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 18%, var(--tsbs-color-white));
 		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.profile-settings-academies {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.75rem;
+	}
+
+	.profile-settings-academy {
+		position: relative;
+		display: grid;
+		min-height: 3rem;
+		cursor: pointer;
+	}
+
+	.profile-settings-academy input {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		cursor: pointer;
+	}
+
+	.profile-settings-academy span {
+		display: grid;
+		place-items: center;
+		padding: 0.625rem;
+		color: var(--tsbs-color-neutral);
+		font-weight: 600;
+		text-align: center;
+		background: var(--tsbs-color-neutral-soft);
+		border: 1px solid transparent;
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.profile-settings-academy input:checked + span {
+		color: var(--tsbs-color-white);
+		background: var(--profile-academy-accent);
+	}
+
+	.profile-settings-academy input:focus-visible + span {
+		outline: 0.1875rem solid var(--tsbs-color-focus);
+		outline-offset: 0.1875rem;
+	}
+
+	.profile-settings-fields__error {
+		margin: 0;
+		color: #991b1b;
+		font-size: 0.875rem;
 	}
 
 	.profile-settings-actions {

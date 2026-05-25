@@ -39,7 +39,7 @@ function initializeServices(): PasswordResetService {
             authService,
             {
                 tokenExpiryMinutes: TOKEN_EXPIRY_MINUTES,
-                resetLinkBase: `${STRAPI_API_BASE_URL.replace('/api', '')}/auth/reset-password`,
+                resetLinkBase: `${STRAPI_API_BASE_URL}/auth/reset-password`,
             }
         );
 
