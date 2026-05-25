@@ -1,0 +1,80 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import arboreaLogo from '../../assets/Arborea-logo-the-secret-bookish-society.png';
+import arcadiaLogo from '../../assets/Arcadia-logo-the-secret-bookish-society.png';
+import armoniaLogo from '../../assets/Armonia-logo-the-secret-bookish-society.png';
+import astrariaLogo from '../../assets/Astraria-logo-the-secret-bookish-society.png';
+
+const { lang = 'it' } = Astro.props;
+
+const academies = [
+	{
+		name: 'Astraria',
+		theme: 'astraria',
+		logo: astrariaLogo,
+		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		href: '/sala-accademia/classifica-astraria/',
+	},
+	{
+		name: 'Arcadia',
+		theme: 'arcadia',
+		logo: arcadiaLogo,
+		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		href: '/sala-accademia/classifica-arcadia/',
+	},
+	{
+		name: 'Armonia',
+		theme: 'armonia',
+		logo: armoniaLogo,
+		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		href: '/sala-accademia/classifica-armonia/',
+	},
+	{
+		name: 'Arborea',
+		theme: 'arborea',
+		logo: arboreaLogo,
+		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		href: '/sala-accademia/classifica-arborea/',
+	},
+];
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell missions-shell biblioteca-academies-page">
+		<header class="missions-header biblioteca-academies-header">
+			<h1>Le Accademie</h1>
+		</header>
+
+		<section class="container-xl tsbs-app-container biblioteca-academies-content" aria-labelledby="biblioteca-academies-title">
+			<h2 id="biblioteca-academies-title" class="visually-hidden">Le Accademie</h2>
+
+			<p class="biblioteca-academies-intro">
+				Sed bibendum nunc eget nunc iaculis sollicitudin. Pellentesque lacinia ultrices tempus. Vivamus vel libero eget mauris placerat rhoncus et ac ex.
+			</p>
+
+			<div class="biblioteca-academies-list" aria-label="Elenco Accademie">
+				{academies.map((academy) => (
+					<a class={`biblioteca-academy-card is-${academy.theme}`} href={academy.href}>
+						<span class="biblioteca-academy-card__icon" aria-hidden="true">
+							<img
+								src={academy.logo.src}
+								width={academy.logo.width}
+								height={academy.logo.height}
+								alt=""
+								loading="lazy"
+								decoding="async"
+							/>
+						</span>
+						<div class="biblioteca-academy-card__copy">
+							<h3>{academy.name}</h3>
+							<p>{academy.text}</p>
+						</div>
+					</a>
+				))}
+			</div>
+		</section>
+	</main>
+</Layout>

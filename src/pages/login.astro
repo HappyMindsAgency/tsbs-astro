@@ -1,0 +1,352 @@
+---
+import Layout from '../layouts/Layout.astro';
+import loginHero from '../assets/login-hero.png';
+
+const { lang = 'it' } = Astro.props;
+
+// Gestione messaggi di errore
+const error = Astro.url.searchParams.get('error');
+const identifier = Astro.url.searchParams.get('identifier') || '';
+
+const errorMessages: Record<string, string> = {
+	missing_credentials: "Per favore, inserisci sia l'identificativo che la password.",
+	invalid_credentials: "Le chiavi fornite non aprono questa porta. Controlla le tue credenziali.",
+	session_config_error: "C'è stato un problema nel forgiare la tua sessione. Riprova o contatta un Bibliotecario.",
+	internal_server_error: "Un'ombra oscura ha interrotto il collegamento. Riprova più tardi.",
+	invalid_identifier_format: "L'identificativo fornito non segue i canoni della Società. Verifica che sia un nome utente o un'email corretta.",
+};
+
+const errorMessage = error ? (errorMessages[error] || "Si è verificato un errore arcano imprevisto.") : null;
+---
+
+<Layout lang={lang} theme="theme-neutral">
+	<main class="login-page">
+		<div class="login-stage">
+			<img
+				class="login-visual"
+				src={loginHero.src}
+				width={loginHero.width}
+				height={loginHero.height}
+				alt=""
+				aria-hidden="true"
+			/>
+
+			<section class="login-panel" aria-labelledby="login-title">
+				<h1 id="login-title">Login</h1>
+				<p class="login-intro">
+					Sei alle porte della Secret Bookish Society.
+					<br />
+					Solo tu hai la chiave.
+					<br />
+					Inserisci le tue credenziali.
+					<br />
+					Non hai ancora risposto alla Chiamata? <a href="/registrazione/">Registrati.</a>
+				</p>
+
+				{errorMessage && (
+					<div class="login-error-box" role="alert">
+						<i class="bi bi-exclamation-circle-fill"></i>
+						<span>{errorMessage}</span>
+					</div>
+				)}
+
+				<form class="login-form" action="/api/login" method="post">
+					<div class="login-field">
+						<label for="login-identifier">Username/Email</label>
+						<input
+							id="login-identifier"
+							name="identifier"
+							type="text"
+							autocomplete="username"
+							value={identifier}
+							required
+							pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$|^[a-zA-Z0-9_.-]{3,}$"
+							title="Inserisci un'email valida o un nome utente di almeno 3 caratteri senza spazi."
+						/>
+					</div>
+
+					<div class="login-field">
+						<label for="login-password">Password</label>
+						<div class="login-password">
+							<input id="login-password" name="password" type="password" autocomplete="current-password" required />
+							<button type="button" class="login-password__toggle" aria-label="Mostra password" data-password-toggle>
+								<i class="bi bi-eye"></i>
+							</button>
+						</div>
+					</div>
+
+					<button type="submit" class="login-submit">Login</button>
+				</form>
+
+				<a class="login-forgot" href="/auth/reset-password/request">Password dimenticata?</a>
+			</section>
+		</div>
+	</main>
+</Layout>
+
+<script>
+	const loginPasswordWindow = window as Window & { tsbsLoginPasswordToggleReady?: boolean };
+
+	if (!loginPasswordWindow.tsbsLoginPasswordToggleReady) {
+		loginPasswordWindow.tsbsLoginPasswordToggleReady = true;
+
+		document.addEventListener('click', (event) => {
+			const target = event.target;
+			const toggle = target instanceof Element ? target.closest('[data-password-toggle]') : null;
+			const password = document.querySelector('#login-password');
+
+			if (!(toggle instanceof HTMLButtonElement) || !(password instanceof HTMLInputElement)) {
+				return;
+			}
+
+			const isHidden = password.type === 'password';
+			password.type = isHidden ? 'text' : 'password';
+			toggle.setAttribute('aria-label', isHidden ? 'Nascondi password' : 'Mostra password');
+			toggle.setAttribute('aria-pressed', String(isHidden));
+			const icon = toggle.querySelector('.bi');
+			icon?.classList.toggle('bi-eye', !isHidden);
+			icon?.classList.toggle('bi-eye-slash', isHidden);
+		});
+	}
+
+	const initLoginPasswordToggleState = () => {
+		const toggle = document.querySelector('[data-password-toggle]');
+
+		if (!(toggle instanceof HTMLButtonElement)) {
+			return;
+		}
+
+		toggle.setAttribute('aria-pressed', 'false');
+	};
+
+	initLoginPasswordToggleState();
+	document.addEventListener('astro:page-load', initLoginPasswordToggleState);
+</script>
+
+<style lang="scss">
+	.login-page {
+		--login-text: var(--tsbs-color-heading);
+		--login-muted: var(--tsbs-color-body);
+		--login-border: #546176;
+		--login-panel: var(--tsbs-color-neutral-soft);
+		--login-control: #ffffff;
+		--login-button: var(--tsbs-global-cta-var1-bg);
+		--login-button-hover: var(--tsbs-global-cta-var1-hover-bg);
+		--login-button-active: var(--tsbs-global-cta-var1-active-bg);
+		--login-page-padding-y: clamp(2rem, 7vw, 3.875rem);
+		--login-page-padding-x: clamp(0.9375rem, 4vw, 1.875rem);
+		--login-page-padding-bottom: calc(clamp(3.5rem, 14vw, 5rem) + env(safe-area-inset-bottom));
+		--login-submit-margin-top: clamp(2rem, 9vw, 3rem);
+
+		min-height: 100vh;
+		padding: var(--login-page-padding-y) var(--login-page-padding-x) var(--login-page-padding-bottom);
+		color: var(--login-text);
+		background: var(--tsbs-color-surface);
+	}
+
+	.login-stage {
+		display: grid;
+		gap: 2.25rem;
+	}
+
+	.login-visual {
+		width: 100%;
+		aspect-ratio: 416 / 296;
+		object-fit: contain;
+	}
+
+	.login-panel {
+		display: grid;
+		gap: 0;
+		width: 100%;
+		padding: 0 1.4375rem;
+		color: var(--login-text);
+	}
+
+	.login-panel h1 {
+		margin: 0 0 0.625rem;
+		color: var(--login-text);
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1.1;
+	}
+
+	.login-intro {
+		margin: 0;
+		color: var(--login-text);
+		font-size: 1rem;
+		line-height: 1.4;
+	}
+
+	.login-intro a,
+	.login-forgot {
+		color: var(--login-text);
+		font-weight: 700;
+		text-decoration: underline;
+		text-underline-offset: 0.125rem;
+	}
+
+	.login-form {
+		display: grid;
+		gap: 1.5625rem;
+		margin-top: 2.25rem;
+	}
+
+	.login-field {
+		display: grid;
+		gap: 0.375rem;
+	}
+
+	.login-field label {
+		color: var(--login-muted);
+		font-size: 0.875rem;
+		line-height: 1.2;
+	}
+
+	.login-field input {
+		width: 100%;
+		height: 3rem;
+		padding: 0.625rem 0.875rem;
+		color: var(--tsbs-color-heading);
+		font: inherit;
+		line-height: 1.2;
+		background: var(--login-control);
+		border: 1px solid var(--login-border);
+		border-radius: 0.3125rem;
+	}
+
+	.login-password {
+		position: relative;
+	}
+
+	.login-password input {
+		padding-right: 3rem;
+	}
+
+	.login-password__toggle {
+		position: absolute;
+		top: 50%;
+		right: 0.625rem;
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		padding: 0;
+		color: var(--login-border);
+		background: transparent;
+		border: 0;
+		transform: translateY(-50%);
+	}
+
+	.login-password__toggle .bi {
+		font-size: 1.25rem;
+		line-height: 1;
+	}
+
+	.login-submit {
+		width: calc(100% - 3.125rem);
+		min-height: 3rem;
+		margin: var(--login-submit-margin-top) auto 0;
+		padding: 0.75rem 1rem;
+		color: #ffffff;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		background: var(--login-button);
+		border: 0;
+		border-radius: 0.3125rem;
+	}
+
+	.login-submit:hover {
+		background: var(--login-button-hover);
+	}
+
+	.login-submit:active {
+		background: var(--login-button-active);
+	}
+
+	.login-forgot {
+		justify-self: center;
+		margin-top: 1rem;
+		font-size: 1rem;
+		line-height: 1.2;
+	}
+
+	.login-error-box {
+		color: #dc3545;
+		display: flex;
+		align-items: center;
+		gap: 8px; 
+	}
+
+	@media (min-width: 768px) {
+		.login-page {
+			--login-page-padding-y: clamp(1.0625rem, 1.2vw, 1.75rem);
+			--login-page-padding-x: clamp(1.875rem, 5vw, 4.5rem);
+			--login-page-padding-bottom: clamp(1.0625rem, 1.2vw, 1.75rem);
+			--login-submit-margin-top: clamp(2rem, 2vw, 2.25rem);
+
+			display: grid;
+			place-items: center;
+		}
+
+		.login-stage {
+			position: relative;
+			display: grid;
+			place-items: center;
+			width: min(100%, 80.9375rem);
+			min-height: calc(100vh - 2.125rem);
+		}
+
+		.login-visual {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			aspect-ratio: auto;
+			object-fit: contain;
+			object-position: center;
+			background: #ffffff;
+			border-radius: 0.5rem;
+		}
+
+		.login-panel {
+			position: relative;
+			z-index: 1;
+			width: min(100%, 35.5rem);
+			min-height: 30.75rem;
+			padding: 1.9375rem 6.25rem 1.875rem;
+			background: var(--login-panel);
+			border-radius: 1.125rem;
+		}
+
+		.login-panel h1 {
+			font-size: 2rem;
+		}
+
+		.login-form {
+			margin-top: 1.875rem;
+			gap: 1.5rem;
+		}
+
+		.login-submit {
+			width: calc(100% - 2.5rem);
+		}
+
+		.login-forgot {
+			margin-top: 1.125rem;
+		}
+	}
+
+	@media (max-width: 374.98px) {
+		.login-panel {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+
+		.login-submit {
+			width: 100%;
+		}
+	}
+</style>

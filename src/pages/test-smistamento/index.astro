@@ -1,0 +1,37 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TestSmistamento from '../../components/TestSmistamentoComponents/TestSmistamento.astro';
+import RisultatoSmistamento from '../../components/TestSmistamentoComponents/RisultatoSmistamento.astro';
+import ConfermaAccademia from '../../components/TestSmistamentoComponents/ConfermaAccademia.astro';
+import SceltaAvatar from '../../components/TestSmistamentoComponents/SceltaAvatar.astro';
+
+const { lang = 'it' } = Astro.props;
+
+const academies = ['astraria', 'arcadia', 'armonia', 'arborea'];
+const requestedStep = Astro.url.searchParams.get('step') || 'test';
+const requestedAcademy = Astro.url.searchParams.get('academy');
+const academy = requestedAcademy && academies.includes(requestedAcademy) ? requestedAcademy : undefined;
+const theme = academy ? `theme-${academy}` : 'theme-neutral';
+
+const steps = {
+	test: TestSmistamento,
+	risultato: RisultatoSmistamento,
+	'conferma-accademia': ConfermaAccademia,
+	'scelta-avatar': SceltaAvatar,
+};
+
+const CurrentStep = steps[requestedStep as keyof typeof steps] || TestSmistamento;
+---
+
+<Layout lang={lang} theme={theme}>
+	<main class="test-smistamento-page">
+		<CurrentStep lang={lang} selectedAcademy={academy} academy={academy} />
+	</main>
+</Layout>
+
+<style lang="scss">
+	.test-smistamento-page {
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+</style>

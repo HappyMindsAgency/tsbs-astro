@@ -12,7 +12,7 @@ export const mockProfiles = [
 		academyLabel: 'Nome Accademia',
 		rankLabel: 'Adepto - n° trofei',
 		position: '',
-		href: '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/',
+		href: '/scrivania/utenti-preferiti/esploso-profilo-utente/',
 	},
 	{
 		id: 'adepto-21',
@@ -25,7 +25,7 @@ export const mockProfiles = [
 		rankLabel: 'Adepto - 24 trofei',
 		position: 'I',
 		medal: 'gold',
-		href: '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/',
+		href: '/scrivania/utenti-preferiti/esploso-profilo-utente/',
 	},
 	{
 		id: 'adepto-7',
@@ -38,7 +38,7 @@ export const mockProfiles = [
 		rankLabel: 'Adepto - 43 trofei',
 		position: 'II',
 		medal: 'silver',
-		href: '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/',
+		href: '/scrivania/utenti-preferiti/esploso-profilo-utente/',
 	},
 	{
 		id: 'adepto-8',
@@ -51,7 +51,7 @@ export const mockProfiles = [
 		rankLabel: 'Adepto - 31 trofei',
 		position: 'III',
 		medal: 'bronze',
-		href: '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/',
+		href: '/scrivania/utenti-preferiti/esploso-profilo-utente/',
 	},
 	{
 		id: 'adepto-12',
@@ -63,6 +63,6 @@ export const mockProfiles = [
 		academyLabel: 'Accademia Astraria',
 		rankLabel: 'Adepto - 29 trofei',
 		position: '12',
-		href: '/atrio/scrivania/utenti-preferiti/esploso-profilo-utente/',
+		href: '/scrivania/utenti-preferiti/esploso-profilo-utente/',
 	},
 ];

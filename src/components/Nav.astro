@@ -10,19 +10,19 @@ const { lang = "it", deactivateAll = false } = Astro.props;
 const pathname = Astro.url.pathname;
 
 const mobileItems = [
-  { id: "scrivania", label: "Scrivania", href: "/atrio/scrivania/", icon: scrivaniaIcon },
-  { id: "missioni", label: "Missioni", href: "/atrio/missioni/", icon: missioniIcon },
+  { id: "scrivania", label: "Scrivania", href: "/scrivania/", icon: scrivaniaIcon },
+  { id: "missioni", label: "Missioni", href: "/missioni/", icon: missioniIcon },
   { id: "atrio", label: "Atrio", href: "/atrio/", icon: atrioIcon, activePaths: ["/epistole/"] },
-  { id: "accademia", label: "Accademia", href: "/atrio/sala-accademia/", icon: accademiaIcon },
-  { id: "biblioteca", label: "Biblioteca", href: "/atrio/biblioteca/", icon: bibliotecaIcon, activePaths: ["/atrio/eventi-biblioteca-classense/"] },
+  { id: "accademia", label: "Accademia", href: "/sala-accademia/", icon: accademiaIcon },
+  { id: "biblioteca", label: "Biblioteca", href: "/biblioteca/", icon: bibliotecaIcon, activePaths: ["/eventi-biblioteca-classense/"] },
 ];
 
 const desktopItems = [
   { id: "atrio", label: "Atrio", href: "/atrio/", icon: atrioIcon, activePaths: ["/epistole/"] },
-  { id: "scrivania", label: "Scrivania", href: "/atrio/scrivania/", icon: scrivaniaIcon },
-  { id: "missioni", label: "Missioni", href: "/atrio/missioni/", icon: missioniIcon },
-  { id: "accademia", label: "Accademia", href: "/atrio/sala-accademia/", icon: accademiaIcon },
-  { id: "biblioteca", label: "Biblioteca", href: "/atrio/biblioteca/", icon: bibliotecaIcon, activePaths: ["/atrio/eventi-biblioteca-classense/"] },
+  { id: "scrivania", label: "Scrivania", href: "/scrivania/", icon: scrivaniaIcon },
+  { id: "missioni", label: "Missioni", href: "/missioni/", icon: missioniIcon },
+  { id: "accademia", label: "Accademia", href: "/sala-accademia/", icon: accademiaIcon },
+  { id: "biblioteca", label: "Biblioteca", href: "/biblioteca/", icon: bibliotecaIcon, activePaths: ["/eventi-biblioteca-classense/"] },
 ];
 
 const normalizePath = (path: string) => path.replace(/\/+$/, "") || "/";

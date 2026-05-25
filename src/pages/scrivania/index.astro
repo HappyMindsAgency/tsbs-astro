@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import classificaIcon from '../../assets/03_classifica_bianco_scrivania.svg';
+import grimorioIcon from '../../assets/02_grimorio_bianco_scrivania.svg';
+import trofeiIcon from '../../assets/01_trofei_bianco_scrivania.svg';
+
+const { lang = 'it' } = Astro.props;
+
+const notes = [
+	{
+		meta: 'OGGI • PERSONALE',
+		title: 'Etiam vehicula dui ante',
+		text: 'onec et dui nec augue semper placerat. Vestibulum ante ipsum primis in faucibus luctus...',
+		slug: 'etiam-vehicula-dui-ante',
+	},
+	{
+		meta: 'IERI • ACCADEMIA',
+		title: 'Lorem ipsum dolor sit amet',
+		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+		slug: 'lorem-ipsum-dolor-sit-amet',
+	},
+	{
+		meta: 'IERI • ACCADEMIA',
+		title: 'Lorem ipsum dolor sit amet',
+		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
+		slug: 'lorem-ipsum-dolor-sit-amet-2',
+	},
+];
+
+const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell desk-page">
+		<header class="desk-hero" aria-labelledby="desk-title">
+			<div class="desk-hero__panel">
+				<a class="desk-favorites-button" href="/scrivania/utenti-preferiti/" aria-label="Utenti preferiti">
+					<i class="bi bi-heart" aria-hidden="true"></i>
+				</a>
+
+				<p class="desk-academy-pill">Accademia Astraria</p>
+
+				<div class="desk-avatar" aria-hidden="true">
+					<i class="bi bi-image"></i>
+				</div>
+
+				<h1 id="desk-title">Username Adepto</h1>
+				<p class="desk-rank">Adepto - n° trofei</p>
+				<p class="desk-code">
+					<i class="bi bi-person-vcard" aria-hidden="true"></i>
+					<span>000000</span>
+				</p>
+			</div>
+		</header>
+
+		<div class="container-xl tsbs-app-container desk-content">
+			<section class="desk-section" aria-labelledby="recap-title">
+				<h2 id="recap-title" class="tsbs-section-title">Recap</h2>
+
+				<div class="desk-recap-grid">
+					<a class="desk-recap-card" href="/scrivania/trofei/">
+						<img
+							class="desk-recap-card__icon"
+							src={trofeiIcon.src}
+							width={trofeiIcon.width}
+							height={trofeiIcon.height}
+							alt=""
+							aria-hidden="true"
+							loading="lazy"
+							decoding="async"
+						/>
+						<span>Trofei</span>
+					</a>
+					<a class="desk-recap-card" href="/sala-accademia/classifica-generale/">
+						<img
+							class="desk-recap-card__icon"
+							src={classificaIcon.src}
+							width={classificaIcon.width}
+							height={classificaIcon.height}
+							alt=""
+							aria-hidden="true"
+							loading="lazy"
+							decoding="async"
+						/>
+						<span>Classifica Accademia</span>
+					</a>
+					<a class="desk-recap-card" href="/scrivania/grimorio/">
+						<img
+							class="desk-recap-card__icon"
+							src={grimorioIcon.src}
+							width={grimorioIcon.width}
+							height={grimorioIcon.height}
+							alt=""
+							aria-hidden="true"
+							loading="lazy"
+							decoding="async"
+						/>
+						<span>Grimorio</span>
+					</a>
+				</div>
+			</section>
+
+			<a class="tsbs-note-pad" href={featuredNoteHref} aria-labelledby="note-title">
+				<span class="tsbs-note-pad__action" aria-hidden="true">
+					<i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+				</span>
+				<h2 id="note-title">Titolo della nota</h2>
+				<p>Scrivi qui le tue annotazioni da Adepto</p>
+				<div class="tsbs-note-pad__lines" aria-hidden="true">
+					<span></span>
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</a>
+
+			<section class="desk-section desk-latest" aria-labelledby="latest-title">
+				<h2 id="latest-title" class="tsbs-section-title">Ultime note</h2>
+
+				<div class="tsbs-note-list">
+					{notes.map((note) => (
+						<a class="tsbs-note-card" href={`/scrivania/grimorio/pubblicate/${note.slug}/`}>
+							<div class="tsbs-note-card__copy">
+								<p class="tsbs-note-card__meta">{note.meta}</p>
+								<h3>{note.title}</h3>
+								<p>{note.text}</p>
+							</div>
+							<div class="tsbs-note-card__actions" aria-hidden="true">
+								<i class="bi bi-share"></i>
+								<i class="bi bi-chevron-right"></i>
+							</div>
+						</a>
+					))}
+				</div>
+
+				<button class="missions-load-more" type="button">
+					<span>Carica altro</span>
+					<i class="bi bi-arrow-right" aria-hidden="true"></i>
+				</button>
+			</section>
+		</div>
+	</main>
+</Layout>

@@ -20,6 +20,190 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-25 - Route Eventi Biblioteca Classense In Root Pages
+
+Decisione:
+- spostare la sezione Eventi Biblioteca Classense da `/atrio/eventi-biblioteca-classense/` a `/eventi-biblioteca-classense/`
+- usare `src/pages/eventi-biblioteca-classense/` come route attiva
+- mantenere i vecchi file sotto `src/pages/atrio/_eventi-biblioteca-classense/` come riferimento non routato
+
+Motivo:
+- allineare Eventi Biblioteca Classense all'alberatura pubblica corrente
+- evitare link attivi verso il vecchio percorso sotto Atrio
+
+Impatto:
+- `src/pages/eventi-biblioteca-classense/`
+- navigazione principale
+- link eventi dall'Atrio
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
+## 2026-05-25 - Route Biblioteca In Root Pages
+
+Decisione:
+- spostare la sezione Biblioteca da `/atrio/biblioteca/` a `/biblioteca/`
+- usare `src/pages/biblioteca/` come route attiva
+- mantenere i vecchi file sotto `src/pages/atrio/_biblioteca/` come riferimento non routato
+
+Motivo:
+- allineare Biblioteca all'alberatura pubblica corrente
+- evitare link attivi verso il vecchio percorso sotto Atrio
+
+Impatto:
+- `src/pages/biblioteca/`
+- navigazione principale
+- link interni della Biblioteca
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
+## 2026-05-25 - Route Classifica Generale Sala Accademia
+
+Decisione:
+- rinominare la pagina `/sala-accademia/classifica/` in `/sala-accademia/classifica-generale/`
+- usare `src/pages/sala-accademia/classifica-generale.astro` come route attiva
+
+Motivo:
+- rendere piu esplicita la differenza tra classifica generale e classifiche delle singole accademie
+
+Impatto:
+- link interni dalla Sala Accademia
+- link dalla Scrivania
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
+## 2026-05-25 - Route Sala Accademia In Root Pages
+
+Decisione:
+- spostare la sezione Sala Accademia da `/atrio/sala-accademia/` a `/sala-accademia/`
+- usare `src/pages/sala-accademia/` come route attiva
+- mantenere i vecchi file sotto `src/pages/atrio/_sala-accademia/` come riferimento non routato
+
+Motivo:
+- allineare Sala Accademia all'alberatura pubblica corrente
+- evitare link attivi verso il vecchio percorso sotto Atrio
+
+Impatto:
+- `src/pages/sala-accademia/`
+- navigazione principale
+- link da Scrivania e Biblioteca/Accademie
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
+## 2026-05-25 - Route Missioni In Root Pages
+
+Decisione:
+- spostare la sezione Missioni da `/atrio/missioni/` a `/missioni/`
+- usare `src/pages/missioni/` come route attiva
+- mantenere i vecchi file sotto `src/pages/atrio/_missioni/` come riferimento non routato
+
+Motivo:
+- allineare Missioni all'alberatura pubblica corrente
+- evitare link attivi verso il vecchio percorso sotto Atrio
+
+Impatto:
+- `src/pages/missioni/`
+- navigazione principale
+- link da Atrio e pagine missione
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
+## 2026-05-25 - Route Scrivania In Root Pages
+
+Decisione:
+- spostare la sezione Scrivania da `/atrio/scrivania/` a `/scrivania/`
+- usare `src/pages/scrivania/` come route attiva
+- mantenere i vecchi file sotto `src/pages/atrio/_scrivania/` come riferimento non routato
+
+Motivo:
+- allineare Scrivania all'alberatura pubblica corrente
+- evitare link attivi verso il vecchio percorso sotto Atrio
+
+Impatto:
+- `src/pages/scrivania/`
+- navigazione principale
+- link da Atrio, Sala Accademia, Classifica, toast e profili mock
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
+## 2026-05-25 - Route Test Smistamento In Root Pages
+
+Decisione:
+- spostare il test smistamento pubblico da `/landing/test-smistamento/` a `/test-smistamento/`
+- usare `src/pages/test-smistamento/index.astro` come route attiva per l'ingresso del flusso
+- usare `src/pages/test-smistamento/benvenuto-accademia-[accademia].astro` come route risultato per accademia
+- usare `src/pages/test-smistamento/scegli-avatar/index.astro` come sottoroute attiva
+- mantenere i vecchi file sotto `landing/_test-smistamento/` come riferimento non routato
+
+Motivo:
+- allineare il test smistamento all'alberatura pubblica corrente
+- rendere esplicita nell'URL l'accademia risultante dal test
+- evitare link generati dai componenti verso il vecchio percorso `landing/test-smistamento`
+
+Impatto:
+- `src/pages/test-smistamento/`
+- componenti del flusso test smistamento
+- link dalla conferma registrazione
+
+Stato:
+- approvata
+
+## 2026-05-25 - Route Registrazione In Root Pages
+
+Decisione:
+- spostare la pagina registrazione pubblica da `/landing/registrazione/` a `/registrazione/`
+- spostare la pagina conferma registrazione da `/landing/registrazione/registrazione-completata/` a `/registrazione-completata/`
+- usare `src/pages/registrazione.astro` come file route attivo
+- usare `src/pages/registrazione-completata.astro` come file route attivo per la conferma
+- mantenere il vecchio file registrazione sotto `landing/registrazione/_index.astro` come riferimento non routato
+- mantenere il vecchio file conferma sotto `landing/registrazione/_registrazione-completata.astro` come riferimento non routato
+- far proseguire il form verso `/registrazione-completata/`
+
+Motivo:
+- allineare la registrazione all'alberatura pubblica corrente
+- evitare link e form action verso il vecchio percorso `landing/registrazione`
+
+Impatto:
+- `src/pages/registrazione.astro`
+- `src/pages/registrazione-completata.astro`
+- link interni da landing, login e onboarding
+- form di registrazione
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
+## 2026-05-25 - Route Login In Root Pages
+
+Decisione:
+- spostare la pagina login pubblica da `/landing/login/` a `/login/`
+- usare `src/pages/login.astro` come file route attivo
+- mantenere il vecchio file login sotto `landing/login/_index.astro` come riferimento non routato
+
+Motivo:
+- allineare il login all'alberatura pubblica corrente
+- evitare link e redirect verso il vecchio percorso `landing/login`
+
+Impatto:
+- `src/pages/login.astro`
+- link interni da landing e registrazione
+- redirect di errore login
+- `docs/wiki/alberatura.md`
+
+Stato:
+- approvata
+
 ## 2026-05-20 - Maintenance Mode Hardcoded Con Futuro Switch Vercel
 
 Decisione:

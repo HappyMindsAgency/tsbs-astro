@@ -1,0 +1,151 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Nav from '../../../components/Nav.astro';
+import DomandaModal from '../../../components/PopupComponents/DomandaModal.astro';
+
+export const prerender = false;
+
+interface ReadingChallengeBook {
+	title: string;
+	checked?: boolean;
+}
+
+interface ReadingChallengeCategory {
+	id: string;
+	label: string;
+	books?: ReadingChallengeBook[];
+}
+
+const { lang = 'it' } = Astro.props;
+const { slugMis } = Astro.params;
+const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
+const missionPath = `/missioni/${slugMis ?? ''}/`;
+
+const categories: ReadingChallengeCategory[] = [
+	{
+		id: 'giallo',
+		label: 'Giallo',
+		books: [
+			{ title: 'Dieci Piccoli Indiani - Agatha Christie' },
+			{ title: 'Il Mastino dei Baskerville - Arthur Conan Doyle' },
+			{ title: 'Il Nome della Rosa - Umberto Eco' },
+			{ title: 'Il Codice da Vinci - Dan Brown' },
+			{ title: 'La Ragazza con il Tatuaggio del Drago - Stieg Larsson' },
+		],
+	},
+	{ id: 'fantasy', label: 'Fantasy' },
+	{ id: 'fantascienza', label: 'Fantascienza' },
+	{ id: 'romantico', label: 'Romantico' },
+	{ id: 'thriller', label: 'Thriller' },
+	{ id: 'horror', label: 'Horror' },
+	{ id: 'storico', label: 'Storico' },
+	{ id: 'biografia', label: 'Biografia' },
+	{ id: 'classico', label: 'Classico' },
+];
+---
+
+<Layout lang={locale}>
+	<Nav lang={locale} />
+
+	<main class="tsbs-app-shell reading-challenge">
+		<header class="mission-detail__topbar">
+			<a class="mission-detail__back" href={missionPath}>
+				<i class="bi bi-arrow-left" aria-hidden="true"></i>
+				<span>Torna alle missioni</span>
+			</a>
+		</header>
+
+		<section class="container-xl tsbs-app-container reading-challenge__content" aria-labelledby="reading-challenge-title">
+			<div class="mission-detail__media reading-challenge__media" aria-label="Immagine sfida di lettura">
+				<i class="bi bi-image" aria-hidden="true"></i>
+			</div>
+
+			<div class="reading-challenge__body">
+				<h1 id="reading-challenge-title">Nome della sfida di lettura</h1>
+
+				<hr class="mission-detail__rule reading-challenge__rule" />
+
+				<article class="mission-detail__objective reading-challenge__objective" aria-labelledby="reading-challenge-objective-title">
+					<h2 id="reading-challenge-objective-title">Obiettivo:</h2>
+					<p>Raggiungi X letture, contribuisci al prestigio della tua Accademia e conquista il trofeo insieme agli altri membri.</p>
+				</article>
+
+				<div class="reading-challenge__progress" aria-label="Progresso letture">
+					<strong>0 / 50</strong>
+					<span>libri letti</span>
+				</div>
+
+				<div class="accordion reading-challenge__accordion" id="reading-challenge-categories">
+					{categories.map((category, index) => (
+						<div class="accordion-item reading-challenge__category">
+							<h2 class="accordion-header" id={`heading-${category.id}`}>
+								<button
+									class={`accordion-button reading-challenge__category-button ${index === 0 ? '' : 'collapsed'}`}
+									type="button"
+									data-bs-toggle="collapse"
+									data-bs-target={`#collapse-${category.id}`}
+									aria-expanded={index === 0 ? 'true' : 'false'}
+									aria-controls={`collapse-${category.id}`}
+								>
+									{category.label}
+								</button>
+							</h2>
+
+							<div
+								id={`collapse-${category.id}`}
+								class={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`}
+								aria-labelledby={`heading-${category.id}`}
+								data-bs-parent="#reading-challenge-categories"
+							>
+								{category.books && (
+									<div class="accordion-body reading-challenge__book-list">
+										{category.books.map((book) => (
+											<label class="reading-challenge__book">
+												<input type="checkbox" checked={book.checked ?? false} />
+												<span>{book.title}</span>
+											</label>
+										))}
+									</div>
+								)}
+							</div>
+						</div>
+					))}
+				</div>
+
+				<hr class="mission-detail__rule reading-challenge__rule reading-challenge__rule--reward" />
+
+				<div class="mission-detail__reward reading-challenge__reward" aria-label="Ricompensa sfida lettura">
+					<p>Completando questa missione otterrai:</p>
+					<p class="mission-detail__trophy">
+						<i class="bi bi-award" aria-hidden="true"></i>
+						<strong>Trofeo "Topo da biblioteca"</strong>
+					</p>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<DomandaModal />
+</Layout>
+
+<script>
+	const setupReadingChallengeModal = () => {
+		document.querySelectorAll<HTMLInputElement>('.reading-challenge__book input[type="checkbox"]').forEach((input) => {
+			if (input.dataset.readingChallengeQuestionReady === 'true') return;
+			input.dataset.readingChallengeQuestionReady = 'true';
+
+			input.addEventListener('change', () => {
+				if (!input.checked) return;
+
+				document.dispatchEvent(
+					new CustomEvent('tsbs:question-modal-open', {
+						detail: { input },
+					})
+				);
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupReadingChallengeModal);
+	setupReadingChallengeModal();
+</script>

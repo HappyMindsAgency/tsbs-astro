@@ -22,9 +22,9 @@ const normalizeAcademy = (value: unknown): AcademyKey => {
 const { academy = 'arborea', lang = 'it' } = Astro.props;
 const currentAcademy = normalizeAcademy(academy);
 const academyName = academyLabels[currentAcademy];
-const resultBaseUrl = '/landing/test-smistamento/';
-const confirmHref = `${resultBaseUrl}scegli-avatar/?academy=${encodeURIComponent(currentAcademy)}`;
-const chooseHref = `${resultBaseUrl}?step=conferma-accademia&academy=${encodeURIComponent(currentAcademy)}`;
+const avatarChoiceUrl = '/test-smistamento/scegli-avatar/';
+const confirmHref = `${avatarChoiceUrl}?academy=${encodeURIComponent(currentAcademy)}`;
+const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeURIComponent(currentAcademy)}`;
 ---
 
 <section class="sorting-result-page" data-academy={currentAcademy} data-lang={lang} aria-labelledby="sorting-result-title">

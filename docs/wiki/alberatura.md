@@ -15,18 +15,13 @@ Gli URL definitivi non sono ancora confermati. Questa alberatura va quindi consi
 
 ```txt
 src/pages/
-├─ login/
-│  └─ index.astro
-│
-├─ chiamata/
-│  ├─ index.astro
-│  ├─ registrazione/
-│  │  └─ index.astro
-│  └─ registrazione-completata/
-│     └─ index.astro
+├─ login.astro
+├─ registrazione.astro
+├─ registrazione-completata.astro
 │
 ├─ test-smistamento/
 │  ├─ index.astro
+│  ├─ benvenuto-accademia-[accademia].astro
 │  ├─ risultato/
 │  │  └─ index.astro
 │  ├─ appartenenza/
@@ -51,7 +46,7 @@ src/pages/
 │
 ├─ sala-accademia/
 │  ├─ index.astro
-│  ├─ classifica.astro
+│  ├─ classifica-generale.astro
 │  └─ [slugAccademia].astro
 │
 ├─ scrivania/
@@ -67,15 +62,15 @@ src/pages/
 │  └─ membri/
 │     └─ [nickname].astro
 │
+├─ eventi-biblioteca-classense/
+│  ├─ index.astro
+│  └─ [slugEv].astro
+│
 ├─ biblioteca/
 │  ├─ index.astro
-│  ├─ eventi-biblioteca-classense/
-│  │  ├─ index.astro
-│  │  └─ [slugEvento].astro
 │  ├─ archivio/
 │  │  └─ index.astro
-│  └─ accademie/
-│     └─ index.astro
+│  └─ accademie.astro
 │
 └─ epistole/
    ├─ index.astro
@@ -86,10 +81,10 @@ src/pages/
 
 ### Missioni
 
-La sezione `atrio/missioni/` usa una struttura dinamica basata su singola missione:
+La sezione `missioni/` usa una struttura dinamica basata su singola missione:
 
 ```txt
-atrio/missioni/[slugMis]/
+missioni/[slugMis]/
 ├─ index.astro
 ├─ sfida-lettura.astro
 ├─ prova/
@@ -109,24 +104,24 @@ I diversi frame Figma delle missioni non corrispondono necessariamente a file As
 - esito con trofeo
 - esito senza trofeo
 
-La pagina `atrio/missioni/index.astro` gestisce elenco e filtri.
+La pagina `missioni/index.astro` gestisce elenco e filtri.
 
-La pagina `atrio/missioni/[slugMis]/prova/index.astro` gestisce l'ingresso/regia della prova in base ai dati Strapi e allo stato della partecipazione.
+La pagina `missioni/[slugMis]/prova/index.astro` gestisce l'ingresso/regia della prova in base ai dati Strapi e allo stato della partecipazione.
 
-La pagina `atrio/missioni/[slugMis]/sfida-lettura.astro` gestisce il layout della sfida lettura legata alla singola missione.
+La pagina `missioni/[slugMis]/sfida-lettura.astro` gestisce il layout della sfida lettura legata alla singola missione.
 
-La pagina `atrio/missioni/[slugMis]/prova/sfida-lettura.astro` gestisce lo step extra della scelta citazionale / sfida lettura quando il flusso della prova lo richiede.
+La pagina `missioni/[slugMis]/prova/sfida-lettura.astro` gestisce lo step extra della scelta citazionale / sfida lettura quando il flusso della prova lo richiede.
 
-La pagina `atrio/missioni/[slugMis]/esito.astro` gestisce il risultato finale della missione.
+La pagina `missioni/[slugMis]/esito.astro` gestisce il risultato finale della missione.
 
 La route della singola missione deve restare stabile e non moltiplicarsi in base a categoria o tipologia.
 
 ### Utenti Preferiti
 
-La sezione `atrio/scrivania/utenti-preferiti/` contiene:
+La sezione `scrivania/utenti-preferiti/` contiene:
 
 ```txt
-atrio/scrivania/utenti-preferiti/
+scrivania/utenti-preferiti/
 ├─ index.astro
 └─ esploso-profilo-utente.astro
 ```
@@ -166,19 +161,19 @@ src/components/PopupComponents/
 Le pagine Astro restano pagine di regia:
 
 ```txt
-atrio/missioni/[slugMis]/index.astro -> sceglie il componente dettaglio
-atrio/missioni/[slugMis]/sfida-lettura.astro -> layout sfida lettura della singola missione
-atrio/missioni/[slugMis]/prova/index.astro -> sceglie il componente prova o fa da regia dello step corrente
-atrio/missioni/[slugMis]/prova/sfida-lettura.astro -> step prova dedicato alla sfida lettura
-atrio/missioni/[slugMis]/esito.astro -> sceglie il componente esito
+missioni/[slugMis]/index.astro -> sceglie il componente dettaglio
+missioni/[slugMis]/sfida-lettura.astro -> layout sfida lettura della singola missione
+missioni/[slugMis]/prova/index.astro -> sceglie il componente prova o fa da regia dello step corrente
+missioni/[slugMis]/prova/sfida-lettura.astro -> step prova dedicato alla sfida lettura
+missioni/[slugMis]/esito.astro -> sceglie il componente esito
 ```
 
 Per la scelta citazionale / sfida lettura, il flusso previsto e:
 
 ```txt
-/atrio/missioni/[slugMis]/sfida-lettura       -> layout della sfida lettura
-/atrio/missioni/[slugMis]/prova/sfida-lettura -> step prova dedicato alla sfida lettura
-/atrio/missioni/[slugMis]/prova/              -> regia della prova basata sui dati Strapi
+/missioni/[slugMis]/sfida-lettura       -> layout della sfida lettura
+/missioni/[slugMis]/prova/sfida-lettura -> step prova dedicato alla sfida lettura
+/missioni/[slugMis]/prova/              -> regia della prova basata sui dati Strapi
 ```
 
 Lo step `sfida-lettura.astro` e specifico della scelta citazionale / sfida lettura. La domanda a scelta multipla non richiede una route `domanda.astro` separata se puo riusare il componente della prova a scelta multipla dentro `prova/index.astro`.
@@ -243,10 +238,10 @@ Il campo `nickname` esiste in Strapi ed e unico, ma prima di implementare questa
 
 ### Grimorio E Note
 
-La sezione `atrio/scrivania/grimorio/` contiene l'elenco delle note personali e l'esploso della singola nota:
+La sezione `scrivania/grimorio/` contiene l'elenco delle note personali e l'esploso della singola nota:
 
 ```txt
-atrio/scrivania/grimorio/
+scrivania/grimorio/
 ├─ index.astro
 └─ [slugNota].astro
 ```
@@ -257,13 +252,17 @@ In fase provvisoria, prima del binding Strapi, e accettabile usare uno slug stat
 
 ### Biblioteca
 
-La sezione `biblioteca/` raccoglie contenuti istituzionali, archivio e ponte con Biblioteca Classense:
+La sezione `biblioteca/` raccoglie contenuti istituzionali, archivio e ponte con Biblioteca Classense.
+Gli eventi Biblioteca Classense restano una sezione root dedicata:
 
 ```txt
 biblioteca/
-├─ eventi-biblioteca-classense/
 ├─ archivio/
-└─ accademie/
+└─ accademie.astro
+
+eventi-biblioteca-classense/
+├─ index.astro
+└─ [slugEv].astro
 ```
 
 Questa scelta permette di mantenere il menu principale coerente con Figma, dove compare la voce `Biblioteca`, senza perdere le sezioni previste dall'architettura informativa.
@@ -301,7 +300,7 @@ Route dinamiche gia coerenti con campi slug presenti in Strapi:
 
 ```txt
 sala-accademia/[slugAccademia].astro
-biblioteca/eventi-biblioteca-classense/[slugEvento].astro
+eventi-biblioteca-classense/[slugEv].astro
 epistole/[slugEpistola].astro
 scrivania/grimorio/[slugNota].astro
 ```
@@ -309,7 +308,7 @@ scrivania/grimorio/[slugNota].astro
 Route dinamica da confermare:
 
 ```txt
-atrio/missioni/[slugMis]/
+missioni/[slugMis]/
 ```
 
 perche la collection `Missione` non ha ancora un campo `slug`.

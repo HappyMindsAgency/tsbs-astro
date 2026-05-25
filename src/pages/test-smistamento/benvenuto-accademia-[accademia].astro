@@ -1,0 +1,35 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import RisultatoSmistamento from '../../components/TestSmistamentoComponents/RisultatoSmistamento.astro';
+import ConfermaAccademia from '../../components/TestSmistamentoComponents/ConfermaAccademia.astro';
+import SceltaAvatar from '../../components/TestSmistamentoComponents/SceltaAvatar.astro';
+
+const { lang = 'it' } = Astro.props;
+const { accademia = 'arborea' } = Astro.params;
+
+const academies = ['astraria', 'arcadia', 'armonia', 'arborea'];
+const requestedStep = Astro.url.searchParams.get('step') || 'risultato';
+const academy = academies.includes(accademia) ? accademia : 'arborea';
+const theme = academy ? `theme-${academy}` : 'theme-neutral';
+
+const steps = {
+	risultato: RisultatoSmistamento,
+	'conferma-accademia': ConfermaAccademia,
+	'scelta-avatar': SceltaAvatar,
+};
+
+const CurrentStep = steps[requestedStep as keyof typeof steps] || RisultatoSmistamento;
+---
+
+<Layout lang={lang} theme={theme}>
+	<main class="test-smistamento-page">
+		<CurrentStep lang={lang} selectedAcademy={academy} academy={academy} />
+	</main>
+</Layout>
+
+<style lang="scss">
+	.test-smistamento-page {
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+</style>

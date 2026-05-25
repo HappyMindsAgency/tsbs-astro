@@ -17,7 +17,7 @@ const events = [
 	{ date: '18 APR', time: '17:00', title: 'Lorem ipsum dolor sit amet' },
 ];
 
-const featuredNoteHref = '/atrio/scrivania/grimorio/titolo-della-nota/';
+const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 
 ---
 <Layout lang={lang}>
@@ -53,7 +53,7 @@ const featuredNoteHref = '/atrio/scrivania/grimorio/titolo-della-nota/';
 		<section class="dashboard-section" aria-labelledby="tasks-title">
 			<div class="dashboard-section__head">
 				<h2 id="tasks-title" class="tsbs-section-title">Incarichi ordine</h2>
-				<a class="tsbs-accent-link" href="/atrio/missioni/">Vedi tutti →</a>
+				<a class="tsbs-accent-link" href="/missioni/">Vedi tutti →</a>
 			</div>
 			<div class="dashboard-task-grid">
 				{tasks.map((task) => (
@@ -76,7 +76,7 @@ const featuredNoteHref = '/atrio/scrivania/grimorio/titolo-della-nota/';
 		<section class="dashboard-section dashboard-grimoire" aria-labelledby="grimoire-title">
 			<div class="dashboard-section__head dashboard-section__head--desktop">
 				<h2 id="grimoire-title" class="tsbs-section-title">Grimorio</h2>
-				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href="/atrio/scrivania/grimorio/">Vai al tuo grimorio →</a>
+				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href="/scrivania/grimorio/">Vai al tuo grimorio →</a>
 			</div>
 			<a class="tsbs-note-pad" href={featuredNoteHref} aria-label="Apri nota del Grimorio">
 				<span class="tsbs-note-pad__action" aria-hidden="true">
@@ -91,13 +91,13 @@ const featuredNoteHref = '/atrio/scrivania/grimorio/titolo-della-nota/';
 					<span></span>
 				</div>
 			</a>
-			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href="/atrio/scrivania/grimorio/">Vai al tuo grimorio →</a>
+			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href="/scrivania/grimorio/">Vai al tuo grimorio →</a>
 		</section>
 
 		<section class="dashboard-section dashboard-events" aria-labelledby="events-title">
 			<div class="dashboard-section__head">
 				<h2 id="events-title" class="tsbs-section-title">Eventi</h2>
-				<a class="tsbs-accent-link" href="/atrio/eventi-biblioteca-classense/">Vedi tutti →</a>
+				<a class="tsbs-accent-link" href="/eventi-biblioteca-classense/">Vedi tutti →</a>
 			</div>
 			<div class="dashboard-event-grid">
 				{events.map((event) => (

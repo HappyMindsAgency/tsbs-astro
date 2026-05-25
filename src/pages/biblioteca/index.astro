@@ -1,0 +1,66 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import societaSegretaImage from '../../assets/biblioteca-la-societa-segreta.png';
+import accademieImage from '../../assets/biblioteca-le-accademie.png';
+import classenseImage from '../../assets/biblioteca-la-classense.png';
+
+const { lang = 'it' } = Astro.props;
+
+const archiveItems = [
+	{
+		title: 'La Società Segreta - TSBS',
+		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		image: societaSegretaImage,
+		href: '#societa-segreta',
+	},
+	{
+		title: 'Le Accademie',
+		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		image: accademieImage,
+		href: '/biblioteca/accademie/',
+	},
+	{
+		title: 'La Classense',
+		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+		image: classenseImage,
+		href: '#classense',
+	},
+];
+---
+
+<Layout lang={lang}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell missions-shell biblioteca-page">
+		<header class="missions-header biblioteca-header">
+			<h1>Biblioteca</h1>
+		</header>
+
+		<section class="container-xl tsbs-app-container biblioteca-content" aria-labelledby="biblioteca-title">
+			<h2 id="biblioteca-title" class="visually-hidden">Biblioteca</h2>
+
+			<p class="biblioteca-intro">
+				Sed bibendum nunc eget nunc iaculis sollicitudin. Pellentesque lacinia ultrices tempus. Vivamus vel libero eget mauris placerat rhoncus et ac ex. Ut pellentesque lorem ac vehicula tempor. Praesent semper dignissim pharetra. Proin ac rutrum nisl, eget viverra tellus. Etiam iaculis iaculis odio eu sagittis. Integer convallis libero eu ex accumsan, id faucibus velit finibus.
+			</p>
+
+			<section class="biblioteca-archive" aria-labelledby="biblioteca-archive-title">
+				<h2 id="biblioteca-archive-title" class="tsbs-section-title">Esplora l'Archivio</h2>
+
+				<div class="biblioteca-archive__list">
+					{archiveItems.map((item) => (
+						<a class="biblioteca-archive-card" href={item.href}>
+							<span class="biblioteca-archive-card__icon" aria-hidden="true">
+								<img src={item.image.src} alt="" loading="lazy" />
+							</span>
+							<span class="biblioteca-archive-card__copy">
+								<strong>{item.title}</strong>
+								<span>{item.text}</span>
+							</span>
+						</a>
+					))}
+				</div>
+			</section>
+		</section>
+	</main>
+</Layout>

@@ -1,17 +1,194 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import loginHero from '../assets/login-hero.png';
 
 const { lang = 'it' } = Astro.props;
 ---
 
 <Layout lang={lang} theme="theme-neutral">
-	<main class="tsbs-simple-confirmation-page">
-		<section class="container-xl tsbs-simple-confirmation-page__content" aria-labelledby="registration-completed-title">
-			<h1 id="registration-completed-title" class="tsbs-simple-confirmation-page__title">Lorem ipsum</h1>
-			<p class="tsbs-simple-confirmation-page__intro">
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae nibh sed lorem facilisis dictum.
-			</p>
-			<a class="btn global-cta-var1 tsbs-simple-confirmation-page__cta" href="/landing/test-smistamento/">Lorem ipsum</a>
-		</section>
+	<main class="registration-confirmation-page">
+		<div class="registration-confirmation-stage">
+			<img
+				class="registration-confirmation-visual"
+				src={loginHero.src}
+				width={loginHero.width}
+				height={loginHero.height}
+				alt=""
+				aria-hidden="true"
+			/>
+
+			<section class="registration-confirmation-panel" aria-labelledby="registration-confirmation-title">
+				<h1 id="registration-confirmation-title">Registrazione completata</h1>
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna
+					aliqua.
+				</p>
+				<a class="registration-confirmation-continue registration-confirmation-continue--desktop" href="/test-smistamento/">Prosegui</a>
+			</section>
+
+			<a class="registration-confirmation-continue registration-confirmation-continue--mobile" href="/test-smistamento/">Prosegui</a>
+		</div>
 	</main>
 </Layout>
+
+<style lang="scss">
+	.registration-confirmation-page {
+		--confirmation-panel: var(--tsbs-color-neutral-soft);
+		--confirmation-button: var(--tsbs-global-cta-var1-bg);
+		--confirmation-button-hover: var(--tsbs-global-cta-var1-hover-bg);
+		--confirmation-button-active: var(--tsbs-global-cta-var1-active-bg);
+		--confirmation-page-padding-y: clamp(2rem, 7vw, 3.875rem);
+		--confirmation-page-padding-x: clamp(0.4375rem, 2vw, 0.9375rem);
+		--confirmation-page-padding-bottom: calc(clamp(3.5rem, 14vw, 5rem) + env(safe-area-inset-bottom));
+
+		min-height: 100vh;
+		padding: var(--confirmation-page-padding-y) var(--confirmation-page-padding-x) var(--confirmation-page-padding-bottom);
+		color: var(--tsbs-color-text);
+		background: var(--tsbs-color-surface);
+	}
+
+	.registration-confirmation-stage {
+		position: relative;
+		display: grid;
+		place-items: center;
+		min-height: calc(100vh - var(--confirmation-page-padding-y) - var(--confirmation-page-padding-bottom));
+		overflow: hidden;
+		background: #ffffff;
+		border-radius: 0.875rem;
+	}
+
+	.registration-confirmation-visual {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		object-position: center;
+		opacity: 0.18;
+	}
+
+	.registration-confirmation-panel {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		justify-items: center;
+		width: min(100%, 21.5rem);
+		padding: 0 1.5rem;
+		color: var(--tsbs-color-text);
+		text-align: center;
+	}
+
+	.registration-confirmation-panel h1 {
+		margin: 0 0 1.25rem;
+		color: var(--tsbs-color-heading);
+		font-size: clamp(2.875rem, 12vw, 3.125rem);
+		font-weight: 700;
+		line-height: 0.95;
+	}
+
+	.registration-confirmation-panel p {
+		margin: 0;
+		color: var(--tsbs-color-text);
+		font-size: 1.125rem;
+		line-height: 1.22;
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue) {
+		display: grid;
+		place-items: center;
+		min-height: 3rem;
+		padding: 0.75rem 1rem;
+		color: #ffffff;
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		text-align: center;
+		text-decoration: none;
+		background: var(--confirmation-button);
+		border-radius: 0.3125rem;
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue--mobile) {
+		position: absolute;
+		right: clamp(1rem, 5vw, 2rem);
+		bottom: clamp(1.5rem, 7vw, 2.75rem);
+		left: clamp(1rem, 5vw, 2rem);
+		z-index: 1;
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue--desktop) {
+		display: none;
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue:hover) {
+		color: #ffffff;
+		background: var(--confirmation-button-hover);
+	}
+
+	:global(.registration-confirmation-page .registration-confirmation-continue:active) {
+		background: var(--confirmation-button-active);
+	}
+
+	@media (min-width: 768px) {
+		.registration-confirmation-page {
+			--confirmation-page-padding-y: clamp(1.0625rem, 1.2vw, 1.75rem);
+			--confirmation-page-padding-x: clamp(1.875rem, 5vw, 4.5rem);
+			--confirmation-page-padding-bottom: clamp(1.0625rem, 1.2vw, 1.75rem);
+
+			display: grid;
+			place-items: center;
+		}
+
+		.registration-confirmation-stage {
+			width: min(100%, 80.9375rem);
+			min-height: calc(100vh - 2.125rem);
+		}
+
+		.registration-confirmation-panel {
+			width: min(100%, 40rem);
+			min-height: 22rem;
+			padding: 3.5rem 5rem;
+			align-content: center;
+			background: var(--confirmation-panel);
+			border-radius: 1.125rem;
+		}
+
+		.registration-confirmation-visual {
+			opacity: 0.9;
+		}
+
+		.registration-confirmation-panel h1 {
+			font-size: clamp(3rem, 4vw, 4.5rem);
+		}
+
+		.registration-confirmation-panel p {
+			font-size: 1.25rem;
+			line-height: 1.3;
+		}
+
+		:global(.registration-confirmation-page .registration-confirmation-continue--mobile) {
+			display: none;
+		}
+
+		:global(.registration-confirmation-page .registration-confirmation-continue--desktop) {
+			display: grid;
+			width: min(100%, 20rem);
+			margin-top: 2rem;
+		}
+	}
+
+	@media (max-width: 374.98px) {
+		.registration-confirmation-panel {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+
+		.registration-confirmation-panel h1 {
+			font-size: 2.5rem;
+		}
+
+		.registration-confirmation-panel p {
+			font-size: 1rem;
+		}
+	}
+</style>
