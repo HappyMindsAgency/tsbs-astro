@@ -1,0 +1,511 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AvatarProfiloModal from '../../components/PopupComponents/AvatarProfiloModal.astro';
+import avatar01 from '../../assets/Avatar_01_tartaruga.svg';
+
+const { lang = 'it' } = Astro.props;
+
+const academies = [
+	{ id: 'arborea', label: 'Arborea', accent: 'var(--tsbs-color-arborea)' },
+	{ id: 'armonia', label: 'Armonia', accent: 'var(--tsbs-color-armonia)' },
+	{ id: 'arcadia', label: 'Arcadia', accent: 'var(--tsbs-color-arcadia)' },
+	{ id: 'astraria', label: 'Astraria', accent: 'var(--tsbs-color-astraria)' },
+];
+---
+
+<Layout lang={lang} theme="theme-neutral">
+	<main class="profile-settings-page">
+		<div class="container-xl tsbs-app-container profile-settings">
+			<header class="profile-settings__header" aria-labelledby="profile-settings-title">
+				<p class="profile-settings__eyebrow">Profilo e impostazioni</p>
+				<div class="profile-settings__heading">
+					<div>
+						<h1 id="profile-settings-title">Il tuo profilo</h1>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+					</div>
+					<a class="profile-settings__back-link" href="/atrio/">
+						<i class="bi bi-arrow-left" aria-hidden="true"></i>
+						<span>Atrio</span>
+					</a>
+				</div>
+			</header>
+
+			<div class="profile-settings__layout">
+				<aside class="profile-settings__summary" aria-labelledby="profile-summary-title">
+					<div class="profile-settings__avatar" aria-hidden="true">
+						<img
+							src={avatar01.src}
+							width={avatar01.width}
+							height={avatar01.height}
+							alt=""
+							loading="eager"
+							decoding="async"
+							data-profile-avatar-current
+						/>
+					</div>
+					<div>
+						<h2 id="profile-summary-title">Username</h2>
+						<p>Adepto</p>
+					</div>
+					<dl class="profile-settings__meta">
+						<div>
+							<dt>Accademia</dt>
+							<dd>Arborea</dd>
+						</div>
+						<div>
+							<dt>Email</dt>
+							<dd>username@email.it</dd>
+						</div>
+					</dl>
+				</aside>
+
+				<form class="profile-settings__form" action="#" method="post">
+					<section class="profile-settings-card" aria-labelledby="academy-title">
+						<div class="profile-settings-card__head">
+							<span class="profile-settings-card__icon" aria-hidden="true">
+								<i class="bi bi-bookmark-star"></i>
+							</span>
+							<div>
+								<h2 id="academy-title">Cambia accademia</h2>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+							</div>
+						</div>
+						<div class="profile-settings-academies">
+							{academies.map((academy) => (
+								<label class="profile-settings-academy" style={`--profile-academy-accent: ${academy.accent};`}>
+									<input type="radio" name="academy" value={academy.id} checked={academy.id === 'arborea'} />
+									<span>{academy.label}</span>
+								</label>
+							))}
+						</div>
+					</section>
+
+					<section class="profile-settings-card" aria-labelledby="avatar-title">
+						<div class="profile-settings-card__head">
+							<span class="profile-settings-card__icon" aria-hidden="true">
+								<i class="bi bi-person-bounding-box"></i>
+							</span>
+							<div>
+								<h2 id="avatar-title">Cambia avatar</h2>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+							</div>
+						</div>
+						<div class="profile-settings-upload">
+							<button class="profile-settings-upload__button" type="button" data-avatar-profile-modal-open>
+								Scegli avatar
+							</button>
+						</div>
+					</section>
+
+					<section class="profile-settings-card" aria-labelledby="password-title">
+						<div class="profile-settings-card__head">
+							<span class="profile-settings-card__icon" aria-hidden="true">
+								<i class="bi bi-shield-lock"></i>
+							</span>
+							<div>
+								<h2 id="password-title">Reimposta password</h2>
+								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+							</div>
+						</div>
+						<div class="profile-settings-fields profile-settings-fields--password">
+							<label>
+								<span>Password attuale</span>
+								<input name="current-password" type="password" autocomplete="current-password" />
+							</label>
+							<label>
+								<span>Nuova password</span>
+								<input name="new-password" type="password" autocomplete="new-password" />
+							</label>
+							<label>
+								<span>Conferma password</span>
+								<input name="confirm-password" type="password" autocomplete="new-password" />
+							</label>
+						</div>
+					</section>
+
+					<div class="profile-settings-actions">
+						<a class="btn tsbs-cta-primary-soft profile-settings-actions__button" href="/atrio/">Annulla</a>
+						<button class="btn tsbs-cta-primary profile-settings-actions__button" type="submit">Salva modifiche</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+
+	<AvatarProfiloModal renderHidden />
+</Layout>
+
+<script>
+	const setupProfileAvatarPicker = () => {
+		const openControls = document.querySelectorAll<HTMLElement>('[data-avatar-profile-modal-open]');
+		const currentAvatar = document.querySelector<HTMLImageElement>('[data-profile-avatar-current]');
+
+		openControls.forEach((control) => {
+			if (control.dataset.avatarProfileOpenReady === 'true') return;
+			control.dataset.avatarProfileOpenReady = 'true';
+
+			control.addEventListener('click', () => {
+				document.dispatchEvent(new CustomEvent('tsbs:avatar-profile-modal-open'));
+			});
+		});
+
+		document.addEventListener('tsbs:avatar-profile-change', (event) => {
+			if (!(event instanceof CustomEvent) || !currentAvatar) return;
+
+			const src = event.detail?.src;
+			if (typeof src === 'string' && src.length > 0) {
+				currentAvatar.src = src;
+			}
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupProfileAvatarPicker);
+	setupProfileAvatarPicker();
+</script>
+
+<style lang="scss">
+	.profile-settings-page {
+		--profile-current-academy-accent: var(--tsbs-color-arborea);
+
+		background: var(--tsbs-color-surface);
+	}
+
+	.profile-settings {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.profile-settings__header {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.profile-settings__eyebrow {
+		margin: 0;
+		color: var(--tsbs-color-neutral-accent);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.profile-settings__heading {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.profile-settings__heading h1,
+	.profile-settings__heading p {
+		margin: 0;
+	}
+
+	.profile-settings__heading h1 {
+		font-size: clamp(2rem, 8vw, 3rem);
+	}
+
+	.profile-settings__heading p {
+		max-width: 38rem;
+		color: var(--tsbs-color-body);
+	}
+
+	.profile-settings__back-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		width: fit-content;
+		min-height: 2.75rem;
+		padding: 0.625rem 0.875rem;
+		color: var(--tsbs-color-neutral);
+		text-decoration: none;
+		background: var(--tsbs-color-neutral-soft);
+		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 14%, var(--tsbs-color-white));
+		border-radius: var(--tsbs-radius-md);
+	}
+
+	.profile-settings__layout,
+	.profile-settings__form {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.profile-settings__summary,
+	.profile-settings-card {
+		background: var(--tsbs-color-white);
+		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 14%, var(--tsbs-color-white));
+		border-radius: var(--tsbs-radius-md);
+	}
+
+	.profile-settings__summary {
+		display: grid;
+		gap: 1rem;
+		align-content: start;
+		padding: 1.25rem;
+	}
+
+	.profile-settings__avatar {
+		display: grid;
+		place-items: center;
+		width: 5rem;
+		aspect-ratio: 1;
+		color: var(--tsbs-color-neutral);
+		background: var(--tsbs-color-neutral-soft);
+		border: 0.125rem solid var(--profile-current-academy-accent);
+		border-radius: 50%;
+	}
+
+	.profile-settings__avatar img {
+		width: 82%;
+		height: 82%;
+		object-fit: contain;
+		transform: scale(1.18);
+	}
+
+	.profile-settings__summary h2,
+	.profile-settings__summary p,
+	.profile-settings__meta,
+	.profile-settings__meta dd {
+		margin: 0;
+	}
+
+	.profile-settings__summary h2 {
+		font-size: 1.5rem;
+	}
+
+	.profile-settings__summary p {
+		font-style: italic;
+	}
+
+	.profile-settings__meta {
+		display: grid;
+		gap: 0.875rem;
+		padding-top: 0.5rem;
+	}
+
+	.profile-settings__meta div {
+		display: grid;
+		gap: 0.125rem;
+	}
+
+	.profile-settings__meta dt {
+		color: var(--tsbs-color-neutral);
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	.profile-settings-card {
+		display: grid;
+		gap: 1.25rem;
+		padding: 1.25rem;
+	}
+
+	.profile-settings-card__head {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: 0.875rem;
+		align-items: start;
+	}
+
+	.profile-settings-card__icon {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		aspect-ratio: 1;
+		color: var(--tsbs-color-neutral);
+		background: var(--tsbs-color-neutral-soft);
+		border-radius: 50%;
+	}
+
+	.profile-settings-card h2,
+	.profile-settings-card p {
+		margin: 0;
+	}
+
+	.profile-settings-card h2 {
+		font-size: 1.25rem;
+	}
+
+	.profile-settings-card p,
+	.profile-settings-upload__hint {
+		color: var(--tsbs-color-body);
+		font-size: 0.9375rem;
+	}
+
+	.profile-settings-upload {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.profile-settings-upload__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: fit-content;
+		min-height: 2.75rem;
+		padding: 0.625rem 1rem;
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-color-neutral);
+		border: 1px solid var(--tsbs-color-neutral);
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.profile-settings-upload__button:hover {
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-global-cta-var1-hover-bg);
+		border-color: var(--tsbs-global-cta-var1-hover-border);
+	}
+
+	.profile-settings-fields {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.profile-settings-fields label {
+		display: grid;
+		gap: 0.375rem;
+	}
+
+	.profile-settings-fields span {
+		color: var(--tsbs-color-heading);
+		font-weight: 600;
+	}
+
+	.profile-settings-fields input {
+		min-height: 3rem;
+		width: 100%;
+		padding: 0.625rem 0.75rem;
+		color: var(--tsbs-color-text);
+		background: #ffffff;
+		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 18%, var(--tsbs-color-white));
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.profile-settings-academies {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.75rem;
+	}
+
+	.profile-settings-academy {
+		position: relative;
+		display: grid;
+		min-height: 3rem;
+		cursor: pointer;
+	}
+
+	.profile-settings-academy input {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		cursor: pointer;
+	}
+
+	.profile-settings-academy span {
+		display: grid;
+		place-items: center;
+		padding: 0.625rem;
+		color: var(--tsbs-color-neutral);
+		font-weight: 600;
+		text-align: center;
+		background: var(--tsbs-color-neutral-soft);
+		border: 1px solid transparent;
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.profile-settings-academy input:checked + span {
+		color: var(--tsbs-color-white);
+		background: var(--profile-academy-accent);
+	}
+
+	.profile-settings-academy input:focus-visible + span {
+		outline: 0.1875rem solid var(--tsbs-color-focus);
+		outline-offset: 0.1875rem;
+	}
+
+	.profile-settings-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		justify-content: center;
+	}
+
+	.profile-settings-actions__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 8.25rem;
+		min-height: 3rem;
+		padding: 0.75rem 1rem;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		border-radius: 0.3125rem;
+	}
+
+	@media (min-width: 768px) {
+		.profile-settings__heading {
+			grid-template-columns: minmax(0, 1fr) auto;
+			align-items: start;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.profile-settings {
+			gap: 2rem;
+			padding-top: 3rem;
+		}
+
+		.profile-settings__layout {
+			grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr);
+			grid-template-areas:
+				"summary academy"
+				"summary avatar"
+				"summary password"
+				". actions";
+			align-items: stretch;
+			gap: 1.5rem;
+		}
+
+		.profile-settings__form {
+			display: contents;
+		}
+
+		.profile-settings__form .profile-settings-card:nth-of-type(1) {
+			grid-area: academy;
+		}
+
+		.profile-settings__form .profile-settings-card:nth-of-type(2) {
+			grid-area: avatar;
+		}
+
+		.profile-settings__form .profile-settings-card:nth-of-type(3) {
+			grid-area: password;
+		}
+
+		.profile-settings__summary,
+		.profile-settings-card {
+			padding: 1.5rem;
+		}
+
+		.profile-settings__summary {
+			grid-area: summary;
+			position: sticky;
+			top: 2rem;
+			align-self: stretch;
+		}
+
+		.profile-settings-actions {
+			grid-area: actions;
+		}
+
+		.profile-settings-fields--password {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.profile-settings-academies {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+	}
+</style>

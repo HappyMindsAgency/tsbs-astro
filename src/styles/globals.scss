@@ -659,9 +659,15 @@ body:has(.tsbs-legal-page) {
 			height: 3rem;
 			padding: 0;
 			color: var(--tsbs-color-white);
+			text-decoration: none;
 			background: var(--tsbs-theme-accent);
 			border: 0;
 			border-radius: 50%;
+		}
+
+		.dashboard-menu-button:hover,
+		.dashboard-menu-button:focus-visible {
+			color: var(--tsbs-color-white);
 		}
 
 		.dashboard-menu-button .bi {

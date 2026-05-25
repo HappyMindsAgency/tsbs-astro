@@ -1,0 +1,514 @@
+---
+import avatar01 from '../../assets/Avatar_01_tartaruga.svg';
+import avatar02 from '../../assets/Avatar_02_ampolla.svg';
+import avatar03 from '../../assets/Avatar_03_fantasma.svg';
+import avatar04 from '../../assets/Avatar_04_candela.svg';
+import avatar05 from '../../assets/Avatar_05_penna_calamaio.svg';
+import avatar06 from '../../assets/Avatar_06_pavone.svg';
+import avatar07 from '../../assets/Avatar_07_libro.svg';
+import avatar08 from '../../assets/Avatar_08_piccione.svg';
+import avatar09 from '../../assets/Avatar_09_gatto1.svg';
+import avatar10 from '../../assets/Avatar_10_gatto2.svg';
+import avatar11 from '../../assets/Avatar_11_gatto3.svg';
+import avatar12 from '../../assets/Avatar_12_gatto4.svg';
+
+interface Props {
+	isOpen?: boolean;
+	renderHidden?: boolean;
+}
+
+const { isOpen = false, renderHidden = false } = Astro.props as Props;
+const shouldRender = isOpen || renderHidden;
+
+const avatars = [
+	avatar01,
+	avatar02,
+	avatar03,
+	avatar04,
+	avatar05,
+	avatar06,
+	avatar07,
+	avatar08,
+	avatar09,
+	avatar10,
+	avatar11,
+	avatar12,
+];
+---
+
+{shouldRender && (
+	<div
+		class="avatar-profile-modal"
+		data-avatar-profile-modal
+		hidden={!isOpen}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="avatar-profile-modal-title"
+	>
+		<div class="avatar-profile-modal__backdrop" data-avatar-profile-modal-close></div>
+
+		<section class="avatar-profile-modal__panel">
+			<button class="avatar-profile-modal__close" type="button" data-avatar-profile-modal-close aria-label="Chiudi">
+				<i class="bi bi-x-lg" aria-hidden="true"></i>
+			</button>
+
+			<section class="scelta-avatar" aria-labelledby="avatar-profile-modal-title">
+				<div class="scelta-avatar__inner">
+					<header class="scelta-avatar__header">
+						<h1 id="avatar-profile-modal-title">Scegli il tuo Volto</h1>
+						<p>Lorem ipsum dolor sit amet</p>
+					</header>
+
+					<form class="scelta-avatar__form" data-avatar-profile-modal-form>
+						<div class="scelta-avatar__preview" aria-live="polite">
+							{avatars.map((avatar, index) => (
+								<img
+									class={`scelta-avatar__preview-image scelta-avatar__preview-image--${index + 1}`}
+									src={avatar.src}
+									width={avatar.width}
+									height={avatar.height}
+									alt={`Avatar ${index + 1}`}
+									loading={index === 0 ? 'eager' : 'lazy'}
+									decoding="async"
+									data-avatar-profile-preview={index + 1}
+								/>
+							))}
+						</div>
+
+						<p class="scelta-avatar__username">Username</p>
+
+						<fieldset class="scelta-avatar__fieldset">
+							<legend class="visually-hidden">Seleziona un avatar</legend>
+
+							<div class="scelta-avatar__grid">
+								{avatars.map((avatar, index) => {
+									const avatarNumber = index + 1;
+									const avatarId = `profile-avatar-${avatarNumber}`;
+
+									return (
+										<label class={`scelta-avatar__option scelta-avatar__option--${avatarNumber}`} for={avatarId}>
+											<input
+												id={avatarId}
+												class="visually-hidden"
+												type="radio"
+												name="profile-avatar"
+												value={avatarId}
+												data-avatar-profile-option={avatarNumber}
+												data-avatar-profile-src={avatar.src}
+												checked={index === 0}
+											/>
+											<span class="scelta-avatar__thumb">
+												<img
+													src={avatar.src}
+													width={avatar.width}
+													height={avatar.height}
+													alt=""
+													loading="lazy"
+													decoding="async"
+												/>
+											</span>
+											<span class="visually-hidden">Avatar {avatarNumber}</span>
+										</label>
+									);
+								})}
+							</div>
+						</fieldset>
+
+						<button class="btn tsbs-cta-primary mission-proof-question__cta scelta-avatar__cta" type="submit">
+							Conferma la scelta
+						</button>
+					</form>
+				</div>
+			</section>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupAvatarProfileModal = () => {
+		document.querySelectorAll<HTMLElement>('[data-avatar-profile-modal]').forEach((modal) => {
+			if (modal.dataset.avatarProfileModalReady === 'true') return;
+			modal.dataset.avatarProfileModalReady = 'true';
+
+			const form = modal.querySelector<HTMLFormElement>('[data-avatar-profile-modal-form]');
+			const closeControls = modal.querySelectorAll<HTMLElement>('[data-avatar-profile-modal-close]');
+			const firstInput = modal.querySelector<HTMLInputElement>('input[name="profile-avatar"]');
+			let previousFocus: HTMLElement | null = null;
+
+			if (!form) return;
+
+			const closeModal = () => {
+				modal.hidden = true;
+				if (previousFocus) previousFocus.focus();
+			};
+
+			const openModal = () => {
+				previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+				modal.hidden = false;
+				firstInput?.focus();
+			};
+
+			document.addEventListener('tsbs:avatar-profile-modal-open', openModal);
+
+			closeControls.forEach((control) => {
+				control.addEventListener('click', closeModal);
+			});
+
+			form.addEventListener('submit', (event) => {
+				event.preventDefault();
+
+				const selected = form.querySelector<HTMLInputElement>('input[name="profile-avatar"]:checked');
+				if (!selected) return;
+
+				document.dispatchEvent(
+					new CustomEvent('tsbs:avatar-profile-change', {
+						detail: {
+							src: selected.dataset.avatarProfileSrc,
+							value: selected.value,
+						},
+					}),
+				);
+				closeModal();
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !modal.hidden) {
+					closeModal();
+				}
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupAvatarProfileModal);
+	setupAvatarProfileModal();
+</script>
+
+<style>
+	.avatar-profile-modal {
+		--tsbs-theme-accent: var(--tsbs-color-arborea);
+		--tsbs-theme-cta-bg: #7b872e;
+		--tsbs-theme-cta-border: #7b872e;
+		--tsbs-theme-cta-hover-bg: #252f06;
+		--tsbs-theme-cta-hover-border: #252f06;
+		--tsbs-theme-cta-active-bg: #e2eaaa;
+		--tsbs-theme-cta-active-border: #e2eaaa;
+
+		position: fixed;
+		inset: 0;
+		z-index: 1200;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
+	}
+
+	.avatar-profile-modal[hidden] {
+		display: none;
+	}
+
+	.avatar-profile-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-heading) 48%, transparent);
+	}
+
+	.avatar-profile-modal__panel {
+		position: relative;
+		z-index: 1;
+		width: min(100%, 60rem);
+		max-height: calc(100dvh - 2rem);
+		overflow-y: auto;
+		background: var(--tsbs-color-surface);
+		border: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 18%, var(--tsbs-color-white));
+		border-radius: 0.875rem;
+		box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--tsbs-theme-accent) 20%, transparent);
+	}
+
+	.avatar-profile-modal__close {
+		position: absolute;
+		top: 0.875rem;
+		right: 0.875rem;
+		z-index: 2;
+		display: inline-grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		padding: 0;
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-accent);
+		border: 1px solid var(--tsbs-theme-accent);
+		border-radius: 999rem;
+	}
+
+	.avatar-profile-modal__close:hover {
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-cta-hover-bg);
+		border-color: var(--tsbs-theme-cta-hover-border);
+	}
+
+	.avatar-profile-modal__close:focus-visible {
+		outline: 0.1875rem solid var(--tsbs-color-focus);
+		outline-offset: 0.1875rem;
+	}
+
+	.avatar-profile-modal .scelta-avatar {
+		--scelta-avatar-preview-size: min(42vw, 9.75rem);
+		--scelta-avatar-preview-image-padding: 1.875rem;
+		--scelta-avatar-image-scale: 1.34;
+		--scelta-avatar-preview-space: 1rem;
+		--scelta-avatar-username-space: 1.5rem;
+		--scelta-avatar-card-size: auto;
+		--scelta-avatar-card-image-padding: 1.35rem;
+		--scelta-avatar-grid-gap: 0.75rem;
+		--scelta-avatar-grid-space: 1.75rem;
+
+		min-height: 100%;
+		padding: clamp(2rem, 8vw, 4rem) var(--bs-gutter-x, 1rem);
+		background: var(--tsbs-color-surface);
+	}
+
+	.avatar-profile-modal .scelta-avatar__inner {
+		width: min(100%, 26rem);
+		margin: 0 auto;
+	}
+
+	.avatar-profile-modal .scelta-avatar__header {
+		margin-bottom: 1.75rem;
+		text-align: left;
+	}
+
+	.avatar-profile-modal .scelta-avatar__header h1 {
+		margin-bottom: 0.75rem;
+		font-family: var(--tsbs-font-body);
+		font-size: clamp(1.875rem, 8vw, 2.5rem);
+		font-weight: 600;
+		line-height: 1.12;
+		color: var(--tsbs-theme-accent);
+	}
+
+	.avatar-profile-modal .scelta-avatar__header p {
+		max-width: 18rem;
+		margin: 0;
+		font-size: 1rem;
+		line-height: 1.45;
+		color: var(--tsbs-color-body);
+	}
+
+	.avatar-profile-modal .scelta-avatar__form {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.avatar-profile-modal .scelta-avatar__preview {
+		position: relative;
+		width: var(--scelta-avatar-preview-size);
+		aspect-ratio: 1;
+		margin-bottom: var(--scelta-avatar-preview-space);
+		overflow: hidden;
+		border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 72%, transparent);
+		border-radius: 50%;
+		background: var(--tsbs-color-neutral-soft);
+	}
+
+	.avatar-profile-modal .scelta-avatar__preview-image {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		padding: calc(var(--scelta-avatar-preview-image-padding) * 0.15);
+		object-fit: contain;
+		opacity: 0;
+		transform: scale(var(--scelta-avatar-image-scale));
+		transition: opacity 180ms ease;
+	}
+
+	.avatar-profile-modal .scelta-avatar__preview-image--1 {
+		opacity: 1;
+	}
+
+	.avatar-profile-modal .scelta-avatar__username {
+		margin: 0 0 var(--scelta-avatar-username-space);
+		font-family: var(--tsbs-font-body);
+		font-size: 1.375rem;
+		font-weight: 600;
+		line-height: 1.2;
+		color: var(--tsbs-theme-heading);
+	}
+
+	.avatar-profile-modal .scelta-avatar__fieldset {
+		width: 100%;
+		margin: 0;
+		padding: calc(var(--scelta-avatar-card-image-padding) * 0.12);
+		border: 0;
+	}
+
+	.avatar-profile-modal .scelta-avatar__grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--scelta-avatar-grid-gap);
+		width: min(100%, 20rem);
+		margin: 0 auto var(--scelta-avatar-grid-space);
+	}
+
+	.avatar-profile-modal .scelta-avatar__option {
+		position: relative;
+		width: var(--scelta-avatar-card-size);
+		cursor: pointer;
+	}
+
+	.avatar-profile-modal .scelta-avatar__thumb {
+		display: block;
+		aspect-ratio: 1;
+		overflow: hidden;
+		border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 22%, transparent);
+		border-radius: 50%;
+		background: var(--tsbs-color-neutral-soft);
+		transition:
+			border-color 180ms ease,
+			box-shadow 180ms ease,
+			transform 180ms ease;
+	}
+
+	.avatar-profile-modal .scelta-avatar__thumb img {
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		object-fit: contain;
+		transform: scale(var(--scelta-avatar-image-scale));
+	}
+
+	.avatar-profile-modal .scelta-avatar__option:hover .scelta-avatar__thumb,
+	.avatar-profile-modal .scelta-avatar__option:has(input:focus-visible) .scelta-avatar__thumb {
+		border-color: var(--tsbs-theme-accent);
+		box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--tsbs-theme-accent) 18%, transparent);
+		transform: translateY(-0.125rem);
+	}
+
+	.avatar-profile-modal .scelta-avatar__option:has(input:checked) .scelta-avatar__thumb {
+		border-color: var(--tsbs-theme-accent);
+	}
+
+	.avatar-profile-modal .scelta-avatar__option:has(input:checked)::after {
+		position: absolute;
+		top: -0.125rem;
+		right: -0.125rem;
+		display: grid;
+		place-items: center;
+		width: 1.625rem;
+		aspect-ratio: 1;
+		color: var(--tsbs-theme-accent);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1;
+		content: "✓";
+		background: var(--tsbs-color-white);
+		border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 72%, transparent);
+		border-radius: 50%;
+	}
+
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-1:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-2:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-3:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-4:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-5:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-6:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-7:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-8:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-9:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-10:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-11:checked) .scelta-avatar__preview-image,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-12:checked) .scelta-avatar__preview-image {
+		opacity: 0;
+	}
+
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-1:checked) .scelta-avatar__preview-image--1,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-2:checked) .scelta-avatar__preview-image--2,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-3:checked) .scelta-avatar__preview-image--3,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-4:checked) .scelta-avatar__preview-image--4,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-5:checked) .scelta-avatar__preview-image--5,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-6:checked) .scelta-avatar__preview-image--6,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-7:checked) .scelta-avatar__preview-image--7,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-8:checked) .scelta-avatar__preview-image--8,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-9:checked) .scelta-avatar__preview-image--9,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-10:checked) .scelta-avatar__preview-image--10,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-11:checked) .scelta-avatar__preview-image--11,
+	.avatar-profile-modal .scelta-avatar__form:has(#profile-avatar-12:checked) .scelta-avatar__preview-image--12 {
+		opacity: 1;
+	}
+
+	.avatar-profile-modal .scelta-avatar__cta {
+		margin-top: 0.75rem;
+	}
+
+	@media (min-width: 768px) {
+		.avatar-profile-modal .scelta-avatar {
+			--scelta-avatar-preview-size: clamp(5.75rem, 14.5vh, 10rem);
+			--scelta-avatar-preview-image-padding: clamp(1.35rem, 3.8vh, 2.625rem);
+			--scelta-avatar-image-scale: 1.36;
+			--scelta-avatar-preview-space: clamp(0.5rem, 2.2vh, 1.5rem);
+			--scelta-avatar-username-space: clamp(0.75rem, 4.7vh, 3.25rem);
+			--scelta-avatar-card-size: clamp(4.25rem, 10vh, 6.75rem);
+			--scelta-avatar-card-image-padding: clamp(1.15rem, 3.4vh, 2.375rem);
+			--scelta-avatar-grid-gap: clamp(0.5rem, 1.65vh, 1rem);
+			--scelta-avatar-grid-space: clamp(0.75rem, 4.8vh, 3.5rem);
+
+			display: grid;
+			align-items: start;
+			min-height: 0;
+			padding-top: clamp(0.75rem, 7.75vh, 5.5rem);
+			padding-bottom: clamp(0.75rem, 4vh, 3rem);
+			overflow: hidden;
+		}
+
+		.avatar-profile-modal .scelta-avatar__inner {
+			width: min(100%, 53.375rem);
+		}
+
+		.avatar-profile-modal .scelta-avatar__header {
+			margin-bottom: clamp(0.75rem, 4.7vh, 3.25rem);
+		}
+
+		.avatar-profile-modal .scelta-avatar__header h1 {
+			margin-bottom: clamp(0.5rem, 1.45vh, 1rem);
+			font-size: clamp(2.5rem, 2.5vw, 3rem);
+			line-height: 1.15;
+			color: var(--tsbs-theme-accent);
+		}
+
+		.avatar-profile-modal .scelta-avatar__header p {
+			max-width: none;
+			font-size: clamp(0.875rem, 1.45vh, 1rem);
+			color: var(--tsbs-color-body);
+		}
+
+		.avatar-profile-modal .scelta-avatar__username {
+			font-size: 1.25rem;
+			color: color-mix(in srgb, var(--tsbs-theme-accent) 72%, var(--tsbs-color-heading));
+		}
+
+		.avatar-profile-modal .scelta-avatar__grid {
+			grid-template-columns: repeat(6, var(--scelta-avatar-card-size));
+			justify-content: center;
+			width: calc((var(--scelta-avatar-card-size) * 6) + (var(--scelta-avatar-grid-gap) * 5));
+			max-width: 100%;
+		}
+
+		.avatar-profile-modal .scelta-avatar__option {
+			width: var(--scelta-avatar-card-size);
+		}
+
+		.avatar-profile-modal .scelta-avatar__option:has(input:checked)::after {
+			top: -0.25rem;
+			right: -0.25rem;
+			width: 2rem;
+			font-size: 1.25rem;
+		}
+
+		.avatar-profile-modal .scelta-avatar__cta {
+			margin-top: 0;
+			width: min(100%, 25rem);
+		}
+	}
+
+</style>
