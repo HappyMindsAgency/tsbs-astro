@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import loginHero from '../assets/login-hero.png';
+import loginHero from '../assets/login.png';
 
 const { lang = 'it' } = Astro.props;
 
@@ -146,7 +146,7 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 
 	.login-stage {
 		display: grid;
-		gap: 2.25rem;
+		gap: clamp(0.75rem, 4vw, 1.25rem);
 	}
 
 	.login-visual {
@@ -164,7 +164,7 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 	}
 
 	.login-panel h1 {
-		margin: 0 0 0.625rem;
+		margin: 0 0 1rem;
 		color: var(--login-text);
 		font-size: 2rem;
 		font-weight: 700;
@@ -295,6 +295,7 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 			position: relative;
 			display: grid;
 			place-items: center;
+			gap: 2.25rem;
 			width: min(100%, 80.9375rem);
 			min-height: calc(100vh - 2.125rem);
 		}
@@ -307,8 +308,6 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 			aspect-ratio: auto;
 			object-fit: contain;
 			object-position: center;
-			background: #ffffff;
-			border-radius: 0.5rem;
 		}
 
 		.login-panel {

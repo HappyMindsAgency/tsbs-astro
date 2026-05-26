@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import signInHero from '../assets/sign-in-hero.png';
+import signInHero from '../assets/sign-in.png';
 import italianCities from '../data/italianCities.json';
 
 const { lang = 'it' } = Astro.props;
@@ -450,7 +450,7 @@ const { lang = 'it' } = Astro.props;
 
 	.sign-in-stage {
 		display: grid;
-		gap: 2.25rem;
+		gap: clamp(0.75rem, 4vw, 1.25rem);
 	}
 
 	.sign-in-visual {
@@ -753,6 +753,7 @@ const { lang = 'it' } = Astro.props;
 			position: relative;
 			display: grid;
 			place-items: center;
+			gap: 2.25rem;
 			width: min(100%, 80.9375rem);
 			min-height: calc(100vh - 2.125rem);
 		}
@@ -765,8 +766,6 @@ const { lang = 'it' } = Astro.props;
 			aspect-ratio: auto;
 			object-fit: contain;
 			object-position: center;
-			background: #ffffff;
-			border-radius: 0.5rem;
 		}
 
 		.sign-in-panel {
