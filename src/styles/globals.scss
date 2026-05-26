@@ -1118,7 +1118,9 @@ body:has(.tsbs-legal-page) {
 	.academy-hero__mobile-crest > img {
 		width: 100%;
 		height: auto;
-		filter: drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--tsbs-theme-accent) 22%, transparent));
+		filter:
+			brightness(0.68)
+			drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--tsbs-theme-accent) 22%, transparent));
 	}
 
 	.academy-hero__mobile-logo {
@@ -1544,6 +1546,7 @@ body:has(.tsbs-legal-page) {
 			width: min(100%, 13rem);
 			height: auto;
 			opacity: 0.92;
+			filter: brightness(0.68);
 		}
 
 		.academy-hero__crest--left {
