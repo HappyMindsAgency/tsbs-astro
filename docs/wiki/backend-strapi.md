@@ -122,3 +122,4 @@ Per la mappa pagine, pubblica/privata e sorgenti dati previste consultare:
 - [Schema Strapi](./schema-strapi.md)
 - [Visualizzazione Pagine](./visualizzazione-pagine.md)
 - [Decision Log](./decision-log.md)
+- [Gestione logiche Astro e Strapi](./esempio-gestione-logiche-astro-strapi.md)

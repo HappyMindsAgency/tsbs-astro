@@ -422,3 +422,4 @@ Nota:
 - [Visualizzazione Pagine](./visualizzazione-pagine.md)
 - [Alberatura](./alberatura.md)
 - [Decision Log](./decision-log.md)
+- [Gestione logiche Astro e Strapi](./esempio-gestione-logiche-astro-strapi.md)
