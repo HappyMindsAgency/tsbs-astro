@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import ImpostazioniLogoutModal from '../../components/PopupComponents/ImpostazioniLogoutModal.astro';
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
 const { lang = 'it' } = Astro.props;
 
@@ -30,17 +31,19 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 	<main class="tsbs-app-shell dashboard-shell">
 		<header class="dashboard-header">
 			<div class="dashboard-profile">
-				<div class="dashboard-avatar" aria-hidden="true" data-atrio-avatar>
-					<img data-atrio-avatar-img hidden alt="" />
-				</div>
 				<div>
 					<p class="dashboard-username" data-atrio-username>—</p>
 					<p class="dashboard-rank" data-atrio-livello>—</p>
 				</div>
+				<div class="dashboard-avatar-wrap">
+					<div class="dashboard-avatar" aria-hidden="true" data-atrio-avatar>
+						<img data-atrio-avatar-img hidden alt="" />
+					</div>
+					<button class="dashboard-avatar-edit" type="button" aria-label="Apri impostazioni profilo" data-atrio-profile-menu-open>
+						<i class="bi bi-pencil-fill" aria-hidden="true"></i>
+					</button>
+				</div>
 			</div>
-			<a class="dashboard-menu-button" href="/profilo/impostazioni/" aria-label="Profilo e impostazioni">
-				<i class="bi bi-list" aria-hidden="true"></i>
-			</a>
 		</header>
 
 		<section class="tsbs-card dashboard-epistle" aria-labelledby="epistle-title">
@@ -117,10 +120,22 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 			</div>
 		</section>
 	</main>
+	<ImpostazioniLogoutModal renderHidden={true} />
 	<WelcomeToast isOpen={true} />
 </Layout>
 
 <script>
+	const setupAtrioProfileMenu = () => {
+		document.querySelectorAll<HTMLElement>('[data-atrio-profile-menu-open]').forEach((trigger) => {
+			if (trigger.dataset.atrioProfileMenuReady === 'true') return;
+			trigger.dataset.atrioProfileMenuReady = 'true';
+
+			trigger.addEventListener('click', () => {
+				document.dispatchEvent(new CustomEvent('tsbs:settings-logout-modal-open'));
+			});
+		});
+	};
+
 	const loadAtrioHeader = async () => {
 		try {
 			const res = await fetch('/api/user/profilo');
@@ -148,6 +163,8 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 		}
 	};
 
+	setupAtrioProfileMenu();
 	loadAtrioHeader();
+	document.addEventListener('astro:page-load', setupAtrioProfileMenu);
 	document.addEventListener('astro:page-load', loadAtrioHeader);
 </script>

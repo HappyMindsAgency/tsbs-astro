@@ -1,0 +1,165 @@
+---
+interface Props {
+	isOpen?: boolean;
+	renderHidden?: boolean;
+}
+
+const { isOpen = false, renderHidden = false } = Astro.props as Props;
+const shouldRender = isOpen || renderHidden;
+---
+
+{shouldRender && (
+	<div
+		class="settings-logout-modal"
+		data-settings-logout-modal
+		hidden={!isOpen}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="settings-logout-modal-title"
+	>
+		<div class="settings-logout-modal__backdrop" data-settings-logout-modal-close></div>
+
+		<section class="settings-logout-modal__panel">
+			<h2 id="settings-logout-modal-title" class="visually-hidden">Menu profilo</h2>
+			<a class="settings-logout-modal__item" href="/profilo/impostazioni/">
+				<i class="bi bi-gear-fill" aria-hidden="true"></i>
+				<span>Impostazioni</span>
+			</a>
+			<button class="settings-logout-modal__item" type="button" data-settings-logout-modal-logout>
+				<i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+				<span>Log out</span>
+			</button>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupSettingsLogoutModal = () => {
+		document.querySelectorAll<HTMLElement>('[data-settings-logout-modal]').forEach((modal) => {
+			if (modal.dataset.settingsLogoutModalReady === 'true') return;
+			modal.dataset.settingsLogoutModalReady = 'true';
+
+			const closeControls = modal.querySelectorAll<HTMLElement>('[data-settings-logout-modal-close]');
+			const firstItem = modal.querySelector<HTMLElement>('.settings-logout-modal__item');
+			let previousFocus: HTMLElement | null = null;
+
+			const closeModal = () => {
+				modal.hidden = true;
+				previousFocus?.focus();
+			};
+
+			const openModal = () => {
+				previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+				modal.hidden = false;
+				firstItem?.focus();
+			};
+
+			document.addEventListener('tsbs:settings-logout-modal-open', openModal);
+
+			closeControls.forEach((control) => {
+				control.addEventListener('click', closeModal);
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !modal.hidden) {
+					closeModal();
+				}
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupSettingsLogoutModal);
+	setupSettingsLogoutModal();
+</script>
+
+<style lang="scss">
+	.settings-logout-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 1200;
+		display: grid;
+		align-items: start;
+		justify-items: start;
+		padding: 8.875rem 1.875rem 1.875rem;
+	}
+
+	.settings-logout-modal[hidden] {
+		display: none;
+	}
+
+	.settings-logout-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-white) 60%, transparent);
+		backdrop-filter: blur(0.0625rem);
+	}
+
+	.settings-logout-modal__panel {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		gap: 0.25rem;
+		width: min(calc(100vw - 3.75rem), 15rem);
+		padding: 0.5rem;
+		background: var(--tsbs-color-white);
+		border: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 18%, var(--tsbs-color-white));
+		border-radius: 0.5rem;
+		box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--tsbs-theme-accent) 16%, transparent);
+	}
+
+	.settings-logout-modal__item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		width: 100%;
+		min-height: 3rem;
+		padding: 0.75rem 0.875rem;
+		color: var(--tsbs-color-heading);
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.1;
+		text-align: left;
+		text-decoration: none;
+		background: transparent;
+		border: 0;
+		border-radius: 0.25rem;
+	}
+
+	.settings-logout-modal__item:hover,
+	.settings-logout-modal__item:focus-visible {
+		color: var(--tsbs-theme-accent);
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-white));
+	}
+
+	.settings-logout-modal__item .bi {
+		flex: 0 0 auto;
+		color: var(--tsbs-theme-accent);
+		font-size: 1.125rem;
+		line-height: 1;
+	}
+
+	@media (max-width: 360px) {
+		.settings-logout-modal {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+
+		.settings-logout-modal__panel {
+			width: min(calc(100vw - 2rem), 15rem);
+		}
+	}
+
+	@media (min-width: 992px) {
+		.settings-logout-modal {
+			justify-items: end;
+			padding-top: 5.25rem;
+			padding-right: 3rem;
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.875rem);
+		}
+
+		.settings-logout-modal__panel {
+			width: min(100%, 17rem);
+		}
+	}
+</style>
