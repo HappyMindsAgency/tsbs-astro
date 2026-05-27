@@ -29,8 +29,6 @@ const { lang = 'it' } = Astro.props;
 					<i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
 					<span data-sign-in-error-message></span>
 				</div>
-
-				<form class="sign-in-form" action="/registrazione-completata/" method="post" data-sign-in-form>
 					<div class="sign-in-field">
 						<label for="sign-in-name">Nome</label>
 						<input id="sign-in-name" name="name" type="text" autocomplete="given-name" />
@@ -93,7 +91,7 @@ const { lang = 'it' } = Astro.props;
 					<div class="sign-in-consents">
 						<label class="sign-in-check">
 							<input type="checkbox" name="marketing" />
-							<span>Sì, consapevolmente vorrei essere bombardato da email marketing</span>
+							<span>Sì, accetto di iscrivermi alla newsletter della Biblioteca Classense</span>
 						</label>
 
 						<label class="sign-in-check">

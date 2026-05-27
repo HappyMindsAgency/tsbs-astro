@@ -1,6 +1,7 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import { resolveUserTheme } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 
@@ -51,9 +52,11 @@ const missionTabs = [
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
+
+const theme = await resolveUserTheme(Astro.cookies.get('jwt')?.value);
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell">

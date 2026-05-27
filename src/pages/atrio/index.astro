@@ -3,11 +3,15 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import ImpostazioniLogoutModal from '../../components/PopupComponents/ImpostazioniLogoutModal.astro';
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
+import { getLastEpistola } from '../../lib/strapi/epistole';
+import { resolveUserTheme } from '../../lib/theme';
 const { lang = 'it' } = Astro.props;
 
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
+
+const theme = await resolveUserTheme(Astro.cookies.get('jwt')?.value);
 
 const tasks = [
 	{ title: 'Lorem ipsum dolor', progress: 65 },
@@ -21,11 +25,12 @@ const events = [
 	{ date: '18 APR', time: '17:00', title: 'Lorem ipsum dolor sit amet' },
 ];
 
-const featuredEpistleHref = '/epistole/lorem-ipsum-dolor/';
+const lastEpistola = await getLastEpistola();
+const featuredEpistleHref = lastEpistola ? `/epistole/${lastEpistola.slug}/` : '/epistole/';
 const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 
 ---
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell dashboard-shell">
@@ -49,8 +54,10 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 		<section class="tsbs-card dashboard-epistle" aria-labelledby="epistle-title">
 			<div class="dashboard-epistle__content">
 				<p class="dashboard-eyebrow">L'EPISTOLA</p>
-				<h1 id="epistle-title">Lorem ipsum dolor</h1>
-				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus dignissim magna at magna finibus...</p>
+				<h1 id="epistle-title">{lastEpistola?.titolo ?? 'Nessuna epistola disponibile'}</h1>
+				{lastEpistola?.contenuto && (
+					<p set:html={lastEpistola.contenuto.slice(0, 180).replace(/<[^>]*>/g, '') + '…'} />
+				)}
 				<a class="btn tsbs-cta-primary dashboard-button" href={featuredEpistleHref}>Leggi Epistola</a>
 			</div>
 		</section>

@@ -4,6 +4,7 @@ import Nav from '../../components/Nav.astro';
 import classificaIcon from '../../assets/03_classifica_bianco_scrivania.svg';
 import grimorioIcon from '../../assets/02_grimorio_bianco_scrivania.svg';
 import trofeiIcon from '../../assets/01_trofei_bianco_scrivania.svg';
+import { resolveUserTheme } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 
@@ -32,9 +33,11 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
+
+const theme = await resolveUserTheme(Astro.cookies.get('jwt')?.value);
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell desk-page">

@@ -59,6 +59,23 @@ export async function getEpistole() {
 	return response.data || [];
 }
 
+// Ultima epistola pubblicata — usata nel widget dell'Atrio.
+export async function getLastEpistola() {
+	const searchParams = new URLSearchParams();
+	searchParams.set('status', 'published');
+	searchParams.set('sort[0]', 'publishedAt:desc');
+	searchParams.set('fields[0]', 'titolo');
+	searchParams.set('fields[1]', 'slug');
+	searchParams.set('fields[2]', 'contenuto');
+	searchParams.set('fields[3]', 'publishedAt');
+	searchParams.set('pagination[pageSize]', '1');
+	setEpistolaRelations(searchParams);
+
+	const response = await fetchStrapi<StrapiCollectionResponse<Epistola>>('/epistole', searchParams);
+
+	return response.data?.[0] || null;
+}
+
 // Binding del dettaglio epistola /epistole/:slug.
 export async function getEpistolaBySlug(slug: string) {
 	const searchParams = new URLSearchParams();

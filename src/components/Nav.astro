@@ -79,27 +79,22 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
         </a>
       </li>
     ))}
-    {/* TODO: rimuovere quando il logout sarà integrato nel profilo */}
-    <li class="tsbs-mobile-nav__item">
-      <button class="tsbs-mobile-nav__link tsbs-mobile-nav__logout" type="button" data-logout-trigger>
-        <i class="bi bi-box-arrow-left tsbs-mobile-nav__icon" aria-hidden="true"></i>
-        <span>Esci</span>
-      </button>
-    </li>
   </ul>
 </nav>
 
 <aside class="tsbs-desktop-nav" aria-label="Menu principale" data-lang={lang}>
   <p class="tsbs-desktop-nav__brand">
-    <img
-      class="tsbs-desktop-nav__brand-logo"
-      src={navbarLogo.src}
-      width={navbarLogo.width}
-      height={navbarLogo.height}
-      alt="The Secret Bookish Society"
-      loading="eager"
-      decoding="async"
-    />
+    <a href="/" aria-label="The Secret Bookish Society" class="p-0 m-0">
+      <img
+        class="tsbs-desktop-nav__brand-logo"
+        src={navbarLogo.src}
+        width={navbarLogo.width}
+        height={navbarLogo.height}
+        alt="The Secret Bookish Society"
+        loading="eager"
+        decoding="async"
+      />
+    </a>
   </p>
   <nav class="tsbs-desktop-nav__menu" aria-label="Menu principale desktop">
     <ul class="tsbs-desktop-nav__list">
@@ -129,22 +124,7 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
       ))}
     </ul>
   </nav>
-  <div class="tsbs-desktop-nav__footer">
-    <button class="tsbs-desktop-nav__logout" type="button" data-logout-trigger>
-      <i class="bi bi-box-arrow-left" aria-hidden="true"></i>
-      <span>Esci</span>
-    </button>
-  </div>
 </aside>
-
-<script>
-  document.querySelectorAll('[data-logout-trigger]').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.assign('/login/');
-    });
-  });
-</script>
 
 <script define:vars={{ navContextItems, deactivateAll }} data-astro-rerun>
   const navContextStorageKey = "tsbs.activeNavContext";
@@ -296,19 +276,6 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
     display: none;
   }
 
-  .tsbs-mobile-nav__logout {
-    width: 100%;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .tsbs-mobile-nav__logout .bi {
-    display: block;
-    font-size: 1.5rem;
-    line-height: 1;
-  }
-
   @media (min-width: 992px) {
     .tsbs-mobile-nav {
       display: none;
@@ -379,35 +346,5 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
       box-shadow: 0 0.75rem 1.875rem rgba(84, 97, 118, 0.08);
     }
 
-    .tsbs-desktop-nav__footer {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 1rem;
-      border-top: 1px solid var(--nav-border);
-    }
-
-    .tsbs-desktop-nav__logout {
-      display: flex;
-      align-items: center;
-      gap: 0.875rem;
-      width: 100%;
-      min-height: 3rem;
-      padding: 0.625rem 1.5rem;
-      color: var(--nav-muted-color);
-      font-size: 0.9375rem;
-      font-weight: 500;
-      background: none;
-      border: none;
-      border-radius: 1rem;
-      cursor: pointer;
-      text-align: left;
-    }
-
-    .tsbs-desktop-nav__logout:hover {
-      color: #c0392b;
-      background: #fdf2f0;
-    }
   }
 </style>

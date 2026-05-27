@@ -44,12 +44,13 @@ const normalizedAcademy = academies.some((academy) => academy.id === selectedAca
 			</fieldset>
 
 			{academies.map((academy) => (
-				<a
+				<button
+					type="button"
 					class={`btn tsbs-cta-primary mission-proof-question__cta choice-question__cta sorting-academy-choice__cta sorting-academy-choice__cta--${academy.id}`}
-					href={`/test-smistamento/benvenuto-accademia-${academy.id}/`}
+					data-confirm-academy={academy.id}
 				>
 					Scegli
-				</a>
+				</button>
 			))}
 		</div>
 	</div>
@@ -117,3 +118,26 @@ const normalizedAcademy = academies.some((academy) => academy.id === selectedAca
 		display: inline-flex !important;
 	}
 </style>
+
+<script>
+	document.querySelectorAll<HTMLButtonElement>('[data-confirm-academy]').forEach((btn) => {
+		btn.addEventListener('click', async () => {
+			const accademia = btn.dataset.confirmAcademy;
+			if (!accademia) return;
+
+			btn.disabled = true;
+
+			try {
+				await fetch('/api/user/accademia', {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ accademia }),
+				});
+			} catch {
+				// Navigazione comunque: il salvataggio è best-effort
+			}
+
+			window.location.assign(`/test-smistamento/benvenuto-accademia-${accademia}/`);
+		});
+	});
+</script>

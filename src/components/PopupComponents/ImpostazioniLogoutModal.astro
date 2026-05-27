@@ -56,6 +56,12 @@ const shouldRender = isOpen || renderHidden;
 
 			document.addEventListener('tsbs:settings-logout-modal-open', openModal);
 
+			const logoutBtn = modal.querySelector<HTMLElement>('[data-settings-logout-modal-logout]');
+			logoutBtn?.addEventListener('click', async () => {
+				await fetch('/api/auth/logout', { method: 'POST' });
+				window.location.assign('/');
+			});
+
 			closeControls.forEach((control) => {
 				control.addEventListener('click', closeModal);
 			});
