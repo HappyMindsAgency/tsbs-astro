@@ -53,7 +53,7 @@ const avatars = [
         }
       </div>
 
-      <p class="scelta-avatar__username">Lorem Ipsum</p>
+      <p class="scelta-avatar__username" data-scelta-avatar-username>—</p>
 
       <fieldset class="scelta-avatar__fieldset">
         <legend class="visually-hidden">Seleziona un avatar</legend>
@@ -100,6 +100,18 @@ const avatars = [
 </section>
 
 <script>
+  (async () => {
+    try {
+      const res = await fetch('/api/user/profilo');
+      if (!res.ok) return;
+      const profilo = await res.json();
+      const el = document.querySelector('[data-scelta-avatar-username]');
+      if (el instanceof HTMLElement && profilo.username) el.textContent = profilo.username;
+    } catch {
+      // Fallback silenzioso
+    }
+  })();
+
   const form = document.querySelector<HTMLFormElement>('.scelta-avatar__form');
 
   form?.addEventListener('submit', async (event) => {

@@ -7,13 +7,14 @@ const { isOpen = false, theme = '' } = Astro.props;
 		<div class="welcome-toast__backdrop" data-welcome-toast-close></div>
 		<div class="welcome-toast__panel">
 			<div class="welcome-toast__body">
-				<div class="welcome-toast__avatar" aria-hidden="true">
-					<i class="bi bi-person-fill"></i>
+				<div class="welcome-toast__avatar" aria-hidden="true" data-welcome-toast-avatar>
+					<i class="bi bi-person-fill" data-welcome-toast-avatar-fallback></i>
+					<img data-welcome-toast-avatar-img hidden alt="" />
 				</div>
 				<div class="welcome-toast__content">
 					<h2 id="welcome-toast-title" class="welcome-toast__title">
 						<span class="welcome-toast__title-light">Benvenut*</span>
-						<span class="welcome-toast__title-accent">Adept*</span>
+						<span class="welcome-toast__title-accent" data-welcome-toast-username>Adepto</span>
 					</h2>
 					<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id, porta sapien.</p>
 				</div>
@@ -26,7 +27,32 @@ const { isOpen = false, theme = '' } = Astro.props;
 )}
 
 <script>
+	const loadWelcomeToastProfilo = async () => {
+		try {
+			const res = await fetch('/api/user/profilo');
+			if (!res.ok) return;
+			const profilo = await res.json();
+
+			const nameEl = document.querySelector('[data-welcome-toast-username]');
+			if (nameEl instanceof HTMLElement && profilo.username) nameEl.textContent = profilo.username;
+
+			if (profilo.avatarSrc) {
+				const fallback = document.querySelector('[data-welcome-toast-avatar-fallback]');
+				const img = document.querySelector<HTMLImageElement>('[data-welcome-toast-avatar-img]');
+				if (fallback instanceof HTMLElement) fallback.hidden = true;
+				if (img instanceof HTMLImageElement) {
+					img.src = profilo.avatarSrc;
+					img.hidden = false;
+				}
+			}
+		} catch {
+			// Fallback silenzioso
+		}
+	};
+
 	const setupWelcomeToast = () => {
+		loadWelcomeToastProfilo();
+
 		const toast = document.querySelector<HTMLElement>('[data-welcome-toast]');
 		if (!toast) return;
 

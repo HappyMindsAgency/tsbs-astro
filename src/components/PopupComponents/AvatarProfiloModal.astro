@@ -75,7 +75,7 @@ const avatars = [
 							))}
 						</div>
 
-						<p class="scelta-avatar__username">Username</p>
+						<p class="scelta-avatar__username" data-avatar-modal-username>—</p>
 
 						<fieldset class="scelta-avatar__fieldset">
 							<legend class="visually-hidden">Seleziona un avatar</legend>
@@ -142,9 +142,28 @@ const avatars = [
 				if (previousFocus) previousFocus.focus();
 			};
 
-			const openModal = () => {
+			const openModal = async () => {
 				previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 				modal.hidden = false;
+
+				try {
+					const res = await fetch('/api/user/profilo');
+					if (res.ok) {
+						const profilo = await res.json();
+						const nameEl = modal.querySelector('[data-avatar-modal-username]');
+						if (nameEl instanceof HTMLElement && profilo.username) nameEl.textContent = profilo.username;
+
+						if (profilo.avatar) {
+							const currentInput = modal.querySelector<HTMLInputElement>(
+								`input[value="profile-${profilo.avatar}"]`,
+							);
+							if (currentInput) currentInput.checked = true;
+						}
+					}
+				} catch {
+					// Fallback silenzioso
+				}
+
 				firstInput?.focus();
 			};
 

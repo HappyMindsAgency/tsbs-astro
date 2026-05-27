@@ -41,17 +41,18 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 					<i class="bi bi-heart" aria-hidden="true"></i>
 				</a>
 
-				<p class="desk-academy-pill">Accademia Astraria</p>
+				<p class="desk-academy-pill" data-desk-accademia>—</p>
 
-				<div class="desk-avatar" aria-hidden="true">
-					<i class="bi bi-image"></i>
+				<div class="desk-avatar" aria-hidden="true" data-desk-avatar>
+					<i class="bi bi-eyeglasses" data-desk-avatar-fallback></i>
+					<img data-desk-avatar-img hidden alt="" />
 				</div>
 
-				<h1 id="desk-title">Username Adepto</h1>
-				<p class="desk-rank">Adepto - n° trofei</p>
+				<h1 id="desk-title" data-desk-username>—</h1>
+				<p class="desk-rank" data-desk-livello>—</p>
 				<p class="desk-code">
 					<i class="bi bi-person-vcard" aria-hidden="true"></i>
-					<span>000000</span>
+					<span data-desk-codice>—</span>
 				</p>
 			</div>
 		</header>
@@ -144,3 +145,37 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 		</div>
 	</main>
 </Layout>
+
+<script>
+	const loadDeskHeader = async () => {
+		try {
+			const res = await fetch('/api/user/profilo');
+			if (!res.ok) return;
+			const profilo = await res.json();
+
+			const set = (sel: string, val: string | null) => {
+				const el = document.querySelector(sel);
+				if (el instanceof HTMLElement && val) el.textContent = val;
+			};
+
+			set('[data-desk-username]', profilo.username);
+			set('[data-desk-livello]', profilo.livello);
+			set('[data-desk-accademia]', profilo.accademia);
+
+			if (profilo.avatarSrc) {
+				const fallback = document.querySelector('[data-desk-avatar-fallback]');
+				const img = document.querySelector<HTMLImageElement>('[data-desk-avatar-img]');
+				if (fallback instanceof HTMLElement) fallback.hidden = true;
+				if (img instanceof HTMLImageElement) {
+					img.src = profilo.avatarSrc;
+					img.hidden = false;
+				}
+			}
+		} catch {
+			// Fallback silenzioso
+		}
+	};
+
+	loadDeskHeader();
+	document.addEventListener('astro:page-load', loadDeskHeader);
+</script>
