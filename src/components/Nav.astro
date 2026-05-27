@@ -4,6 +4,7 @@ import atrioIcon from "../assets/atrio-icona-navbar.png";
 import bibliotecaIcon from "../assets/biblioteca-icona-navbar.png";
 import missioniIcon from "../assets/missioni-icona-navbar.png";
 import scrivaniaIcon from "../assets/scrivania-icona-navbar.png";
+import navbarLogo from "../assets/tsbs-logo-navbar.png";
 
 const { lang = "it", deactivateAll = false } = Astro.props;
 
@@ -87,7 +88,17 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
 </nav>
 
 <aside class="tsbs-desktop-nav" aria-label="Menu principale" data-lang={lang}>
-  <p class="tsbs-desktop-nav__brand">The Secret Bookish Society</p>
+  <p class="tsbs-desktop-nav__brand">
+    <img
+      class="tsbs-desktop-nav__brand-logo"
+      src={navbarLogo.src}
+      width={navbarLogo.width}
+      height={navbarLogo.height}
+      alt="The Secret Bookish Society"
+      loading="eager"
+      decoding="async"
+    />
+  </p>
   <nav class="tsbs-desktop-nav__menu" aria-label="Menu principale desktop">
     <ul class="tsbs-desktop-nav__list">
       {desktopItems.map((item) => (
@@ -330,13 +341,18 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
     .tsbs-desktop-nav__brand {
       display: flex;
       align-items: center;
-      min-height: 3.75rem;
-      padding: 0 1.5rem;
+      justify-content: center;
+      min-height: 5rem;
+      padding: 0.625rem 1.5rem;
       margin: 0;
-      color: var(--nav-active-color);
-      font-size: 0.875rem;
-      font-weight: 700;
       border-bottom: 1px solid var(--nav-border);
+    }
+
+    .tsbs-desktop-nav__brand-logo {
+      width: clamp(4.5rem, 43%, 6rem);
+      height: auto;
+      max-height: 3.3rem;
+      object-fit: contain;
     }
 
     .tsbs-desktop-nav__menu {

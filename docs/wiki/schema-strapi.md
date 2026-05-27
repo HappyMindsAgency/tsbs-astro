@@ -25,6 +25,11 @@ Regole di lettura:
 | Progressione | `membro`, `livello`, `trofeo`, `trofeo-membro`, `stagione` | Dati personali e di gioco; binding da gestire con auth. |
 | Eventi | `evento` + integrazione WordPress Classense | Distinguere eventi interni TSBS da eventi recuperati da WordPress. |
 
+Nota richtext:
+- usare `src/components/RitchText.astro` in fase di binding quando un campo Strapi contiene Markdown/richtext da renderizzare come HTML
+- il contenuto passato a `set:html` deve provenire da una fonte controllata o sanificata
+- il nome del file contiene il refuso `RitchText`; se si rinomina in `RichText`, aggiornare anche gli import
+
 ## Collection E Single Type
 
 ### Accademia
