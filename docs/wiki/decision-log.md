@@ -42,6 +42,67 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-27 - Regole Data E Carica Altro Per Binding Editoriali
+
+Decisione:
+- nelle liste collegate a Strapi che mostrano contenuti pubblicati ordinare i record per `publishedAt:desc`
+- visualizzare la data nel formato italiano esteso gia usato per Epistole: giorno numerico, mese lungo, anno numerico, per esempio `27 maggio 2026`
+- usare la stessa logica progressiva di `Carica altro` delle Epistole: batch iniziale/responsive 3 card mobile, 4 tablet, 5 desktop
+- nascondere il bottone `Carica altro` quando tutte le card previste sono gia visibili o quando il numero di card e inferiore/uguale al batch corrente
+
+Motivo:
+- mantenere coerenza tra Epistole, Grimorio e futuri binding editoriali
+- evitare etichette temporali diverse come `OGGI`/`IERI` quando il formato data approvato e quello esteso
+- non mostrare comandi inutili quando non ci sono altri contenuti da caricare
+
+Impatto:
+- `src/pages/epistole/index.astro`
+- `src/pages/scrivania/grimorio/index.astro`
+- `src/pages/scrivania/index.astro`
+- `src/lib/strapi/grimorio.ts`
+- `docs/wiki/schema-strapi.md`
+
+Stato:
+- approvata
+
+## 2026-05-27 - Label Visibilita Nelle Card Grimorio
+
+Decisione:
+- nelle card lista del Grimorio non mostrare il nome della `Categoria Grimorio` come meta visibile
+- usare il campo booleano `visibilePubblico` per mostrare la label `Pubblica` quando `true` e `Privata` quando `false`
+- mantenere le categorie Grimorio disponibili nel binding per filtri, raggruppamenti o usi futuri
+
+Motivo:
+- rendere immediatamente leggibile all'utente lo stato di visibilita della nota
+- evitare di confondere la tassonomia editoriale con la visibilita del contenuto
+
+Impatto:
+- `src/lib/strapi/grimorio.ts`
+- `src/pages/scrivania/grimorio/index.astro`
+- `src/pages/scrivania/index.astro`
+- `docs/wiki/schema-strapi.md`
+
+Stato:
+- approvata
+
+## 2026-05-27 - Cancellazione Note Grimorio Da Definire
+
+Decisione:
+- la cancellazione delle note Grimorio non viene ancora implementata
+- il bidoncino nel dettaglio di una nota pubblicata resta non distruttivo finche la funzione non sara definita
+- non creare route API o chiamate Strapi di delete per le note Grimorio in questa fase
+
+Motivo:
+- la logica funzionale e di permessi per eliminare una nota e ancora da definire
+- evitare cancellazioni accidentali o flussi incompleti prima della decisione definitiva
+
+Impatto:
+- `src/lib/strapi/grimorio.ts`
+- `src/pages/scrivania/grimorio/pubblicate/[slugNotaPub].astro`
+
+Stato:
+- approvata
+
 ## 2026-05-27 - Campo datiAggiuntivi Membro Per Avatar E Ultimo Login
 
 Decisione:

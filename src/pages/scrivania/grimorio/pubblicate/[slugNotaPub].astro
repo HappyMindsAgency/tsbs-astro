@@ -1,8 +1,27 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
 import Nav from '../../../../components/Nav.astro';
+import RitchText from '../../../../components/RitchText.astro';
+import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro } from '../../../../lib/strapi/grimorio';
 
 const { lang = 'it' } = Astro.props;
+const jwt = Astro.cookies.get('jwt')?.value;
+const slugNotaPub = Astro.params.slugNotaPub;
+
+if (!jwt) {
+	return Astro.redirect('/');
+}
+
+if (!slugNotaPub) {
+	return Astro.redirect('/scrivania/grimorio/');
+}
+
+const membro = await getCurrentMembroFromJwt(jwt);
+const nota = membro ? await getGrimorioNotaBySlugForMembro(slugNotaPub, membro.id, lang) : null;
+
+if (!nota) {
+	return Astro.redirect('/scrivania/grimorio/');
+}
 ---
 
 <Layout lang={lang}>
@@ -16,33 +35,17 @@ const { lang = 'it' } = Astro.props;
 		<div class="container-xl tsbs-app-container note-page__content">
 			<section class="note-editor note-editor--published" aria-labelledby="published-note-title">
 				<div class="note-editor__head">
-					<h2 id="published-note-title" class="note-editor__title note-editor__title--static">Titolo della nota</h2>
-					<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" data-note-delete>
+					<h2 id="published-note-title" class="note-editor__title note-editor__title--static">{nota.titolo}</h2>
+					<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" disabled>
 						<i class="bi bi-trash" aria-hidden="true"></i>
 					</button>
 				</div>
 
 				<div class="note-editor__body note-editor__body--published">
-					<p>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer pretium, nunc sed fermentum
-						vehicula, libero sapien gravida ante, vitae cursus magna mi non lorem. Sed porta, augue non
-						commodo volutpat, ipsum risus gravida neque, sit amet dictum arcu massa vitae lectus.
-					</p>
-					<p>
-						Curabitur vel nibh at lorem posuere dignissim. Vestibulum ante ipsum primis in faucibus orci
-						luctus et ultrices posuere cubilia curae; Donec posuere velit vitae sem facilisis, sed
-						consequat lorem efficitur.
-					</p>
+					<RitchText block={nota.contenuto} className="note-editor__richtext" />
 				</div>
 			</section>
 		</div>
 	</main>
 
-	<script>
-		const deleteButton = document.querySelector<HTMLButtonElement>('[data-note-delete]');
-
-		deleteButton?.addEventListener('click', () => {
-			window.confirm('Eliminare questa nota?');
-		});
-	</script>
 </Layout>

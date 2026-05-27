@@ -40,6 +40,7 @@ Struttura attuale:
 src/lib/strapi/
   client.ts
   epistole.ts
+  grimorio.ts
 ```
 
 `client.ts` contiene solo logica generica e riusabile:
@@ -56,12 +57,23 @@ src/lib/strapi/
 - campi principali del dettaglio: `titolo`, `slug`, `contenuto`
 - relazioni predisposte: `accademia`, `categorie_epistola`, `stagioni`
 
+`grimorio.ts` contiene solo logica del dominio Grimorio:
+- tipi `GrimorioNota`, `GrimorioCategoria`, `GrimorioAccademia`, `GrimorioMembro`
+- query delle note Grimorio filtrate sul `Membro` autenticato
+- query del dettaglio nota per `slug`
+- campi principali: `titolo`, `slug`, `contenuto`, `visibilePubblico`, `publishedAt`, `locale`
+- relazioni predisposte: `categorie_grimorio`, `accademia`, `membro`
+- utility di presentazione coerenti con Epistole: estratto testuale e data italiana estesa
+
 Regola per i prossimi binding:
 - ogni area dinamica puo avere un file dedicato quando serve, per esempio `missioni.ts`, `grimorio.ts`, `quiz.ts`
 - `client.ts` deve restare generico e non contenere tipi o query di una singola collection
 - i file specifici devono contenere tipi, query e mapper della propria area
 - in fase di binding Astro vanno predisposti e mappati almeno tutti i campi e le relazioni rilevanti gia presenti nello schema Strapi, anche se in Strapi sono ancora vuoti
 - se un campo o una relazione non viene ancora mostrato nella UI, va comunque tipizzato e popolato quando e gia previsto dallo schema e utile alla pagina
+- le liste editoriali Strapi devono ordinare i record pubblicati per `publishedAt:desc`, salvo diversa decisione esplicita
+- il formato data nelle card lista deve restare quello delle Epistole: giorno numerico, mese lungo, anno numerico in italiano, per esempio `27 maggio 2026`
+- la logica `Carica altro` va mantenuta coerente con Epistole: batch responsive 3 mobile, 4 tablet, 5 desktop; il bottone va nascosto quando il numero di card e inferiore/uguale al batch visibile o quando tutte le card sono gia mostrate
 
 Esempio Epistole:
 - anche se `accademia`, `categorie_epistola` e `stagioni` sono vuoti in alcune epistole, Astro li richiede gia con `populate` e li espone nel tipo `Epistola`
@@ -200,7 +212,7 @@ Esempio Epistole:
 - Campi localizzati: `titolo`, `slug`, `contenuto`
 - Relazioni: `accademia`, `categorie_grimorio`, `membro`
 - draftAndPublish: `true`
-- Note binding Astro: area privata sotto Scrivania; usare auth per contenuti legati a `membro`.
+- Note binding Astro: area privata sotto Scrivania; usare auth per contenuti legati a `membro`. Le liste Grimorio devono usare `status=published`, `sort[0]=publishedAt:desc`, locale italiano Strapi `it-IT`, data in formato esteso come Epistole e logica `Carica altro` con batch 3/4/5. Nelle card lista la meta visibile deve mostrare `Pubblica` se `visibilePubblico` e `true`, `Privata` se `false`; `Categoria Grimorio` resta disponibile per filtri/raggruppamenti ma non sostituisce la label di visibilita. La cancellazione dal dettaglio e ancora da definire: non creare route API o chiamate Strapi di delete finche il flusso non viene approvato.
 - Dubbi aperti: chiarire come usare `visibilePubblico`, dato che le route Grimorio risultano private nell'elenco pagine.
 
 ### Landing
