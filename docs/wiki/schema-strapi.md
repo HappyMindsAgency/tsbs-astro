@@ -30,6 +30,43 @@ Nota richtext:
 - il contenuto passato a `set:html` deve provenire da una fonte controllata o sanificata
 - il nome del file contiene il refuso `RitchText`; se si rinomina in `RichText`, aggiornare anche gli import
 
+## Struttura Client Strapi In Astro
+
+Il binding Strapi in Astro e organizzato in `src/lib/strapi/`.
+
+Struttura attuale:
+
+```txt
+src/lib/strapi/
+  client.ts
+  epistole.ts
+```
+
+`client.ts` contiene solo logica generica e riusabile:
+- costruzione della base URL Strapi da `STRAPI_API_URL` o `STRAPI_URL`
+- normalizzazione del path `/api`
+- gestione del token readonly `AUTH_READONLY`
+- funzione comune `fetchStrapi`
+- gestione errori delle risposte Strapi
+- tipo generico `StrapiCollectionResponse<T>`
+
+`epistole.ts` contiene solo logica del dominio Epistole:
+- tipi `Epistola`, `EpistolaAccademia`, `EpistolaCategoria`, `EpistolaStagione`
+- query `getEpistolaBySlug`
+- campi principali del dettaglio: `titolo`, `slug`, `contenuto`
+- relazioni predisposte: `accademia`, `categorie_epistola`, `stagioni`
+
+Regola per i prossimi binding:
+- ogni area dinamica puo avere un file dedicato quando serve, per esempio `missioni.ts`, `grimorio.ts`, `quiz.ts`
+- `client.ts` deve restare generico e non contenere tipi o query di una singola collection
+- i file specifici devono contenere tipi, query e mapper della propria area
+- in fase di binding Astro vanno predisposti e mappati almeno tutti i campi e le relazioni rilevanti gia presenti nello schema Strapi, anche se in Strapi sono ancora vuoti
+- se un campo o una relazione non viene ancora mostrato nella UI, va comunque tipizzato e popolato quando e gia previsto dallo schema e utile alla pagina
+
+Esempio Epistole:
+- anche se `accademia`, `categorie_epistola` e `stagioni` sono vuoti in alcune epistole, Astro li richiede gia con `populate` e li espone nel tipo `Epistola`
+- la UI del dettaglio al momento usa solo `titolo` e `contenuto`, ma il dato relazionale e gia disponibile per filtri, badge, varianti narrative o logiche future
+
 ## Collection E Single Type
 
 ### Accademia

@@ -20,6 +20,28 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-27 - Struttura Client Strapi Astro Per Binding Progressivo
+
+Decisione:
+- organizzare il binding Strapi lato Astro in `src/lib/strapi/`
+- usare `client.ts` per la logica generica: base URL, token readonly, `fetchStrapi`, gestione errori e tipi di risposta comuni
+- usare file per area dinamica, a partire da `epistole.ts`, per tipi e query specifiche della collection
+- predisporre nel binding Astro i campi e le relazioni rilevanti gia presenti nello schema Strapi, anche quando in Strapi sono ancora vuoti o non ancora mostrati nella UI
+
+Motivo:
+- evitare un unico file `strapi.ts` troppo grande
+- mantenere semplice il binding iniziale e scalabile l'aggiunta di Missioni, Grimorio, Quiz e altre aree
+- ridurre refactor futuri quando i dati relazionali saranno valorizzati e usati nel frontend
+
+Impatto:
+- `src/lib/strapi/client.ts`
+- `src/lib/strapi/epistole.ts`
+- `src/pages/epistole/[slugEpis].astro`
+- `docs/wiki/schema-strapi.md`
+
+Stato:
+- approvata
+
 ## 2026-05-27 - Campo datiAggiuntivi Membro Per Avatar E Ultimo Login
 
 Decisione:
