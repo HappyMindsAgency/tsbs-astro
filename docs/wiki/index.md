@@ -66,6 +66,12 @@ Mappa operativa delle pagine e visualizzazioni.
 
 Da consultare quando si decide se una pagina e pubblica o privata, quale sorgente dati usare e quale strategia di binding applicare.
 
+### [Esempio Gestione Logiche Astro Strapi](./esempio-gestione-logiche-astro-strapi.md)
+
+Esempio operativo per distinguere responsabilita tra Astro e Strapi.
+
+Da consultare quando una pagina pubblica contiene anche blocchi privati, oppure quando si definiscono guardie auth e richieste dati personali.
+
 ### [Frontend Design](./frontend-design.md)
 
 Regole UI e front-end.
@@ -123,4 +129,5 @@ Non serve collegare tutto con tutto. I backlink devono aiutare il flusso di lavo
 - [Alberatura](./alberatura.md)
 - [Schema Strapi](./schema-strapi.md)
 - [Visualizzazione Pagine](./visualizzazione-pagine.md)
+- [Esempio Gestione Logiche Astro Strapi](./esempio-gestione-logiche-astro-strapi.md)
 - [Maintenance Mode](./maintenance.md)
