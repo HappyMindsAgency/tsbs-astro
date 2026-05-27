@@ -610,13 +610,19 @@ body:has(.tsbs-legal-page) {
 		.dashboard-header {
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
+			justify-content: flex-start;
 		}
 
 		.dashboard-profile {
 			display: flex;
 			align-items: center;
 			gap: 0.875rem;
+		}
+
+		.dashboard-avatar-wrap {
+			position: relative;
+			order: -1;
+			flex: 0 0 auto;
 		}
 
 		.dashboard-avatar {
@@ -629,8 +635,38 @@ body:has(.tsbs-legal-page) {
 			border-radius: 50%;
 		}
 
-		.dashboard-avatar .bi {
-			font-size: 2rem;
+		.dashboard-avatar img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+
+		.dashboard-avatar-edit {
+			position: absolute;
+			right: -0.125rem;
+			bottom: -0.125rem;
+			display: grid;
+			place-items: center;
+			width: 1.5rem;
+			height: 1.5rem;
+			padding: 0;
+			color: var(--tsbs-color-white);
+			background: var(--tsbs-theme-accent);
+			border: 0.125rem solid var(--tsbs-color-surface);
+			border-radius: 50%;
+			box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
+		}
+
+		.dashboard-avatar-edit:hover,
+		.dashboard-avatar-edit:focus-visible {
+			color: var(--tsbs-color-white);
+			background: var(--tsbs-theme-cta-hover-bg);
+		}
+
+		.dashboard-avatar-edit .bi {
+			font-size: 0.75rem;
+			line-height: 1;
 		}
 
 		.dashboard-username,
@@ -649,30 +685,6 @@ body:has(.tsbs-legal-page) {
 			font-size: 0.75rem;
 			font-style: italic;
 			line-height: 1.2;
-		}
-
-		.dashboard-menu-button {
-			display: grid;
-			place-items: center;
-			flex: 0 0 auto;
-			width: 3rem;
-			height: 3rem;
-			padding: 0;
-			color: var(--tsbs-color-white);
-			text-decoration: none;
-			background: var(--tsbs-theme-accent);
-			border: 0;
-			border-radius: 50%;
-		}
-
-		.dashboard-menu-button:hover,
-		.dashboard-menu-button:focus-visible {
-			color: var(--tsbs-color-white);
-		}
-
-		.dashboard-menu-button .bi {
-			font-size: 1.75rem;
-			line-height: 1;
 		}
 
 		.dashboard-epistle {
@@ -999,6 +1011,7 @@ body:has(.tsbs-legal-page) {
 			}
 
 			.dashboard-header {
+				justify-content: flex-end;
 				min-height: 5.625rem;
 				padding-left: 3rem;
 				padding-right: 3rem;
@@ -1008,13 +1021,27 @@ body:has(.tsbs-legal-page) {
 				border-bottom: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-white));
 			}
 
-			.dashboard-avatar {
-				width: 3rem;
-				height: 3rem;
+			.dashboard-profile {
+				justify-content: flex-end;
 			}
 
-			.dashboard-avatar .bi {
-				display: none;
+			.dashboard-avatar-wrap {
+				order: 0;
+			}
+
+			.dashboard-avatar {
+				width: 4.5rem;
+				height: 4.5rem;
+			}
+
+			.dashboard-avatar-edit {
+				width: 1.625rem;
+				height: 1.625rem;
+				border-color: var(--tsbs-color-white);
+			}
+
+			.dashboard-avatar-edit .bi {
+				font-size: 0.8125rem;
 			}
 
 			.dashboard-username {

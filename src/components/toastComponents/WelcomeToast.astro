@@ -8,7 +8,6 @@ const { isOpen = false, theme = '' } = Astro.props;
 		<div class="welcome-toast__panel">
 			<div class="welcome-toast__body">
 				<div class="welcome-toast__avatar" aria-hidden="true" data-welcome-toast-avatar>
-					<i class="bi bi-person-fill" data-welcome-toast-avatar-fallback></i>
 					<img data-welcome-toast-avatar-img hidden alt="" />
 				</div>
 				<div class="welcome-toast__content">
@@ -37,10 +36,11 @@ const { isOpen = false, theme = '' } = Astro.props;
 			if (nameEl instanceof HTMLElement && profilo.username) nameEl.textContent = profilo.username;
 
 			if (profilo.avatarSrc) {
-				const fallback = document.querySelector('[data-welcome-toast-avatar-fallback]');
 				const img = document.querySelector<HTMLImageElement>('[data-welcome-toast-avatar-img]');
-				if (fallback instanceof HTMLElement) fallback.hidden = true;
 				if (img instanceof HTMLImageElement) {
+					img.onerror = () => {
+						img.hidden = true;
+					};
 					img.src = profilo.avatarSrc;
 					img.hidden = false;
 				}
@@ -110,12 +110,16 @@ const { isOpen = false, theme = '' } = Astro.props;
 	.welcome-toast__avatar {
 		display: grid;
 		place-items: center;
+		width: 8.75rem;
+		height: 8.75rem;
 		color: color-mix(in srgb, var(--tsbs-theme-accent) 54%, var(--tsbs-color-white));
 	}
 
-	.welcome-toast__avatar .bi {
-		font-size: 7rem;
-		line-height: 1;
+	.welcome-toast__avatar img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
 	.welcome-toast__content {
@@ -171,8 +175,9 @@ const { isOpen = false, theme = '' } = Astro.props;
 			padding-left: 1rem;
 		}
 
-		.welcome-toast__avatar .bi {
-			font-size: 5.75rem;
+		.welcome-toast__avatar {
+			width: 7.1875rem;
+			height: 7.1875rem;
 		}
 	}
 
@@ -184,8 +189,9 @@ const { isOpen = false, theme = '' } = Astro.props;
 			align-items: center;
 		}
 
-		.welcome-toast__avatar .bi {
-			font-size: 8.5rem;
+		.welcome-toast__avatar {
+			width: 8.5rem;
+			height: 8.5rem;
 		}
 	}
 
