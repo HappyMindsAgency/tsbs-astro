@@ -34,7 +34,7 @@ export function isValidIdentifier(identifier: string): boolean {
  * @returns Una Response di redirect (303).
  */
 export function redirectWithLoginError(baseUrl: string, error: LoginErrorCode, identifier: string = ''): Response {
-    const url = new URL(`${baseUrl}/login`);
+    const url = new URL(`${baseUrl}/`);
     url.searchParams.set('error', error);
     if (identifier) {
         url.searchParams.set('identifier', identifier);

@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 
@@ -26,6 +26,9 @@ const notes = [
 ];
 
 const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

@@ -5,6 +5,10 @@ import Nav from '../../../components/Nav.astro';
 export const prerender = false;
 
 const { lang = 'it' } = Astro.props;
+
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

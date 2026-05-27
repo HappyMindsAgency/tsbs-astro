@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import TrofeiIstruzioni from '../../components/PopupComponents/TrofeiIstruzioni.astro';
@@ -99,6 +99,9 @@ const trophyCatalog = [
 
 const cells = Array.from({ length: board.rows * board.cols });
 const trophyCatalogJson = JSON.stringify(trophyCatalog);
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

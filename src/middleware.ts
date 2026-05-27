@@ -8,6 +8,17 @@ const BYPASS_QUERY_VALUE = 'tsbs';
 const BYPASS_COOKIE_NAME = 'maintenance_bypass';
 const BYPASS_COOKIE_MAX_AGE = 60 * 60 * 12;
 
+// Percorsi accessibili senza sessione attiva.
+const PUBLIC_PATHS = ['/', '/registrazione/', '/auth/'];
+
+function isPublicPath(pathname: string) {
+	return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p));
+}
+
+function isLoginPage(pathname: string) {
+	return pathname === '/';
+}
+
 function isApiRoute(pathname: string) {
 	return pathname === API_PATH || pathname.startsWith(`${API_PATH}/`);
 }
@@ -45,6 +56,22 @@ function getRequestBase(context: Parameters<Parameters<typeof defineMiddleware>[
 
 export const onRequest = defineMiddleware((context, next) => {
 	const { pathname, searchParams } = context.url;
+
+	// Guarda auth solo per route non-API, non-asset, non-maintenance.
+	if (!isApiRoute(pathname) && !isStaticAsset(pathname) && !isMaintenanceRoute(pathname)) {
+		const hasJwt = context.cookies.has('jwt');
+
+		if (isLoginPage(pathname) && hasJwt) {
+			const base = getRequestBase(context);
+			return Response.redirect(new URL('/atrio/', base), 302);
+		}
+
+		if (!isPublicPath(pathname) && !hasJwt) {
+			const base = getRequestBase(context);
+			return Response.redirect(new URL('/', base), 302);
+		}
+	}
+
 	const hasValidBypass = searchParams.get(BYPASS_QUERY_PARAM) === BYPASS_QUERY_VALUE;
 
 	if (hasValidBypass) {

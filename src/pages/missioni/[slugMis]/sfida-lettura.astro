@@ -5,6 +5,10 @@ import DomandaModal from '../../../components/PopupComponents/DomandaModal.astro
 
 export const prerender = false;
 
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
+
 interface ReadingChallengeBook {
 	title: string;
 	checked?: boolean;

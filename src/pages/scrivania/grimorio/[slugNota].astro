@@ -5,6 +5,10 @@ import NotaModal from '../../../components/PopupComponents/NotaModal.astro';
 import NotaToast from '../../../components/toastComponents/NotaToast.astro';
 
 const { lang = 'it' } = Astro.props;
+
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

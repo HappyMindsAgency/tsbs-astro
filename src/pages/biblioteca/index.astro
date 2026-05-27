@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import societaSegretaImage from '../../assets/biblioteca-la-societa-segreta.png';
@@ -27,6 +27,9 @@ const archiveItems = [
 		href: '#classense',
 	},
 ];
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

@@ -6,6 +6,10 @@ export const prerender = false;
 
 const { lang = 'it' } = Astro.props;
 
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
+
 const programItems = [
 	{
 		day: '04',

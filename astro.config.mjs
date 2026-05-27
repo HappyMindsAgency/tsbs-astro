@@ -3,10 +3,12 @@ import node from '@astrojs/node';
 import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 
+const isVercel = !!process.env.VERCEL;
+
 // https://astro.build/config
 export default defineConfig({
     output: 'server',
-    adapter: vercel({}),
+    adapter: isVercel ? vercel({}) : node({ mode: 'standalone' }),
     server: {
         host: true,
         port: 4321,

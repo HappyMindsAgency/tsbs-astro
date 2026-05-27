@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 
@@ -24,6 +24,9 @@ const epistles = [
 		slug: 'lorem-ipsum-dolor-sit-amet-2',
 	},
 ];
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

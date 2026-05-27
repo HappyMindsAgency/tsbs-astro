@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 
@@ -23,6 +23,9 @@ const events = [
 	{ date: '04 Ago', slug: 'lorem-ipsum-dolor-04-ago' },
 	{ date: '18 Ago - 25 Ago', slug: 'lorem-ipsum-dolor-ago' },
 ];
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

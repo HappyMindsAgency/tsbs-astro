@@ -53,11 +53,6 @@ const activeDesktopHref = getActiveHref(desktopItems);
 const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, href, activePaths }));
 ---
 
-<!-- TODO trigger logout provvisorio — rimuovere quando integrato nel profilo -->
-<button class="tsbs-mobile-logout" type="button" data-logout-trigger aria-label="Esci">
-  <i class="bi bi-box-arrow-left" aria-hidden="true"></i>
-</button>
-
 <nav class="tsbs-mobile-nav" aria-label="Menu principale" data-lang={lang}>
   <ul class="tsbs-mobile-nav__list">
     {mobileItems.map((item) => (
@@ -84,6 +79,13 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
         </a>
       </li>
     ))}
+    {/* TODO: rimuovere quando il logout sarà integrato nel profilo */}
+    <li class="tsbs-mobile-nav__item">
+      <button class="tsbs-mobile-nav__link tsbs-mobile-nav__logout" type="button" data-logout-trigger>
+        <i class="bi bi-box-arrow-left tsbs-mobile-nav__icon" aria-hidden="true"></i>
+        <span>Esci</span>
+      </button>
+    </li>
   </ul>
 </nav>
 
@@ -258,7 +260,7 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
 
   .tsbs-mobile-nav__list {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     align-items: center;
     gap: 0.25rem;
   }
@@ -294,34 +296,20 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
     display: none;
   }
 
-  .tsbs-mobile-logout {
-    position: fixed;
-    bottom: calc(var(--tsbs-mobile-nav-viewport-height, 4.5rem) + 0.75rem);
-    right: 0.75rem;
-    z-index: 1031;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    padding: 0;
-    color: var(--nav-muted-color);
-    font-size: 1.25rem;
-    background: var(--nav-surface);
-    border: 1px solid var(--nav-border);
-    border-radius: 50%;
+  .tsbs-mobile-nav__logout {
+    width: 100%;
+    background: none;
+    border: none;
     cursor: pointer;
   }
 
-  .tsbs-mobile-logout:hover {
-    color: #c0392b;
+  .tsbs-mobile-nav__logout .bi {
+    display: block;
+    font-size: 1.5rem;
+    line-height: 1;
   }
 
   @media (min-width: 992px) {
-    .tsbs-mobile-logout {
-      display: none;
-    }
-
     .tsbs-mobile-nav {
       display: none;
     }

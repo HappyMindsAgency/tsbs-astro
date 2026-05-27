@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../layouts/Layout.astro';
 import TestSmistamento from '../../components/TestSmistamentoComponents/TestSmistamento.astro';
 import RisultatoSmistamento from '../../components/TestSmistamentoComponents/RisultatoSmistamento.astro';
@@ -21,6 +21,9 @@ const steps = {
 };
 
 const CurrentStep = steps[requestedStep as keyof typeof steps] || TestSmistamento;
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang} theme={theme}>

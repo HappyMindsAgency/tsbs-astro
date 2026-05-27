@@ -13,6 +13,10 @@ import trophyIcon from '../assets/trofei-icona-scrivania.png';
 
 const { lang = 'it' } = Astro.props;
 const { accademia = 'arborea' } = Astro.params;
+
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 const profileHref = '/scrivania/utenti-preferiti/esploso-profilo-utente/';
 type AcademyKey = 'arcadia' | 'arborea' | 'armonia' | 'astraria';
 

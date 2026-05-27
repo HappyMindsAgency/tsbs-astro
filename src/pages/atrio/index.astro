@@ -4,6 +4,10 @@ import Nav from '../../components/Nav.astro';
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
 const { lang = 'it' } = Astro.props;
 
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
+
 const tasks = [
 	{ title: 'Lorem ipsum dolor', progress: 65 },
 	{ title: 'Lorem ipsum dolor', progress: 65 },

@@ -1,9 +1,12 @@
----
+﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import SnakeGame from '../../components/SnakeGame.astro';
 
 const { lang = 'it' } = Astro.props;
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

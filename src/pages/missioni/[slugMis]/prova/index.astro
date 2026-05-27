@@ -8,6 +8,10 @@ import { strapi } from '@strapi/client';
 export const prerender = false;
 
 const { lang = 'it' } = Astro.props;
+
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 const { slugMis } = Astro.params;
 const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
 const strapiBaseURL = import.meta.env.STRAPI_API_URL || import.meta.env.STRAPI_URL;

@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import arboreaLogo from '../../assets/Arborea-logo-the-secret-bookish-society.png';
@@ -38,6 +38,9 @@ const academies = [
 		href: '/sala-accademia-arborea/',
 	},
 ];
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>

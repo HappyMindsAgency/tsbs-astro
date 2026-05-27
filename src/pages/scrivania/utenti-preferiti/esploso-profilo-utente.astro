@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import trofeoBandiera from '../../../assets/trofeo-bandiera.png';
@@ -33,6 +33,9 @@ const trophies = [
 ];
 
 const cells = Array.from({ length: board.rows * board.cols });
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 ---
 
 <Layout lang={lang}>
