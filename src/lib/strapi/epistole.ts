@@ -26,19 +26,13 @@ export type Epistola = {
 	titolo: string;
 	slug: string;
 	contenuto: string | null;
+	publishedAt?: string | null;
 	accademia: EpistolaAccademia | null;
 	categorie_epistola: EpistolaCategoria[];
 	stagioni: EpistolaStagione[];
 };
 
-// Binding del dettaglio epistola /epistole/:slug.
-export async function getEpistolaBySlug(slug: string) {
-	const searchParams = new URLSearchParams();
-	searchParams.set('filters[slug][$eq]', slug);
-	searchParams.set('fields[0]', 'titolo');
-	searchParams.set('fields[1]', 'slug');
-	searchParams.set('fields[2]', 'contenuto');
-
+function setEpistolaRelations(searchParams: URLSearchParams) {
 	// Relazioni predisposte anche se vuote: servono a filtri, badge o logiche narrative future.
 	searchParams.set('populate[accademia][fields][0]', 'nome');
 	searchParams.set('populate[accademia][fields][1]', 'slug');
@@ -46,7 +40,36 @@ export async function getEpistolaBySlug(slug: string) {
 	searchParams.set('populate[categorie_epistola][fields][1]', 'slug');
 	searchParams.set('populate[stagioni][fields][0]', 'titolo');
 	searchParams.set('populate[stagioni][fields][1]', 'slug');
+}
+
+// Binding della lista epistole /epistole.
+export async function getEpistole() {
+	const searchParams = new URLSearchParams();
+	searchParams.set('status', 'published');
+	searchParams.set('sort[0]', 'publishedAt:desc');
+	searchParams.set('fields[0]', 'titolo');
+	searchParams.set('fields[1]', 'slug');
+	searchParams.set('fields[2]', 'contenuto');
+	searchParams.set('fields[3]', 'publishedAt');
+	searchParams.set('pagination[pageSize]', '100');
+	setEpistolaRelations(searchParams);
+
+	const response = await fetchStrapi<StrapiCollectionResponse<Epistola>>('/epistole', searchParams);
+
+	return response.data || [];
+}
+
+// Binding del dettaglio epistola /epistole/:slug.
+export async function getEpistolaBySlug(slug: string) {
+	const searchParams = new URLSearchParams();
+	searchParams.set('status', 'published');
+	searchParams.set('filters[slug][$eq]', slug);
+	searchParams.set('fields[0]', 'titolo');
+	searchParams.set('fields[1]', 'slug');
+	searchParams.set('fields[2]', 'contenuto');
+	searchParams.set('fields[3]', 'publishedAt');
 	searchParams.set('pagination[pageSize]', '1');
+	setEpistolaRelations(searchParams);
 
 	const response = await fetchStrapi<StrapiCollectionResponse<Epistola>>('/epistole', searchParams);
 

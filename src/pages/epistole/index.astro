@@ -1,31 +1,62 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import { getEpistole } from '../../lib/strapi/epistole';
 
 const { lang = 'it' } = Astro.props;
 
-const epistles = [
-	{
-		meta: 'OGGI',
-		title: 'Etiam vehicula dui ante',
-		text: 'onec et dui nec augue semper placerat. Vestibulum ante ipsum primis in faucibus...',
-		slug: 'etiam-vehicula-dui-ante',
-	},
-	{
-		meta: 'IERI',
-		title: 'Lorem ipsum dolor sit amet',
-		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
-		slug: 'lorem-ipsum-dolor-sit-amet',
-	},
-	{
-		meta: '16-01-2026',
-		title: 'Lorem ipsum dolor sit amet',
-		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
-		slug: 'lorem-ipsum-dolor-sit-amet-2',
-	},
-];
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
+}
+
+const epistole = await getEpistole();
+const featuredEpistola = epistole[0] || null;
+const archiveEpistole = epistole.slice(1);
+
+function getPlainText(value: string | null) {
+	if (!value) return '';
+
+	return value
+		.replace(/```[\s\S]*?```/g, ' ')
+		.replace(/`([^`]+)`/g, '$1')
+		.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+		.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+		.replace(/[#>*_\-~]/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+function getExcerpt(value: string | null, maxLength = 130) {
+	const plainText = getPlainText(value);
+
+	if (plainText.length <= maxLength) return plainText;
+
+	return `${plainText.slice(0, maxLength).trim()}...`;
+}
+
+function formatEpistolaDate(value?: string | null) {
+	if (!value) return '';
+
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return '';
+
+	const today = new Date();
+	const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+	const dateStart = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+	const dayDiff = Math.round((todayStart - dateStart) / 86400000);
+
+	if (dayDiff === 0) return 'OGGI';
+	if (dayDiff === 1) return 'IERI';
+
+	return new Intl.DateTimeFormat('it-IT', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+	}).format(date);
+}
+
+function getPrimaryCategory(epistola: typeof epistole[number]) {
+	return epistola.categorie_epistola?.[0]?.nome || "L'EPISTOLA";
 }
 ---
 
@@ -38,35 +69,76 @@ if (!Astro.cookies.has('jwt')) {
 		</header>
 
 		<div class="container-xl tsbs-app-container epistole-content">
-			<section class="tsbs-card epistole-featured" aria-labelledby="epistole-featured-title">
-				<div class="epistole-featured__copy">
-					<p class="epistole-eyebrow">L'EPISTOLA</p>
-					<h2 id="epistole-featured-title">Lorem ipsum dolor</h2>
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus dignissim magna at magna finibus...</p>
-				</div>
-				<a class="btn tsbs-cta-primary epistole-featured__button" href="/epistole/lorem-ipsum-dolor/">
-					Leggi Epistola
-				</a>
-			</section>
+			{featuredEpistola && (
+				<section class="tsbs-card epistole-featured" aria-labelledby="epistole-featured-title">
+					<div class="epistole-featured__copy">
+						<p class="epistole-eyebrow">{getPrimaryCategory(featuredEpistola)}</p>
+						<h2 id="epistole-featured-title">{featuredEpistola.titolo}</h2>
+						<p>{getExcerpt(featuredEpistola.contenuto, 150)}</p>
+					</div>
+					<a class="btn tsbs-cta-primary epistole-featured__button" href={`/epistole/${featuredEpistola.slug}/`}>
+						Leggi Epistola
+					</a>
+				</section>
+			)}
 
 			<section class="epistole-archive" aria-labelledby="epistole-archive-title">
 				<h2 id="epistole-archive-title" class="tsbs-section-title">Archivio Epistole</h2>
 
 				<div class="epistole-list">
-					{epistles.map((epistle) => (
-						<a class="epistole-card" href={`/epistole/${epistle.slug}/`}>
-							<p class="epistole-card__meta">{epistle.meta}</p>
-							<h3>{epistle.title}</h3>
-							<p>{epistle.text}</p>
+					{archiveEpistole.map((epistola, index) => (
+						<a class={`epistole-card ${index >= 3 ? 'is-hidden' : ''}`} href={`/epistole/${epistola.slug}/`} data-epistole-card>
+							<p class="epistole-card__meta">{formatEpistolaDate(epistola.publishedAt)}</p>
+							<h3>{epistola.titolo}</h3>
+							<p>{getExcerpt(epistola.contenuto)}</p>
 						</a>
 					))}
 				</div>
 
-				<button class="missions-load-more epistole-load-more" type="button" aria-controls="epistole-archive-title">
-					<span>Carica altro</span>
-					<i class="bi bi-arrow-right" aria-hidden="true"></i>
-				</button>
+				{archiveEpistole.length > 0 && (
+					<button class="missions-load-more epistole-load-more" type="button" data-epistole-load-more aria-controls="epistole-archive-title">
+						<span>Carica altro</span>
+						<i class="bi bi-arrow-right" aria-hidden="true"></i>
+					</button>
+				)}
 			</section>
 		</div>
 	</main>
+
+	<script>
+		const getEpistoleBatchSize = () => {
+			if (window.matchMedia('(min-width: 992px)').matches) return 5;
+			if (window.matchMedia('(min-width: 768px)').matches) return 4;
+			return 3;
+		};
+
+		const setupEpistoleArchive = () => {
+			const cards = [...document.querySelectorAll<HTMLElement>('[data-epistole-card]')];
+			const loadMoreButton = document.querySelector<HTMLButtonElement>('[data-epistole-load-more]');
+			if (!loadMoreButton) return;
+
+			const batchSize = getEpistoleBatchSize();
+			let visibleCount = Number(loadMoreButton.dataset.visibleCount || batchSize);
+			visibleCount = Math.max(batchSize, visibleCount);
+
+			const updateCards = () => {
+				cards.forEach((card, index) => {
+					card.classList.toggle('is-hidden', index >= visibleCount);
+				});
+
+				loadMoreButton.hidden = visibleCount >= cards.length;
+				loadMoreButton.dataset.visibleCount = String(visibleCount);
+			};
+
+			loadMoreButton.onclick = () => {
+				visibleCount += batchSize;
+				updateCards();
+			};
+
+			updateCards();
+		};
+
+		document.addEventListener('astro:page-load', setupEpistoleArchive);
+		setupEpistoleArchive();
+	</script>
 </Layout>
