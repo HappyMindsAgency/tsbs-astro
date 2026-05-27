@@ -629,8 +629,11 @@ body:has(.tsbs-legal-page) {
 			border-radius: 50%;
 		}
 
-		.dashboard-avatar .bi {
-			font-size: 2rem;
+		.dashboard-avatar img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
 		}
 
 		.dashboard-username,
@@ -1011,10 +1014,6 @@ body:has(.tsbs-legal-page) {
 			.dashboard-avatar {
 				width: 3rem;
 				height: 3rem;
-			}
-
-			.dashboard-avatar .bi {
-				display: none;
 			}
 
 			.dashboard-username {
