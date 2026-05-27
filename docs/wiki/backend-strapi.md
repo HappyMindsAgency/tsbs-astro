@@ -94,6 +94,14 @@ Diagramma interattivo:
 Nota:
 - verificare sempre che il diagramma sia aggiornato prima di usarlo come fonte decisionale.
 
+## Schema Operativo
+
+Per la mappa sintetica degli schema Strapi reali consultare:
+- [Schema Strapi](./schema-strapi.md)
+
+Per la mappa pagine, pubblica/privata e sorgenti dati previste consultare:
+- [Visualizzazione Pagine](./visualizzazione-pagine.md)
+
 ## Da Confermare
 
 - slug tecnici
@@ -111,4 +119,7 @@ Nota:
 - [Index Wiki](./index.md)
 - [Alberatura](./alberatura.md)
 - [Architettura Informativa](./architettura-informativa.md)
+- [Schema Strapi](./schema-strapi.md)
+- [Visualizzazione Pagine](./visualizzazione-pagine.md)
 - [Decision Log](./decision-log.md)
+- [Gestione logiche Astro e Strapi](./esempio-gestione-logiche-astro-strapi.md)
