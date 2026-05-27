@@ -16,6 +16,7 @@ const events = [
 	{ date: '18 APR', time: '17:00', title: 'Lorem ipsum dolor sit amet' },
 ];
 
+const featuredEpistleHref = '/epistole/lorem-ipsum-dolor/';
 const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 
 ---
@@ -44,11 +45,10 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 				<p class="dashboard-eyebrow">L'EPISTOLA</p>
 				<h1 id="epistle-title">Lorem ipsum dolor</h1>
 				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus dignissim magna at magna finibus...</p>
-				<a class="dashboard-inline-link dashboard-epistle-link-desktop tsbs-accent-link d-none d-lg-inline" href="/epistole/">Riepilogo epistole →</a>
-				<a class="btn tsbs-cta-primary dashboard-button" href="/epistole/">Leggi Epistola</a>
+				<a class="btn tsbs-cta-primary dashboard-button" href={featuredEpistleHref}>Leggi Epistola</a>
 			</div>
 		</section>
-		<a class="dashboard-inline-link dashboard-epistle-link tsbs-accent-link d-lg-none" href="/epistole/">Riepilogo epistole →</a>
+		<a class="dashboard-inline-link dashboard-epistle-link tsbs-accent-link" href="/epistole/">Riepilogo epistole →</a>
 
 		<section class="dashboard-section" aria-labelledby="tasks-title">
 			<div class="dashboard-section__head">
