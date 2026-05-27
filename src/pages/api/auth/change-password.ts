@@ -2,7 +2,7 @@
 import type { APIRoute } from 'astro';
 import { setAuthCookie } from '../../../utils/auth.utils';
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL;
+const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
 	// 1. Verifica che l'utente sia autenticato

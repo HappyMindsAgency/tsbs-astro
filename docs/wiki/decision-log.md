@@ -20,6 +20,29 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-27 - Campo datiAggiuntivi Membro Per Avatar E Ultimo Login
+
+Decisione:
+- usare il campo JSON `datiAggiuntivi` del Membro come contenitore per dati utente non strutturati
+- salvare `ultimoLogin` (ISO 8601) al momento del login, in background dopo `setAuthCookie`
+- salvare `avatar` (es. `avatar-1` … `avatar-12`) al completamento della scelta in `SceltaAvatar.astro`
+- creare la route `PUT /api/user/dati-aggiuntivi` come endpoint unico per aggiornare il campo tramite merge shallow
+- usare il token admin `AUTH_READONLY` per la scrittura su Strapi (il JWT utente serve solo per identificare il Membro)
+- la scelta avatar nella pagina impostazioni profilo userà la stessa route
+
+Motivo:
+- `datiAggiuntivi` è già previsto nel modello Membro come JSON libero
+- evitare nuovi campi su Strapi per dati di contorno non strutturati
+- merge shallow garantisce che aggiornamenti parziali (es. solo avatar) non cancellino altri campi già presenti
+
+Impatto:
+- `src/pages/api/user/dati-aggiuntivi.ts` (nuovo)
+- `src/pages/api/auth/login.ts`
+- `src/components/TestSmistamentoComponents/SceltaAvatar.astro`
+
+Stato:
+- approvata
+
 ## 2026-05-25 - Route Eventi Biblioteca Classense In Root Pages
 
 Decisione:

@@ -154,11 +154,24 @@ const avatars = [
 				control.addEventListener('click', closeModal);
 			});
 
-			form.addEventListener('submit', (event) => {
+			form.addEventListener('submit', async (event) => {
 				event.preventDefault();
 
 				const selected = form.querySelector<HTMLInputElement>('input[name="profile-avatar"]:checked');
 				if (!selected) return;
+
+				// Normalizza "profile-avatar-N" → "avatar-N" per coerenza con SceltaAvatar
+				const avatar = selected.value.replace('profile-', '');
+
+				try {
+					await fetch('/api/user/dati-aggiuntivi', {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ avatar }),
+					});
+				} catch {
+					// Il salvataggio non blocca la chiusura del modal
+				}
 
 				document.dispatchEvent(
 					new CustomEvent('tsbs:avatar-profile-change', {

@@ -40,17 +40,17 @@ const { lang = 'it' } = Astro.props;
 						</button>
 					</div>
 					<div>
-						<h2 id="profile-summary-title">Username</h2>
-						<p>Adepto</p>
+						<h2 id="profile-summary-title" data-profile-username>—</h2>
+						<p data-profile-livello>—</p>
 					</div>
 					<dl class="profile-settings__meta">
 						<div>
 							<dt>Accademia</dt>
-							<dd>Arborea</dd>
+							<dd data-profile-accademia>—</dd>
 						</div>
 						<div>
 							<dt>Email</dt>
-							<dd>username@email.it</dd>
+							<dd data-profile-email>—</dd>
 						</div>
 					</dl>
 				</aside>
@@ -69,7 +69,7 @@ const { lang = 'it' } = Astro.props;
 						<div class="profile-settings-fields">
 							<label>
 								<span>Nuovo username</span>
-								<input name="username" type="text" autocomplete="username" value="Username" />
+								<input name="username" type="text" autocomplete="username" value="" data-profile-username-input />
 							</label>
 						</div>
 					</section>
@@ -114,6 +114,39 @@ const { lang = 'it' } = Astro.props;
 </Layout>
 
 <script>
+	// --- Caricamento dati utente corrente ---
+
+	const loadProfilo = async () => {
+		try {
+			const res = await fetch('/api/user/profilo');
+			if (!res.ok) return;
+			const profilo = await res.json();
+
+			const set = (sel: string, val: string | null) => {
+				const el = document.querySelector(sel);
+				if (el instanceof HTMLElement && val) el.textContent = val;
+			};
+
+			set('[data-profile-username]', profilo.username);
+			set('[data-profile-livello]', profilo.livello);
+			set('[data-profile-accademia]', profilo.accademia);
+			set('[data-profile-email]', profilo.email);
+
+			const usernameInput = document.querySelector<HTMLInputElement>('[data-profile-username-input]');
+			if (usernameInput && profilo.username) usernameInput.value = profilo.username;
+
+			if (profilo.avatarSrc) {
+				const img = document.querySelector<HTMLImageElement>('[data-profile-avatar-current]');
+				if (img) img.src = profilo.avatarSrc;
+			}
+		} catch {
+			// Dati non disponibili: la pagina resta con i placeholder
+		}
+	};
+
+	loadProfilo();
+	document.addEventListener('astro:page-load', loadProfilo);
+
 	const setupProfileAvatarPicker = () => {
 		const openControls = document.querySelectorAll<HTMLElement>('[data-avatar-profile-modal-open]');
 		const currentAvatar = document.querySelector<HTMLImageElement>('[data-profile-avatar-current]');

@@ -6,8 +6,8 @@ import { logger } from '../../../../services/logger';
 import { AuthService } from '../../../../services/auth.service';
 
 // Configuration
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL || 'http://localhost:1337';
-const STRAPI_API = import.meta.env.STRAPI_API;
+const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL || 'http://localhost:1337';
+const STRAPI_API = import.meta.env.AUTH_READONLY;
 const SMTP_HOST = import.meta.env.SMTP_HOST;
 const SMTP_PORT = parseInt(import.meta.env.SMTP_PORT || '587');
 const SMTP_USERNAME = import.meta.env.SMTP_USERNAME;

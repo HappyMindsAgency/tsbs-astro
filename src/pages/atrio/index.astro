@@ -2,7 +2,6 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
-
 const { lang = 'it' } = Astro.props;
 
 const tasks = [
@@ -26,12 +25,13 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 	<main class="tsbs-app-shell dashboard-shell">
 		<header class="dashboard-header">
 			<div class="dashboard-profile">
-				<div class="dashboard-avatar" aria-hidden="true">
-					<i class="bi bi-eyeglasses"></i>
+				<div class="dashboard-avatar" aria-hidden="true" data-atrio-avatar>
+					<i class="bi bi-eyeglasses" data-atrio-avatar-fallback></i>
+					<img data-atrio-avatar-img hidden alt="" />
 				</div>
 				<div>
-					<p class="dashboard-username">Username</p>
-					<p class="dashboard-rank">Adepto</p>
+					<p class="dashboard-username" data-atrio-username>—</p>
+					<p class="dashboard-rank" data-atrio-livello>—</p>
 				</div>
 			</div>
 			<a class="dashboard-menu-button" href="/profilo/impostazioni/" aria-label="Profilo e impostazioni">
@@ -115,6 +115,35 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 		</section>
 	</main>
 	<WelcomeToast isOpen={true} />
-
-
 </Layout>
+
+<script>
+	const loadAtrioHeader = async () => {
+		try {
+			const res = await fetch('/api/user/profilo');
+			if (!res.ok) return;
+			const profilo = await res.json();
+
+			const username = document.querySelector('[data-atrio-username]');
+			const livello = document.querySelector('[data-atrio-livello]');
+
+			if (username instanceof HTMLElement && profilo.username) username.textContent = profilo.username;
+			if (livello instanceof HTMLElement && profilo.livello) livello.textContent = profilo.livello;
+
+			if (profilo.avatarSrc) {
+				const fallback = document.querySelector('[data-atrio-avatar-fallback]');
+				const img = document.querySelector<HTMLImageElement>('[data-atrio-avatar-img]');
+				if (fallback instanceof HTMLElement) fallback.hidden = true;
+				if (img instanceof HTMLImageElement) {
+					img.src = profilo.avatarSrc;
+					img.hidden = false;
+				}
+			}
+		} catch {
+			// Fallback silenzioso: rimangono i placeholder
+		}
+	};
+
+	loadAtrioHeader();
+	document.addEventListener('astro:page-load', loadAtrioHeader);
+</script>

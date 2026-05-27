@@ -3,8 +3,8 @@ import type { APIRoute } from 'astro';
 import { LoginError, isValidIdentifier, redirectWithLoginError, redirectToAtrio, setAuthCookie, AuthServiceError } from '../../../utils/auth.utils';
 import { AuthService } from '../../../services/auth.service'; 
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL
-const STRAPI_API = import.meta.env.STRAPI_API; 
+const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
+const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
 	const baseUrl = new URL(request.url).origin;
@@ -32,6 +32,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		// jwt = ''; // Simula una risposta di Strapi senza JWT
 		if (jwt && user) {
             setAuthCookie(cookies, jwt);
+
+            // Registra l'ultimo login in background — nessun blocco sul redirect in caso di errore
+            fetch(`${baseUrl}/api/user/dati-aggiuntivi`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Cookie': `jwt=${jwt}` },
+                body: JSON.stringify({ ultimoLogin: new Date().toISOString() }),
+            }).catch(() => {});
+
 			return redirectToAtrio(baseUrl);
 		} else {
 			console.error('Strapi response was OK, but JWT or User data is missing.');

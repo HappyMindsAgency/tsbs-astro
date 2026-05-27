@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 
 // Definizione dell'URL base dell'API Strapi.
 // NOTA: Come per login.ts, questo dovrebbe idealmente essere una variabile d'ambiente.
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_BASE_URL;
+const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
 
 export const GET: APIRoute = async ({ request, cookies }) => {
 	// 1. Recupera il token JWT dal cookie HttpOnly impostato durante il login.

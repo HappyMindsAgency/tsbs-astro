@@ -46,6 +46,7 @@ const avatars = [
               height={avatar.height}
               alt={`Avatar ${index + 1}`}
               loading={index === 0 ? "eager" : "lazy"}
+              data-avatar-src={avatar.src}
               decoding="async"
             />
           ))
@@ -91,12 +92,35 @@ const avatars = [
         </div>
       </fieldset>
 
-      <a class="btn tsbs-cta-primary mission-proof-question__cta scelta-avatar__cta" href="/atrio/">
+      <button type="submit" class="btn tsbs-cta-primary mission-proof-question__cta scelta-avatar__cta">
         Conferma la scelta
-      </a>
+      </button>
     </form>
   </div>
 </section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('.scelta-avatar__form');
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const selected = form.querySelector<HTMLInputElement>('input[name="avatar"]:checked');
+    const avatar = selected?.value ?? 'avatar-1';
+
+    try {
+      await fetch('/api/user/dati-aggiuntivi', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar }),
+      });
+    } catch {
+      // Il salvataggio dell'avatar non blocca la navigazione
+    }
+
+    window.location.assign('/atrio/');
+  });
+</script>
 
 <style>
   .scelta-avatar {
