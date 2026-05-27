@@ -900,6 +900,10 @@ body:has(.tsbs-legal-page) {
 			text-decoration: none;
 		}
 
+		.tsbs-note-card.is-hidden {
+			display: none;
+		}
+
 		.tsbs-note-card__copy {
 			display: grid;
 			align-content: start;
@@ -3969,8 +3973,7 @@ body:has(.tsbs-legal-page) {
 // NOTA
 .note-page__content {
 		display: grid;
-		height: calc(100dvh - var(--tsbs-mobile-nav-viewport-height) - 5.25rem);
-		min-height: 0;
+		min-height: calc(100dvh - var(--tsbs-mobile-nav-viewport-height) - 5.25rem);
 		padding-top: 1rem;
 		padding-bottom: 1rem;
 	}
@@ -3986,7 +3989,8 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.note-editor--published {
-		grid-template-rows: auto minmax(0, 1fr);
+		grid-template-rows: auto auto;
+		overflow: visible;
 	}
 
 	.note-editor__head {
@@ -4078,10 +4082,13 @@ body:has(.tsbs-legal-page) {
 		background-image: repeating-linear-gradient(
 			to bottom,
 			transparent 0,
-			transparent calc(1.75rem - 1px),
+			transparent calc(1.75rem - 2px),
+			rgba(84, 97, 118, 0.22) calc(1.75rem - 2px),
 			rgba(84, 97, 118, 0.22) calc(1.75rem - 1px),
-			rgba(84, 97, 118, 0.22) 1.75rem
+			transparent calc(1.75rem - 1px),
+			transparent 1.75rem
 		);
+		background-position-y: 0.3125rem;
 		background-clip: content-box;
 	}
 
@@ -4115,14 +4122,44 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.note-editor__body--published {
-		padding-top: 1.75rem;
+		padding-top: 2rem;
 		line-height: 1.75rem;
+		overflow: visible;
+		background-image: none;
+	}
+
+	.note-editor__body--published :where(h1, h2, h3, h4, h5, h6) {
+		width: 100%;
+		max-width: none;
+		margin: 0 0 1.75rem;
+		line-height: 1.15;
+		background-image: repeating-linear-gradient(
+			to bottom,
+			transparent 0,
+			transparent calc(1.15em - 0.18em),
+			rgba(84, 97, 118, 0.22) calc(1.15em - 0.18em),
+			rgba(84, 97, 118, 0.22) calc(1.15em - 0.15em),
+			transparent calc(1.15em - 0.15em),
+			transparent 1.15em
+		);
+		background-position-y: 0.06em;
 	}
 
 	.note-editor__body--published p {
-		max-width: 48rem;
+		width: 100%;
+		max-width: none;
 		margin: 0 0 1.75rem;
-		transform: translateY(0.3125rem);
+		line-height: 1.75rem;
+		background-image: repeating-linear-gradient(
+			to bottom,
+			transparent 0,
+			transparent calc(1.75rem - 0.1875rem),
+			rgba(84, 97, 118, 0.22) calc(1.75rem - 0.1875rem),
+			rgba(84, 97, 118, 0.22) calc(1.75rem - 0.125rem),
+			transparent calc(1.75rem - 0.125rem),
+			transparent 1.75rem
+		);
+		background-position-y: 0.125rem;
 	}
 
 	.note-editor__actions {
@@ -4146,7 +4183,6 @@ body:has(.tsbs-legal-page) {
 
 	@media (min-width: 768px) {
 		.note-page__content {
-			height: auto;
 			padding-top: 3rem;
 		}
 
@@ -4156,7 +4192,7 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.note-editor--published {
-			grid-template-rows: auto minmax(28rem, 1fr);
+			grid-template-rows: auto auto;
 		}
 	}
 

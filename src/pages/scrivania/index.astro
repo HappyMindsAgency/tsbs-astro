@@ -4,34 +4,25 @@ import Nav from '../../components/Nav.astro';
 import classificaIcon from '../../assets/03_classifica_bianco_scrivania.svg';
 import grimorioIcon from '../../assets/02_grimorio_bianco_scrivania.svg';
 import trofeiIcon from '../../assets/01_trofei_bianco_scrivania.svg';
+import { formatGrimorioDate, getCurrentMembroFromJwt, getGrimorioExcerpt, getGrimorioNoteByMembro, getGrimorioVisibilityLabel } from '../../lib/strapi/grimorio';
 
 const { lang = 'it' } = Astro.props;
-
-const notes = [
-	{
-		meta: 'OGGI • PERSONALE',
-		title: 'Etiam vehicula dui ante',
-		text: 'onec et dui nec augue semper placerat. Vestibulum ante ipsum primis in faucibus luctus...',
-		slug: 'etiam-vehicula-dui-ante',
-	},
-	{
-		meta: 'IERI • ACCADEMIA',
-		title: 'Lorem ipsum dolor sit amet',
-		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
-		slug: 'lorem-ipsum-dolor-sit-amet',
-	},
-	{
-		meta: 'IERI • ACCADEMIA',
-		title: 'Lorem ipsum dolor sit amet',
-		text: 'uis posuere volutpat massa, ut tristique tellus. Suspendisse potenti. Donec posuere velit...',
-		slug: 'lorem-ipsum-dolor-sit-amet-2',
-	},
-];
+const jwt = Astro.cookies.get('jwt')?.value;
 
 const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
-if (!Astro.cookies.has('jwt')) {
+if (!jwt) {
 	return Astro.redirect('/');
 }
+
+const membro = await getCurrentMembroFromJwt(jwt);
+const notes = membro ? await getGrimorioNoteByMembro(membro.id, lang) : [];
+
+const getNoteMeta = (publishedAt: string | null | undefined, visibilePubblico: boolean) => {
+	const dayLabel = formatGrimorioDate(publishedAt);
+	const scopeLabel = getGrimorioVisibilityLabel(visibilePubblico);
+
+	return [dayLabel, scopeLabel].filter(Boolean).join(' • ');
+};
 ---
 
 <Layout lang={lang}>
@@ -125,12 +116,18 @@ if (!Astro.cookies.has('jwt')) {
 				<h2 id="latest-title" class="tsbs-section-title">Ultime note</h2>
 
 				<div class="tsbs-note-list">
-					{notes.map((note) => (
-						<a class="tsbs-note-card" href={`/scrivania/grimorio/pubblicate/${note.slug}/`}>
+					{notes.map((note, index) => (
+						<a
+							class={`tsbs-note-card ${index >= 3 ? 'is-hidden' : ''}`}
+							href={`/scrivania/grimorio/pubblicate/${note.slug}/`}
+							data-grimorio-card
+						>
 							<div class="tsbs-note-card__copy">
-								<p class="tsbs-note-card__meta">{note.meta}</p>
-								<h3>{note.title}</h3>
-								<p>{note.text}</p>
+								<p class="tsbs-note-card__meta">
+									{getNoteMeta(note.publishedAt, note.visibilePubblico)}
+								</p>
+								<h3>{note.titolo}</h3>
+								<p>{getGrimorioExcerpt(note.contenuto)}</p>
 							</div>
 							<div class="tsbs-note-card__actions" aria-hidden="true">
 								<i class="bi bi-share"></i>
@@ -140,16 +137,50 @@ if (!Astro.cookies.has('jwt')) {
 					))}
 				</div>
 
-				<button class="missions-load-more" type="button">
-					<span>Carica altro</span>
-					<i class="bi bi-arrow-right" aria-hidden="true"></i>
-				</button>
+				{notes.length > 3 && (
+					<button class="missions-load-more grimorio-load-more" type="button" data-grimorio-load-more aria-controls="latest-title">
+						<span>Carica altro</span>
+						<i class="bi bi-arrow-right" aria-hidden="true"></i>
+					</button>
+				)}
 			</section>
 		</div>
 	</main>
 </Layout>
 
 <script>
+	const getGrimorioBatchSize = () => {
+		if (window.matchMedia('(min-width: 992px)').matches) return 5;
+		if (window.matchMedia('(min-width: 768px)').matches) return 4;
+		return 3;
+	};
+
+	const setupGrimorioArchive = () => {
+		const cards = [...document.querySelectorAll<HTMLElement>('[data-grimorio-card]')];
+		const loadMoreButton = document.querySelector<HTMLButtonElement>('[data-grimorio-load-more]');
+		if (!loadMoreButton) return;
+
+		const batchSize = getGrimorioBatchSize();
+		let visibleCount = Number(loadMoreButton.dataset.visibleCount || batchSize);
+		visibleCount = Math.max(batchSize, visibleCount);
+
+		const updateCards = () => {
+			cards.forEach((card, index) => {
+				card.classList.toggle('is-hidden', index >= visibleCount);
+			});
+
+			loadMoreButton.hidden = visibleCount >= cards.length;
+			loadMoreButton.dataset.visibleCount = String(visibleCount);
+		};
+
+		loadMoreButton.onclick = () => {
+			visibleCount += batchSize;
+			updateCards();
+		};
+
+		updateCards();
+	};
+
 	const loadDeskHeader = async () => {
 		try {
 			const res = await fetch('/api/user/profilo');
@@ -180,5 +211,9 @@ if (!Astro.cookies.has('jwt')) {
 	};
 
 	loadDeskHeader();
-	document.addEventListener('astro:page-load', loadDeskHeader);
+	setupGrimorioArchive();
+	document.addEventListener('astro:page-load', () => {
+		loadDeskHeader();
+		setupGrimorioArchive();
+	});
 </script>
