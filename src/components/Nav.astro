@@ -52,6 +52,11 @@ const activeDesktopHref = getActiveHref(desktopItems);
 const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, href, activePaths }));
 ---
 
+<!-- TODO trigger logout provvisorio — rimuovere quando integrato nel profilo -->
+<button class="tsbs-mobile-logout" type="button" data-logout-trigger aria-label="Esci">
+  <i class="bi bi-box-arrow-left" aria-hidden="true"></i>
+</button>
+
 <nav class="tsbs-mobile-nav" aria-label="Menu principale" data-lang={lang}>
   <ul class="tsbs-mobile-nav__list">
     {mobileItems.map((item) => (
@@ -111,7 +116,22 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
       ))}
     </ul>
   </nav>
+  <div class="tsbs-desktop-nav__footer">
+    <button class="tsbs-desktop-nav__logout" type="button" data-logout-trigger>
+      <i class="bi bi-box-arrow-left" aria-hidden="true"></i>
+      <span>Esci</span>
+    </button>
+  </div>
 </aside>
+
+<script>
+  document.querySelectorAll('[data-logout-trigger]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.assign('/login/');
+    });
+  });
+</script>
 
 <script define:vars={{ navContextItems, deactivateAll }} data-astro-rerun>
   const navContextStorageKey = "tsbs.activeNavContext";
@@ -263,7 +283,34 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
     display: none;
   }
 
+  .tsbs-mobile-logout {
+    position: fixed;
+    bottom: calc(var(--tsbs-mobile-nav-viewport-height, 4.5rem) + 0.75rem);
+    right: 0.75rem;
+    z-index: 1031;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    color: var(--nav-muted-color);
+    font-size: 1.25rem;
+    background: var(--nav-surface);
+    border: 1px solid var(--nav-border);
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .tsbs-mobile-logout:hover {
+    color: #c0392b;
+  }
+
   @media (min-width: 992px) {
+    .tsbs-mobile-logout {
+      display: none;
+    }
+
     .tsbs-mobile-nav {
       display: none;
     }
@@ -326,6 +373,37 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
       color: var(--nav-active-color);
       background: var(--nav-active-surface);
       box-shadow: 0 0.75rem 1.875rem rgba(84, 97, 118, 0.08);
+    }
+
+    .tsbs-desktop-nav__footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      border-top: 1px solid var(--nav-border);
+    }
+
+    .tsbs-desktop-nav__logout {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      width: 100%;
+      min-height: 3rem;
+      padding: 0.625rem 1.5rem;
+      color: var(--nav-muted-color);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      background: none;
+      border: none;
+      border-radius: 1rem;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .tsbs-desktop-nav__logout:hover {
+      color: #c0392b;
+      background: #fdf2f0;
     }
   }
 </style>
