@@ -22,63 +22,66 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 <Layout lang={lang} theme="theme-neutral">
 	<main class="login-page">
 		<div class="login-stage">
-			<img
-				class="login-visual"
-				src={loginHero.src}
-				width={loginHero.width}
-				height={loginHero.height}
-				alt=""
-				aria-hidden="true"
-			/>
-
 			<section class="login-panel" aria-labelledby="login-title">
-				<h1 id="login-title">Login</h1>
-				<p class="login-intro">
-					Sei alle porte della Secret Bookish Society.
-					<br />
-					Solo tu hai la chiave.
-					<br />
-					Inserisci le tue credenziali.
-					<br />
-					Non hai ancora risposto alla Chiamata? <a href="/registrazione/">Registrati.</a>
-				</p>
+				<div class="login-media" aria-hidden="true">
+					<img
+						class="login-visual"
+						src={loginHero.src}
+						width={loginHero.width}
+						height={loginHero.height}
+						alt=""
+					/>
+				</div>
 
-				{errorMessage && (
-					<div class="login-error-box" role="alert">
-						<i class="bi bi-exclamation-circle-fill"></i>
-						<span>{errorMessage}</span>
-					</div>
-				)}
+				<div class="login-content">
+					<h1 id="login-title">Login</h1>
+					<p class="login-intro">
+						Sei alle porte della Secret Bookish Society.
+						<br />
+						Solo tu hai la chiave.
+						<br />
+						Inserisci le tue credenziali.
+						<br />
+						Non hai ancora risposto alla Chiamata? <a href="/registrazione/">Registrati.</a>
+					</p>
 
-				<form class="login-form" action="/api/auth/login" method="post">
-					<div class="login-field">
-						<label for="login-identifier">Username/Email</label>
-						<input
-							id="login-identifier"
-							name="identifier"
-							type="text"
-							autocomplete="username"
-							value={identifier}
-							required
-							pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$|^[a-zA-Z0-9_.-]{3,}$"
-							title="Inserisci un'email valida o un nome utente di almeno 3 caratteri senza spazi."
-						/>
-					</div>
-
-					<div class="login-field">
-						<label for="login-password">Password</label>
-						<div class="login-password">
-							<input id="login-password" name="password" type="password" autocomplete="current-password" required />
-							<button type="button" class="login-password__toggle" aria-label="Mostra password" data-password-toggle>
-								<i class="bi bi-eye"></i>
-							</button>
+					{errorMessage && (
+						<div class="login-error-box" role="alert">
+							<i class="bi bi-exclamation-circle-fill"></i>
+							<span>{errorMessage}</span>
 						</div>
-					</div>
+					)}
 
-					<button type="submit" class="login-submit">Login</button>
-				</form>
+					<form class="login-form" action="/api/auth/login" method="post">
+						<div class="login-field">
+							<label for="login-identifier">Username/Email</label>
+							<input
+								id="login-identifier"
+								name="identifier"
+								type="text"
+								autocomplete="username"
+								value={identifier}
+								required
+								pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$|^[a-zA-Z0-9_.-]{3,}$"
+								title="Inserisci un'email valida o un nome utente di almeno 3 caratteri senza spazi."
+							/>
+						</div>
 
-				<a class="login-forgot" href="/auth/reset-password/request">Password dimenticata?</a>
+						<div class="login-field">
+							<label for="login-password">Password</label>
+							<div class="login-password">
+								<input id="login-password" name="password" type="password" autocomplete="current-password" required />
+								<button type="button" class="login-password__toggle" aria-label="Mostra password" data-password-toggle>
+									<i class="bi bi-eye"></i>
+								</button>
+							</div>
+						</div>
+
+						<button type="submit" class="login-submit">Login</button>
+					</form>
+
+					<a class="login-forgot" href="/auth/reset-password/request">Password dimenticata?</a>
+				</div>
 			</section>
 		</div>
 	</main>
@@ -149,6 +152,10 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 		gap: clamp(0.75rem, 4vw, 1.25rem);
 	}
 
+	.login-media {
+		width: 100%;
+	}
+
 	.login-visual {
 		width: 100%;
 		aspect-ratio: 416 / 296;
@@ -157,13 +164,17 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 
 	.login-panel {
 		display: grid;
-		gap: 0;
+		gap: clamp(0.75rem, 4vw, 1.25rem);
 		width: 100%;
-		padding: 0 1.4375rem;
 		color: var(--login-text);
 	}
 
-	.login-panel h1 {
+	.login-content {
+		display: grid;
+		padding: 0 1.4375rem;
+	}
+
+	.login-content h1 {
 		margin: 0 0 1rem;
 		color: var(--login-text);
 		font-size: 2rem;
@@ -292,17 +303,33 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 		}
 
 		.login-stage {
-			position: relative;
 			display: grid;
 			place-items: center;
-			gap: 2.25rem;
 			width: min(100%, 80.9375rem);
 			min-height: calc(100vh - 2.125rem);
 		}
 
+		.login-panel {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+			align-items: center;
+			column-gap: clamp(2rem, 5vw, 5.5rem);
+			width: min(100%, 58rem);
+			min-height: 18.75rem;
+			padding: clamp(1.75rem, 3vw, 2.5rem);
+			background: var(--login-panel);
+			border-radius: 0.3125rem;
+		}
+
+		.login-media {
+			display: grid;
+			place-items: center;
+			align-self: stretch;
+			min-height: 13rem;
+			overflow: hidden;
+		}
+
 		.login-visual {
-			position: absolute;
-			inset: 0;
 			width: 100%;
 			height: 100%;
 			aspect-ratio: auto;
@@ -310,17 +337,11 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 			object-position: center;
 		}
 
-		.login-panel {
-			position: relative;
-			z-index: 1;
-			width: min(100%, 35.5rem);
-			min-height: 30.75rem;
-			padding: 1.9375rem 6.25rem 1.875rem;
-			background: color-mix(in srgb, var(--login-panel) 85%, transparent);
-			border-radius: 1.125rem;
+		.login-content {
+			padding: 0;
 		}
 
-		.login-panel h1 {
+		.login-content h1 {
 			font-size: 2rem;
 		}
 
@@ -339,7 +360,7 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 	}
 
 	@media (max-width: 374.98px) {
-		.login-panel {
+		.login-content {
 			padding-right: 1rem;
 			padding-left: 1rem;
 		}
