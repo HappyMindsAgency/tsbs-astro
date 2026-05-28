@@ -197,6 +197,7 @@ const getNoteMeta = (publishedAt: string | null | undefined, visibilePubblico: b
 			set('[data-desk-username]', profilo.username);
 			set('[data-desk-livello]', profilo.livello);
 			set('[data-desk-accademia]', profilo.accademia);
+			set('[data-desk-codice]', profilo.tessera);
 
 			if (profilo.avatarSrc) {
 				const fallback = document.querySelector('[data-desk-avatar-fallback]');

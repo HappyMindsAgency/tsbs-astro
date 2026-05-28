@@ -1,59 +1,121 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import {
+	getMissioniAttive,
+	getPartecipazioniMissioneByJwt,
+	type Missione,
+	type PartecipazioneMissione,
+} from '../../lib/strapi/missioni';
 import { resolveUserContext } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 
-const missionTabs = [
-	{
-		id: 'in-corso',
-		label: 'In corso',
-		missions: [
-			{ progress: 65, meta: '65%', href: '/missioni/lorem-ipsum-dolor/' },
-			{ progress: 90, meta: '90%' },
-			{ progress: 50, meta: 'Step 2/4' },
-			{ progress: 25, meta: 'Step 1/4' },
-			{ progress: 80, meta: '80%' },
-			{ progress: 100, meta: 'Completata' },
-			{ progress: 35, meta: '35%' },
-			{ progress: 70, meta: 'Step 3/4' },
-		],
-	},
-	{
-		id: 'completate',
-		label: 'Completate',
-		missions: [
-			{ progress: 100, meta: 'Completata' },
-			{ progress: 100, meta: 'Completata' },
-			{ progress: 100, meta: 'Completata' },
-			{ progress: 100, meta: 'Completata' },
-			{ progress: 100, meta: 'Completata' },
-			{ progress: 100, meta: 'Completata' },
-			{ progress: 100, meta: 'Completata' },
-			{ progress: 100, meta: 'Completata' },
-		],
-	},
-	{
-		id: 'disponibili',
-		label: 'Disponibili',
-		missions: [
-			{ progress: 0, meta: 'Disponibile' },
-			{ progress: 0, meta: 'Disponibile' },
-			{ progress: 0, meta: 'Disponibile' },
-			{ progress: 0, meta: 'Disponibile' },
-			{ progress: 0, meta: 'Disponibile' },
-			{ progress: 0, meta: 'Disponibile' },
-			{ progress: 0, meta: 'Disponibile' },
-			{ progress: 0, meta: 'Disponibile' },
-		],
-	},
-];
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+const jwt = Astro.cookies.get('jwt')?.value;
+const { theme, accademia } = await resolveUserContext(jwt);
+
+type MissionCard = {
+	title: string;
+	description: string;
+	href: string;
+	progress: number;
+	meta: string;
+};
+
+type MissionTab = {
+	id: string;
+	label: string;
+	missions: MissionCard[];
+};
+
+function getPlainText(value: string | null | undefined) {
+	if (!value) return '';
+	return value
+		.replace(/[#*_>`[\]()]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+function getExcerpt(value: string | null | undefined) {
+	const plainText = getPlainText(value);
+	if (!plainText) return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+	if (plainText.length <= 110) return plainText;
+
+	return `${plainText.slice(0, 107).trim()}...`;
+}
+
+function normalizeProgress(value: string | null | undefined, fallback = 0) {
+	if (!value) return fallback;
+
+	const progress = Number.parseFloat(value.replace(',', '.').replace('%', '').trim());
+	if (!Number.isFinite(progress)) return fallback;
+
+	return Math.min(100, Math.max(0, Math.round(progress)));
+}
+
+function getMissionProgress(partecipazione: PartecipazioneMissione | undefined) {
+	if (partecipazione?.stato === 'completata') return 100;
+	return normalizeProgress(partecipazione?.progresso, 0);
+}
+
+function toMissionCard(missione: Missione, partecipazione: PartecipazioneMissione | undefined): MissionCard {
+	const progress = getMissionProgress(partecipazione);
+
+	return {
+		title: missione.titolo,
+		description: getExcerpt(missione.descrizione),
+		href: `/missioni/${missione.slug}/`,
+		progress,
+		meta: `${progress}%`,
+	};
+}
+
+function buildMissionTabs(missioni: Missione[], partecipazioni: PartecipazioneMissione[]): MissionTab[] {
+	const partecipazioniByMissione = new Map<string, PartecipazioneMissione>();
+	for (const partecipazione of partecipazioni) {
+		const missioneSlug = partecipazione.missione?.slug;
+		if (missioneSlug) partecipazioniByMissione.set(missioneSlug, partecipazione);
+	}
+
+	const inCorso: MissionCard[] = [];
+	const completate: MissionCard[] = [];
+	const disponibili: MissionCard[] = [];
+
+	for (const missione of missioni) {
+		const partecipazione = partecipazioniByMissione.get(missione.slug);
+		const missionCard = toMissionCard(missione, partecipazione);
+
+		if (partecipazione?.stato === 'completata') {
+			completate.push(missionCard);
+			continue;
+		}
+
+		if (partecipazione?.stato === 'inCorso') {
+			inCorso.push(missionCard);
+			continue;
+		}
+
+		disponibili.push(missionCard);
+	}
+
+	return [
+		{ id: 'in-corso', label: 'In corso', missions: inCorso },
+		{ id: 'completate', label: 'Completate', missions: completate },
+		{ id: 'disponibili', label: 'Disponibili', missions: disponibili },
+	];
+}
+
+const [missioniAttive, partecipazioniMissione] = await Promise.all([
+	getMissioniAttive(lang),
+	jwt ? getPartecipazioniMissioneByJwt(jwt, lang) : Promise.resolve([]),
+]);
+const missionTabs = buildMissionTabs(missioniAttive, partecipazioniMissione);
+const firstPopulatedTabIndex = missionTabs.findIndex((tab) => tab.missions.length > 0);
+const activeTabIndex = firstPopulatedTabIndex >= 0 ? firstPopulatedTabIndex : 0;
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -71,14 +133,14 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 				{missionTabs.map((tab, index) => (
 					<li class="nav-item missions-tabs__item" role="presentation">
 						<button
-							class={`nav-link missions-tabs__button ${index === 0 ? 'active' : ''}`}
+							class={`nav-link missions-tabs__button ${index === activeTabIndex ? 'active' : ''}`}
 							id={`${tab.id}-tab`}
 							data-bs-toggle="tab"
 							data-bs-target={`#${tab.id}`}
 							type="button"
 							role="tab"
 							aria-controls={tab.id}
-							aria-selected={index === 0 ? 'true' : 'false'}
+							aria-selected={index === activeTabIndex ? 'true' : 'false'}
 						>
 							{tab.label}
 						</button>
@@ -89,48 +151,52 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 			<div class="tab-content missions-tab-content" id="missions-tabs-content">
 				{missionTabs.map((tab, tabIndex) => (
 					<div
-						class={`tab-pane fade ${tabIndex === 0 ? 'show active' : ''}`}
+						class={`tab-pane fade ${tabIndex === activeTabIndex ? 'show active' : ''}`}
 						id={tab.id}
 						role="tabpanel"
 						aria-labelledby={`${tab.id}-tab`}
 						tabindex="0"
 					>
-						<div class="missions-grid dashboard-task-grid">
-							{tab.missions.map((mission) => (
-								mission.href ? (
-									<a class="tsbs-card dashboard-task mission-card mission-card-link" href={mission.href} data-mission-card>
-										<div class="dashboard-task__header">
-											<div>
-												<h3 class="tsbs-accent-title">Lorem ipsum dolor</h3>
-												<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+						{tab.missions.length > 0 ? (
+							<>
+								<div class="missions-grid dashboard-task-grid">
+									{tab.missions.map((mission) => (
+										<a class="tsbs-card dashboard-task mission-card mission-card-link" href={mission.href} data-mission-card>
+											<div class="dashboard-task__header">
+												<div>
+													<h3 class="tsbs-accent-title">{mission.title}</h3>
+													<p>{mission.description}</p>
+												</div>
 											</div>
-										</div>
-										<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
-											<span style={`width: ${mission.progress}%`}></span>
-										</div>
-										<p class="dashboard-progress-label">{mission.meta}</p>
-									</a>
-								) : (
-									<article class="tsbs-card dashboard-task mission-card" data-mission-card>
-										<div class="dashboard-task__header">
-											<div>
-												<h3 class="tsbs-accent-title">Lorem ipsum dolor</h3>
-												<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+											<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
+												<span style={`width: ${mission.progress}%`}></span>
 											</div>
-										</div>
-										<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
-											<span style={`width: ${mission.progress}%`}></span>
-										</div>
-										<p class="dashboard-progress-label">{mission.meta}</p>
-									</article>
-								)
-							))}
-						</div>
+											<p class="dashboard-progress-label">{mission.meta}</p>
+										</a>
+									))}
+								</div>
 
-						<button class="missions-load-more" type="button" data-load-more aria-controls={tab.id}>
-							<span>Carica altro</span>
-							<i class="bi bi-arrow-right" aria-hidden="true"></i>
-						</button>
+								<button class="missions-load-more" type="button" data-load-more aria-controls={tab.id}>
+									<span>Carica altro</span>
+									<i class="bi bi-arrow-right" aria-hidden="true"></i>
+								</button>
+							</>
+						) : (
+							<div class="missions-grid dashboard-task-grid">
+								<article class="tsbs-card dashboard-task mission-card">
+									<div class="dashboard-task__header">
+										<div>
+											<h3 class="tsbs-accent-title">Nessuna missione</h3>
+											<p>Nessuna missione in questa sezione.</p>
+										</div>
+									</div>
+									<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label="Progresso 0%">
+										<span style="width: 0%"></span>
+									</div>
+									<p class="dashboard-progress-label">0%</p>
+								</article>
+							</div>
+						)}
 					</div>
 				))}
 			</div>

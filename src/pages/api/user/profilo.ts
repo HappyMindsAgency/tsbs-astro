@@ -34,6 +34,7 @@ const AVATAR_SRC_MAP: Record<string, string> = {
 
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
+const LIBRARY_CARD_CODE_PATTERN = /^\d{14}$/;
 
 export const GET: APIRoute = async ({ cookies }) => {
     const jwt = cookies.get('jwt')?.value;
@@ -62,6 +63,9 @@ export const GET: APIRoute = async ({ cookies }) => {
 
     const qs = new URLSearchParams({
         'filters[user][id][$eq]': String(user.id),
+        'fields[0]': 'tessera',
+        'fields[1]': 'punti',
+        'fields[2]': 'datiAggiuntivi',
         'populate[0]': 'accademia',
         'populate[1]': 'livello',
     });
@@ -79,6 +83,7 @@ export const GET: APIRoute = async ({ cookies }) => {
     }
 
     const avatarId = ((membro?.datiAggiuntivi as Record<string, unknown> | null)?.avatar as string) ?? null;
+    const tessera = normalizeLibraryCardCode((membro?.tessera as string | null) ?? '');
 
     return json({
         username: user.username ?? null,
@@ -89,8 +94,13 @@ export const GET: APIRoute = async ({ cookies }) => {
         accademiaSlug: (membro?.accademia as Record<string, unknown> | null)?.slug ?? null,
         livello: (membro?.livello as Record<string, unknown> | null)?.nome ?? null,
         punti: (membro?.punti as number | null) ?? null,
+        tessera: LIBRARY_CARD_CODE_PATTERN.test(tessera) ? tessera : null,
     });
 };
+
+function normalizeLibraryCardCode(value: string) {
+    return value.replace(/[\s-]+/g, '').trim();
+}
 
 function json(data: unknown, status = 200): Response {
     return new Response(JSON.stringify(data), {

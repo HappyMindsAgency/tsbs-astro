@@ -1,4 +1,5 @@
 import { fetchStrapi, type StrapiCollectionResponse } from './client';
+import { getStrapiApiUrl } from './api-url';
 
 type StrapiRelationBase = {
 	id: number;
@@ -76,6 +77,26 @@ export type Missione = StrapiRelationBase & {
 	stagione: MissioneStagione | null;
 };
 
+export type PartecipazioneMissioneStato = 'daFare' | 'inCorso' | 'completata';
+
+export type PartecipazioneMissione = StrapiRelationBase & {
+	stato: PartecipazioneMissioneStato | null;
+	progresso: string | null;
+	dataInizio: string | null;
+	dataCompletamento: string | null;
+	datiRuntime: unknown;
+	missione: Pick<Missione, 'id' | 'documentId' | 'titolo' | 'slug'> | null;
+};
+
+type StrapiUser = {
+	id: number;
+	email?: string;
+};
+
+type MembroMissioni = StrapiRelationBase & {
+	email: string | null;
+};
+
 const STRAPI_LOCALE_BY_LANG: Record<string, string> = {
 	it: 'it-IT',
 };
@@ -118,6 +139,14 @@ function setMissioneRelations(searchParams: URLSearchParams) {
 	searchParams.set('populate[stagione][fields][1]', 'slug');
 }
 
+function setMissioneListRelations(searchParams: URLSearchParams) {
+	searchParams.set('populate[categorie_missione][fields][0]', 'nome');
+	searchParams.set('populate[livello][fields][0]', 'nome');
+	searchParams.set('populate[livello][fields][1]', 'slug');
+	searchParams.set('populate[missione_precedente][fields][0]', 'titolo');
+	searchParams.set('populate[missione_precedente][fields][1]', 'slug');
+}
+
 function normalizeMissione(missione: Missione): Missione {
 	return {
 		...missione,
@@ -140,4 +169,71 @@ export async function getMissioneBySlug(slug: string, lang = 'it') {
 	const missione = response.data?.[0];
 
 	return missione ? normalizeMissione(missione) : null;
+}
+
+export async function getMissioniAttive(lang = 'it') {
+	const searchParams = new URLSearchParams();
+	searchParams.set('locale', getItalianStrapiLocale(lang));
+	searchParams.set('status', 'published');
+	searchParams.set('filters[attiva][$eq]', 'true');
+	searchParams.set('pagination[pageSize]', '100');
+	searchParams.set('sort[0]', 'ordine:asc');
+	searchParams.set('sort[1]', 'publishedAt:asc');
+	setMissioneFields(searchParams);
+	setMissioneListRelations(searchParams);
+
+	const response = await fetchStrapi<StrapiCollectionResponse<Missione>>('/missioni', searchParams);
+	return (response.data ?? []).map(normalizeMissione);
+}
+
+export async function getPartecipazioniMissioneByJwt(jwt: string, lang = 'it') {
+	const membro = await getCurrentMembroMissioniFromJwt(jwt);
+	if (!membro) return [];
+
+	return getPartecipazioniMissioneByMembro(membro.documentId, lang);
+}
+
+async function getCurrentMembroMissioniFromJwt(jwt: string) {
+	const apiBaseUrl = getStrapiApiUrl();
+	const userResponse = await fetch(`${apiBaseUrl}/users/me`, {
+		headers: { Authorization: `Bearer ${jwt}`, 'Content-Type': 'application/json' },
+	});
+
+	if (!userResponse.ok) return null;
+
+	const user = (await userResponse.json()) as StrapiUser;
+	if (!user.email) return null;
+
+	const searchParams = new URLSearchParams();
+	searchParams.set('status', 'draft');
+	searchParams.set('filters[email][$eq]', user.email);
+	searchParams.set('fields[0]', 'email');
+	searchParams.set('pagination[pageSize]', '1');
+
+	const membroResponse = await fetch(`${apiBaseUrl}/membri?${searchParams}`, {
+		headers: { Authorization: `Bearer ${import.meta.env.AUTH_READONLY}`, 'Content-Type': 'application/json' },
+	});
+
+	if (!membroResponse.ok) return null;
+
+	const membroPayload = (await membroResponse.json()) as StrapiCollectionResponse<MembroMissioni>;
+	return membroPayload.data?.[0] ?? null;
+}
+
+async function getPartecipazioniMissioneByMembro(membroDocumentId: string, lang = 'it') {
+	const searchParams = new URLSearchParams();
+	searchParams.set('locale', getItalianStrapiLocale(lang));
+	searchParams.set('status', 'draft');
+	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
+	searchParams.set('pagination[pageSize]', '100');
+	searchParams.set('fields[0]', 'stato');
+	searchParams.set('fields[1]', 'progresso');
+	searchParams.set('fields[2]', 'dataInizio');
+	searchParams.set('fields[3]', 'dataCompletamento');
+	searchParams.set('fields[4]', 'datiRuntime');
+	searchParams.set('populate[missione][fields][0]', 'titolo');
+	searchParams.set('populate[missione][fields][1]', 'slug');
+
+	const response = await fetchStrapi<StrapiCollectionResponse<PartecipazioneMissione>>('/partecipazioni-missione', searchParams);
+	return response.data ?? [];
 }

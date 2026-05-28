@@ -38,6 +38,7 @@ const questions = providedQuestions.length > 0 ? providedQuestions : fallbackQue
 const firstQuestion = questions[0];
 const title = firstQuestion.question;
 const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
+const hasMultipleQuestions = questions.length > 1;
 ---
 
 <article class="mission-proof-question choice-question" data-choice-question data-lang={lang} aria-label="Prova missione">
@@ -51,7 +52,20 @@ const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
 		<form class="choice-question__form" data-choice-question-form>
 			<fieldset class="choice-question__fieldset">
-				<legend data-choice-question-title>Scegli una sola risposta</legend>
+				<div class="mission-proof-question__prompt-row">
+					<legend data-choice-question-title>Scegli una sola risposta</legend>
+
+					{hasMultipleQuestions && (
+						<div class="mission-proof-question__step-controls" data-choice-question-step-controls>
+							<button class="btn mission-proof-question__back" type="button" data-choice-question-back disabled aria-label="Torna alla domanda precedente">
+								<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
+							</button>
+							<p class="mission-proof-question__progress" data-choice-question-progress aria-live="polite">
+								1/{questions.length}
+							</p>
+						</div>
+					)}
+				</div>
 
 				<div class="choice-question__answers" data-choice-question-answers>
 					{firstQuestion.answers.map((answer, index) => (
@@ -64,9 +78,11 @@ const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 				</div>
 			</fieldset>
 
-			<button class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta" type="submit" data-choice-question-submit hidden>
-				Avanti →
-			</button>
+			<div class="mission-proof-question__actions mission-proof-question__actions--choice">
+				<button class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta" type="submit" data-choice-question-submit disabled>
+					Avanti →
+				</button>
+			</div>
 		</form>
 	</div>
 
@@ -83,6 +99,8 @@ const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 		const title = root.querySelector('[data-choice-question-title]');
 		const answers = root.querySelector('[data-choice-question-answers]');
 		const submit = root.querySelector('[data-choice-question-submit]');
+		const back = root.querySelector('[data-choice-question-back]');
+		const progress = root.querySelector('[data-choice-question-progress]');
 		const passedToast = root.querySelector('.test-result-toast--passed');
 		const notPassedToast = root.querySelector('.test-result-toast--not-passed');
 
@@ -123,6 +141,7 @@ const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 		const renderQuestion = () => {
 			const currentQuestion = questions[currentQuestionIndex];
 			const isLastQuestion = currentQuestionIndex === questions.length - 1;
+			const savedAnswer = submittedAnswers[currentQuestionIndex] || '';
 
 			const headerTitle = root.querySelector('.mission-proof-question__title');
 			if (headerTitle) headerTitle.textContent = currentQuestion.question;
@@ -140,6 +159,7 @@ const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 					input.type = 'radio';
 					input.name = 'risposta';
 					input.value = answer.label;
+					input.checked = answer.label === savedAnswer;
 					answerLabel.className = 'choice-question__answer-label';
 					answerLabel.textContent = answer.label;
 					label.append(input, answerLabel);
@@ -157,12 +177,24 @@ const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 			submit.innerHTML = isLastQuestion
 				? '<span>Concludi la prova</span><i class="bi bi-stars choice-question__complete-icon" aria-hidden="true"></i>'
 				: 'Avanti →';
-			submit.hidden = true;
+			submit.disabled = !hasSelectedAnswer();
+
+			if (back) back.disabled = currentQuestionIndex === 0;
+			if (progress) progress.textContent = `${currentQuestionIndex + 1}/${questions.length}`;
 		};
 
 		answers.addEventListener('change', () => {
-			submit.hidden = !hasSelectedAnswer();
+			submit.disabled = !hasSelectedAnswer();
 		});
+
+		if (back) {
+			back.addEventListener('click', () => {
+				if (currentQuestionIndex === 0) return;
+				submittedAnswers[currentQuestionIndex] = getSelectedAnswer();
+				currentQuestionIndex -= 1;
+				renderQuestion();
+			});
+		}
 
 		form.addEventListener('submit', (event) => {
 			event.preventDefault();

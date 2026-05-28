@@ -3165,6 +3165,76 @@ body:has(.tsbs-legal-page) {
 		border-radius: var(--tsbs-radius-sm);
 	}
 
+	.mission-proof-question__cta:disabled {
+		color: var(--tsbs-color-white);
+		pointer-events: none;
+		background: var(--mission-proof-question-accent);
+		border-color: var(--mission-proof-question-accent);
+		opacity: 0.44;
+	}
+
+	.mission-proof-question__actions {
+		display: grid;
+		justify-items: center;
+		width: 100%;
+	}
+
+	.mission-proof-question__prompt-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		width: 100%;
+	}
+
+	.mission-proof-question__step-controls {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		flex: 0 0 auto;
+	}
+
+	.mission-proof-question__back {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		padding: 0;
+		color: var(--mission-proof-question-accent);
+		font-weight: 800;
+		font-size: 1.35rem;
+		line-height: 1;
+		background: transparent;
+		border: 0;
+		border-radius: 50%;
+	}
+
+	.mission-proof-question__back:hover,
+	.mission-proof-question__back:focus-visible {
+		color: var(--tsbs-color-white);
+		background: var(--mission-proof-question-accent);
+		border-color: var(--mission-proof-question-accent);
+	}
+
+	.mission-proof-question__back:disabled {
+		color: #6f7280;
+		pointer-events: none;
+		background: transparent;
+		border-color: transparent;
+		opacity: 0.65;
+	}
+
+	.mission-proof-question__progress {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-size: 0.875rem;
+		font-weight: 800;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
 	.free-answer-mission {
 		--free-answer-mission-field-border: #c8cbd2;
 	}
@@ -3250,8 +3320,9 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.choice-question__fieldset legend {
+		flex: 1 1 auto;
 		float: none;
-		padding: 0 0 0.75rem;
+		padding: 0;
 		margin: 0;
 		color: var(--tsbs-color-heading);
 		font-size: 1rem;
@@ -3364,10 +3435,18 @@ body:has(.tsbs-legal-page) {
 			min-width: 13.5rem;
 		}
 
+		.mission-proof-question__actions {
+			justify-items: start;
+		}
+
 		.mission-proof-question__cta.choice-question__cta {
 			justify-self: center;
 			width: min(100%, calc(17.875rem - 1rem));
 			min-width: 0;
+		}
+
+		.mission-proof-question__actions--choice {
+			justify-items: center;
 		}
 	}
 
