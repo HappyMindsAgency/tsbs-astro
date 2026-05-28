@@ -113,8 +113,51 @@ if (!Astro.cookies.has('jwt')) {
 				</div>
 				</form>
 			</div>
+
+			<div class="profile-settings-danger">
+				<p>La cancellazione dell'account è un'operazione irreversibile. Tutti i tuoi dati verranno eliminati definitivamente.</p>
+				<button class="btn profile-settings-danger__button" type="button" data-delete-account-open>
+					<i class="bi bi-trash3" aria-hidden="true"></i>
+					Elimina account
+				</button>
+			</div>
 		</div>
 	</main>
+
+	<!-- Modale cancellazione account -->
+	<div class="delete-account-overlay" data-delete-account-overlay aria-modal="true" role="dialog" aria-labelledby="delete-account-title" hidden>
+		<div class="delete-account-modal">
+			<h2 id="delete-account-title">Elimina il tuo account</h2>
+			<p class="delete-account-modal__warning">
+				<i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+				<span>Questa azione è <strong>irreversibile</strong>. Il tuo account e tutti i dati associati verranno eliminati definitivamente.</span>
+			</p>
+			<label class="delete-account-modal__label" for="delete-confirm-input">
+				Digita <strong>CANCELLAMI</strong> per confermare
+			</label>
+			<input
+				id="delete-confirm-input"
+				class="delete-account-modal__input"
+				type="text"
+				placeholder="CANCELLAMI"
+				autocomplete="off"
+				data-delete-confirm-input
+			/>
+			<p class="delete-account-modal__error" data-delete-error hidden></p>
+			<div class="delete-account-modal__actions">
+				<button class="btn tsbs-cta-primary-soft delete-account-modal__cancel" type="button" data-delete-account-cancel>
+					Annulla
+				</button>
+				<button class="btn delete-account-modal__confirm" type="button" data-delete-account-confirm disabled>
+					<span data-delete-btn-label>Elimina il mio account</span>
+					<span data-delete-btn-loading hidden>
+						<span class="delete-spinner" aria-hidden="true"></span>
+						Eliminazione in corso…
+					</span>
+				</button>
+			</div>
+		</div>
+	</div>
 
 	<AvatarProfiloModal renderHidden />
 </Layout>
@@ -325,6 +368,93 @@ if (!Astro.cookies.has('jwt')) {
 
 	document.addEventListener('astro:page-load', setupSaveSettings);
 	setupSaveSettings();
+
+	// --- Cancellazione account ---
+
+	const CONFIRM_PHRASE = 'CANCELLAMI';
+
+	const setupDeleteAccount = () => {
+		const overlay = document.querySelector<HTMLElement>('[data-delete-account-overlay]');
+		const openBtn = document.querySelector<HTMLButtonElement>('[data-delete-account-open]');
+		const cancelBtn = document.querySelector<HTMLButtonElement>('[data-delete-account-cancel]');
+		const confirmBtn = document.querySelector<HTMLButtonElement>('[data-delete-account-confirm]');
+		const confirmInput = document.querySelector<HTMLInputElement>('[data-delete-confirm-input]');
+		const errorEl = document.querySelector<HTMLElement>('[data-delete-error]');
+		const labelEl = document.querySelector<HTMLElement>('[data-delete-btn-label]');
+		const loadingEl = document.querySelector<HTMLElement>('[data-delete-btn-loading]');
+
+		if (!overlay || !openBtn || !cancelBtn || !confirmBtn || !confirmInput) return;
+		if (openBtn.dataset.deleteAccountReady === 'true') return;
+		openBtn.dataset.deleteAccountReady = 'true';
+
+		const openModal = () => {
+			confirmInput.value = '';
+			confirmBtn.disabled = true;
+			if (errorEl) errorEl.hidden = true;
+			overlay.hidden = false;
+			confirmInput.focus();
+		};
+
+		const closeModal = () => {
+			overlay.hidden = true;
+		};
+
+		const setLoading = (loading: boolean) => {
+			confirmBtn.disabled = loading;
+			if (labelEl) labelEl.hidden = loading;
+			if (loadingEl) loadingEl.hidden = !loading;
+		};
+
+		const showError = (msg: string) => {
+			if (!errorEl) return;
+			errorEl.textContent = msg;
+			errorEl.hidden = false;
+		};
+
+		openBtn.addEventListener('click', openModal);
+		cancelBtn.addEventListener('click', closeModal);
+
+		overlay.addEventListener('click', (e) => {
+			if (e.target === overlay) closeModal();
+		});
+
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && !overlay.hidden) closeModal();
+		});
+
+		confirmInput.addEventListener('input', () => {
+			confirmBtn.disabled = confirmInput.value !== CONFIRM_PHRASE;
+			if (errorEl) errorEl.hidden = true;
+		});
+
+		confirmBtn.addEventListener('click', async () => {
+			if (confirmInput.value !== CONFIRM_PHRASE) return;
+
+			setLoading(true);
+
+			try {
+				const res = await fetch('/api/user/delete-account', { method: 'DELETE' });
+
+				if (!res.ok) {
+					const data = await res.json().catch(() => ({}));
+					console.error('[DeleteAccount] Errore API:', data);
+					showError('Si è verificato un errore durante la cancellazione. Riprova o contatta il supporto.');
+					setLoading(false);
+					return;
+				}
+
+				// Tutto ok: redirect alla index
+				window.location.href = '/';
+			} catch (err) {
+				console.error('[DeleteAccount] Errore di rete:', err);
+				showError('Errore di rete. Verifica la connessione e riprova.');
+				setLoading(false);
+			}
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupDeleteAccount);
+	setupDeleteAccount();
 </script>
 
 <style lang="scss">
@@ -672,6 +802,178 @@ if (!Astro.cookies.has('jwt')) {
 			grid-template-columns: minmax(0, 1fr) auto;
 			align-items: start;
 		}
+	}
+
+	// --- Danger zone ---
+
+	.profile-settings-danger {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 1rem 1.25rem;
+		background: #fff5f5;
+		border: 1px solid #fecaca;
+		border-radius: var(--tsbs-radius-md);
+
+		p {
+			margin: 0;
+			color: #7f1d1d;
+			font-size: 0.9375rem;
+		}
+	}
+
+	.profile-settings-danger__button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 2.75rem;
+		padding: 0.625rem 1rem;
+		color: #991b1b;
+		font-weight: 700;
+		background: transparent;
+		border: 1px solid #fca5a5;
+		border-radius: var(--tsbs-radius-sm);
+		white-space: nowrap;
+
+		&:hover {
+			color: #fff;
+			background: #dc2626;
+			border-color: #dc2626;
+		}
+	}
+
+	// --- Modale cancellazione ---
+
+	.delete-account-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 1000;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
+		background: rgba(0, 0, 0, 0.55);
+		backdrop-filter: blur(2px);
+	}
+
+	.delete-account-modal {
+		display: grid;
+		gap: 1.25rem;
+		width: 100%;
+		max-width: 28rem;
+		padding: 1.5rem;
+		background: #fff;
+		border-radius: var(--tsbs-radius-md);
+		box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+
+		h2 {
+			margin: 0;
+			font-size: 1.375rem;
+		}
+	}
+
+	.delete-account-modal__warning {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 0.5rem;
+		align-items: start;
+		margin: 0;
+		padding: 0.75rem 1rem;
+		color: #7f1d1d;
+		font-size: 0.9375rem;
+		background: #fff5f5;
+		border: 1px solid #fecaca;
+		border-radius: var(--tsbs-radius-sm);
+
+		.bi {
+			margin-top: 0.15rem;
+			color: #dc2626;
+		}
+
+		span {
+			min-width: 0;
+		}
+	}
+
+	.delete-account-modal__label {
+		display: block;
+		font-size: 0.9375rem;
+		color: var(--tsbs-color-heading);
+	}
+
+	.delete-account-modal__input {
+		width: 100%;
+		min-height: 3rem;
+		padding: 0.625rem 0.75rem;
+		color: var(--tsbs-color-text);
+		background: #fff;
+		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 18%, var(--tsbs-color-white));
+		border-radius: var(--tsbs-radius-sm);
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+
+		&:focus {
+			outline: 0.1875rem solid var(--tsbs-color-focus);
+			outline-offset: 0.125rem;
+		}
+	}
+
+	.delete-account-modal__error {
+		margin: 0;
+		color: #991b1b;
+		font-size: 0.875rem;
+	}
+
+	.delete-account-modal__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		justify-content: flex-end;
+	}
+
+	.delete-account-modal__cancel {
+		min-height: 2.75rem;
+		padding: 0.625rem 1rem;
+		font-weight: 700;
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.delete-account-modal__confirm {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 2.75rem;
+		padding: 0.625rem 1rem;
+		color: #fff;
+		font-weight: 700;
+		background: #dc2626;
+		border: 1px solid #dc2626;
+		border-radius: var(--tsbs-radius-sm);
+
+		&:disabled {
+			opacity: 0.45;
+			cursor: not-allowed;
+		}
+
+		&:not(:disabled):hover {
+			background: #b91c1c;
+			border-color: #b91c1c;
+		}
+	}
+
+	.delete-spinner {
+		display: inline-block;
+		width: 1rem;
+		height: 1rem;
+		border: 2px solid rgba(255, 255, 255, 0.35);
+		border-top-color: #fff;
+		border-radius: 50%;
+		animation: spin 0.7s linear infinite;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
 	}
 
 	@media (min-width: 992px) {
