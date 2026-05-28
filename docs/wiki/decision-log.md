@@ -20,6 +20,27 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-28 - Missione 01 Per Inserimento Tessera Biblioteca
+
+Decisione:
+- usare la prova della `Missione 01: Il Varco` come inserimento del numero tessera Biblioteca
+- quando la domanda libera ha una risposta Strapi vuota ma marcata `corretta`, validare solo formalmente il codice tessera come 14 cifre numeriche e considerare superata la prova
+- salvare il codice normalizzato nel campo `Membro.tessera`
+- mostrare `Membro.tessera` nella hero della Scrivania, accanto all'icona tessera
+
+Motivo:
+- la verifica reale della tessera Biblioteca resta manuale, come gia previsto dai guardrail backend
+- il quiz deve poter funzionare anche senza una risposta testuale attesa in Strapi
+- la Scrivania deve riflettere il codice inserito dall'utente
+
+Impatto:
+- `src/pages/api/missioni/[slugMis]/prova.ts`
+- `src/pages/api/user/profilo.ts`
+- `src/pages/scrivania/index.astro`
+
+Stato:
+- approvata
+
 ## 2026-05-28 - Slug Missione Disponibile Per Binding
 
 Decisione:
