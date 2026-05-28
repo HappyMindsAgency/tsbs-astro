@@ -24,25 +24,19 @@ if (!slugMis) {
 
 const theme = await resolveUserTheme(jwt);
 const missione = await getMissioneBySlug(slugMis, locale);
+const rawQuestions = missione?.quiz?.domande ?? [];
+const hasAnswerElements = rawQuestions.some((domanda) => (domanda.risposte || []).length > 0);
 
-if (!missione?.quiz?.domande?.length) {
+if (!missione?.quiz || rawQuestions.length === 0 || !hasAnswerElements) {
 	return Astro.redirect('/404');
 }
 
-const questions = missione.quiz.domande
-	.map((domanda) => ({
-		question: domanda.domanda?.trim() || '',
-		answers: (domanda.risposte || [])
-			.map((risposta) => ({
-				label: risposta.risposta?.trim() || '',
-			}))
-			.filter((risposta) => risposta.label.length > 0),
-	}))
-	.filter((domanda) => domanda.question.length > 0 && domanda.answers.length > 0);
-
-if (questions.length === 0) {
-	return Astro.redirect('/404');
-}
+const questions = rawQuestions.map((domanda) => ({
+	question: domanda.domanda?.trim() || 'Lorem ipsum',
+	answers: (domanda.risposte || []).map((risposta) => ({
+		label: risposta.risposta?.trim() || 'Lorem ipsum',
+	})),
+}));
 
 const isFreeAnswer = questions.every((domanda) => domanda.answers.length === 1);
 const ProvaComponent = isFreeAnswer ? RispostaLibera : SceltaDomanda;

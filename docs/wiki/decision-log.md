@@ -83,6 +83,41 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-05-28 - Progresso Missioni In Percentuale
+
+Decisione:
+- nella lista Missioni usare `partecipazioni_missione.progresso` come percentuale `0-100`
+- usare `partecipazioni_missione.stato` per separare le missioni tra `In corso`, `Completate` e `Disponibili`
+- mostrare le missioni senza partecipazione personale in `Disponibili` con progresso `0%`
+
+Motivo:
+- il frontend deve mostrare una barra progresso coerente senza usare step testuali statici
+- `progresso` e gia previsto nello schema Strapi della partecipazione missione
+
+Impatto:
+- `src/pages/missioni/index.astro`
+- `src/lib/strapi/missioni.ts`
+
+Stato:
+- approvata
+
+## 2026-05-28 - Fallback Editoriale Prova Missione
+
+Decisione:
+- la pagina prova missione non deve andare in 404 quando domanda o risposta esistono in Strapi ma hanno testo vuoto
+- il 404 resta solo quando manca la struttura della prova: quiz collegato, domande o elementi risposta
+- per testi editoriali prova vuoti usare un fallback neutro `Lorem ipsum`
+
+Motivo:
+- evitare che contenuti editoriali incompleti in Strapi blocchino la navigazione alla prova
+- distinguere dato strutturale mancante da testo ancora non compilato
+
+Impatto:
+- `src/pages/missioni/[slugMis]/prova/index.astro`
+
+Stato:
+- approvata
+
 ## 2026-05-27 - Struttura Client Strapi Astro Per Binding Progressivo
 
 Decisione:
