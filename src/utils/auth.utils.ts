@@ -33,22 +33,17 @@ export function isValidIdentifier(identifier: string): boolean {
  * @param identifier L'identificativo da precompilare (opzionale).
  * @returns Una Response di redirect (303).
  */
-export function redirectWithLoginError(baseUrl: string, error: LoginErrorCode, identifier: string = ''): Response {
-    const url = new URL(`${baseUrl}/`);
-    url.searchParams.set('error', error);
-    if (identifier) {
-        url.searchParams.set('identifier', identifier);
-    }
-    return new Response(null, { status: 303, headers: { Location: url.toString() } });
+export function redirectWithLoginError(_baseUrl: string, error: LoginErrorCode, identifier: string = ''): Response {
+    const params = new URLSearchParams({ error });
+    if (identifier) params.set('identifier', identifier);
+    return new Response(null, { status: 303, headers: { Location: `/?${params.toString()}` } });
 }
 
 /**
  * Crea una risposta di reindirizzamento all'atrio (successo login).
- * @param baseUrl L'URL di base dell'applicazione.
- * @returns Una Response di redirect (303).
  */
-export function redirectToAtrio(baseUrl: string): Response {
-    return new Response(null, { status: 303, headers: { Location: `${baseUrl}/atrio` } });
+export function redirectToAtrio(_baseUrl: string): Response {
+    return new Response(null, { status: 303, headers: { Location: '/atrio/' } });
 }
 
 /**

@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request }) => {
             return new Response(null, {
                 status: 303,
                 headers: {
-                    'Location': `${baseUrl}/atrio`,
+                    'Location': '/atrio/',
                     'Set-Cookie': buildJwtCookieHeader(jwt),
                 },
             });
