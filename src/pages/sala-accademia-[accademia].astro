@@ -10,13 +10,21 @@ import armoniaLogo from '../assets/Armonia-logo-the-secret-bookish-society.png';
 import astrariaBanner from '../assets/Astraria-accademia-stendardo-the-secret-bookish-society.png';
 import astrariaLogo from '../assets/Astraria-logo-the-secret-bookish-society.png';
 import trophyIcon from '../assets/trofei-icona-scrivania.png';
+import { resolveUserAcademy } from '../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 const { accademia = 'arborea' } = Astro.params;
 
-if (!Astro.cookies.has('jwt')) {
-	return Astro.redirect('/');
+const jwt = Astro.cookies.get('jwt')?.value;
+if (!jwt) return Astro.redirect('/');
+
+const userAcademy = await resolveUserAcademy(jwt);
+
+// Redirect se l'utente tenta di accedere alla sala di un'altra accademia
+if (accademia !== userAcademy) {
+	return Astro.redirect(`/sala-accademia-${userAcademy}/`, 302);
 }
+
 const profileHref = '/scrivania/utenti-preferiti/esploso-profilo-utente/';
 type AcademyKey = 'arcadia' | 'arborea' | 'armonia' | 'astraria';
 
@@ -50,7 +58,7 @@ const academies: Record<AcademyKey, {
 };
 
 const isAcademyKey = (value: string): value is AcademyKey => value in academies;
-const academyKey = isAcademyKey(accademia) ? accademia : fallbackAcademy;
+const academyKey = isAcademyKey(userAcademy) ? userAcademy : fallbackAcademy;
 const academy = academies[academyKey];
 const rankingHref = '/classifica-generale/';
 
@@ -69,7 +77,7 @@ const chronicleRows = [
 ];
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={`theme-${academyKey}`} accademia={academyKey}>
 	<Nav lang={lang} />
 
 	<main class={`tsbs-app-shell academy-page theme-${academyKey}`} data-academy={academyKey}>

@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import { getEpistole } from '../../lib/strapi/epistole';
-import { resolveUserTheme } from '../../lib/theme';
+import { resolveUserContext } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 
@@ -10,7 +10,7 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const theme = await resolveUserTheme(Astro.cookies.get('jwt')?.value);
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 
 const epistole = await getEpistole();
 const featuredEpistola = epistole[0] || null;
@@ -55,7 +55,7 @@ function getPrimaryCategory(epistola: typeof epistole[number]) {
 }
 ---
 
-<Layout lang={lang} theme={theme}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell epistole-page">

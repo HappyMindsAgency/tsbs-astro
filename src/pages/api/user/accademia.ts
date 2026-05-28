@@ -39,8 +39,12 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     }
     const user = await userRes.json();
 
-    // Trova il Membro
-    const qs = new URLSearchParams({ 'filters[user][id][$eq]': String(user.id) });
+    // Trova il Membro per email (campo diretto unico).
+    // status=draft perché il Membro è appena creato e non ancora pubblicato.
+    const qs = new URLSearchParams({
+        'filters[email][$eq]': String(user.email),
+        'status': 'draft',
+    });
     const membroRes = await fetch(
         `${STRAPI_API_BASE_URL}/membri?${qs}`,
         { headers: { 'Authorization': `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' } },

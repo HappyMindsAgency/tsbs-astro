@@ -2,7 +2,7 @@
 import Head from "../components/Head.astro";
 import '../styles/globals.scss';
 
-const { entita, documentId, lang = 'it', theme = 'theme-arborea' } = Astro.props;
+const { entita, documentId, lang = 'it', theme = 'theme-arborea', accademia = '' } = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang={lang}>
@@ -15,6 +15,7 @@ const { entita, documentId, lang = 'it', theme = 'theme-arborea' } = Astro.props
         data-page-entity={entita ?? ''}
         data-page-document-id={documentId ?? ''}
         data-page-pathname={Astro.url.pathname}
+        data-user-academy={accademia}
     >
         <slot />
 

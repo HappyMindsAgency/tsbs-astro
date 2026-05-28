@@ -13,31 +13,43 @@ const SLUG_TO_THEME: Record<string, string> = {
 	astraria: 'theme-astraria',
 };
 
-export async function resolveUserTheme(jwt: string | undefined): Promise<string> {
-	if (!jwt) return 'theme-arborea';
+export type AcademySlug = 'arborea' | 'arcadia' | 'armonia' | 'astraria';
+
+export async function resolveUserAcademy(jwt: string | undefined): Promise<AcademySlug> {
+	if (!jwt) return 'arborea';
 
 	try {
 		const userRes = await fetch(`${STRAPI_API_BASE_URL}/users/me`, {
 			headers: { Authorization: `Bearer ${jwt}`, 'Content-Type': 'application/json' },
 		});
-		if (!userRes.ok) return 'theme-arborea';
+		if (!userRes.ok) return 'arborea';
 		const user = await userRes.json();
 
 		const qs = new URLSearchParams({
-			'filters[user][id][$eq]': String(user.id),
+			'filters[email][$eq]': String(user.email),
 			'populate[0]': 'accademia',
 			'fields[0]': 'id',
+			'status': 'draft',
 		});
 		const membroRes = await fetch(`${STRAPI_API_BASE_URL}/membri?${qs}`, {
 			headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
 		});
-		if (!membroRes.ok) return 'theme-arborea';
+		if (!membroRes.ok) return 'arborea';
 
 		const membroData = await membroRes.json();
 		const slug: string | undefined = membroData?.data?.[0]?.accademia?.slug;
-
-		return SLUG_TO_THEME[slug ?? ''] ?? 'theme-arborea';
+		return (slug as AcademySlug) ?? 'arborea';
 	} catch {
-		return 'theme-arborea';
+		return 'arborea';
 	}
+}
+
+export async function resolveUserTheme(jwt: string | undefined): Promise<string> {
+	const slug = await resolveUserAcademy(jwt);
+	return SLUG_TO_THEME[slug] ?? 'theme-arborea';
+}
+
+export async function resolveUserContext(jwt: string | undefined): Promise<{ theme: string; accademia: AcademySlug }> {
+	const accademia = await resolveUserAcademy(jwt);
+	return { accademia, theme: SLUG_TO_THEME[accademia] ?? 'theme-arborea' };
 }

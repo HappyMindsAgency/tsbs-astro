@@ -23,6 +23,7 @@ const desktopItems = [
   { id: "scrivania", label: "Scrivania", href: "/scrivania/", icon: scrivaniaIcon },
   { id: "missioni", label: "Missioni", href: "/missioni/", icon: missioniIcon },
   { id: "accademia", label: "Accademia", href: "/sala-accademia-arborea/", icon: accademiaIcon, activePaths: ["/sala-accademia-", "/accademia-"] },
+
   { id: "biblioteca", label: "Biblioteca", href: "/biblioteca/", icon: bibliotecaIcon, activePaths: ["/eventi-biblioteca-classense/"] },
 ];
 
@@ -125,6 +126,20 @@ const navContextItems = desktopItems.map(({ id, href, activePaths }) => ({ id, h
     </ul>
   </nav>
 </aside>
+
+<script>
+  // Aggiorna dinamicamente l'href del link accademia in base all'accademia dell'utente
+  function updateAcademyNavLink() {
+    const academy = document.body.dataset.userAcademy;
+    if (!academy) return;
+    const href = `/sala-accademia-${academy}/`;
+    document.querySelectorAll<HTMLAnchorElement>('[data-nav-section="accademia"]').forEach((link) => {
+      link.href = href;
+    });
+  }
+  updateAcademyNavLink();
+  document.addEventListener('astro:page-load', updateAcademyNavLink);
+</script>
 
 <script define:vars={{ navContextItems, deactivateAll }} data-astro-rerun>
   const navContextStorageKey = "tsbs.activeNavContext";

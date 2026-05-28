@@ -4,14 +4,14 @@ import Nav from '../../components/Nav.astro';
 import ImpostazioniLogoutModal from '../../components/PopupComponents/ImpostazioniLogoutModal.astro';
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
 import { getLastEpistola } from '../../lib/strapi/epistole';
-import { resolveUserTheme } from '../../lib/theme';
+import { resolveUserContext } from '../../lib/theme';
 const { lang = 'it' } = Astro.props;
 
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const theme = await resolveUserTheme(Astro.cookies.get('jwt')?.value);
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 
 const tasks = [
 	{ title: 'Lorem ipsum dolor', progress: 65 },
@@ -30,7 +30,7 @@ const featuredEpistleHref = lastEpistola ? `/epistole/${lastEpistola.slug}/` : '
 const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 
 ---
-<Layout lang={lang} theme={theme}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell dashboard-shell">

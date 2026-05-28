@@ -4,7 +4,7 @@ import Nav from '../../components/Nav.astro';
 import classificaIcon from '../../assets/03_classifica_bianco_scrivania.svg';
 import grimorioIcon from '../../assets/02_grimorio_bianco_scrivania.svg';
 import trofeiIcon from '../../assets/01_trofei_bianco_scrivania.svg';
-import { resolveUserTheme } from '../../lib/theme';
+import { resolveUserContext } from '../../lib/theme';
 import { formatGrimorioDate, getCurrentMembroFromJwt, getGrimorioExcerpt, getGrimorioNoteByMembro, getGrimorioVisibilityLabel } from '../../lib/strapi/grimorio';
 
 const { lang = 'it' } = Astro.props;
@@ -15,7 +15,7 @@ if (!jwt) {
 	return Astro.redirect('/');
 }
 
-const theme = await resolveUserTheme(Astro.cookies.get('jwt')?.value);
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 const membro = await getCurrentMembroFromJwt(jwt);
 const notes = membro ? await getGrimorioNoteByMembro(membro.id, lang) : [];
 
@@ -27,7 +27,7 @@ const getNoteMeta = (publishedAt: string | null | undefined, visibilePubblico: b
 };
 ---
 
-<Layout lang={lang} theme={theme}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell desk-page">
