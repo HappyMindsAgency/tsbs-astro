@@ -88,7 +88,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membro.documentId}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${jwt}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: { accademia: accademiaDocumentId } }),
+        body: JSON.stringify({ data: { accademia: { connect: [{ documentId: accademiaDocumentId }] } } }),
     });
 
     if (!updateRes.ok) {
