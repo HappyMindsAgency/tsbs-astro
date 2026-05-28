@@ -63,12 +63,12 @@ export const onRequest = defineMiddleware((context, next) => {
 
 		if (isLoginPage(pathname) && hasJwt) {
 			const base = getRequestBase(context);
-			return Response.redirect(new URL('/atrio/', base), 302);
+			return new Response(null, { status: 302, headers: { Location: new URL('/atrio/', base).toString() } });
 		}
 
 		if (!isPublicPath(pathname) && !hasJwt) {
 			const base = getRequestBase(context);
-			return Response.redirect(new URL('/', base), 302);
+			return new Response(null, { status: 302, headers: { Location: new URL('/', base).toString() } });
 		}
 	}
 
@@ -113,5 +113,5 @@ export const onRequest = defineMiddleware((context, next) => {
 	}
 
 	const base = getRequestBase(context);
-	return Response.redirect(new URL(MAINTENANCE_PATH, base), 302);
+	return new Response(null, { status: 302, headers: { Location: new URL(MAINTENANCE_PATH, base).toString() } });
 });

@@ -39,7 +39,7 @@ export function redirectWithLoginError(baseUrl: string, error: LoginErrorCode, i
     if (identifier) {
         url.searchParams.set('identifier', identifier);
     }
-    return Response.redirect(url.toString(), 303);
+    return new Response(null, { status: 303, headers: { Location: url.toString() } });
 }
 
 /**
@@ -48,7 +48,7 @@ export function redirectWithLoginError(baseUrl: string, error: LoginErrorCode, i
  * @returns Una Response di redirect (303).
  */
 export function redirectToAtrio(baseUrl: string): Response {
-    return Response.redirect(`${baseUrl}/atrio`, 303);
+    return new Response(null, { status: 303, headers: { Location: `${baseUrl}/atrio` } });
 }
 
 /**
