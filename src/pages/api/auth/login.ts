@@ -1,13 +1,13 @@
 // src/pages/api/login.ts
 import type { APIRoute } from 'astro';
-import { LoginError, isValidIdentifier, redirectWithLoginError, redirectToAtrio, setAuthCookie, AuthServiceError } from '../../../utils/auth.utils';
+import { LoginError, isValidIdentifier, redirectWithLoginError, buildJwtCookieHeader, AuthServiceError } from '../../../utils/auth.utils';
 import { AuthService } from '../../../services/auth.service';
 import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
-export const POST: APIRoute = async ({ request, cookies }) => {
+export const POST: APIRoute = async ({ request }) => {
 	const baseUrl = new URL(request.url).origin;
 	let identifier = '';
 
@@ -32,8 +32,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		// simula session_config_error
 		// jwt = ''; // Simula una risposta di Strapi senza JWT
 		if (jwt && user) {
-            setAuthCookie(cookies, jwt);
-
             // Registra l'ultimo login in background — nessun blocco sul redirect in caso di errore
             fetch(`${baseUrl}/api/user/dati-aggiuntivi`, {
                 method: 'PUT',
@@ -41,7 +39,16 @@ export const POST: APIRoute = async ({ request, cookies }) => {
                 body: JSON.stringify({ ultimoLogin: new Date().toISOString() }),
             }).catch(() => {});
 
-			return redirectToAtrio(baseUrl);
+            // Costruiamo la redirect manualmente per poter allegare Set-Cookie senza
+            // incappare nel bug "immutable headers" dell'adapter Vercel (appendHeader su
+            // una Response già sealed dal runtime).
+            return new Response(null, {
+                status: 303,
+                headers: {
+                    'Location': `${baseUrl}/atrio`,
+                    'Set-Cookie': buildJwtCookieHeader(jwt),
+                },
+            });
 		} else {
 			console.error('Strapi response was OK, but JWT or User data is missing.');
 			return redirectWithLoginError(baseUrl, LoginError.SESSION_CONFIG_ERROR, identifier);

@@ -58,8 +58,6 @@ export function redirectToAtrio(baseUrl: string): Response {
  */
 export function setAuthCookie(cookies: AstroCookies, jwt: string): void {
     const maxAgeInSeconds = 7 * 24 * 60 * 60; // 7 days
-
-    // Assumendo che import.meta.env sia disponibile nel contesto di Astro per NODE_ENV
     const isProduction = import.meta.env.NODE_ENV === 'production';
 
     cookies.set('jwt', jwt, {
@@ -69,6 +67,18 @@ export function setAuthCookie(cookies: AstroCookies, jwt: string): void {
         path: '/',
         maxAge: maxAgeInSeconds,
     });
+}
+
+/**
+ * Restituisce il valore dell'header Set-Cookie per il JWT.
+ * Usare quando si costruisce manualmente una Response (es. redirect) per evitare
+ * il bug "immutable headers" dell'adapter Vercel.
+ */
+export function buildJwtCookieHeader(jwt: string): string {
+    const maxAge = 7 * 24 * 60 * 60;
+    const isProduction = import.meta.env.NODE_ENV === 'production';
+    const secure = isProduction ? '; Secure' : '';
+    return `jwt=${jwt}; HttpOnly${secure}; SameSite=Lax; Path=/; Max-Age=${maxAge}`;
 }
 
 export class AuthServiceError extends Error {
