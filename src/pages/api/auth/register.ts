@@ -12,8 +12,9 @@ import {
 import { AuthService } from '../../../services/auth.service';
 import { isNicknameBlacklisted } from '../../../data/nicknameBlacklist';
 import { logger } from '../../../services/logger';
+import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
+const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 export const POST: APIRoute = async ({ request, cookies }) => {

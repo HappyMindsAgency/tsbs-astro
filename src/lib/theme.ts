@@ -1,7 +1,9 @@
 // Risolve il tema CSS dell'accademia per l'utente autenticato.
 // Da usare nel frontmatter delle pagine SSR che non hanno un tema fisso.
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
+import { getStrapiApiUrl } from './strapi/api-url';
+
+const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 const SLUG_TO_THEME: Record<string, string> = {

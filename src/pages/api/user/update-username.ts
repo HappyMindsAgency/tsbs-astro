@@ -1,8 +1,9 @@
 // src/pages/api/user/update-username.ts
 import type { APIRoute } from 'astro';
 import { logger } from '../../../services/logger';
+import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
+const STRAPI_API_BASE_URL = getStrapiApiUrl();
 
 export const POST: APIRoute = async ({ request, cookies }) => {
 	const jwt = cookies.get('jwt')?.value;

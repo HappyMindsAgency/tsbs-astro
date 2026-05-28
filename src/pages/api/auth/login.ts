@@ -1,9 +1,10 @@
 // src/pages/api/login.ts
 import type { APIRoute } from 'astro';
 import { LoginError, isValidIdentifier, redirectWithLoginError, redirectToAtrio, setAuthCookie, AuthServiceError } from '../../../utils/auth.utils';
-import { AuthService } from '../../../services/auth.service'; 
+import { AuthService } from '../../../services/auth.service';
+import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
+const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 export const POST: APIRoute = async ({ request, cookies }) => {

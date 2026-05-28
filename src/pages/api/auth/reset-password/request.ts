@@ -4,9 +4,10 @@ import { EmailService } from '../../../../services/email.service';
 import { PasswordResetService } from '../../../../services/password-reset.service';
 import { logger } from '../../../../services/logger';
 import { AuthService } from '../../../../services/auth.service';
+import { getStrapiApiUrl } from '../../../../lib/strapi/api-url';
 
 // Configuration
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL || 'http://localhost:1337';
+const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 const SMTP_HOST = import.meta.env.SMTP_HOST;
 const SMTP_PORT = parseInt(import.meta.env.SMTP_PORT || '587');

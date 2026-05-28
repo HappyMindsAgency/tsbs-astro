@@ -3,6 +3,7 @@
 
 import type { APIRoute } from 'astro';
 import { logger } from '../../../services/logger';
+import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 import avatar01 from '../../../assets/Avatar_01_tartaruga.svg';
 import avatar02 from '../../../assets/Avatar_02_ampolla.svg';
 import avatar03 from '../../../assets/Avatar_03_fantasma.svg';
@@ -31,7 +32,7 @@ const AVATAR_SRC_MAP: Record<string, string> = {
     'avatar-12': avatar12.src,
 };
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
+const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 export const GET: APIRoute = async ({ cookies }) => {

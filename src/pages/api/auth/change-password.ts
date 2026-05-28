@@ -1,8 +1,9 @@
 // src/pages/api/auth/change-password.ts
 import type { APIRoute } from 'astro';
 import { setAuthCookie } from '../../../utils/auth.utils';
+import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
+const STRAPI_API_BASE_URL = getStrapiApiUrl();
 
 export const POST: APIRoute = async ({ request, cookies }) => {
 	// 1. Verifica che l'utente sia autenticato

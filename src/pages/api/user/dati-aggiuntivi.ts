@@ -2,8 +2,9 @@
 
 import type { APIRoute } from 'astro';
 import { logger } from '../../../services/logger';
+import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 
-const STRAPI_API_BASE_URL = import.meta.env.STRAPI_API_URL;
+const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 export const PUT: APIRoute = async ({ request, cookies }) => {
