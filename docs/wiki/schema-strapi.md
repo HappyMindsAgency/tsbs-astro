@@ -6,6 +6,7 @@ Questo file e una mappa operativa degli schema Strapi reali da usare nella fase 
 
 Fonte aggiornata:
 - `/Users/viola/Documents/GitHub/strapi-tsbs/src/api/**/schema.json`
+- ultimo confronto Missione: `/Users/viola/Downloads/strapi-tsbs-main/src/api/missione/content-types/missione/schema.json`
 
 Regole di lettura:
 - non sostituisce gli schema Strapi, li riassume
@@ -41,6 +42,7 @@ src/lib/strapi/
   client.ts
   epistole.ts
   grimorio.ts
+  missioni.ts
 ```
 
 `client.ts` contiene solo logica generica e riusabile:
@@ -64,6 +66,12 @@ src/lib/strapi/
 - campi principali: `titolo`, `slug`, `contenuto`, `visibilePubblico`, `publishedAt`, `locale`
 - relazioni predisposte: `categorie_grimorio`, `accademia`, `membro`
 - utility di presentazione coerenti con Epistole: estratto testuale e data italiana estesa
+
+`missioni.ts` contiene solo logica del dominio Missioni:
+- tipi `Missione`, `MissioneCategoria`, `MissioneQuiz`, `MissioneTrofeo`
+- query del dettaglio missione per `slug`
+- campi principali: `titolo`, `slug`, `descrizione`, `tipoFruizione`, `opzionale`, `ordine`, `punteggio`, `attiva`
+- relazioni predisposte: `categorie_missione`, `libro`, `livello`, `missione_precedente`, `quiz`, `trofeo`, `stagione`
 
 Regola per i prossimi binding:
 - ogni area dinamica puo avere un file dedicato quando serve, per esempio `missioni.ts`, `grimorio.ts`, `quiz.ts`
@@ -273,12 +281,13 @@ Esempio Epistole:
 - Nome Strapi tecnico: `api::missione.missione`
 - Tipo: collection type
 - Endpoint/collection: `missioni`
-- Campi principali: `titolo`, `descrizione`, `tipoFruizione`, `opzionale`, `ordine`, `punteggio`, `attiva`
+- Campi principali: `titolo`, `slug`, `descrizione`, `tipoFruizione`, `opzionale`, `ordine`, `punteggio`, `attiva`
 - Campi required: `titolo`
-- Campi localizzati: `titolo`, `descrizione`
+- Campi localizzati: `titolo`, `slug`, `descrizione`
 - Relazioni: `categorie_missione`, `eventi`, `libro`, `livello`, `missione_precedente`, `quiz`, `trofeo`, `stagione`, `partecipazioni_missione`
 - draftAndPublish: `true`
-- Note binding Astro: per lista/dettaglio usare contenuti pubblicati e probabilmente `attiva: true`; stato personale da `partecipazioni_missione`.
+- Note binding Astro: per lista/dettaglio usare contenuti pubblicati e probabilmente `attiva: true`; la route Astro `missioni/[slugMis]/` puo filtrare su `slug`; stato personale da `partecipazioni_missione`.
+- Note schema: `slug` e un campo UID localizzato con `targetField: titolo`.
 - Dubbi aperti: confermare valori reali di `tipoFruizione`, tipo prova, tipo esito e regole di sblocco.
 
 ### Onboarding
@@ -347,7 +356,7 @@ Esempio Epistole:
 - Relazioni: `missione`
 - Media/componenti: `custom.domanda`, `custom.step`
 - draftAndPublish: `true`
-- Note binding Astro: va collegato dopo `Missione`; distinguere quiz standard da caccia al tesoro.
+- Note binding Astro: va collegato dopo `Missione`; distinguere quiz standard da caccia al tesoro. Per convenzione backend, le domande aperte usano lo stesso componente delle domande a risposta multipla: una sola voce in `domande.risposte` indica risposta libera/attesa, piu voci indicano scelta multipla.
 - Dubbi aperti: confermare gestione tentativi, salvataggio risposte, soglia e feedback esito.
 
 ### Rendicontazione

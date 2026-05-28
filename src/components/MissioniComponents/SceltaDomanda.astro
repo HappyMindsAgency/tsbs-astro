@@ -1,20 +1,10 @@
 ---
 import TestPassed from '../toastComponents/TestPassed.astro';
+import TestNotPassed from '../toastComponents/TestNotPassed.astro';
 
-const { missione = null, lang = 'it', slugMis = '' } = Astro.props;
+const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props;
 
-const title =
-	missione?.titolo ||
-	missione?.nome ||
-	missione?.title ||
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
-
-const eyebrow =
-	missione?.nomeMissione ||
-	missione?.label ||
-	'NOME DELLA MISSIONE';
-
-const questions = [
+const fallbackQuestions = [
 	{
 		question: 'Scegli una sola risposta',
 		answers: [
@@ -44,7 +34,10 @@ const questions = [
 	},
 ];
 
+const questions = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
 const firstQuestion = questions[0];
+const title = firstQuestion.question;
+const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 ---
 
 <article class="mission-proof-question choice-question" data-choice-question data-lang={lang} aria-label="Prova missione">
@@ -58,14 +51,14 @@ const firstQuestion = questions[0];
 	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
 		<form class="choice-question__form" data-choice-question-form>
 			<fieldset class="choice-question__fieldset">
-				<legend data-choice-question-title>{firstQuestion.question}</legend>
+				<legend data-choice-question-title>Scegli una sola risposta</legend>
 
 				<div class="choice-question__answers" data-choice-question-answers>
 					{firstQuestion.answers.map((answer, index) => (
 						<label class="choice-question__answer" for={`mission-answer-0-${index}`}>
 							<input id={`mission-answer-0-${index}`} type="radio" name="risposta" value={answer.label} />
 							<span class="choice-question__answer-label">{answer.label}</span>
-							<span class="choice-question__answer-description">{answer.description}</span>
+							{answer.description && <span class="choice-question__answer-description">{answer.description}</span>}
 						</label>
 					))}
 				</div>
@@ -78,9 +71,10 @@ const firstQuestion = questions[0];
 	</div>
 
 	<TestPassed renderHidden={true} />
+	<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
 </article>
 
-<script define:vars={{ questions }}>
+<script define:vars={{ questions, slugMis }}>
 	const setupChoiceQuestion = () => {
 		const root = document.querySelector('[data-choice-question]');
 		if (!root) return;
@@ -89,32 +83,77 @@ const firstQuestion = questions[0];
 		const title = root.querySelector('[data-choice-question-title]');
 		const answers = root.querySelector('[data-choice-question-answers]');
 		const submit = root.querySelector('[data-choice-question-submit]');
-		const toast = root.querySelector('[data-test-result-toast]');
+		const passedToast = root.querySelector('.test-result-toast--passed');
+		const notPassedToast = root.querySelector('.test-result-toast--not-passed');
 
-		if (!form || !title || !answers || !submit || !toast) return;
+		if (!form || !title || !answers || !submit || !passedToast || !notPassedToast) return;
 
 		let currentQuestionIndex = 0;
+		const submittedAnswers = new Array(questions.length).fill('');
 
-		const hasSelectedAnswer = () => Boolean(answers.querySelector('input[name="risposta"]:checked'));
+		const getSelectedAnswer = () => answers.querySelector('input[name="risposta"]:checked')?.value ?? '';
+		const hasSelectedAnswer = () => Boolean(getSelectedAnswer());
+
+		const showResultToast = (passed) => {
+			passedToast.hidden = !passed;
+			notPassedToast.hidden = passed;
+		};
+
+		const validateMissionProof = async () => {
+			submit.disabled = true;
+
+			try {
+				const response = await fetch(`/api/missioni/${slugMis}/prova`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						answers: submittedAnswers.map((answer, questionIndex) => ({ questionIndex, answer })),
+					}),
+				});
+				const payload = await response.json().catch(() => null);
+
+				showResultToast(response.ok && payload?.passed === true);
+			} catch {
+				showResultToast(false);
+			} finally {
+				submit.disabled = false;
+			}
+		};
 
 		const renderQuestion = () => {
 			const currentQuestion = questions[currentQuestionIndex];
 			const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
-			title.textContent = currentQuestion.question;
-			answers.innerHTML = currentQuestion.answers
-				.map((answer, answerIndex) => {
+			const headerTitle = root.querySelector('.mission-proof-question__title');
+			if (headerTitle) headerTitle.textContent = currentQuestion.question;
+			title.textContent = 'Scegli una sola risposta';
+			answers.replaceChildren(
+				...currentQuestion.answers.map((answer, answerIndex) => {
 					const id = `mission-answer-${currentQuestionIndex}-${answerIndex}`;
+					const label = document.createElement('label');
+					const input = document.createElement('input');
+					const answerLabel = document.createElement('span');
 
-					return `
-						<label class="choice-question__answer" for="${id}">
-							<input id="${id}" type="radio" name="risposta" value="${answer.label}">
-							<span class="choice-question__answer-label">${answer.label}</span>
-							<span class="choice-question__answer-description">${answer.description}</span>
-						</label>
-					`;
-				})
-				.join('');
+					label.className = 'choice-question__answer';
+					label.setAttribute('for', id);
+					input.id = id;
+					input.type = 'radio';
+					input.name = 'risposta';
+					input.value = answer.label;
+					answerLabel.className = 'choice-question__answer-label';
+					answerLabel.textContent = answer.label;
+					label.append(input, answerLabel);
+
+					if (answer.description) {
+						const answerDescription = document.createElement('span');
+						answerDescription.className = 'choice-question__answer-description';
+						answerDescription.textContent = answer.description;
+						label.append(answerDescription);
+					}
+
+					return label;
+				}),
+			);
 			submit.innerHTML = isLastQuestion
 				? '<span>Concludi la prova</span><i class="bi bi-stars choice-question__complete-icon" aria-hidden="true"></i>'
 				: 'Avanti →';
@@ -129,6 +168,7 @@ const firstQuestion = questions[0];
 			event.preventDefault();
 
 			if (!hasSelectedAnswer()) return;
+			submittedAnswers[currentQuestionIndex] = getSelectedAnswer();
 
 			if (currentQuestionIndex < questions.length - 1) {
 				currentQuestionIndex += 1;
@@ -136,7 +176,7 @@ const firstQuestion = questions[0];
 				return;
 			}
 
-			toast.hidden = false;
+			validateMissionProof();
 		});
 
 		renderQuestion();

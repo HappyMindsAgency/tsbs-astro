@@ -1,42 +1,23 @@
 ---
 import TestPassed from '../toastComponents/TestPassed.astro';
+import TestNotPassed from '../toastComponents/TestNotPassed.astro';
 
-const { missione = null, lang = 'it', slugMis = '' } = Astro.props;
+const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props;
 
-const title =
-	missione?.titolo ||
-	missione?.nome ||
-	missione?.title ||
-	'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
-
-const eyebrow =
-	missione?.nomeMissione ||
-	missione?.label ||
-	'NOME DELLA MISSIONE';
-
-const quote =
-	missione?.citazione ||
-	missione?.quote ||
-	missione?.descrizioneBreve ||
-	'Phasellus accumsan, felis sed dictum gravida, est leo congue mauris, nec luctus sem nisi a ante. Aenean quis facilisis augue, eget ornare odio. Proin non arcu vel erat finibus venenatis.';
-
-const answerLabel = missione?.prova?.labelRisposta || 'Risposta libera';
-const prompts = [
+const fallbackQuestions = [
 	{
-		instruction: 'Descrizione dell’azione da compiere',
-		placeholder: 'Inserisci qui la tua risposta',
-	},
-	{
-		instruction: 'Descrizione della seconda azione da compiere',
-		placeholder: 'Inserisci qui la tua seconda risposta',
-	},
-	{
-		instruction: 'Descrizione della terza azione da compiere',
-		placeholder: 'Inserisci qui la tua terza risposta',
+		question: 'Descrizione dell’azione da compiere',
+		answers: [{ label: 'Risposta libera' }],
 	},
 ];
 
-const firstPrompt = prompts[0];
+const questions = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
+const firstQuestion = questions[0];
+const title = firstQuestion.question;
+const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
+const quote = missione?.quiz?.descrizione?.trim() || '';
+
+const answerLabel = 'Risposta libera';
 ---
 
 <article class="mission-proof-question free-answer-mission" data-free-answer-mission data-lang={lang} aria-label="Prova missione">
@@ -48,18 +29,20 @@ const firstPrompt = prompts[0];
 	</header>
 
 	<div class="container-xl tsbs-app-container mission-proof-question__panel free-answer-mission__panel">
-		<blockquote class="free-answer-mission__quote">
-			<p>{quote}</p>
-		</blockquote>
+		{quote && (
+			<blockquote class="free-answer-mission__quote">
+				<p>{quote}</p>
+			</blockquote>
+		)}
 
 		<form class="free-answer-mission__form" data-free-answer-form>
 			<div class="free-answer-mission__field">
-				<label for="mission-free-answer" data-free-answer-instruction>{firstPrompt.instruction}</label>
+				<label for="mission-free-answer" data-free-answer-instruction>{firstQuestion.question}</label>
 				<textarea
 					id="mission-free-answer"
 					name="risposta-libera"
 					rows="8"
-					placeholder={firstPrompt.placeholder}
+					placeholder="Inserisci qui la tua risposta"
 					aria-label={answerLabel}
 					data-free-answer-input
 				></textarea>
@@ -72,9 +55,10 @@ const firstPrompt = prompts[0];
 	</div>
 
 	<TestPassed renderHidden={true} />
+	<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
 </article>
 
-<script define:vars={{ prompts }}>
+<script define:vars={{ questions, slugMis }}>
 	const setupFreeAnswerMission = () => {
 		const root = document.querySelector('[data-free-answer-mission]');
 		if (!root) return;
@@ -83,21 +67,51 @@ const firstPrompt = prompts[0];
 		const instruction = root.querySelector('[data-free-answer-instruction]');
 		const input = root.querySelector('[data-free-answer-input]');
 		const submit = root.querySelector('[data-free-answer-submit]');
-		const toast = root.querySelector('[data-test-result-toast]');
+		const passedToast = root.querySelector('.test-result-toast--passed');
+		const notPassedToast = root.querySelector('.test-result-toast--not-passed');
 
-		if (!form || !instruction || !input || !submit || !toast) return;
+		if (!form || !instruction || !input || !submit || !passedToast || !notPassedToast) return;
 
 		let currentPromptIndex = 0;
+		const submittedAnswers = new Array(questions.length).fill('');
 
 		const hasAnswer = () => input.value.trim().length > 0;
 
-		const renderPrompt = () => {
-			const currentPrompt = prompts[currentPromptIndex];
-			const isLastPrompt = currentPromptIndex === prompts.length - 1;
+		const showResultToast = (passed) => {
+			passedToast.hidden = !passed;
+			notPassedToast.hidden = passed;
+		};
 
-			instruction.textContent = currentPrompt.instruction;
+		const validateMissionProof = async () => {
+			submit.disabled = true;
+
+			try {
+				const response = await fetch(`/api/missioni/${slugMis}/prova`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						answers: submittedAnswers.map((answer, questionIndex) => ({ questionIndex, answer })),
+					}),
+				});
+				const payload = await response.json().catch(() => null);
+
+				showResultToast(response.ok && payload?.passed === true);
+			} catch {
+				showResultToast(false);
+			} finally {
+				submit.disabled = false;
+			}
+		};
+
+		const renderPrompt = () => {
+			const currentPrompt = questions[currentPromptIndex];
+			const isLastPrompt = currentPromptIndex === questions.length - 1;
+
+			const headerTitle = root.querySelector('.mission-proof-question__title');
+			if (headerTitle) headerTitle.textContent = currentPrompt.question;
+			instruction.textContent = currentPrompt.question;
 			input.value = '';
-			input.setAttribute('placeholder', currentPrompt.placeholder);
+			input.setAttribute('placeholder', 'Inserisci qui la tua risposta');
 			submit.innerHTML = isLastPrompt
 				? '<span>Concludi la prova</span><i class="bi bi-stars free-answer-mission__complete-icon" aria-hidden="true"></i>'
 				: 'Avanti →';
@@ -112,14 +126,15 @@ const firstPrompt = prompts[0];
 			event.preventDefault();
 
 			if (!hasAnswer()) return;
+			submittedAnswers[currentPromptIndex] = input.value.trim();
 
-			if (currentPromptIndex < prompts.length - 1) {
+			if (currentPromptIndex < questions.length - 1) {
 				currentPromptIndex += 1;
 				renderPrompt();
 				return;
 			}
 
-			toast.hidden = false;
+			validateMissionProof();
 		});
 
 		renderPrompt();

@@ -201,8 +201,7 @@ missioni/lettura/[slugMis].astro
 perche legherebbero URL e architettura Astro a una classificazione editoriale che potrebbe cambiare.
 
 Da confermare lato Strapi:
-- la collection `Missione` dovra avere un campo `slug` se si vuole usare `[slugMis]`
-- in alternativa si dovra usare un identificativo tecnico Strapi, meno adatto a URL editoriali
+- la collection `Missione` ora espone un campo `slug`, quindi `[slugMis]` puo essere collegato allo slug editoriale della missione
 - la collection `Missione` dovra esporre campi o relazioni sufficienti per scegliere layout dettaglio, tipo prova e tipo esito senza moltiplicare le route Astro
 
 ### Categorie Missione
@@ -303,15 +302,8 @@ sala-accademia/[slugAccademia].astro
 eventi-biblioteca-classense/[slugEv].astro
 epistole/[slugEpistola].astro
 scrivania/grimorio/[slugNota].astro
-```
-
-Route dinamica da confermare:
-
-```txt
 missioni/[slugMis]/
 ```
-
-perche la collection `Missione` non ha ancora un campo `slug`.
 
 ## Vedi Anche
 

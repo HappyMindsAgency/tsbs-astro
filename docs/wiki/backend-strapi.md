@@ -104,7 +104,7 @@ Per la mappa pagine, pubblica/privata e sorgenti dati previste consultare:
 
 ## Da Confermare
 
-- slug tecnici
+- slug tecnici delle collection non ancora riallineate; `Missione.slug` risulta presente nello schema aggiornato
 - stati ufficiali delle collection
 - ruoli e permessi Strapi
 - campi obbligatori

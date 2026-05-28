@@ -3,68 +3,55 @@ import Layout from '../../../../layouts/Layout.astro';
 import Nav from '../../../../components/Nav.astro';
 import SceltaDomanda from '../../../../components/MissioniComponents/SceltaDomanda.astro';
 import RispostaLibera from '../../../../components/MissioniComponents/RispostaLibera.astro';
-import { strapi } from '@strapi/client';
+import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
+import { resolveUserTheme } from '../../../../lib/theme';
 
 export const prerender = false;
 
 const { lang = 'it' } = Astro.props;
+const jwt = Astro.cookies.get('jwt')?.value;
 
-if (!Astro.cookies.has('jwt')) {
+if (!jwt) {
 	return Astro.redirect('/');
 }
+
 const { slugMis } = Astro.params;
 const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
-const strapiBaseURL = import.meta.env.STRAPI_API_URL || import.meta.env.STRAPI_URL;
-const requestedTipoProva = Astro.url.searchParams.get('tipoProva');
 
-// Questa pagina resta la regia stabile della prova: quando Strapi sara la fonte dati completa,
-// usera slug missione, tipo prova e stato partecipazione per scegliere il componente corretto
-// senza creare route Astro separate per domanda, risposta libera o varianti future.
-const provaComponents = {
-	'scelta-multipla': SceltaDomanda,
-	sceltaMultipla: SceltaDomanda,
-	quiz: SceltaDomanda,
-	'risposta-libera': RispostaLibera,
-	rispostaLibera: RispostaLibera,
-	'parola-dordine': RispostaLibera,
-	parolaDordine: RispostaLibera,
-};
-
-let missione = null;
-
-if (strapiBaseURL && slugMis) {
-	try {
-		const client = strapi({ baseURL: strapiBaseURL });
-		const response = await client.collection('missioni').find({
-			locale,
-			filters: {
-				slugMis: {
-					$eq: slugMis,
-				},
-			},
-			populate: ['prova', 'partecipazioni'],
-		});
-
-		missione = response?.data?.[0] || null;
-	} catch {
-		missione = null;
-	}
+if (!slugMis) {
+	return Astro.redirect('/404');
 }
 
-const tipoProva =
-	requestedTipoProva ||
-	missione?.tipoProva ||
-	missione?.prova?.tipoProva ||
-	missione?.categoriaMissione?.tipoProva ||
-	'scelta-multipla';
+const theme = await resolveUserTheme(jwt);
+const missione = await getMissioneBySlug(slugMis, locale);
 
-const ProvaComponent = provaComponents[tipoProva as keyof typeof provaComponents] || SceltaDomanda;
+if (!missione?.quiz?.domande?.length) {
+	return Astro.redirect('/404');
+}
+
+const questions = missione.quiz.domande
+	.map((domanda) => ({
+		question: domanda.domanda?.trim() || '',
+		answers: (domanda.risposte || [])
+			.map((risposta) => ({
+				label: risposta.risposta?.trim() || '',
+			}))
+			.filter((risposta) => risposta.label.length > 0),
+	}))
+	.filter((domanda) => domanda.question.length > 0 && domanda.answers.length > 0);
+
+if (questions.length === 0) {
+	return Astro.redirect('/404');
+}
+
+const isFreeAnswer = questions.every((domanda) => domanda.answers.length === 1);
+const ProvaComponent = isFreeAnswer ? RispostaLibera : SceltaDomanda;
 ---
 
-<Layout lang={locale}>
+<Layout lang={locale} theme={theme}>
 	<Nav lang={locale} />
 
 	<main class="tsbs-app-shell mission-proof">
-		<ProvaComponent missione={missione} lang={locale} slugMis={slugMis} />
+		<ProvaComponent missione={missione} questions={questions} lang={locale} slugMis={slugMis} />
 	</main>
 </Layout>

@@ -20,6 +20,69 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-05-28 - Slug Missione Disponibile Per Binding
+
+Decisione:
+- recepire nello schema operativo Astro che la collection Strapi `Missione` espone il campo `slug`
+- usare `slug` come identificativo editoriale per la route `missioni/[slugMis]/`
+- mantenere ancora da confermare i campi o valori che guideranno layout dettaglio, tipo prova e tipo esito
+
+Motivo:
+- lo schema aggiornato fornito in `/Users/viola/Downloads/strapi-tsbs-main` aggiunge `slug` a `Missione` come UID localizzato con `targetField: titolo`
+- rimuovere il blocco documentale che impediva il binding della route dinamica missione
+
+Impatto:
+- `docs/wiki/schema-strapi.md`
+- `docs/wiki/alberatura.md`
+- `docs/wiki/backend-strapi.md`
+- futuro binding di `src/pages/missioni/[slugMis]/`
+
+Stato:
+- approvata
+
+## 2026-05-28 - Convenzione Domande Aperte Nei Quiz Missione
+
+Decisione:
+- gestire le prove a domanda aperta dentro la stessa struttura Strapi dei quiz a risposta multipla
+- usare `Quiz.domande.domanda` per il testo della domanda
+- usare una sola voce in `domande.risposte` come risposta attesa/corretta per le domande aperte
+- usare piu voci in `domande.risposte` per le domande a scelta multipla
+
+Motivo:
+- conferma ricevuta dal backend: i quiz a domanda aperta sono gestiti come quelli a risposta multipla, ma con una sola risposta
+- evitare di introdurre campi o componenti Strapi non previsti
+- mantenere due componenti frontend principali: scelta guidata e risposta libera
+
+Impatto:
+- futuro binding di `src/pages/missioni/[slugMis]/prova/index.astro`
+- `src/components/MissioniComponents/SceltaDomanda.astro`
+- `src/components/MissioniComponents/RispostaLibera.astro`
+- `docs/wiki/schema-strapi.md`
+
+Stato:
+- approvata
+
+## 2026-05-28 - Validazione Server-Side Prova Missione
+
+Decisione:
+- introdurre una route Astro server-side `POST /api/missioni/:slug/prova` per validare le risposte delle prove missione
+- continuare a passare al client solo il testo delle risposte, senza esporre il campo Strapi `corretta`
+- rimandare a una fase successiva il salvataggio dello stato personale in `partecipazioni_missione`
+
+Motivo:
+- separare il catalogo missioni pubblico/readonly dalla validazione della prova dell'utente loggato
+- mantenere la risposta corretta solo sul server
+- evitare di introdurre ora la logica membro/progresso prima del binding completo delle partecipazioni
+
+Impatto:
+- `src/pages/api/missioni/[slugMis]/prova.ts`
+- `src/pages/missioni/[slugMis]/prova/index.astro`
+- `src/components/MissioniComponents/SceltaDomanda.astro`
+- `src/components/MissioniComponents/RispostaLibera.astro`
+
+Stato:
+- approvata
+
 ## 2026-05-27 - Struttura Client Strapi Astro Per Binding Progressivo
 
 Decisione:

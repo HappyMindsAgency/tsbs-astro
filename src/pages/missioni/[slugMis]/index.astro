@@ -1,17 +1,37 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import RitchText from '../../../components/RitchText.astro';
+import { getMissioneBySlug } from '../../../lib/strapi/missioni';
+import { resolveUserTheme } from '../../../lib/theme';
 
 export const prerender = false;
 
 const { lang = 'it' } = Astro.props;
+const { slugMis } = Astro.params;
+const jwt = Astro.cookies.get('jwt')?.value;
 
-if (!Astro.cookies.has('jwt')) {
+if (!jwt) {
 	return Astro.redirect('/');
 }
+
+if (!slugMis) {
+	return Astro.redirect('/404');
+}
+
+const theme = await resolveUserTheme(jwt);
+const missione = await getMissioneBySlug(slugMis, lang);
+
+if (!missione) {
+	return Astro.redirect('/404');
+}
+
+const hasDescription = Boolean(missione.descrizione?.trim());
+const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.punteggio} punti` : '');
+const missionProofHref = `/missioni/${missione.slug}/prova/`;
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell mission-detail">
@@ -23,39 +43,30 @@ if (!Astro.cookies.has('jwt')) {
 		</header>
 
 		<section class="container-xl tsbs-app-container mission-detail__content" aria-labelledby="mission-title">
-			<div class="mission-detail__media" aria-label="Immagine missione">
-				<i class="bi bi-image" aria-hidden="true"></i>
-			</div>
-
 			<div class="mission-detail__body">
-				<h1 id="mission-title">Nome della missione</h1>
+				<h1 id="mission-title">{missione.titolo}</h1>
 
-				<hr class="mission-detail__rule" />
+				{hasDescription && <hr class="mission-detail__rule" />}
 
-				<blockquote class="mission-detail__quote">
-					<p>"Si dice che l'antico astronomo abbia nascosto le coordinate del sapere proprio sotto gli occhi di tutti. Il mondo non e piatto, e nemmeno la verita..."</p>
-				</blockquote>
+				{hasDescription && (
+					<RitchText block={missione.descrizione} className="mission-detail__description" />
+				)}
 
-				<article class="mission-detail__objective" aria-labelledby="mission-objective-title">
-					<h2 id="mission-objective-title">Obiettivo:</h2>
-					<p>Trova il Mappamondo antico al centro della Sala e trova il sigillo nascosto alla base.</p>
-				</article>
+				{trophyLabel && (
+					<>
+						{hasDescription && <hr class="mission-detail__rule mission-detail__rule--reward" />}
 
-				<p class="mission-detail__description">
-					Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id, porta sapien.
-				</p>
+						<div class="mission-detail__reward" aria-label="Ricompensa missione">
+							<p>Completando questa missione otterrai:</p>
+							<p class="mission-detail__trophy">
+								<i class="bi bi-award" aria-hidden="true"></i>
+								<strong>{trophyLabel}</strong>
+							</p>
+						</div>
+					</>
+				)}
 
-				<hr class="mission-detail__rule mission-detail__rule--reward" />
-
-				<div class="mission-detail__reward" aria-label="Ricompensa missione">
-					<p>Completando questa missione otterrai:</p>
-					<p class="mission-detail__trophy">
-						<i class="bi bi-award" aria-hidden="true"></i>
-						<strong>Trofeo "Esploratore"</strong>
-					</p>
-				</div>
-
-				<a class="btn tsbs-cta-primary mission-detail__cta" href="prova/">Avvia la missione</a>
+				<a class="btn tsbs-cta-primary mission-detail__cta" href={missionProofHref}>Avvia la missione</a>
 			</div>
 		</section>
 	</main>
