@@ -9,108 +9,111 @@ const { lang = 'it' } = Astro.props;
 <Layout lang={lang} theme="theme-neutral">
 	<main class="sign-in-page">
 		<div class="sign-in-stage">
-			<img
-				class="sign-in-visual"
-				src={signInHero.src}
-				width={signInHero.width}
-				height={signInHero.height}
-				alt=""
-				aria-hidden="true"
-			/>
-
 			<section class="sign-in-panel" aria-labelledby="sign-in-title">
-				<h1 id="sign-in-title">Crea un account</h1>
-				<p class="sign-in-intro">
-					Inserisci i dati per la registrazione o effettua il <a href="/login/">log in</a>
-				</p>
-
-				<form class="sign-in-form" action="/registrazione-completata/" method="post" data-sign-in-form>
-				<div class="sign-in-error-box" role="alert" data-sign-in-error hidden>
-					<i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-					<span data-sign-in-error-message></span>
+				<div class="sign-in-media" aria-hidden="true">
+					<img
+						class="sign-in-visual"
+						src={signInHero.src}
+						width={signInHero.width}
+						height={signInHero.height}
+						alt=""
+					/>
 				</div>
-					<div class="sign-in-field">
-						<label for="sign-in-name">Nome</label>
-						<input id="sign-in-name" name="name" type="text" autocomplete="given-name" />
-					</div>
 
-					<div class="sign-in-field">
-						<label for="sign-in-surname">Cognome</label>
-						<input id="sign-in-surname" name="surname" type="text" autocomplete="family-name" />
-					</div>
+				<div class="sign-in-content">
+					<h1 id="sign-in-title">Crea un account</h1>
+					<p class="sign-in-intro">
+						Inserisci i dati per la registrazione o effettua il <a href="/login/">log in</a>
+					</p>
 
-					<div class="sign-in-field">
-						<label for="sign-in-username">Username*</label>
-						<input id="sign-in-username" name="username" type="text" autocomplete="username" required />
-					</div>
-
-					<div class="sign-in-field">
-						<label for="sign-in-email">Email*</label>
-						<input id="sign-in-email" name="email" type="email" autocomplete="email" required />
-					</div>
-
-					<div class="sign-in-field">
-						<label for="sign-in-password">Password*</label>
-						<div class="sign-in-password">
-							<input
-								id="sign-in-password"
-								name="password"
-								type="password"
-								autocomplete="new-password"
-								minlength="8"
-								required
-							/>
-							<button type="button" class="sign-in-password__toggle" aria-label="Mostra password" data-sign-in-password-toggle>
-								<i class="bi bi-eye"></i>
-							</button>
+					<form class="sign-in-form" action="/registrazione-completata/" method="post" data-sign-in-form>
+						<div class="sign-in-error-box" role="alert" data-sign-in-error hidden>
+							<i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+							<span data-sign-in-error-message></span>
 						</div>
-						<p class="sign-in-help">
-							<i class="bi bi-info-circle" aria-hidden="true"></i>
-							Minimo 8 caratteri, almeno una maiuscola e un numero.
-						</p>
-					</div>
-
-					<div class="sign-in-field">
-						<label for="sign-in-city">Città</label>
-						<div class="sign-in-city" data-city-autocomplete>
-							<input
-								id="sign-in-city"
-								name="cityName"
-								type="text"
-								autocomplete="address-level2"
-								aria-autocomplete="list"
-								aria-expanded="false"
-								aria-controls="sign-in-city-results"
-								data-city-input
-							/>
-							<input id="sign-in-city-code" name="cityIstatCode" type="hidden" data-city-code />
-							<div id="sign-in-city-results" class="sign-in-city__results" role="listbox" data-city-results hidden></div>
+						<div class="sign-in-field">
+							<label for="sign-in-name">Nome</label>
+							<input id="sign-in-name" name="name" type="text" autocomplete="given-name" />
 						</div>
-					</div>
 
-					<div class="sign-in-consents">
-						<label class="sign-in-check">
-							<input type="checkbox" name="marketing" />
-							<span>Sì, accetto di iscrivermi alla newsletter della Biblioteca Classense</span>
-						</label>
+						<div class="sign-in-field">
+							<label for="sign-in-surname">Cognome</label>
+							<input id="sign-in-surname" name="surname" type="text" autocomplete="family-name" />
+						</div>
 
-						<label class="sign-in-check">
-							<input type="checkbox" name="age_confirm" required />
-							<span>Dichiaro di aver compiuto <strong>14 anni</strong> di età o di avere il consenso dei miei genitori/tutori*</span>
-						</label>
+						<div class="sign-in-field">
+							<label for="sign-in-username">Username*</label>
+							<input id="sign-in-username" name="username" type="text" autocomplete="username" required />
+						</div>
 
-						<label class="sign-in-check">
-							<input type="checkbox" name="terms" required />
-							<span>
-								Dichiaro di aver letto e accettato i <a href="#">Termini di Servizio</a> e la <a href="#">Privacy Policy</a> della web app.*
-							</span>
-						</label>
-					</div>
+						<div class="sign-in-field">
+							<label for="sign-in-email">Email*</label>
+							<input id="sign-in-email" name="email" type="email" autocomplete="email" required />
+						</div>
 
-					<button type="submit" class="sign-in-submit">Crea il tuo account</button>
-				</form>
+						<div class="sign-in-field">
+							<label for="sign-in-password">Password*</label>
+							<div class="sign-in-password">
+								<input
+									id="sign-in-password"
+									name="password"
+									type="password"
+									autocomplete="new-password"
+									minlength="8"
+									required
+								/>
+								<button type="button" class="sign-in-password__toggle" aria-label="Mostra password" data-sign-in-password-toggle>
+									<i class="bi bi-eye"></i>
+								</button>
+							</div>
+							<p class="sign-in-help">
+								<i class="bi bi-info-circle" aria-hidden="true"></i>
+								Minimo 8 caratteri, almeno una maiuscola e un numero.
+							</p>
+						</div>
 
-				<a class="sign-in-back" href="/login/">Torna indietro</a>
+						<div class="sign-in-field">
+							<label for="sign-in-city">Città</label>
+							<div class="sign-in-city" data-city-autocomplete>
+								<input
+									id="sign-in-city"
+									name="cityName"
+									type="text"
+									autocomplete="address-level2"
+									aria-autocomplete="list"
+									aria-expanded="false"
+									aria-controls="sign-in-city-results"
+									data-city-input
+								/>
+								<input id="sign-in-city-code" name="cityIstatCode" type="hidden" data-city-code />
+								<div id="sign-in-city-results" class="sign-in-city__results" role="listbox" data-city-results hidden></div>
+							</div>
+						</div>
+
+						<div class="sign-in-consents">
+							<label class="sign-in-check">
+								<input type="checkbox" name="marketing" />
+								<span>Sì, accetto di iscrivermi alla newsletter della Biblioteca Classense</span>
+							</label>
+
+							<label class="sign-in-check">
+								<input type="checkbox" name="age_confirm" required />
+								<span>Dichiaro di aver compiuto <strong>14 anni</strong> di età o di avere il consenso dei miei genitori/tutori*</span>
+							</label>
+
+							<label class="sign-in-check">
+								<input type="checkbox" name="terms" required />
+								<span>
+									Dichiaro di aver letto e accettato i <a href="#">Termini di Servizio</a> e la <a href="#">Privacy Policy</a> della web app.*
+								</span>
+							</label>
+						</div>
+
+						<button type="submit" class="sign-in-submit">Crea il tuo account</button>
+					</form>
+
+					<a class="sign-in-back" href="/login/">Torna indietro</a>
+				</div>
 			</section>
 		</div>
 	</main>
@@ -451,6 +454,10 @@ const { lang = 'it' } = Astro.props;
 		gap: clamp(0.75rem, 4vw, 1.25rem);
 	}
 
+	.sign-in-media {
+		width: 100%;
+	}
+
 	.sign-in-visual {
 		width: 100%;
 		aspect-ratio: 416 / 297;
@@ -459,13 +466,17 @@ const { lang = 'it' } = Astro.props;
 
 	.sign-in-panel {
 		display: grid;
-		gap: 0;
+		gap: clamp(0.75rem, 4vw, 1.25rem);
 		width: 100%;
-		padding: 0 0.9375rem;
 		color: var(--sign-in-text);
 	}
 
-	.sign-in-panel h1 {
+	.sign-in-content {
+		display: grid;
+		padding: 0 0.9375rem;
+	}
+
+	.sign-in-content h1 {
 		margin: 0 0 0.625rem;
 		color: var(--sign-in-text);
 		font-size: 2rem;
@@ -748,17 +759,31 @@ const { lang = 'it' } = Astro.props;
 		}
 
 		.sign-in-stage {
-			position: relative;
 			display: grid;
 			place-items: center;
-			gap: 2.25rem;
 			width: min(100%, 80.9375rem);
 			min-height: calc(100vh - 2.125rem);
 		}
 
+		.sign-in-panel {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+			align-items: center;
+			column-gap: clamp(2rem, 4vw, 4.5rem);
+			width: min(100%, 70rem);
+			padding: clamp(1.75rem, 3vw, 2.5rem);
+			background: var(--sign-in-panel);
+			border-radius: 0.3125rem;
+		}
+
+		.sign-in-media {
+			display: grid;
+			place-items: center;
+			align-self: stretch;
+			min-height: 20rem;
+			overflow: hidden;
+		}
+
 		.sign-in-visual {
-			position: absolute;
-			inset: 0;
 			width: 100%;
 			height: 100%;
 			aspect-ratio: auto;
@@ -766,13 +791,8 @@ const { lang = 'it' } = Astro.props;
 			object-position: center;
 		}
 
-		.sign-in-panel {
-			position: relative;
-			z-index: 1;
-			width: min(100%, 52rem);
-			padding: 1.9375rem 5rem 1.875rem;
-			background: var(--sign-in-panel);
-			border-radius: 1.125rem;
+		.sign-in-content {
+			padding: 0;
 		}
 
 		.sign-in-form {
@@ -798,7 +818,7 @@ const { lang = 'it' } = Astro.props;
 	}
 
 	@media (max-width: 374.98px) {
-		.sign-in-panel {
+		.sign-in-content {
 			padding-right: 0.5rem;
 			padding-left: 0.5rem;
 		}
