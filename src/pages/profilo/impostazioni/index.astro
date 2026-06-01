@@ -460,10 +460,15 @@ if (!Astro.cookies.has('jwt')) {
 <style lang="scss">
 	.profile-settings-page {
 		--profile-current-academy-accent: var(--tsbs-color-arborea);
+		--profile-settings-page-bg: #f5f5f5;
+		--profile-settings-box-bg: #ffffff;
+		--profile-settings-danger: #dc2626;
+		--profile-settings-danger-dark: #991b1b;
+		--profile-settings-danger-soft: #fee2e2;
 
 		min-height: 100vh;
 		min-height: 100dvh;
-		background-color: var(--tsbs-color-surface);
+		background-color: var(--profile-settings-page-bg);
 		background-image: none;
 	}
 
@@ -535,8 +540,8 @@ if (!Astro.cookies.has('jwt')) {
 
 	.profile-settings__summary,
 	.profile-settings-card {
-		background: var(--tsbs-color-white);
-		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 14%, var(--tsbs-color-white));
+		background: var(--profile-settings-box-bg);
+		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 14%, var(--profile-settings-box-bg));
 		border-radius: var(--tsbs-radius-md);
 	}
 
@@ -813,7 +818,7 @@ if (!Astro.cookies.has('jwt')) {
 		justify-content: space-between;
 		gap: 0.75rem;
 		padding: 1rem 1.25rem;
-		background: #fff5f5;
+		background: var(--profile-settings-box-bg);
 		border: 1px solid #fecaca;
 		border-radius: var(--tsbs-radius-md);
 
@@ -830,17 +835,24 @@ if (!Astro.cookies.has('jwt')) {
 		gap: 0.5rem;
 		min-height: 2.75rem;
 		padding: 0.625rem 1rem;
-		color: #991b1b;
+		color: #ffffff;
+		font-family: var(--tsbs-font-body);
 		font-weight: 700;
-		background: transparent;
-		border: 1px solid #fca5a5;
+		background: var(--profile-settings-danger);
+		border: 1px solid var(--profile-settings-danger);
 		border-radius: var(--tsbs-radius-sm);
 		white-space: nowrap;
 
 		&:hover {
-			color: #fff;
-			background: #dc2626;
-			border-color: #dc2626;
+			color: var(--profile-settings-danger-dark);
+			background: var(--profile-settings-danger-soft);
+			border-color: var(--profile-settings-danger-soft);
+		}
+
+		&:focus-visible {
+			color: #ffffff;
+			background: var(--profile-settings-danger);
+			border-color: var(--profile-settings-danger);
 		}
 	}
 
