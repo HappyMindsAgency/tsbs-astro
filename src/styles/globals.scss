@@ -3502,7 +3502,7 @@ body:has(.tsbs-legal-page) {
 
 // EPISTOLE
 	.epistole-page {
-		--epistole-card-bg: color-mix(in srgb, var(--tsbs-color-body) 9%, var(--tsbs-color-white));
+		--epistole-card-bg: #f5f5f5;
 		--epistole-card-border: #8d8f95;
 		--epistole-muted: #9aa4b4;
 		--missions-header-bg: var(--tsbs-theme-accent);
@@ -3621,7 +3621,7 @@ body:has(.tsbs-legal-page) {
 		padding: 1.125rem 1.25rem;
 		color: var(--tsbs-color-body);
 		text-decoration: none;
-		background: #f5f5f5;
+		background: var(--epistole-card-bg);
 		border: 1px solid var(--epistole-card-border);
 		border-radius: 0.875rem;
 	}
@@ -3643,7 +3643,7 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.epistole-card p:not(.epistole-card__meta) {
-		color: var(--epistole-muted);
+		color: #666666;
 		font-size: 0.9375rem;
 		line-height: 1.55;
 	}
