@@ -1,4 +1,6 @@
 ---
+import smistamentoPattern from '../../assets/smistamento-pattern-the-secret-bookish-society.png';
+
 const { lang = 'it' } = Astro.props;
 
 const questions = [
@@ -35,7 +37,10 @@ const firstQuestion = questions[0];
 ---
 
 <article class="mission-proof-question choice-question sorting-test" data-sorting-test data-lang={lang} aria-label="Lorem ipsum">
-	<header class="mission-proof-question__header">
+	<header
+		class="mission-proof-question__header"
+		style={`background-color: var(--tsbs-color-neutral); background-image: url(${smistamentoPattern.src}); background-repeat: no-repeat; background-position: center; background-size: cover;`}
+	>
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<p class="mission-proof-question__eyebrow">Lorem ipsum</p>
 			<h1 class="mission-proof-question__title mission-component-title">Lorem ipsum dolor sit amet</h1>
