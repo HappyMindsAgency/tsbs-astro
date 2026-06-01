@@ -1830,7 +1830,7 @@ body:has(.tsbs-legal-page) {
 		gap: 0;
 		padding: 0.25rem;
 		margin: 0 0 1.875rem;
-		background: color-mix(in srgb, var(--tsbs-theme-accent) 18%, var(--tsbs-color-white));
+		background: var(--missions-tabs-bg, var(--tsbs-theme-cta-active-bg));
 		border-radius: 0.875rem;
 	}
 
@@ -1936,6 +1936,7 @@ body:has(.tsbs-legal-page) {
 		--events-card-border: #8d8f95;
 		--events-card-media: #d9d9d9;
 		--events-date-bg: rgba(29, 23, 21, 0.12);
+		--events-tabs-bg: var(--tsbs-theme-cta-active-bg);
 		min-height: 100vh;
 		background: var(--tsbs-color-surface);
 	}
@@ -1958,6 +1959,7 @@ body:has(.tsbs-legal-page) {
 
 	.events-tabs {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+		background: var(--events-tabs-bg);
 	}
 
 	.events-section-title {
