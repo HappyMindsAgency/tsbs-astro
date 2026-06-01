@@ -36,17 +36,19 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 	<main class="tsbs-app-shell dashboard-shell">
 		<header class="dashboard-header">
 			<div class="dashboard-profile">
-				<div>
-					<p class="dashboard-username" data-atrio-username>—</p>
-					<p class="dashboard-rank" data-atrio-livello>—</p>
-				</div>
 				<div class="dashboard-avatar-wrap">
 					<div class="dashboard-avatar" aria-hidden="true" data-atrio-avatar>
 						<img data-atrio-avatar-img hidden alt="" />
 					</div>
-					<button class="dashboard-avatar-edit" type="button" aria-label="Apri impostazioni profilo" data-atrio-profile-menu-open>
-						<i class="bi bi-pencil-fill" aria-hidden="true"></i>
-					</button>
+				</div>
+				<div>
+					<div class="dashboard-username-row">
+						<span class="dashboard-username" data-atrio-username>—</span>
+						<button class="dashboard-profile-menu-button" type="button" aria-label="Apri menu profilo" data-atrio-profile-menu-open>
+							<i class="bi bi-chevron-down" aria-hidden="true"></i>
+						</button>
+					</div>
+					<p class="dashboard-rank" data-atrio-livello>—</p>
 				</div>
 			</div>
 		</header>

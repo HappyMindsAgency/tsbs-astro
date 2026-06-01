@@ -643,7 +643,7 @@ body:has(.tsbs-legal-page) {
 
 			display: grid;
 			gap: 2.5rem;
-			padding-top: 4.25rem;
+			padding-top: 0;
 			padding-right: 1.875rem;
 			padding-left: 1.875rem;
 			background: var(--tsbs-color-surface);
@@ -653,6 +653,12 @@ body:has(.tsbs-legal-page) {
 			display: flex;
 			align-items: center;
 			justify-content: flex-start;
+			min-height: 5.5rem;
+			padding: 0.75rem 1.875rem;
+			margin-right: -1.875rem;
+			margin-left: -1.875rem;
+			background: var(--tsbs-color-white);
+			border-bottom: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-white));
 		}
 
 		.dashboard-profile {
@@ -663,7 +669,6 @@ body:has(.tsbs-legal-page) {
 
 		.dashboard-avatar-wrap {
 			position: relative;
-			order: -1;
 			flex: 0 0 auto;
 		}
 
@@ -684,42 +689,46 @@ body:has(.tsbs-legal-page) {
 			object-fit: contain;
 		}
 
-		.dashboard-avatar-edit {
-			position: absolute;
-			right: -0.125rem;
-			bottom: -0.125rem;
-			display: grid;
-			place-items: center;
-			width: 1.5rem;
-			height: 1.5rem;
-			padding: 0;
-			color: var(--tsbs-color-white);
-			background: var(--tsbs-theme-accent);
-			border: 0.125rem solid var(--tsbs-color-surface);
-			border-radius: 50%;
-			box-shadow: 0 0.25rem 0.75rem color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
-		}
-
-		.dashboard-avatar-edit:hover,
-		.dashboard-avatar-edit:focus-visible {
-			color: var(--tsbs-color-white);
-			background: var(--tsbs-theme-cta-hover-bg);
-		}
-
-		.dashboard-avatar-edit .bi {
-			font-size: 0.75rem;
-			line-height: 1;
-		}
-
-		.dashboard-username,
+		.dashboard-username-row,
 		.dashboard-rank {
 			margin: 0;
+		}
+
+		.dashboard-username-row {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			min-width: 0;
 		}
 
 		.dashboard-username {
 			font-size: 1.125rem;
 			font-weight: 800;
 			line-height: 1.1;
+		}
+
+		.dashboard-profile-menu-button {
+			display: inline-grid;
+			place-items: center;
+			flex: 0 0 auto;
+			width: 1.375rem;
+			height: 1.375rem;
+			padding: 0;
+			color: var(--tsbs-theme-accent);
+			background: transparent;
+			border: 0;
+			border-radius: 50%;
+		}
+
+		.dashboard-profile-menu-button:hover,
+		.dashboard-profile-menu-button:focus-visible {
+			color: var(--tsbs-theme-cta-hover-bg);
+			background: color-mix(in srgb, var(--tsbs-theme-accent) 10%, transparent);
+		}
+
+		.dashboard-profile-menu-button .bi {
+			font-size: 0.875rem;
+			line-height: 1;
 		}
 
 		.dashboard-rank {
@@ -1061,33 +1070,19 @@ body:has(.tsbs-legal-page) {
 				min-height: 5.625rem;
 				padding-left: 3rem;
 				padding-right: 3rem;
+				padding-top: 0;
+				padding-bottom: 0;
 				margin-right: -3rem;
 				margin-left: -3rem;
-				background: var(--tsbs-color-white);
-				border-bottom: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-white));
 			}
 
 			.dashboard-profile {
 				justify-content: flex-end;
 			}
 
-			.dashboard-avatar-wrap {
-				order: 0;
-			}
-
 			.dashboard-avatar {
 				width: 4.5rem;
 				height: 4.5rem;
-			}
-
-			.dashboard-avatar-edit {
-				width: 1.625rem;
-				height: 1.625rem;
-				border-color: var(--tsbs-color-white);
-			}
-
-			.dashboard-avatar-edit .bi {
-				font-size: 0.8125rem;
 			}
 
 			.dashboard-username {
