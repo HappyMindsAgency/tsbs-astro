@@ -1,5 +1,9 @@
 ---
-import onboardingVector from '../../assets/onboarding-vector.png';
+import welcomeAcademyAvatar from '../../assets/benvenuto-accademia-avatar.png';
+import arboreaBanner from '../../assets/Arborea-accademia-stendardo-the-secret-bookish-society.png';
+import arcadiaBanner from '../../assets/Arcadia-accademia-stendardo-the-secret-bookish-society.png';
+import armoniaBanner from '../../assets/Armonia-accademia-stendardo-the-secret-bookish-society.png';
+import astrariaBanner from '../../assets/Astraria-accademia-stendardo-the-secret-bookish-society.png';
 
 type AcademyKey = 'astraria' | 'arcadia' | 'armonia' | 'arborea';
 
@@ -8,6 +12,13 @@ const academyLabels: Record<AcademyKey, string> = {
 	arcadia: 'Arcadia',
 	armonia: 'Armonia',
 	arborea: 'Arborea',
+};
+
+const academyBanners = {
+	astraria: astrariaBanner,
+	arcadia: arcadiaBanner,
+	armonia: armoniaBanner,
+	arborea: arboreaBanner,
 };
 
 const normalizeAcademy = (value: unknown): AcademyKey => {
@@ -22,6 +33,7 @@ const normalizeAcademy = (value: unknown): AcademyKey => {
 const { academy = 'arborea', lang = 'it' } = Astro.props;
 const currentAcademy = normalizeAcademy(academy);
 const academyName = academyLabels[currentAcademy];
+const academyBanner = academyBanners[currentAcademy];
 const avatarChoiceUrl = '/test-smistamento/scegli-avatar/';
 const confirmHref = `${avatarChoiceUrl}?academy=${encodeURIComponent(currentAcademy)}`;
 const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeURIComponent(currentAcademy)}`;
@@ -30,15 +42,20 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 <section class="sorting-result-page" data-academy={currentAcademy} data-lang={lang} aria-labelledby="sorting-result-title">
 	<article class="sorting-result">
 		<div class="sorting-result__visual" aria-hidden="true">
-			<div class="sorting-result__media-icon">
-				<i class="bi bi-image"></i>
-			</div>
+			<img
+				class="sorting-result__banner"
+				src={academyBanner.src}
+				width={academyBanner.width}
+				height={academyBanner.height}
+				alt=""
+				loading="eager"
+			/>
 
 			<img
 				class="sorting-result__avatar"
-				src={onboardingVector.src}
-				width={onboardingVector.width}
-				height={onboardingVector.height}
+				src={welcomeAcademyAvatar.src}
+				width={welcomeAcademyAvatar.width}
+				height={welcomeAcademyAvatar.height}
 				alt=""
 				loading="eager"
 			/>
@@ -66,9 +83,9 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		--sorting-result-accent: var(--tsbs-theme-accent);
 		--sorting-result-muted: var(--tsbs-color-body);
 		--sorting-result-soft: color-mix(in srgb, var(--sorting-result-accent) 13%, var(--tsbs-color-surface));
-		--sorting-result-photo-bg: color-mix(in srgb, var(--tsbs-color-neutral) 10%, var(--tsbs-color-white));
+		--sorting-result-photo-bg: #fffaf0;
 		--sorting-result-line: color-mix(in srgb, var(--sorting-result-accent) 18%, var(--tsbs-color-white));
-		--sorting-result-panel: var(--tsbs-color-surface);
+		--sorting-result-panel: var(--tsbs-color-white);
 		--sorting-result-shadow: 0 1.125rem 3rem color-mix(in srgb, var(--sorting-result-accent) 14%, transparent);
 
 		display: grid;
@@ -77,68 +94,74 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		min-height: 100svh;
 		padding: 0;
 		color: var(--sorting-result-muted);
-		background: var(--sorting-result-photo-bg);
+		background-color: var(--sorting-result-photo-bg);
+		background-image:
+			linear-gradient(rgba(255, 250, 240, 0.8), rgba(255, 250, 240, 0.8)),
+			var(--tsbs-page-pattern-image);
+		background-repeat: repeat;
+		background-position: top left;
+		background-size: var(--tsbs-page-pattern-size);
 	}
 
 	.sorting-result {
 		position: relative;
 		display: grid;
+		grid-template-rows: clamp(22rem, 118vw, 29rem) auto;
+		align-content: start;
 		width: 100%;
 		min-height: 100vh;
 		min-height: 100svh;
 		overflow: hidden;
-		background: var(--sorting-result-photo-bg);
+		background-color: var(--sorting-result-photo-bg);
+		background-image:
+			linear-gradient(rgba(255, 250, 240, 0.8), rgba(255, 250, 240, 0.8)),
+			var(--tsbs-page-pattern-image);
+		background-repeat: repeat;
+		background-position: top left;
+		background-size: var(--tsbs-page-pattern-size);
 		border: 0;
 		border-radius: 0;
 		box-shadow: none;
 	}
 
 	.sorting-result__visual {
-		position: fixed;
-		inset: 0;
+		position: relative;
 		z-index: 4;
-		min-height: 100%;
+		min-height: clamp(22rem, 118vw, 29rem);
 		overflow: visible;
 		pointer-events: none;
 	}
 
-	.sorting-result__media-icon {
-		position: fixed;
-		top: 18svh;
+	.sorting-result__banner {
+		position: absolute;
+		bottom: -1.125rem;
 		left: 50%;
-		display: grid;
-		place-items: center;
-		width: 4rem;
-		aspect-ratio: 1;
-		color: var(--tsbs-color-white);
-		font-size: 1.75rem;
-		background: color-mix(in srgb, var(--tsbs-color-heading) 64%, transparent);
-		border-radius: 50%;
+		z-index: 4;
+		width: auto;
+		height: clamp(20rem, 108vw, 26.5rem);
+		filter:
+			brightness(0.68)
+			drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--sorting-result-accent) 22%, transparent));
 		transform: translateX(-50%);
 	}
 
 	.sorting-result__avatar {
-		position: fixed;
-		right: clamp(2.75rem, 13vw, 4.25rem);
-		bottom: clamp(17rem, 48vw, 18.5rem);
+		position: absolute;
+		right: clamp(1.75rem, 11vw, 3.25rem);
+		bottom: -1rem;
 		z-index: 5;
-		width: min(27vw, 5.75rem);
+		width: clamp(5rem, 24vw, 6.25rem);
 		height: auto;
-		filter: saturate(0) brightness(0.64);
-		opacity: 0.9;
 		pointer-events: none;
 	}
 
 	.sorting-result__panel {
-		position: fixed;
-		right: 0;
-		bottom: 0;
-		left: 0;
+		position: relative;
 		z-index: 3;
 		display: grid;
 		gap: 0.875rem;
-		width: 100vw;
-		padding: 2rem 1.5rem calc(1.75rem + env(safe-area-inset-bottom));
+		width: 100%;
+		padding: 2.25rem 1.5rem calc(1.75rem + env(safe-area-inset-bottom));
 		background: var(--sorting-result-panel);
 		border-radius: 1.25rem 1.25rem 0 0;
 	}
@@ -234,7 +257,13 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			min-height: 100vh;
 			min-height: 100svh;
 			overflow: hidden;
-			background: var(--sorting-result-photo-bg);
+			background-color: var(--sorting-result-photo-bg);
+			background-image:
+				linear-gradient(rgba(255, 250, 240, 0.8), rgba(255, 250, 240, 0.8)),
+				var(--tsbs-page-pattern-image);
+			background-repeat: repeat;
+			background-position: top left;
+			background-size: var(--tsbs-page-pattern-size);
 		}
 
 		.sorting-result__visual {
@@ -254,15 +283,13 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			transform: none;
 		}
 
-		.sorting-result__media-icon {
+		.sorting-result__banner {
 			position: absolute;
-			top: clamp(7.5rem, 20vh, 14rem);
+			top: clamp(1.25rem, 4.5vh, 3rem);
 			left: 50%;
-			width: 4.5rem;
-			color: var(--tsbs-color-white);
-			font-size: 2rem;
-			background: color-mix(in srgb, var(--tsbs-color-heading) 64%, transparent);
-			border-radius: 50%;
+			width: clamp(15.5rem, 16vw, 19rem);
+			height: auto;
+			filter: brightness(0.68);
 			transform: translateX(-50%);
 		}
 
