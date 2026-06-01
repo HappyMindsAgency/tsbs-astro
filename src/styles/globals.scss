@@ -3706,7 +3706,7 @@ body:has(.tsbs-legal-page) {
 
 	.epistle-detail-page {
 		min-height: 100vh;
-		background-color: #fffaf0;
+		background-color: var(--tsbs-color-neutral-soft);
 	}
 
 	.epistle-detail {
@@ -4299,30 +4299,14 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.tsbs-app-shell.epistle-detail-page {
-		background-color: #fffaf0;
+		background-color: var(--tsbs-color-neutral-soft);
 		background-image:
-			linear-gradient(rgba(255, 250, 240, 0.78), rgba(255, 250, 240, 0.78)),
-			url("../assets/Paper_Textures-1.jpg"),
-			url("../assets/Paper_Textures-2.jpg"),
-			url("../assets/Paper_Textures-3.jpg"),
-			url("../assets/Paper_Textures-4.jpg"),
-			url("../assets/Paper_Textures-5.jpg");
-		background-repeat: repeat;
-		background-position:
-			top left,
-			top left,
-			24rem 14rem,
-			42rem -8rem,
-			-18rem 32rem,
-			right -10rem top 28rem;
-		background-size:
-			auto,
-			34rem auto,
-			38rem auto,
-			30rem auto,
-			42rem auto,
-			36rem auto;
-		background-blend-mode: normal, multiply, soft-light, overlay, multiply, screen;
+			linear-gradient(rgba(239, 233, 227, 0.32), rgba(239, 233, 227, 0.32)),
+			url("../assets/Paper_Textures-1.jpg");
+		background-repeat: no-repeat;
+		background-position: center top;
+		background-size: cover;
+		background-blend-mode: normal, multiply;
 	}
 
 	.tsbs-app-shell.tsbs-legal-page {
