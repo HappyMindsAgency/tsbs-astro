@@ -71,7 +71,12 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			</p>
 
 			<div class="sorting-result__actions">
-				<a class="btn tsbs-cta-primary mission-proof-question__cta sorting-result__button" href={confirmHref}>Conferma</a>
+				<button
+					type="button"
+					class="btn tsbs-cta-primary mission-proof-question__cta sorting-result__button"
+					data-confirm-result-academy={currentAcademy}
+					data-confirm-result-href={confirmHref}
+				>Conferma</button>
 				<a class="sorting-result__link" href={chooseHref}>oppure Scegli l’Accademia</a>
 			</div>
 		</div>
@@ -356,3 +361,27 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		}
 	}
 </style>
+
+<script>
+	document.querySelectorAll<HTMLButtonElement>('[data-confirm-result-academy]').forEach((btn) => {
+		btn.addEventListener('click', async () => {
+			const accademia = btn.dataset.confirmResultAcademy;
+			const href = btn.dataset.confirmResultHref;
+			if (!accademia || !href) return;
+
+			btn.disabled = true;
+
+			try {
+				await fetch('/api/user/accademia', {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ accademia }),
+				});
+			} catch {
+				// best-effort: la navigazione procede comunque
+			}
+
+			window.location.assign(href);
+		});
+	});
+</script>
