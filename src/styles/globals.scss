@@ -1705,7 +1705,7 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.academy-section h2 {
-			color: #4f5b70;
+			color: #1d1715;
 			font-size: 1.625rem;
 			font-weight: 700;
 		}
@@ -1791,7 +1791,7 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.academy-ranking-page .academy-section h2 {
-			color: #4f5b70;
+			color: #1d1715;
 			font-size: 1.625rem;
 			font-weight: 700;
 		}
@@ -1868,6 +1868,14 @@ body:has(.tsbs-legal-page) {
 
 	.mission-card.is-hidden {
 		display: none;
+	}
+
+	.missions-shell .mission-card {
+		background: #f5f5f5;
+	}
+
+	.missions-shell .dashboard-progress {
+		background: #b5b5b5;
 	}
 
 	.mission-card-link {
@@ -2089,7 +2097,7 @@ body:has(.tsbs-legal-page) {
 
 // PAGINA BIBLIOTECA
 	.biblioteca-page {
-		--biblioteca-card-bg: color-mix(in srgb, var(--tsbs-color-body) 16%, var(--tsbs-color-white));
+		--biblioteca-card-bg: #f5f5f5;
 		--biblioteca-card-border: color-mix(in srgb, var(--tsbs-color-body) 62%, var(--tsbs-color-white));
 		min-height: 100vh;
 		background: var(--tsbs-color-surface);
@@ -2145,7 +2153,6 @@ body:has(.tsbs-legal-page) {
 	.biblioteca-archive-card:focus {
 		color: var(--tsbs-color-body);
 		text-decoration: none;
-		border-color: var(--tsbs-theme-accent);
 	}
 
 	.biblioteca-archive-card__icon {
