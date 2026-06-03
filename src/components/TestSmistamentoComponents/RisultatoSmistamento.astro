@@ -88,7 +88,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		--sorting-result-accent: var(--tsbs-theme-accent);
 		--sorting-result-muted: var(--tsbs-color-body);
 		--sorting-result-soft: color-mix(in srgb, var(--sorting-result-accent) 13%, var(--tsbs-color-surface));
-		--sorting-result-photo-bg: #fffaf0;
+		--sorting-result-photo-bg: #ffffff;
 		--sorting-result-line: color-mix(in srgb, var(--sorting-result-accent) 18%, var(--tsbs-color-white));
 		--sorting-result-panel: var(--tsbs-color-white);
 		--sorting-result-shadow: 0 1.125rem 3rem color-mix(in srgb, var(--sorting-result-accent) 14%, transparent);
@@ -106,7 +106,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		color: var(--sorting-result-muted);
 		background-color: var(--sorting-result-photo-bg);
 		background-image:
-			linear-gradient(rgba(255, 250, 240, 0.8), rgba(255, 250, 240, 0.8)),
+			var(--tsbs-page-pattern-overlay),
 			var(--tsbs-page-pattern-image);
 		background-repeat: repeat;
 		background-position: top left;
@@ -124,7 +124,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		overflow: hidden;
 		background-color: var(--sorting-result-photo-bg);
 		background-image:
-			linear-gradient(rgba(255, 250, 240, 0.8), rgba(255, 250, 240, 0.8)),
+			var(--tsbs-page-pattern-overlay),
 			var(--tsbs-page-pattern-image);
 		background-repeat: repeat;
 		background-position: top left;
@@ -280,7 +280,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			overflow: hidden;
 			background-color: var(--sorting-result-photo-bg);
 			background-image:
-				linear-gradient(rgba(255, 250, 240, 0.8), rgba(255, 250, 240, 0.8)),
+				var(--tsbs-page-pattern-overlay),
 				var(--tsbs-page-pattern-image);
 			background-repeat: repeat;
 			background-position: top left;
