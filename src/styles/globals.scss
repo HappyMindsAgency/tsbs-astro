@@ -740,13 +740,10 @@ body:has(.tsbs-legal-page) {
 
 		.dashboard-epistle {
 			background-color: var(--tsbs-color-neutral-soft);
-			background-image:
-				linear-gradient(rgba(239, 233, 227, 0.64), rgba(239, 233, 227, 0.64)),
-				url("../assets/Paper_Textures-1.jpg");
-			background-repeat: repeat;
+			background-image: url("../assets/Paper_Textures-1.jpg");
+			background-repeat: no-repeat;
 			background-position: center;
-			background-size: auto, 34rem auto;
-			background-blend-mode: normal, multiply;
+			background-size: cover;
 			border: 0;
 		}
 
@@ -3547,13 +3544,10 @@ body:has(.tsbs-legal-page) {
 		gap: 0.75rem;
 		padding: 1.5rem 1.5rem 0.9375rem;
 		background-color: var(--tsbs-color-neutral-soft);
-		background-image:
-			linear-gradient(rgba(239, 233, 227, 0.64), rgba(239, 233, 227, 0.64)),
-			url("../assets/Paper_Textures-1.jpg");
-		background-repeat: repeat;
+		background-image: url("../assets/Paper_Textures-1.jpg");
+		background-repeat: no-repeat;
 		background-position: center;
-		background-size: auto, 34rem auto;
-		background-blend-mode: normal, multiply;
+		background-size: cover;
 		border: 0;
 		border-radius: 0.875rem;
 	}
