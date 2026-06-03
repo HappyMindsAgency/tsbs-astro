@@ -87,6 +87,8 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		--sorting-result-line: color-mix(in srgb, var(--sorting-result-accent) 18%, var(--tsbs-color-white));
 		--sorting-result-panel: var(--tsbs-color-white);
 		--sorting-result-shadow: 0 1.125rem 3rem color-mix(in srgb, var(--sorting-result-accent) 14%, transparent);
+		--sorting-result-visual-height: clamp(22rem, 118vw, 29rem);
+		--sorting-result-banner-height: clamp(20rem, 108vw, 26.5rem);
 
 		display: grid;
 		place-items: stretch center;
@@ -106,7 +108,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 	.sorting-result {
 		position: relative;
 		display: grid;
-		grid-template-rows: clamp(22rem, 118vw, 29rem) auto;
+		grid-template-rows: var(--sorting-result-visual-height) auto;
 		align-content: start;
 		width: 100%;
 		min-height: 100vh;
@@ -127,7 +129,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 	.sorting-result__visual {
 		position: relative;
 		z-index: 4;
-		min-height: clamp(22rem, 118vw, 29rem);
+		min-height: var(--sorting-result-visual-height);
 		overflow: visible;
 		pointer-events: none;
 	}
@@ -138,7 +140,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		left: 50%;
 		z-index: 4;
 		width: auto;
-		height: clamp(20rem, 108vw, 26.5rem);
+		height: var(--sorting-result-banner-height);
 		filter:
 			brightness(0.68)
 			drop-shadow(0 1rem 1.25rem color-mix(in srgb, var(--sorting-result-accent) 22%, transparent));
@@ -161,6 +163,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		display: grid;
 		gap: 0.875rem;
 		width: 100%;
+		min-height: max(0px, calc(100svh - var(--sorting-result-visual-height)));
 		padding: 2.25rem 1.5rem calc(1.75rem + env(safe-area-inset-bottom));
 		background: var(--sorting-result-panel);
 		border-radius: 1.25rem 1.25rem 0 0;
@@ -247,6 +250,10 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 
 	@media (min-width: 768px) {
 		.sorting-result-page {
+			--sorting-result-banner-height: 27.5rem;
+			--sorting-result-panel-top: clamp(22rem, 40vh, 27rem);
+			--sorting-result-panel-padding-top: clamp(8rem, 7vw, 8.25rem);
+
 			place-items: center;
 			padding: 0;
 		}
@@ -287,8 +294,8 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			position: absolute;
 			top: clamp(1.25rem, 4.5vh, 3rem);
 			left: 50%;
-			width: clamp(15.5rem, 16vw, 19rem);
-			height: auto;
+			width: auto;
+			height: var(--sorting-result-banner-height);
 			filter: brightness(0.68);
 			transform: translateX(-50%);
 		}
@@ -296,13 +303,14 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		.sorting-result__panel {
 			position: absolute;
 			right: auto;
-			bottom: clamp(3.5rem, 8vh, 6rem);
+			top: var(--sorting-result-panel-top);
+			bottom: auto;
 			left: 50%;
 			width: min(69rem, calc(100vw - 12rem));
-			align-content: center;
+			align-content: start;
 			justify-items: center;
-			min-height: 20rem;
-			padding: clamp(2.75rem, 4vw, 4rem) clamp(3rem, 7vw, 6rem);
+			min-height: auto;
+			padding: var(--sorting-result-panel-padding-top) clamp(3rem, 7vw, 6rem) clamp(2.75rem, 4vw, 4rem);
 			text-align: center;
 			border-radius: 1.25rem;
 			transform: translateX(-50%);
@@ -329,6 +337,13 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 
 		.sorting-result__panel p:not(.sorting-result__eyebrow) {
 			max-width: 49rem;
+		}
+	}
+
+	@media (min-width: 1200px) {
+		.sorting-result-page {
+			--sorting-result-banner-height: 27rem;
+			--sorting-result-panel-padding-top: 8rem;
 		}
 	}
 </style>
