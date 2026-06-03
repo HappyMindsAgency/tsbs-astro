@@ -39,11 +39,9 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     }
     const user = await userRes.json();
 
-    // Trova il Membro per email (campo diretto unico).
-    // status=draft perché il Membro è appena creato e non ancora pubblicato.
+    // Trova il Membro collegato allo User (stesso pattern di dati-aggiuntivi.ts).
     const qs = new URLSearchParams({
-        'filters[email][$eq]': String(user.email),
-        'status': 'draft',
+        'filters[user][id][$eq]': String(user.id),
     });
     const membroRes = await fetch(
         `${STRAPI_API_BASE_URL}/membri?${qs}`,
@@ -87,7 +85,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     // Aggiorna il Membro con la relazione accademia
     const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membro.documentId}`, {
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${jwt}`, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: { accademia: { connect: [{ documentId: accademiaDocumentId }] } } }),
     });
 

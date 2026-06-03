@@ -67,7 +67,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     const updateRes = await fetch(updateUrl, {
         method: 'PUT',
         headers: {
-            'Authorization': `Bearer ${jwt}`,
+            'Authorization': `Bearer ${STRAPI_API}`,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({ data: { datiAggiuntivi: datiAggiornati } }),
