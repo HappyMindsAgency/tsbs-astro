@@ -1007,7 +1007,10 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.dashboard-event-card {
+			display: block;
 			overflow: hidden;
+			color: inherit;
+			text-decoration: none;
 			background: var(--tsbs-color-white);
 			border-radius: 0.625rem;
 			scroll-snap-align: start;

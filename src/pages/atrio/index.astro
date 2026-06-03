@@ -19,10 +19,10 @@ const tasks = [
 ];
 
 const events = [
-	{ date: '12 FEB', time: '18:00', title: 'Lorem ipsum dolor sit amet' },
-	{ date: '21 MAR', time: '18:00', title: 'Lorem ipsum dolor sit amet' },
-	{ date: '05 APR', time: '19:30', title: 'Lorem ipsum dolor sit amet' },
-	{ date: '18 APR', time: '17:00', title: 'Lorem ipsum dolor sit amet' },
+	{ date: '12 FEB', time: '18:00', title: 'Lorem ipsum dolor sit amet', slug: 'lorem-ipsum-dolor-15-gen' },
+	{ date: '21 MAR', time: '18:00', title: 'Lorem ipsum dolor sit amet', slug: 'lorem-ipsum-dolor-07-feb' },
+	{ date: '05 APR', time: '19:30', title: 'Lorem ipsum dolor sit amet', slug: 'lorem-ipsum-dolor-mar-apr' },
+	{ date: '18 APR', time: '17:00', title: 'Lorem ipsum dolor sit amet', slug: 'lorem-ipsum-dolor-20-apr' },
 ];
 
 const lastEpistola = await getLastEpistola();
@@ -116,7 +116,7 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 			</div>
 			<div class="dashboard-event-grid">
 				{events.map((event) => (
-					<article class="dashboard-event-card">
+					<a class="dashboard-event-card" href={`/eventi-biblioteca-classense/${event.slug}/`}>
 						<div class="dashboard-event-card__media" aria-hidden="true">
 							<i class="bi bi-image"></i>
 						</div>
@@ -124,7 +124,7 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 							<p>{event.date} • {event.time}</p>
 							<h3 class="tsbs-accent-title">{event.title}</h3>
 						</div>
-					</article>
+					</a>
 				))}
 			</div>
 		</section>
