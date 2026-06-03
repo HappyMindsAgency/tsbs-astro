@@ -2224,6 +2224,10 @@ body:has(.tsbs-legal-page) {
 		.biblioteca-intro {
 			font-size: 1.125rem;
 		}
+
+		.biblioteca-archive-card__icon--tsbs img {
+			transform: translateY(-0.1875rem);
+		}
 	}
 
 // PAGINA BIBLIOTECA - LE ACCADEMIE

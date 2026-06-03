@@ -1,9 +1,9 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
-import societaSegretaImage from '../../assets/biblioteca-la-societa-segreta.png';
+import societaSegretaImage from '../../assets/tsbs-logo-the-secret-bookish-society.png';
 import accademieImage from '../../assets/biblioteca-le-accademie.png';
-import classenseImage from '../../assets/biblioteca-la-classense.png';
+import classenseImage from '../../assets/classense-logo-the-secret-bookish-society.png';
 import { resolveUserContext } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -13,18 +13,21 @@ const archiveItems = [
 		title: 'La Società Segreta - TSBS',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		image: societaSegretaImage,
+		iconClass: 'biblioteca-archive-card__icon--tsbs',
 		href: '#societa-segreta',
 	},
 	{
 		title: 'Le Accademie',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		image: accademieImage,
+		iconClass: '',
 		href: '/biblioteca/accademie/',
 	},
 	{
 		title: 'La Classense',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		image: classenseImage,
+		iconClass: '',
 		href: '#classense',
 	},
 ];
@@ -56,7 +59,7 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 				<div class="biblioteca-archive__list">
 					{archiveItems.map((item) => (
 						<a class="biblioteca-archive-card" href={item.href}>
-							<span class="biblioteca-archive-card__icon" aria-hidden="true">
+							<span class={`biblioteca-archive-card__icon ${item.iconClass}`} aria-hidden="true">
 								<img src={item.image.src} alt="" loading="lazy" />
 							</span>
 							<span class="biblioteca-archive-card__copy">
