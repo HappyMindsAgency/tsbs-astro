@@ -211,6 +211,10 @@ export class AuthService {
                         cognome: cognome || null,
                         attivo: true,
                         user: userId,
+                        livello: { connect: [{ id: 1 }] },
+                        datiAggiuntivi: {
+                            iscrittoDal: new Date().toISOString().split('T')[0],
+                        },
                     },
                 }),
             });
