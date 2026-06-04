@@ -2,74 +2,49 @@
 import smistamentoPattern from '../../assets/smistamento-pattern-the-secret-bookish-society.png';
 
 const { lang = 'it' } = Astro.props;
-
-const questions = [
-	{
-		question: 'Lorem ipsum dolor sit amet?',
-		answers: [
-			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-		],
-	},
-	{
-		question: 'Sed do eiusmod tempor incididunt?',
-		answers: [
-			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-		],
-	},
-	{
-		question: 'Ut labore et dolore magna aliqua?',
-		answers: [
-			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.' },
-		],
-	},
-];
-
-const firstQuestion = questions[0];
 ---
 
-<article class="mission-proof-question choice-question sorting-test" data-sorting-test data-lang={lang} aria-label="Lorem ipsum">
+<article class="mission-proof-question choice-question sorting-test" data-sorting-test data-lang={lang} aria-label="Test di smistamento">
 	<header
 		class="mission-proof-question__header"
 		style={`background-color: var(--tsbs-color-neutral); background-image: url(${smistamentoPattern.src}); background-repeat: no-repeat; background-position: center; background-size: cover;`}
 	>
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
-			<p class="mission-proof-question__eyebrow">Lorem ipsum</p>
-			<h1 class="mission-proof-question__title mission-component-title">Lorem ipsum dolor sit amet</h1>
+			<p class="mission-proof-question__eyebrow">Test di smistamento</p>
+			<h1 class="mission-proof-question__title mission-component-title">Dove ti porterà la tua natura?</h1>
 		</div>
 	</header>
 
 	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
-		<div class="choice-question__form sorting-test__form">
+
+		<!-- Stato: caricamento -->
+		<div class="sorting-test__loading" data-sorting-loading aria-live="polite">
+			<p>Caricamento domande…</p>
+		</div>
+
+		<!-- Stato: errore -->
+		<div class="sorting-test__error" data-sorting-error hidden aria-live="assertive">
+			<p>Non è stato possibile caricare il test. Ricarica la pagina per riprovare.</p>
+		</div>
+
+		<!-- Stato: quiz attivo -->
+		<div class="choice-question__form sorting-test__form" data-sorting-form hidden>
 			<fieldset class="choice-question__fieldset">
-				<legend>{firstQuestion.question}</legend>
+				<legend data-sorting-question-text></legend>
 
-				<p class="sorting-test__progress" data-sorting-test-progress>
-					Domanda 1 di {questions.length}
-				</p>
+				<p class="sorting-test__progress" data-sorting-progress></p>
 
-				<div class="choice-question__answers" data-sorting-test-answers>
-					{firstQuestion.answers.map((answer, index) => (
-						<label class="choice-question__answer" for={`sorting-answer-0-${index}`}>
-							<input id={`sorting-answer-0-${index}`} type="radio" name="risposta-smistamento" value={answer.label} />
-							<span class="choice-question__answer-label">{answer.label}</span>
-							<span class="choice-question__answer-description">{answer.description}</span>
-						</label>
-					))}
-				</div>
+				<div class="choice-question__answers" data-sorting-answers></div>
 			</fieldset>
 
-			<a class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta sorting-test__cta" href="/test-smistamento/benvenuto-accademia-arborea/">
+			<button
+				type="button"
+				class="btn tsbs-cta-primary mission-proof-question__cta choice-question__cta sorting-test__cta"
+				data-sorting-next
+				disabled
+			>
 				Prosegui
-			</a>
+			</button>
 		</div>
 	</div>
 </article>
@@ -117,4 +92,138 @@ const firstQuestion = questions[0];
 		justify-content: center;
 		gap: 0.5rem;
 	}
+
+	.sorting-test__loading,
+	.sorting-test__error {
+		padding: 3rem 0;
+		text-align: center;
+		color: var(--tsbs-theme-body);
+	}
+
+	.sorting-test__error {
+		color: var(--tsbs-color-danger, #c0392b);
+	}
 </style>
+
+<script>
+	// Mapping: indice risposta (0-based) → slug accademia
+	// Risposta 0 → Arcadia, 1 → Astraria, 2 → Armonia, 3 → Arborea
+	const ACCADEMIA_BY_ANSWER_INDEX: Record<number, string> = {
+		0: 'arcadia',
+		1: 'astraria',
+		2: 'armonia',
+		3: 'arborea',
+	};
+
+	async function initSortingTest() {
+		const article = document.querySelector<HTMLElement>('[data-sorting-test]');
+		if (!article) return;
+
+		const loadingEl = article.querySelector<HTMLElement>('[data-sorting-loading]');
+		const errorEl = article.querySelector<HTMLElement>('[data-sorting-error]');
+		const formEl = article.querySelector<HTMLElement>('[data-sorting-form]');
+		const questionTextEl = article.querySelector<HTMLElement>('[data-sorting-question-text]');
+		const progressEl = article.querySelector<HTMLElement>('[data-sorting-progress]');
+		const answersEl = article.querySelector<HTMLElement>('[data-sorting-answers]');
+		const nextBtn = article.querySelector<HTMLButtonElement>('[data-sorting-next]');
+
+		if (!loadingEl || !errorEl || !formEl || !questionTextEl || !progressEl || !answersEl || !nextBtn) return;
+
+		// Carica le domande dall'API
+		let domande: Array<{ domanda: string; risposte: Array<{ risposta: string }> }> = [];
+
+		try {
+			const res = await fetch('/api/quiz/smistamento');
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const data = await res.json();
+			domande = data.domande ?? [];
+		} catch {
+			loadingEl.hidden = true;
+			errorEl.hidden = false;
+			return;
+		}
+
+		if (domande.length === 0) {
+			loadingEl.hidden = true;
+			errorEl.hidden = false;
+			return;
+		}
+
+		// Contatori: quante volte è stato scelto ogni indice di risposta
+		const punteggi: number[] = [0, 0, 0, 0];
+		let domandaCorrente = 0;
+
+		function renderDomanda(index: number) {
+			const d = domande[index];
+			questionTextEl!.textContent = d.domanda;
+			progressEl!.textContent = `Domanda ${index + 1} di ${domande.length}`;
+
+			answersEl!.innerHTML = '';
+			d.risposte.forEach((risposta, rIdx) => {
+				const id = `sorting-answer-${index}-${rIdx}`;
+				const label = document.createElement('label');
+				label.className = 'choice-question__answer';
+				label.htmlFor = id;
+
+				const input = document.createElement('input');
+				input.id = id;
+				input.type = 'radio';
+				input.name = 'risposta-smistamento';
+				input.value = String(rIdx);
+
+				const spanLabel = document.createElement('span');
+				spanLabel.className = 'choice-question__answer-label';
+				// Etichetta A/B/C/D
+				spanLabel.textContent = String.fromCharCode(65 + rIdx);
+
+				const spanDesc = document.createElement('span');
+				spanDesc.className = 'choice-question__answer-description';
+				spanDesc.textContent = risposta.risposta;
+
+				label.appendChild(input);
+				label.appendChild(spanLabel);
+				label.appendChild(spanDesc);
+				answersEl!.appendChild(label);
+
+				input.addEventListener('change', () => {
+					nextBtn!.disabled = false;
+				});
+			});
+
+			nextBtn!.disabled = true;
+			nextBtn!.textContent = index === domande.length - 1 ? 'Scopri la tua Accademia' : 'Prosegui';
+		}
+
+		nextBtn.addEventListener('click', () => {
+			// Registra la risposta scelta
+			const selected = answersEl!.querySelector<HTMLInputElement>('input[type="radio"]:checked');
+			if (!selected) return;
+
+			const answerIndex = parseInt(selected.value, 10);
+			if (!isNaN(answerIndex) && answerIndex >= 0 && answerIndex <= 3) {
+				punteggi[answerIndex]++;
+			}
+
+			domandaCorrente++;
+
+			if (domandaCorrente < domande.length) {
+				renderDomanda(domandaCorrente);
+			} else {
+				// Calcola l'accademia vincente
+				const maxPunteggio = Math.max(...punteggi);
+				const indiceVincente = punteggi.indexOf(maxPunteggio);
+				const accademia = ACCADEMIA_BY_ANSWER_INDEX[indiceVincente] ?? 'arcadia';
+
+				window.location.href = `/test-smistamento/benvenuto-accademia-${accademia}/`;
+			}
+		});
+
+		// Mostra il quiz
+		loadingEl.hidden = true;
+		formEl.hidden = false;
+		renderDomanda(0);
+	}
+
+	// Astro View Transitions: ri-inizializza ad ogni navigazione di pagina
+	document.addEventListener('astro:page-load', initSortingTest);
+</script>
