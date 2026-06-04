@@ -5,6 +5,7 @@ import ImpostazioniLogoutModal from '../../components/PopupComponents/Impostazio
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
 import { getLastEpistola } from '../../lib/strapi/epistole';
 import { resolveUserContext } from '../../lib/theme';
+import { getEventiClassense, CLASSENSE_CALENDARIO_URL } from '../../lib/classense';
 const { lang = 'it' } = Astro.props;
 
 if (!Astro.cookies.has('jwt')) {
@@ -18,12 +19,7 @@ const tasks = [
 	{ title: 'Lorem ipsum dolor', progress: 65 },
 ];
 
-const events = [
-	{ date: '12 FEB', time: '18:00', title: 'Lorem ipsum dolor sit amet', slug: 'lorem-ipsum-dolor-15-gen' },
-	{ date: '21 MAR', time: '18:00', title: 'Lorem ipsum dolor sit amet', slug: 'lorem-ipsum-dolor-07-feb' },
-	{ date: '05 APR', time: '19:30', title: 'Lorem ipsum dolor sit amet', slug: 'lorem-ipsum-dolor-mar-apr' },
-	{ date: '18 APR', time: '17:00', title: 'Lorem ipsum dolor sit amet', slug: 'lorem-ipsum-dolor-20-apr' },
-];
+const eventiClassense = await getEventiClassense();
 
 const lastEpistola = await getLastEpistola();
 const featuredEpistleHref = lastEpistola ? `/epistole/${lastEpistola.slug}/` : '/epistole/';
@@ -109,25 +105,32 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href="/scrivania/grimorio/">Vai al tuo grimorio →</a>
 		</section>
 
-		<section class="dashboard-section dashboard-events" aria-labelledby="events-title">
-			<div class="dashboard-section__head">
-				<h2 id="events-title" class="tsbs-section-title">Eventi</h2>
-				<a class="tsbs-accent-link" href="/eventi-biblioteca-classense/">Vedi tutti →</a>
-			</div>
-			<div class="dashboard-event-grid">
-				{events.map((event) => (
-					<a class="dashboard-event-card" href={`/eventi-biblioteca-classense/${event.slug}/`}>
-						<div class="dashboard-event-card__media" aria-hidden="true">
-							<i class="bi bi-image"></i>
-						</div>
-						<div class="dashboard-event-card__body">
-							<p>{event.date} • {event.time}</p>
-							<h3 class="tsbs-accent-title">{event.title}</h3>
-						</div>
-					</a>
-				))}
-			</div>
-		</section>
+		{eventiClassense.length > 0 && (
+			<section class="dashboard-section dashboard-events" aria-labelledby="events-title">
+				<div class="dashboard-section__head">
+					<h2 id="events-title" class="tsbs-section-title">Eventi</h2>
+					<a class="tsbs-accent-link" href={CLASSENSE_CALENDARIO_URL} target="_blank" rel="noopener noreferrer">Vedi tutti →</a>
+				</div>
+				<div class="dashboard-event-grid">
+					{eventiClassense.map((evento) => (
+						<a class="dashboard-event-card" href={evento.link} target="_blank" rel="noopener noreferrer">
+							<div class="dashboard-event-card__media">
+								<img
+									src={evento.immagine}
+									alt={evento.titolo}
+									class="dashboard-event-card__img"
+									loading="lazy"
+									decoding="async"
+								/>
+							</div>
+							<div class="dashboard-event-card__body">
+								<h3 class="tsbs-accent-title">{evento.titolo}</h3>
+							</div>
+						</a>
+					))}
+				</div>
+			</section>
+		)}
 	</main>
 	<ImpostazioniLogoutModal renderHidden={true} />
 	<WelcomeToast isOpen={true} />

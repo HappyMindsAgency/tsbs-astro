@@ -1,0 +1,249 @@
+// toast.scss — Stili per il sistema Toast globale TSBS
+//
+// STRUTTURA DOM (generata da toast.ts):
+//
+//   #tsbs-toast-container.tsbs-toast-container--bottom-end
+//     └─ .tsbs-toast.tsbs-toast--success (+ --visible / --hiding)
+//          ├─ .tsbs-toast__close         (pulsante ×, se dismissible)
+//          └─ .tsbs-toast__inner
+//               ├─ .tsbs-toast__visual   (lottie canvas | img | icona)
+//               └─ .tsbs-toast__body
+//                    ├─ .tsbs-toast__title
+//                    ├─ .tsbs-toast__message
+//                    └─ .tsbs-toast__btn
+//
+// PER MODIFICARE STILI:
+//   - Posizione container → sezione "Posizionamento"
+//   - Dimensioni / colori → sezione "Toast card"
+//   - Animazioni → sezione "Animazioni"
+//   - Icona/Visual → sezione "Visual"
+
+// ---------------------------------------------------------------------------
+// VARIABILI LOCALI (modificabili senza toccare il TS)
+// ---------------------------------------------------------------------------
+
+$toast-width:          320px;
+$toast-gap:            0.75rem;   // spazio tra toast impilati
+$toast-padding:        1rem;
+$toast-radius:         8px;
+$toast-shadow:         0 4px 24px rgba(0, 0, 0, 0.14);
+$toast-accent-width:   4px;       // spessore bordo colorato a sinistra
+$toast-visual-size:    44px;      // dimensione area visual (lottie/img/icona)
+$toast-font-title:     0.875rem;
+$toast-font-message:   0.8125rem;
+$toast-z-index:        9000;      // sopra modal Bootstrap (1055)
+
+$toast-transition-duration: 280ms;
+$toast-enter-transform: translateY(12px);
+
+// ---------------------------------------------------------------------------
+// CONTAINER — Posizionamento
+// ---------------------------------------------------------------------------
+// Per cambiare posizione globale modifica DEFAULT_POSITION in toast.ts
+// e aggiungi qui l'eventuale variante CSS.
+
+.tsbs-toast-container {
+    position: fixed;
+    z-index: $toast-z-index;
+    display: flex;
+    flex-direction: column;
+    gap: $toast-gap;
+    pointer-events: none; // il container non intercetta click; i singoli toast sì
+    width: $toast-width;
+    max-width: calc(100vw - 2rem);
+
+    // Posizioni disponibili
+    &--top-start    { top: 1rem;    left: 1rem;  }
+    &--top-center   { top: 1rem;    left: 50%;   transform: translateX(-50%); }
+    &--top-end      { top: 1rem;    right: 1rem; }
+    &--bottom-start { bottom: 1rem; left: 1rem;  }
+    &--bottom-center{ bottom: 1rem; left: 50%;   transform: translateX(-50%); }
+    &--bottom-end   { bottom: 1rem; right: 1rem; }
+
+    // Mobile: spazio extra in basso per la tab-bar dell'app
+    @media (max-width: 767.98px) {
+        &--bottom-end,
+        &--bottom-start,
+        &--bottom-center {
+            bottom: 5rem; // sopra la nav bottom dell'app mobile
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// TOAST CARD
+// ---------------------------------------------------------------------------
+
+.tsbs-toast {
+    position: relative;
+    width: 100%;
+    background: #fff;
+    border-radius: $toast-radius;
+    box-shadow: $toast-shadow;
+    border-left: $toast-accent-width solid var(--toast-accent, #2a3369);
+    pointer-events: all; // riabilita click sul singolo toast
+    overflow: hidden;
+
+    // ---------------------------------------------------------------------------
+    // ANIMAZIONI (entrata / uscita)
+    // ---------------------------------------------------------------------------
+    opacity: 0;
+    transform: $toast-enter-transform;
+    transition:
+        opacity $toast-transition-duration ease,
+        transform $toast-transition-duration ease;
+
+    // Stato visibile (classe aggiunta via JS dopo il mount)
+    &--visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    // Stato uscita (classe aggiunta durante dismissToast)
+    &--hiding {
+        opacity: 0;
+        transform: $toast-enter-transform;
+    }
+
+    // Riduzione movimento per utenti con preferenza sistema
+    @media (prefers-reduced-motion: reduce) {
+        transition: opacity $toast-transition-duration ease;
+        transform: none !important;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// LAYOUT INTERNO
+// ---------------------------------------------------------------------------
+
+.tsbs-toast__inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: $toast-padding;
+    // Spazio a destra per il pulsante chiudi
+    padding-right: calc($toast-padding + 1.5rem);
+}
+
+// ---------------------------------------------------------------------------
+// PULSANTE CHIUDI
+// ---------------------------------------------------------------------------
+
+.tsbs-toast__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    color: #999;
+    cursor: pointer;
+    border-radius: 4px;
+    line-height: 1;
+    transition: color 150ms ease, background 150ms ease;
+
+    &:hover {
+        color: #333;
+        background: rgba(0, 0, 0, 0.06);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--tsbs-color-focus, #b58b44);
+        outline-offset: 2px;
+    }
+
+    .bi {
+        font-size: 0.75rem;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// VISUAL (lottie / immagine / icona)
+// ---------------------------------------------------------------------------
+
+.tsbs-toast__visual {
+    flex-shrink: 0;
+    width: $toast-visual-size;
+    height: $toast-visual-size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Icona Bootstrap Icon (fallback e default senza lottie/image)
+    &--icon .bi {
+        font-size: 1.5rem;
+        color: var(--toast-accent, #2a3369);
+    }
+}
+
+.tsbs-toast__lottie-canvas {
+    width: $toast-visual-size;
+    height: $toast-visual-size;
+    display: block;
+}
+
+.tsbs-toast__image {
+    width: $toast-visual-size;
+    height: $toast-visual-size;
+    object-fit: contain;
+    display: block;
+}
+
+// ---------------------------------------------------------------------------
+// BODY (testo + pulsante)
+// ---------------------------------------------------------------------------
+
+.tsbs-toast__body {
+    flex: 1;
+    min-width: 0; // evita overflow testo
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.tsbs-toast__title {
+    margin: 0;
+    font-size: $toast-font-title;
+    font-weight: 600;
+    color: var(--tsbs-color-heading, #1d1715);
+    line-height: 1.3;
+}
+
+.tsbs-toast__message {
+    margin: 0;
+    font-size: $toast-font-message;
+    color: var(--tsbs-color-body, #666666);
+    line-height: 1.45;
+}
+
+// ---------------------------------------------------------------------------
+// PULSANTE AZIONE
+// ---------------------------------------------------------------------------
+
+.tsbs-toast__btn {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: var(--toast-accent, #2a3369);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: opacity 150ms ease;
+
+    &:hover {
+        opacity: 0.85;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--tsbs-color-focus, #b58b44);
+        outline-offset: 2px;
+    }
+}
