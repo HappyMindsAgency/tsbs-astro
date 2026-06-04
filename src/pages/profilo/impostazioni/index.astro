@@ -112,6 +112,77 @@ if (!Astro.cookies.has('jwt')) {
 					<button class="btn tsbs-cta-primary profile-settings-actions__button" type="submit">Salva impostazioni</button>
 				</div>
 				</form>
+
+				<!-- Sezione tessera Biblioteca Classense (fuori dal form principale) -->
+				<section class="profile-settings-card profile-tessera-card" aria-labelledby="tessera-title" data-tessera-section>
+					<div class="profile-settings-card__head">
+						<span class="profile-settings-card__icon" aria-hidden="true">
+							<i class="bi bi-credit-card-2-front"></i>
+						</span>
+						<div>
+							<h2 id="tessera-title">Tessera Biblioteca Classense</h2>
+							<p>Inserisci il numero della tua tessera per sbloccare contenuti esclusivi e ricevere un trofeo speciale.</p>
+						</div>
+					</div>
+
+					<!-- Stato: nessuna / rifiutata (campo attivo) -->
+					<div class="profile-tessera-state" data-tessera-state="nessuna" hidden>
+						<div class="profile-settings-fields">
+							<label for="tessera-input">
+								<span>Numero tessera (14 cifre)</span>
+								<input
+									id="tessera-input"
+									name="tessera"
+									type="text"
+									inputmode="numeric"
+									pattern="\d{14}"
+									maxlength="14"
+									autocomplete="off"
+									placeholder="Es. 12345678901234"
+									data-tessera-input
+								/>
+							</label>
+						</div>
+						<p class="profile-tessera-error" data-tessera-error hidden></p>
+						<div class="profile-tessera-actions">
+							<button class="btn tsbs-cta-primary profile-tessera-actions__submit" type="button" data-tessera-submit>
+								<span data-tessera-btn-label>Invia per la verifica</span>
+								<span data-tessera-btn-loading hidden>
+									<span class="tessera-spinner" aria-hidden="true"></span>
+									Invio in corso…
+								</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Stato: in_verifica -->
+					<div class="profile-tessera-state" data-tessera-state="in_verifica" hidden>
+						<div class="profile-tessera-status profile-tessera-status--pending">
+							<i class="bi bi-hourglass-split" aria-hidden="true"></i>
+							<div>
+								<p class="profile-tessera-status__title">In attesa di verifica</p>
+								<p class="profile-tessera-status__desc">
+									Il numero <strong data-tessera-numero-display></strong> è stato inviato alla Redazione.
+									Riceverai una conferma non appena la verifica sarà completata.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Stato: verificata -->
+					<div class="profile-tessera-state" data-tessera-state="verificata" hidden>
+						<div class="profile-tessera-status profile-tessera-status--verified">
+							<i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+							<div>
+								<p class="profile-tessera-status__title">Tessera verificata — trofeo assegnato!</p>
+								<p class="profile-tessera-status__desc">
+									Il numero <strong data-tessera-numero-display></strong> è stato verificato correttamente.
+									Il trofeo è disponibile nella tua collezione.
+								</p>
+							</div>
+						</div>
+					</div>
+				</section>
 			</div>
 
 			<div class="profile-settings-danger">
@@ -163,42 +234,6 @@ if (!Astro.cookies.has('jwt')) {
 </Layout>
 
 <script>
-	// --- Caricamento dati utente corrente ---
-
-	const loadProfilo = async () => {
-		try {
-			const res = await fetch('/api/user/profilo');
-			if (!res.ok) return;
-			const profilo = await res.json();
-
-			const set = (sel: string, val: string | null) => {
-				const el = document.querySelector(sel);
-				if (el instanceof HTMLElement && val) el.textContent = val;
-			};
-
-			set('[data-profile-username]', profilo.username);
-			set('[data-profile-livello]', profilo.livello);
-			set('[data-profile-accademia]', profilo.accademia);
-			set('[data-profile-email]', profilo.email);
-
-			const usernameInput = document.querySelector<HTMLInputElement>('[data-profile-username-input]');
-			if (usernameInput && profilo.username) {
-				usernameInput.value = profilo.username;
-				usernameInput.dataset.originalUsername = profilo.username;
-			}
-
-			if (profilo.avatarSrc) {
-				const img = document.querySelector<HTMLImageElement>('[data-profile-avatar-current]');
-				if (img) img.src = profilo.avatarSrc;
-			}
-		} catch {
-			// Dati non disponibili: la pagina resta con i placeholder
-		}
-	};
-
-	loadProfilo();
-	document.addEventListener('astro:page-load', loadProfilo);
-
 	const setupProfileAvatarPicker = () => {
 		const openControls = document.querySelectorAll<HTMLElement>('[data-avatar-profile-modal-open]');
 		const currentAvatar = document.querySelector<HTMLImageElement>('[data-profile-avatar-current]');
@@ -455,6 +490,151 @@ if (!Astro.cookies.has('jwt')) {
 
 	document.addEventListener('astro:page-load', setupDeleteAccount);
 	setupDeleteAccount();
+
+	// --- Tessera Biblioteca Classense ---
+
+	const setupTessera = () => {
+		const section = document.querySelector<HTMLElement>('[data-tessera-section]');
+		if (!section) return;
+		if (section.dataset.tesseraReady === 'true') return;
+		section.dataset.tesseraReady = 'true';
+
+		const input = section.querySelector<HTMLInputElement>('[data-tessera-input]');
+		const submitBtn = section.querySelector<HTMLButtonElement>('[data-tessera-submit]');
+		const errorEl = section.querySelector<HTMLElement>('[data-tessera-error]');
+		const btnLabel = section.querySelector<HTMLElement>('[data-tessera-btn-label]');
+		const btnLoading = section.querySelector<HTMLElement>('[data-tessera-btn-loading]');
+
+		const showState = (stato: string, tessera?: string | null) => {
+			section.querySelectorAll<HTMLElement>('[data-tessera-state]').forEach((el) => {
+				el.hidden = el.dataset.tesseraState !== stato;
+			});
+			if (tessera) {
+				section.querySelectorAll<HTMLElement>('[data-tessera-numero-display]').forEach((el) => {
+					el.textContent = tessera;
+				});
+			}
+		};
+
+		const showError = (msg: string) => {
+			if (!errorEl) return;
+			errorEl.textContent = msg;
+			errorEl.hidden = false;
+		};
+
+		const clearError = () => {
+			if (!errorEl) return;
+			errorEl.hidden = true;
+		};
+
+		const setLoading = (loading: boolean) => {
+			if (submitBtn) submitBtn.disabled = loading;
+			if (btnLabel) btnLabel.hidden = loading;
+			if (btnLoading) btnLoading.hidden = !loading;
+		};
+
+		// Inizializza stato dalla risposta profilo (già caricata da loadProfilo)
+		// La funzione viene richiamata via evento custom dopo il caricamento del profilo
+		const initFromProfilo = (statoTessera: string, tessera: string | null) => {
+			showState(statoTessera, tessera);
+		};
+
+		document.addEventListener('tsbs:profilo-loaded', (e) => {
+			if (!(e instanceof CustomEvent)) return;
+			const { statoTessera, tessera } = e.detail ?? {};
+			initFromProfilo(statoTessera ?? 'nessuna', tessera ?? null);
+		});
+
+		if (!submitBtn || !input) return;
+
+		submitBtn.addEventListener('click', async () => {
+			clearError();
+
+			const valore = input.value.replace(/[\s-]+/g, '').trim();
+
+			if (!/^\d{14}$/.test(valore)) {
+				showError('Inserisci un numero tessera valido (14 cifre numeriche).');
+				input.focus();
+				return;
+			}
+
+			setLoading(true);
+
+			try {
+				const res = await fetch('/api/user/tessera', {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ tessera: valore }),
+				});
+
+				const data = await res.json().catch(() => ({}));
+
+				if (!res.ok) {
+					if (res.status === 409) {
+						showError('La tessera è già in attesa di verifica.');
+					} else if (data?.message) {
+						showError(data.message);
+					} else {
+						showError('Si è verificato un errore. Riprova più tardi.');
+					}
+					setLoading(false);
+					return;
+				}
+
+				// Successo: transizione a in_verifica
+				showState('in_verifica', valore);
+			} catch {
+				showError('Errore di rete. Verifica la connessione e riprova.');
+				setLoading(false);
+			}
+		});
+	};
+
+	// Versione aggiornata di loadProfilo che emette l'evento per la tessera
+	const loadProfiloConTessera = async () => {
+		try {
+			const res = await fetch('/api/user/profilo');
+			if (!res.ok) return;
+			const profilo = await res.json();
+
+			const set = (sel: string, val: string | null) => {
+				const el = document.querySelector(sel);
+				if (el instanceof HTMLElement && val) el.textContent = val;
+			};
+
+			set('[data-profile-username]', profilo.username);
+			set('[data-profile-livello]', profilo.livello);
+			set('[data-profile-accademia]', profilo.accademia);
+			set('[data-profile-email]', profilo.email);
+
+			const usernameInput = document.querySelector<HTMLInputElement>('[data-profile-username-input]');
+			if (usernameInput && profilo.username) {
+				usernameInput.value = profilo.username;
+				usernameInput.dataset.originalUsername = profilo.username;
+			}
+
+			if (profilo.avatarSrc) {
+				const img = document.querySelector<HTMLImageElement>('[data-profile-avatar-current]');
+				if (img) img.src = profilo.avatarSrc;
+			}
+
+			// Notifica la sezione tessera
+			document.dispatchEvent(new CustomEvent('tsbs:profilo-loaded', {
+				detail: {
+					statoTessera: profilo.statoTessera ?? 'nessuna',
+					tessera: profilo.tessera ?? null,
+				},
+			}));
+		} catch {
+			// Dati non disponibili: la pagina resta con i placeholder
+		}
+	};
+
+	document.addEventListener('astro:page-load', setupTessera);
+	setupTessera();
+
+	loadProfiloConTessera();
+	document.addEventListener('astro:page-load', loadProfiloConTessera);
 </script>
 
 <style lang="scss">
@@ -809,6 +989,93 @@ if (!Astro.cookies.has('jwt')) {
 		}
 	}
 
+	// --- Tessera ---
+
+	.profile-tessera-card {
+		// fuori dal grid-area del form, occupa la piena larghezza della colonna destra
+	}
+
+	.profile-tessera-state {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.profile-tessera-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+
+		&__submit {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			min-height: 3rem;
+			padding: 0.75rem 1.25rem;
+			font-family: var(--tsbs-font-body);
+			font-size: 1rem;
+			font-weight: 700;
+			border-radius: var(--tsbs-radius-sm);
+		}
+	}
+
+	.profile-tessera-error {
+		margin: 0;
+		color: #991b1b;
+		font-size: 0.875rem;
+	}
+
+	.profile-tessera-status {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 0.875rem;
+		align-items: start;
+		padding: 1rem 1.25rem;
+		border-radius: var(--tsbs-radius-sm);
+
+		.bi {
+			font-size: 1.5rem;
+			margin-top: 0.1rem;
+		}
+
+		&--pending {
+			color: #92400e;
+			background: #fef3c7;
+			border: 1px solid #fde68a;
+
+			.bi { color: #d97706; }
+		}
+
+		&--verified {
+			color: #14532d;
+			background: #dcfce7;
+			border: 1px solid #bbf7d0;
+
+			.bi { color: #16a34a; }
+		}
+	}
+
+	.profile-tessera-status__title {
+		margin: 0 0 0.25rem;
+		font-weight: 700;
+		font-size: 0.9375rem;
+	}
+
+	.profile-tessera-status__desc {
+		margin: 0;
+		font-size: 0.9375rem;
+		line-height: 1.5;
+	}
+
+	.tessera-spinner {
+		display: inline-block;
+		width: 1rem;
+		height: 1rem;
+		border: 2px solid rgba(255, 255, 255, 0.35);
+		border-top-color: #fff;
+		border-radius: 50%;
+		animation: spin 0.7s linear infinite;
+	}
+
 	// --- Danger zone ---
 
 	.profile-settings-danger {
@@ -999,6 +1266,7 @@ if (!Astro.cookies.has('jwt')) {
 			grid-template-areas:
 				"summary username"
 				"summary password"
+				"summary tessera"
 				". actions";
 			align-items: stretch;
 			gap: 1.5rem;
@@ -1026,6 +1294,10 @@ if (!Astro.cookies.has('jwt')) {
 			position: sticky;
 			top: 2rem;
 			align-self: stretch;
+		}
+
+		.profile-tessera-card {
+			grid-area: tessera;
 		}
 
 		.profile-settings-actions {

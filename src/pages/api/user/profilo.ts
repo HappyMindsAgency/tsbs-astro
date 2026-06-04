@@ -66,6 +66,7 @@ export const GET: APIRoute = async ({ cookies }) => {
         'fields[0]': 'tessera',
         'fields[1]': 'punti',
         'fields[2]': 'datiAggiuntivi',
+        'fields[3]': 'statoTessera',
         'populate[0]': 'accademia',
         'populate[1]': 'livello',
     });
@@ -82,7 +83,10 @@ export const GET: APIRoute = async ({ cookies }) => {
         logger.warn(`[Profilo] /membri fallito: ${membroRes.status} — ${errText}`);
     }
 
-    const avatarId = ((membro?.datiAggiuntivi as Record<string, unknown> | null)?.avatar as string) ?? null;
+    const datiAggiuntivi = (membro?.datiAggiuntivi as Record<string, unknown> | null) ?? {};
+    const avatarId = (datiAggiuntivi?.avatar as string) ?? null;
+    // statoTessera è ora un campo di primo livello su Strapi (enumeration)
+    const statoTessera = (membro?.statoTessera as string) ?? 'nessuna';
     const tessera = normalizeLibraryCardCode((membro?.tessera as string | null) ?? '');
 
     return json({
@@ -95,6 +99,7 @@ export const GET: APIRoute = async ({ cookies }) => {
         livello: (membro?.livello as Record<string, unknown> | null)?.nome ?? null,
         punti: (membro?.punti as number | null) ?? null,
         tessera: LIBRARY_CARD_CODE_PATTERN.test(tessera) ? tessera : null,
+        statoTessera,
     });
 };
 
