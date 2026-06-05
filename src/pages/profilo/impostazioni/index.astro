@@ -3,14 +3,18 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import AvatarProfiloModal from '../../../components/PopupComponents/AvatarProfiloModal.astro';
 import avatar01 from '../../../assets/Avatar_01_tartaruga.svg';
+import { resolveUserContext } from '../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
+
+
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 ---
 
-<Layout lang={lang} theme="theme-neutral">
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 	<main class="tsbs-app-shell profile-settings-page">
 		<div class="container-xl tsbs-app-container profile-settings">

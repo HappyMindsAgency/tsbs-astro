@@ -1,10 +1,15 @@
 ﻿---
 import RankingAccademia from '../components/ClassificaComponents/RankingAccademia.astro';
+import { resolveUserContext } from '../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
+
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+
+console.log('Classifica generale - accademia utente:', accademia);
 ---
 
-<RankingAccademia lang={lang} academy="arborea" showBoxCronache={false} showUserRank={true} />
+<RankingAccademia lang={lang} theme={theme} academy={accademia} showBoxCronache={false} showUserRank={true} />

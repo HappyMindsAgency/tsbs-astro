@@ -10,8 +10,14 @@ import trofeoMedaglia from '../../assets/trofeo-medaglia.png';
 import trofeoScudo from '../../assets/trofeo-scudo.png';
 import trofeoStendardo from '../../assets/trofeo-stendardo.png';
 import trofeoTartaruga from '../../assets/trofeo-tartaruga.png';
+import { resolveUserContext } from '../../lib/theme';
+
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
 
 const { lang = 'it' } = Astro.props;
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 
 const board = {
 	rows: 8,
@@ -99,12 +105,10 @@ const trophyCatalog = [
 
 const cells = Array.from({ length: board.rows * board.cols });
 const trophyCatalogJson = JSON.stringify(trophyCatalog);
-if (!Astro.cookies.has('jwt')) {
-	return Astro.redirect('/');
-}
+
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell trophies-page">
