@@ -11,21 +11,29 @@ const featureCards = [
 		icon: societaIcon,
 		visualIcon: 'bi-book',
 		modifier: 'landing-feature--right',
+		title: 'The Secret Bookish Society. Una Società custodita tra le pagine',
+		description:
+			'The Secret Bookish Society nasce per proteggere e tramandare un sapere antico, nascosto tra le sale, gli archivi e i libri della Biblioteca Classense. La Biblioteca custodisce libri, mappe, manoscritti, archivi, immagini e memorie che attraversano i secoli.\n\nNel gioco, questi elementi diventano tracce da osservare, interpretare e proteggere.\nPerché la Società non vive fuori dalla Biblioteca: vive attraverso ciò che la Biblioteca conserva.\n\nNon tutto può essere rivelato subito.\nAlcune tracce chiedono tempo, attenzione e il coraggio di rispondere alla Chiamata.\n\nOgni cinquant’anni, la Società cerca nuovi membri.\nQuesta volta, potresti essere tu.',
+		ctaLabel: 'Rispondi alla Chiamata',
+		ctaHref: '/registrazione/',
 	},
 	{
 		icon: classenseIcon,
 		visualIcon: 'bi-image',
 		modifier: 'landing-feature--left',
+		title: 'Quattro Accademie. Quattro modi di vivere il sapere.',
+		description:
+			'Chi risponde alla Chiamata affronta lo Smistamento: non un esame, ma un passaggio che rivela l’Accademia più affine alla propria natura.\n\nAstraria osserva nel silenzio della notte.\nArcadia domina la parola e l’eccellenza.\nArmonia trasforma il sapere in dialogo e creazione.\nArborea coltiva radici, cura e memoria.\n\nOgni Accademia ha un tempo, un simbolo e una Guida.\nScoprire la tua sarà il primo vero passo nella Società.',
+		ctaLabel: 'Rispondi alla Chiamata',
+		ctaHref: '/registrazione/',
 	},
 	{
 		icon: accademieIcon,
 		visualIcon: 'bi-award',
 		modifier: 'landing-feature--right',
-	},
-	{
-		icon: societaIcon,
-		visualIcon: 'bi-journal-bookmark',
-		modifier: 'landing-feature--left',
+		title: 'Un gioco narrativo tra biblioteca, mistero e scoperta',
+		description:
+			'The Secret Bookish Society è un’esperienza immersiva che unisce digitale e reale, trasformando la Biblioteca Classense in un luogo da esplorare, decifrare e custodire.\n\nRiceverai epistole.\nAffronterai missioni.\nSeguirai indizi tra gli spazi della Biblioteca.\nCompleterai sfide di lettura, enigmi e quiz.\nConquisterai trofei e contribuirai alla crescita della tua Accademia.\n\nQualcosa sta arrivando.\n\nUna nuova minaccia si avvicina. Il sonno della ragione genera mostri.\n\nNon c’è più tempo. Gli Spiriti Custodi stanno aspettando, hanno bisogno di te.',
 	},
 ];
 ---
@@ -41,16 +49,28 @@ const featureCards = [
 			</div>
 
 			<div class="landing-copy">
-				<h1 id="landing-title">Lorem ipsum dolor sit amet</h1>
+				<h1 id="landing-title" class="d-none">Lorem ipsum dolor sit amet</h1>
 				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae libero vel elit consequat
-					commodo. Donec vitae nibh at justo dignissim facilisis.
+					Gli spiriti custodi della Biblioteca Classense si sono risvegliati.<br />
+					<br />
+					Tra scaffali silenziosi e pagine antiche, cercano nuovi adepti da iniziare alla Società Segreta.<br />
+					<br />
+					Non tutti possono entrare.<br />
+					Non tutti sono pronti.<br />
+					<br />
+					The Secret Bookish Society custodisce un sapere antico, prezioso, che richiede attenzione, tempo e
+					dedizione.<br />
+					<br />
+					Se stai leggendo queste parole, non è un caso.<br />
+					È un segno.<br />
+					<br />
+					La Chiamata ha inizio.
 				</p>
 			</div>
 
 			<nav class="landing-actions" aria-label="Accesso">
-				<a class="landing-action landing-action--primary" href="/registrazione/">Registrati</a>
-				<a class="landing-action landing-action--secondary" href="/login/">Login</a>
+				<a class="landing-action landing-action--primary" href="/registrazione/">Rispondi alla Chiamata</a>
+				<a class="landing-action landing-action--secondary" href="/">Login</a>
 			</nav>
 		</section>
 
@@ -62,11 +82,26 @@ const featureCards = [
 							<img src={card.icon.src} width={card.icon.width} height={card.icon.height} alt="" loading="lazy" />
 						</div>
 						<div class="landing-feature__content">
-							<h2>Lorem ipsum</h2>
-							<p>
-								Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet
-								placerat id in neque.
-							</p>
+							<h2>{card.title}</h2>
+							{
+								card.description.split('\n\n').map((paragraph) => (
+									<p>
+										{paragraph.split('\n').map((line, lineIndex, lines) => (
+											<>
+												{line}
+												{lineIndex < lines.length - 1 && <br />}
+											</>
+										))}
+									</p>
+								))
+							}
+							{
+								card.ctaLabel && card.ctaHref && (
+									<a class="landing-feature__cta landing-action landing-action--primary" href={card.ctaHref}>
+										{card.ctaLabel}
+									</a>
+								)
+							}
 						</div>
 						<div class="landing-feature__visual" aria-hidden="true">
 							<i class={`landing-feature__icon bi ${card.visualIcon}`}></i>
@@ -201,10 +236,9 @@ const featureCards = [
 	}
 
 	.landing-copy p {
-		max-width: 38rem;
-		color: var(--landing-muted);
-		font-size: clamp(1rem, 4vw, 1.25rem);
-		line-height: 1.24;
+		color: #000;
+		font-size: 1rem;
+		line-height: 1.35;
 	}
 
 	.landing-actions {
@@ -263,9 +297,9 @@ const featureCards = [
 	.landing-feature {
 		position: relative;
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-columns: minmax(0, 1fr);
 		gap: 1.25rem;
-		align-items: center;
+		align-items: start;
 		min-height: 11.75rem;
 		overflow: hidden;
 		padding: 2rem 1.25rem;
@@ -276,12 +310,12 @@ const featureCards = [
 	}
 
 	.landing-feature--left {
-		grid-template-columns: auto minmax(0, 1fr);
+		grid-template-columns: minmax(0, 1fr);
 	}
 
 	.landing-feature--left .landing-feature__content {
 		order: 2;
-		text-align: right;
+		text-align: left;
 	}
 
 	.landing-feature--left .landing-feature__visual {
@@ -317,26 +351,40 @@ const featureCards = [
 		display: grid;
 		gap: 0.625rem;
 		align-content: center;
-		padding-top: 1.875rem;
+		order: 2;
+		padding-top: 0;
+		color: #000;
+		text-align: left;
 	}
 
 	.landing-feature__content h2 {
 		margin: 0;
-		color: color-mix(in srgb, var(--landing-accent) 78%, var(--landing-muted));
+		color: #000;
 		font-size: clamp(1.125rem, 6vw, 1.75rem);
 		font-weight: 600;
 		line-height: 1.08;
 	}
 
 	.landing-feature__content p {
-		color: color-mix(in srgb, var(--landing-muted) 80%, var(--tsbs-color-white));
-		font-size: 0.875rem;
-		line-height: 1.25;
+		color: #000;
+		font-size: 1rem;
+		line-height: 1.35;
+	}
+
+	.landing-feature__cta {
+		width: min(100%, 17rem);
+		margin-top: 0.375rem;
+	}
+
+	.landing-feature--left .landing-feature__cta {
+		justify-self: start;
 	}
 
 	.landing-feature__visual {
 		display: grid;
 		place-items: center;
+		order: 1;
+		justify-self: center;
 		width: clamp(5rem, 27vw, 8.75rem);
 		aspect-ratio: 1;
 		background: color-mix(in srgb, var(--landing-accent) 64%, var(--landing-muted));
@@ -440,9 +488,9 @@ const featureCards = [
 		}
 
 		.landing-copy {
-			width: min(100%, 46rem);
+			width: 100%;
 			justify-self: center;
-			padding: 0 clamp(2rem, 8vw, 7rem);
+			padding: 0 clamp(1rem, 5vw, 4rem);
 			text-align: center;
 		}
 
@@ -458,25 +506,25 @@ const featureCards = [
 		}
 
 		.landing-features {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-columns: minmax(0, 1fr);
 			gap: 1.5rem;
 		}
 
 		.landing-feature,
 		.landing-feature--left {
 			grid-template-columns: minmax(0, 1fr);
-			align-content: space-between;
-			min-height: 24rem;
+			align-content: start;
+			min-height: auto;
 			padding: 2rem;
 		}
 
 		.landing-feature--left .landing-feature__content {
-			order: 1;
+			order: 2;
 			text-align: left;
 		}
 
 		.landing-feature--left .landing-feature__visual {
-			order: 2;
+			order: 1;
 		}
 
 		.landing-feature__small-icon,
@@ -491,7 +539,7 @@ const featureCards = [
 		}
 
 		.landing-feature__visual {
-			justify-self: end;
+			justify-self: center;
 			width: clamp(7rem, 14vw, 10rem);
 		}
 	}
@@ -511,7 +559,7 @@ const featureCards = [
 
 		.landing-features {
 			width: min(100%, 75rem);
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-columns: minmax(0, 1fr);
 			gap: 1.75rem;
 		}
 
@@ -531,7 +579,7 @@ const featureCards = [
 
 		.landing-feature--left .landing-feature__content {
 			order: 2;
-			text-align: right;
+			text-align: left;
 		}
 
 		.landing-feature--left .landing-feature__visual {
@@ -540,10 +588,21 @@ const featureCards = [
 		}
 
 		.landing-feature__content {
-			max-width: 22rem;
+			order: 1;
+			max-width: none;
+		}
+
+		.landing-feature__content p {
+			font-size: 1.125rem;
+		}
+
+		.landing-copy p {
+			font-size: 1.125rem;
 		}
 
 		.landing-feature__visual {
+			order: 2;
+			justify-self: end;
 			width: clamp(8rem, 12vw, 10rem);
 		}
 	}
