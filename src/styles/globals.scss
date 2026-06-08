@@ -3264,6 +3264,13 @@ body:has(.tsbs-legal-page) {
 		font: inherit;
 	}
 
+	.free-answer-mission__quote a {
+		color: var(--mission-proof-question-accent);
+		font-weight: 700;
+		text-decoration: underline;
+		text-underline-offset: 0.15em;
+	}
+
 	.free-answer-mission__form {
 		display: grid;
 		gap: 3rem;

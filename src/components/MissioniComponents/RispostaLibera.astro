@@ -1,4 +1,5 @@
 ---
+import { marked } from 'marked';
 import TestPassed from '../toastComponents/TestPassed.astro';
 import TestNotPassed from '../toastComponents/TestNotPassed.astro';
 
@@ -16,6 +17,7 @@ const firstQuestion = questions[0];
 const title = firstQuestion.question;
 const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 const quote = missione?.quiz?.descrizione?.trim() || '';
+const quoteContent = quote ? marked.parse(quote, { async: false }) : '';
 
 const answerLabel = 'Risposta libera';
 const hasMultipleQuestions = questions.length > 1;
@@ -31,9 +33,7 @@ const hasMultipleQuestions = questions.length > 1;
 
 	<div class="container-xl tsbs-app-container mission-proof-question__panel free-answer-mission__panel">
 		{quote && (
-			<blockquote class="free-answer-mission__quote">
-				<p>{quote}</p>
-			</blockquote>
+			<blockquote class="free-answer-mission__quote" set:html={quoteContent} />
 		)}
 
 		<form class="free-answer-mission__form" data-free-answer-form>
