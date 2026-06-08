@@ -4,22 +4,33 @@ import onboardingVector from '../../../assets/onboarding-vector.png';
 
 const { lang = 'it' } = Astro.props;
 
+const defaultAcademyDescription =
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia.';
+
 const academySlides = [
 	{
 		id: 'astraria',
 		title: 'Astraria',
+		description:
+			'Nel silenzio si osserva, si studia, si intuisce.\nAstraria custodisce il sapere che matura nell’ombra e guarda alle stelle per leggere il futuro.',
 	},
 	{
 		id: 'arcadia',
 		title: 'Arcadia',
+		description:
+			'La parola è misura e distinzione.\nArcadia coltiva eccellenza, studio dei classici e padronanza del linguaggio.',
 	},
 	{
 		id: 'armonia',
 		title: 'Armonia',
+		description:
+			'La conoscenza nasce dall’incontro.\nArmonia intreccia arti, dialogo e creatività condivisa.',
 	},
 	{
 		id: 'arborea',
 		title: 'Arborea',
+		description:
+			'Ogni sapere ha radici.\nArborea custodisce la cura, l’ascolto e la crescita lenta delle idee.',
 	},
 ];
 ---
@@ -45,7 +56,18 @@ const academySlides = [
 				</div>
 				<h1 id="onboarding-disclaimer-title">Disclaimer</h1>
 				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia.
+					“The Secret Bookish Society" è un gioco narrativo liberamente ispirata alla storia della Biblioteca Classense.
+				</p>
+				<p>
+					Nomi, personaggi, luoghi e avvenimenti appartengono alla finzione o sono rielaborati ai fini del gioco.
+					I riferimenti storici sono adattati in chiave creativa e non costituiscono ricostruzioni documentarie o accademiche.
+				</p>
+				<p>
+					Il progetto nasce con l’intento di valorizzare e far conoscere il patrimonio storico, artistico e archivistico della Biblioteca Classense, invitando a scoprirlo attraverso il linguaggio della narrazione e del gioco.
+				</p>
+				<p>
+					Gli archivisti, ufficialmente, non confermano l’esistenza della Società.
+					Eppure, talvolta, alcuni documenti sembrano apparire — o scomparire — proprio quando la Biblioteca decide che qualcuno è pronto a trovarli.
 				</p>
 			</section>
 
@@ -81,7 +103,12 @@ const academySlides = [
 										</div>
 										<h3>{slide.title}</h3>
 										<p>
-											Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia.
+											{(slide.description ?? defaultAcademyDescription).split('\n').map((line, lineIndex, lines) => (
+												<>
+													{line}
+													{lineIndex < lines.length - 1 && <br />}
+												</>
+											))}
 										</p>
 									</div>
 								</article>
@@ -99,9 +126,9 @@ const academySlides = [
 				<div class="onboarding-signup__icon" aria-hidden="true">
 					<i class="bi bi-image"></i>
 				</div>
-				<h2 id="onboarding-signup-title">Call to action iscrizione</h2>
+				<h2 id="onboarding-signup-title">Entra nella Società Segreta</h2>
 				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque.
+					La tua iniziazione sta per compiersi...
 				</p>
 				<a class="onboarding-signup__button" href="/registrazione/">Iscriviti</a>
 			</section>
@@ -334,7 +361,8 @@ const academySlides = [
 	}
 
 	.onboarding-disclaimer h1 {
-		font-size: 1rem;
+		color: #000;
+		font-size: clamp(1.5rem, 6vw, 2rem);
 		line-height: 1.2;
 	}
 
@@ -344,6 +372,24 @@ const academySlides = [
 		color: var(--onboarding-muted);
 		font-size: 0.875rem;
 		line-height: 1.22;
+	}
+
+	.onboarding-disclaimer p {
+		color: #000;
+		font-size: 1rem;
+		line-height: 1.35;
+	}
+
+	.onboarding-signup p {
+		color: #000;
+		font-size: 1rem;
+		line-height: 1.35;
+	}
+
+	.academy-slide__panel p {
+		color: #000;
+		font-size: var(--tsbs-font-size-body);
+		line-height: var(--tsbs-line-height-body);
 	}
 
 	.onboarding-academies {
@@ -367,6 +413,11 @@ const academySlides = [
 	.academy-slider {
 		position: relative;
 		min-width: 0;
+		overflow: hidden;
+		border-radius: 1.25rem;
+		clip-path: inset(0 round 1.25rem);
+		isolation: isolate;
+		-webkit-mask-image: -webkit-radial-gradient(white, black);
 	}
 
 	.academy-slider__track {
@@ -375,7 +426,11 @@ const academySlides = [
 		width: 100%;
 		max-width: 100%;
 		overflow-x: auto;
+		overflow-y: hidden;
 		overscroll-behavior-x: contain;
+		border-radius: 1.25rem;
+		clip-path: inset(0 round 1.25rem);
+		-webkit-mask-image: -webkit-radial-gradient(white, black);
 		scroll-behavior: smooth;
 		scroll-snap-type: x mandatory;
 		scrollbar-width: none;
@@ -395,6 +450,10 @@ const academySlides = [
 		overflow: hidden;
 		background: var(--onboarding-soft);
 		border-radius: 1.25rem;
+		clip-path: inset(0 round 1.25rem);
+		contain: paint;
+		-webkit-mask-image: -webkit-radial-gradient(white, black);
+		transform: translateZ(0);
 		scroll-snap-align: start;
 	}
 
@@ -566,6 +625,12 @@ const academySlides = [
 		}
 	}
 
+	@media (max-width: 767.98px) {
+		.academy-slide__visual img {
+			bottom: clamp(11.75rem, 42.5vw, 13.25rem);
+		}
+	}
+
 	@media (min-width: 768px) {
 		.onboarding-stage {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -609,42 +674,45 @@ const academySlides = [
 
 		.onboarding-academies__header {
 			padding: 0;
+			text-align: center;
 		}
 
 		.academy-slider__track {
-			gap: 1.5rem;
-			padding-top: 2rem;
+			gap: clamp(1rem, 3vw, 2rem);
+			overflow-x: hidden;
+			padding-top: 0;
 		}
 
 		.academy-slide {
-			flex-basis: max(20rem, calc((100% - 1.5rem) / 2));
-			min-height: 31rem;
+			flex-basis: 100%;
+			min-height: clamp(31rem, 50vw, 36rem);
 		}
 
 		.academy-slide__visual {
-			min-height: 26rem;
+			min-height: clamp(31rem, 50vw, 36rem);
 		}
 
 		.academy-slide__visual img {
-			bottom: clamp(14rem, 16vw, 16rem);
-			width: min(6vw, 5rem);
+			right: clamp(3rem, 9vw, 7rem);
+			bottom: clamp(8rem, 13vw, 10rem);
+			width: min(11vw, 7rem);
 		}
 
 		.academy-slide__panel {
-			right: 1.5rem;
-			bottom: 1.5rem;
-			left: 1.5rem;
-			width: auto;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			width: 100%;
 			min-height: 11rem;
 			border-radius: 1.25rem;
 		}
 
 		.academy-slider__nav--prev {
-			left: -0.875rem;
+			left: 1rem;
 		}
 
 		.academy-slider__nav--next {
-			right: -0.875rem;
+			right: 1rem;
 		}
 
 		.onboarding-disclaimer {
@@ -680,6 +748,18 @@ const academySlides = [
 			align-self: stretch;
 		}
 
+		.onboarding-disclaimer p {
+			font-size: 1.125rem;
+		}
+
+		.onboarding-signup p {
+			font-size: 1.125rem;
+		}
+
+		.academy-slide__panel p {
+			font-size: 1.125rem;
+		}
+
 		.onboarding-signup {
 			align-self: stretch;
 		}
@@ -693,11 +773,11 @@ const academySlides = [
 		}
 
 		.academy-slider__track {
-			padding-top: 2.5rem;
+			padding-top: 0;
 		}
 
 		.academy-slide {
-			flex-basis: max(20rem, calc((100% - 3rem) / 3));
+			flex-basis: 100%;
 		}
 	}
 </style>
