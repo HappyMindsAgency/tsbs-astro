@@ -80,7 +80,11 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 						<button type="submit" class="login-submit">Login</button>
 					</form>
 
-					<a class="login-forgot" href="/auth/reset-password/request">Password dimenticata?</a>
+					<a class="login-forgot" href="/auth/reset-password/request">Hai dimenticato le credenziali?</a>
+					<a class="login-back pt-3" href="/landing/">
+						<i class="bi bi-arrow-left" aria-hidden="true"></i>
+						<span>Torna indietro</span>
+					</a>
 				</div>
 			</section>
 		</div>
@@ -186,7 +190,7 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 		margin: 0;
 		color: var(--login-text);
 		font-size: 1rem;
-		line-height: 1.4;
+		line-height: 1.55;
 	}
 
 	.login-intro a,
@@ -284,6 +288,30 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 		line-height: 1.2;
 	}
 
+	.login-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		justify-self: center;
+		margin-top: 0.75rem;
+		color: color-mix(in srgb, var(--login-text) 82%, var(--login-muted));
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		text-decoration: none;
+	}
+
+	.login-back:hover,
+	.login-back:focus-visible {
+		color: var(--login-text);
+		text-decoration: none;
+	}
+
+	.login-back .bi {
+		font-size: 1.05rem;
+		line-height: 1;
+	}
+
 	.login-error-box {
 		color: #dc3545;
 		display: flex;
@@ -356,6 +384,10 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 
 		.login-forgot {
 			margin-top: 1.125rem;
+		}
+
+		.login-back {
+			margin-top: 0.75rem;
 		}
 	}
 
