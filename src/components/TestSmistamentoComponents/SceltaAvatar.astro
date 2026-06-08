@@ -32,7 +32,7 @@ const avatars = [
   <div class="scelta-avatar__inner">
     <header class="scelta-avatar__header">
       <h1 id="scelta-avatar-title">Scegli il tuo Volto</h1>
-      <p>Lorem ipsum dolor sit amet</p>
+      <p>Seleziona il simbolo con cui desideri essere riconosciuto all’interno della Società</p>
     </header>
 
     <form class="scelta-avatar__form" action="/atrio/">
@@ -93,7 +93,7 @@ const avatars = [
       </fieldset>
 
       <button type="submit" class="btn tsbs-cta-primary mission-proof-question__cta scelta-avatar__cta">
-        Conferma la scelta
+        Conferma
       </button>
     </form>
   </div>
@@ -173,9 +173,9 @@ const avatars = [
   .scelta-avatar__header p {
     max-width: 18rem;
     margin: 0;
-    font-size: 1rem;
-    line-height: 1.45;
-    color: var(--tsbs-color-body);
+    font-size: var(--tsbs-font-size-body);
+    line-height: var(--tsbs-line-height-body);
+    color: #000;
   }
 
   .scelta-avatar__form {
@@ -365,8 +365,8 @@ const avatars = [
 
     .scelta-avatar__header p {
       max-width: none;
-      font-size: clamp(0.875rem, 1.45vh, 1rem);
-      color: var(--tsbs-color-body);
+      font-size: var(--tsbs-font-size-body);
+      color: #000;
     }
 
     .scelta-avatar__username {
