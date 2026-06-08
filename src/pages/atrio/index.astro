@@ -51,19 +51,19 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 
 		<section class="tsbs-card dashboard-epistle" aria-labelledby="epistle-title">
 			<div class="dashboard-epistle__content">
-				<p class="dashboard-eyebrow">L'EPISTOLA</p>
+				<p class="dashboard-eyebrow">LE EPISTOLE</p>
 				<h1 id="epistle-title">{lastEpistola?.titolo ?? 'Nessuna epistola disponibile'}</h1>
 				{lastEpistola?.contenuto && (
 					<p set:html={lastEpistola.contenuto.slice(0, 180).replace(/<[^>]*>/g, '') + '…'} />
 				)}
-				<a class="btn tsbs-cta-primary dashboard-button" href={featuredEpistleHref}>Leggi Epistola</a>
+				<a class="btn tsbs-cta-primary dashboard-button" href={featuredEpistleHref}>Leggi l'Epistola</a>
 			</div>
 		</section>
-		<a class="dashboard-inline-link dashboard-epistle-link tsbs-accent-link" href="/epistole/">Riepilogo epistole →</a>
+		<a class="dashboard-inline-link dashboard-epistle-link tsbs-accent-link" href="/epistole/">Apri l’Archivio delle Epistole →</a>
 
 		<section class="dashboard-section" aria-labelledby="tasks-title">
 			<div class="dashboard-section__head">
-				<h2 id="tasks-title" class="tsbs-section-title">Incarichi ordine</h2>
+				<h2 id="tasks-title" class="tsbs-section-title">Completa le Missioni</h2>
 				<a class="tsbs-accent-link" href="/missioni/">Vedi tutti →</a>
 			</div>
 			<div class="dashboard-task-grid">
@@ -87,7 +87,7 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 		<section class="dashboard-section dashboard-grimoire" aria-labelledby="grimoire-title">
 			<div class="dashboard-section__head dashboard-section__head--desktop">
 				<h2 id="grimoire-title" class="tsbs-section-title">Grimorio</h2>
-				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href="/scrivania/grimorio/">Vai al tuo grimorio →</a>
+				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href="/scrivania/grimorio/">Consulta il tuo Grimorio →</a>
 			</div>
 			<a class="tsbs-note-pad" href={featuredNoteHref} aria-label="Apri nota del Grimorio">
 				<span class="tsbs-note-pad__action" aria-hidden="true">
@@ -108,8 +108,8 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 		{eventiClassense.length > 0 && (
 			<section class="dashboard-section dashboard-events" aria-labelledby="events-title">
 				<div class="dashboard-section__head">
-					<h2 id="events-title" class="tsbs-section-title">Eventi</h2>
-					<a class="tsbs-accent-link" href={CLASSENSE_CALENDARIO_URL} target="_blank" rel="noopener noreferrer">Vedi tutti →</a>
+					<h2 id="events-title" class="tsbs-section-title">Incontri e raduni</h2>
+					<a class="tsbs-accent-link" href={CLASSENSE_CALENDARIO_URL} target="_blank" rel="noopener noreferrer">Apri il calendario →</a>
 				</div>
 				<div class="dashboard-event-grid">
 					{eventiClassense.map((evento) => (
