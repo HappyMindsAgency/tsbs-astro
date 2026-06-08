@@ -1,0 +1,181 @@
+---
+const { isOpen = true, theme = '' } = Astro.props;
+---
+
+{isOpen && (
+	<div class={`intro-sorting-toast ${theme}`} data-intro-sorting-toast role="dialog" aria-labelledby="intro-sorting-toast-title">
+		<section class="intro-sorting-toast__panel" aria-describedby="intro-sorting-toast-copy">
+			<div class="intro-sorting-toast__icon" aria-hidden="true">
+				<i class="bi bi-stars"></i>
+			</div>
+
+			<div class="intro-sorting-toast__content" id="intro-sorting-toast-copy">
+				<h2 id="intro-sorting-toast-title">Lo Smistamento rivela ciò che sei e il luogo a cui appartieni.</h2>
+				<p>Attraverso alcune domande, ti sarà assegnata l’Accademia più affine a te.</p>
+				<p>
+					Rispondi con sincerità. Ogni percorso è diverso.<br />
+					Le Accademie sono in attesa.
+				</p>
+			</div>
+
+			<div class="intro-sorting-toast__footer">
+				<button class="btn tsbs-cta-primary intro-sorting-toast__button" type="button" data-intro-sorting-toast-close>
+					Inizia il test
+				</button>
+			</div>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupIntroSortingToast = () => {
+		document.querySelectorAll<HTMLElement>('[data-intro-sorting-toast]').forEach((toast) => {
+			if (toast.dataset.introSortingToastReady === 'true') return;
+			toast.dataset.introSortingToastReady = 'true';
+
+			const sortingTest = toast.closest('[data-sorting-test]');
+			const disabledSiblings = sortingTest
+				? Array.from(sortingTest.children).filter((child): child is HTMLElement => child instanceof HTMLElement && child !== toast)
+				: [];
+
+			const setContentDisabled = (disabled: boolean) => {
+				disabledSiblings.forEach((element) => {
+					element.inert = disabled;
+					if (disabled) {
+						element.setAttribute('aria-hidden', 'true');
+					} else {
+						element.removeAttribute('aria-hidden');
+					}
+				});
+			};
+
+			const closeToast = () => {
+				setContentDisabled(false);
+				toast.hidden = true;
+			};
+
+			setContentDisabled(!toast.hidden);
+
+			toast.querySelectorAll('[data-intro-sorting-toast-close]').forEach((element) => {
+				element.addEventListener('click', closeToast);
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !toast.hidden) closeToast();
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupIntroSortingToast);
+	setupIntroSortingToast();
+</script>
+
+<style lang="scss">
+	.intro-sorting-toast {
+		position: fixed;
+		inset: 0;
+		z-index: 1200;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
+		color: var(--tsbs-color-heading);
+		pointer-events: auto;
+	}
+
+	.intro-sorting-toast[hidden] {
+		display: none;
+	}
+
+	.intro-sorting-toast__panel {
+		position: relative;
+		display: grid;
+		gap: 1.25rem;
+		width: min(100%, 24rem);
+		overflow: hidden;
+		pointer-events: auto;
+		padding: 1.625rem;
+		background: var(--tsbs-color-white);
+		border-radius: 0.75rem;
+		box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--tsbs-color-neutral) 18%, transparent);
+	}
+
+	.intro-sorting-toast__icon {
+		display: grid;
+		place-items: center;
+		justify-self: center;
+		width: 4.25rem;
+		aspect-ratio: 1;
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-color-neutral);
+		border-radius: 50%;
+	}
+
+	.intro-sorting-toast__icon .bi {
+		font-size: 2rem;
+		line-height: 1;
+	}
+
+	.intro-sorting-toast__content {
+		display: grid;
+		gap: 0.875rem;
+		text-align: center;
+	}
+
+	.intro-sorting-toast__content h2,
+	.intro-sorting-toast__content p {
+		margin: 0;
+		font-family: var(--tsbs-font-body);
+		letter-spacing: 0;
+	}
+
+	.intro-sorting-toast__content h2 {
+		color: var(--tsbs-color-heading);
+		font-size: 1.25rem;
+		font-weight: 700;
+		line-height: 1.18;
+	}
+
+	.intro-sorting-toast__content p {
+		color: #000;
+		font-size: 1rem;
+		line-height: 1.35;
+	}
+
+	.intro-sorting-toast__footer {
+		display: grid;
+	}
+
+	.intro-sorting-toast__button {
+		width: 100%;
+		min-height: 3rem;
+		padding: 0.875rem 1rem;
+		font-family: var(--tsbs-font-body);
+		font-weight: 800;
+		line-height: 1;
+		border-radius: var(--tsbs-radius-sm);
+	}
+
+	@media (max-width: 360px) {
+		.intro-sorting-toast {
+			padding-right: 0.875rem;
+			padding-left: 0.875rem;
+		}
+
+		.intro-sorting-toast__panel {
+			padding: 1.25rem;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.intro-sorting-toast__panel {
+			width: min(100%, 34rem);
+			gap: 1.5rem;
+			padding: 2.25rem 2.5rem 2rem;
+		}
+
+		.intro-sorting-toast__content h2 {
+			font-size: 1.5rem;
+		}
+	}
+
+</style>

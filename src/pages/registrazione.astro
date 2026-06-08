@@ -21,9 +21,9 @@ const { lang = 'it' } = Astro.props;
 				</div>
 
 				<div class="sign-in-content">
-					<h1 id="sign-in-title">Crea un account</h1>
+					<h1 id="sign-in-title">Crea il tuo profilo di adepto</h1>
 					<p class="sign-in-intro">
-						Inserisci i dati per la registrazione o effettua il <a href="/">log in</a>
+						Non hai un profilo? Inserisci i tuoi dati e registrati, altrimenti effettua il <a href="/">log in</a> e la Società Segreta saprà riconoscerti.
 					</p>
 
 					<form class="sign-in-form" action="/registrazione-completata/" method="post" data-sign-in-form>
@@ -109,10 +109,13 @@ const { lang = 'it' } = Astro.props;
 							</label>
 						</div>
 
-						<button type="submit" class="sign-in-submit">Crea il tuo account</button>
+						<button type="submit" class="sign-in-submit">Crea il tuo profilo di adepto</button>
 					</form>
 
-					<a class="sign-in-back" href="/">Torna indietro</a>
+					<a class="sign-in-back" href="/landing/">
+						<i class="bi bi-arrow-left" aria-hidden="true"></i>
+						<span>Torna indietro</span>
+					</a>
 				</div>
 			</section>
 		</div>
@@ -512,7 +515,6 @@ const { lang = 'it' } = Astro.props;
 	}
 
 	.sign-in-intro a,
-	.sign-in-back,
 	.sign-in-check a {
 		color: var(--sign-in-text);
 		font-weight: 700;
@@ -741,10 +743,27 @@ const { lang = 'it' } = Astro.props;
 	}
 
 	.sign-in-back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
 		justify-self: center;
 		margin-top: 1.25rem;
+		color: var(--sign-in-text);
 		font-size: 1rem;
+		font-weight: 700;
 		line-height: 1.2;
+		text-decoration: none;
+	}
+
+	.sign-in-back:hover,
+	.sign-in-back:focus-visible {
+		color: var(--sign-in-text);
+		text-decoration: none;
+	}
+
+	.sign-in-back .bi {
+		font-size: 1.125rem;
+		line-height: 1;
 	}
 
 	@media (min-width: 768px) {

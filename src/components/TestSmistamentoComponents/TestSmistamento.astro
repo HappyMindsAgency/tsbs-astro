@@ -1,10 +1,13 @@
 ---
+import IntroTestSmistamento from '../toastComponents/IntroTestSmistamento.astro';
 import smistamentoPattern from '../../assets/smistamento-pattern-the-secret-bookish-society.png';
 
 const { lang = 'it' } = Astro.props;
 ---
 
 <article class="mission-proof-question choice-question sorting-test" data-sorting-test data-lang={lang} aria-label="Test di smistamento">
+	<IntroTestSmistamento />
+
 	<header
 		class="mission-proof-question__header"
 		style={`background-color: var(--tsbs-color-neutral); background-image: url(${smistamentoPattern.src}); background-repeat: no-repeat; background-position: center; background-size: cover;`}
@@ -30,9 +33,16 @@ const { lang = 'it' } = Astro.props;
 		<!-- Stato: quiz attivo -->
 		<div class="choice-question__form sorting-test__form" data-sorting-form hidden>
 			<fieldset class="choice-question__fieldset">
-				<legend data-sorting-question-text></legend>
+				<div class="mission-proof-question__prompt-row sorting-test__prompt-row">
+					<legend data-sorting-question-text></legend>
 
-				<p class="sorting-test__progress" data-sorting-progress></p>
+					<div class="mission-proof-question__step-controls sorting-test__step-controls">
+						<button class="btn mission-proof-question__back sorting-test__back" type="button" data-sorting-back disabled aria-label="Torna alla domanda precedente">
+							<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
+						</button>
+						<p class="mission-proof-question__progress sorting-test__progress" data-sorting-progress aria-live="polite"></p>
+					</div>
+				</div>
 
 				<div class="choice-question__answers" data-sorting-answers></div>
 			</fieldset>
@@ -68,14 +78,26 @@ const { lang = 'it' } = Astro.props;
 	}
 
 	.sorting-test__progress {
-		margin: 0;
-		color: var(--tsbs-theme-body);
-		font-size: 0.875rem;
-		line-height: 1.4;
+		color: var(--tsbs-color-heading);
 	}
 
 	.sorting-test .choice-question__fieldset {
 		gap: 1.25rem;
+	}
+
+	.sorting-test__back {
+		color: var(--tsbs-color-neutral);
+	}
+
+	.sorting-test__back:hover,
+	.sorting-test__back:focus-visible {
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-color-neutral);
+	}
+
+	.sorting-test__back:disabled {
+		color: var(--tsbs-color-neutral);
+		opacity: 0.45;
 	}
 
 	.sorting-test .choice-question__answer {
@@ -126,8 +148,9 @@ const { lang = 'it' } = Astro.props;
 		const progressEl = article.querySelector<HTMLElement>('[data-sorting-progress]');
 		const answersEl = article.querySelector<HTMLElement>('[data-sorting-answers]');
 		const nextBtn = article.querySelector<HTMLButtonElement>('[data-sorting-next]');
+		const backBtn = article.querySelector<HTMLButtonElement>('[data-sorting-back]');
 
-		if (!loadingEl || !errorEl || !formEl || !questionTextEl || !progressEl || !answersEl || !nextBtn) return;
+		if (!loadingEl || !errorEl || !formEl || !questionTextEl || !progressEl || !answersEl || !nextBtn || !backBtn) return;
 
 		// Carica le domande dall'API
 		let domande: Array<{ domanda: string; risposte: Array<{ risposta: string }> }> = [];
@@ -149,14 +172,13 @@ const { lang = 'it' } = Astro.props;
 			return;
 		}
 
-		// Contatori: quante volte è stato scelto ogni indice di risposta
-		const punteggi: number[] = [0, 0, 0, 0];
 		let domandaCorrente = 0;
+		const risposteSelezionate: Array<number | null> = [];
 
 		function renderDomanda(index: number) {
 			const d = domande[index];
 			questionTextEl!.textContent = d.domanda;
-			progressEl!.textContent = `Domanda ${index + 1} di ${domande.length}`;
+			progressEl!.textContent = `${index + 1}/${domande.length}`;
 
 			answersEl!.innerHTML = '';
 			d.risposte.forEach((risposta, rIdx) => {
@@ -170,6 +192,7 @@ const { lang = 'it' } = Astro.props;
 				input.type = 'radio';
 				input.name = 'risposta-smistamento';
 				input.value = String(rIdx);
+				input.checked = risposteSelezionate[index] === rIdx;
 
 				const spanLabel = document.createElement('span');
 				spanLabel.className = 'choice-question__answer-label';
@@ -190,25 +213,44 @@ const { lang = 'it' } = Astro.props;
 				});
 			});
 
-			nextBtn!.disabled = true;
+			nextBtn!.disabled = risposteSelezionate[index] === undefined || risposteSelezionate[index] === null;
+			backBtn!.disabled = index === 0;
 			nextBtn!.textContent = index === domande.length - 1 ? 'Scopri la tua Accademia' : 'Prosegui';
 		}
 
-		nextBtn.addEventListener('click', () => {
-			// Registra la risposta scelta
+		function salvaRispostaCorrente() {
 			const selected = answersEl!.querySelector<HTMLInputElement>('input[type="radio"]:checked');
-			if (!selected) return;
+			if (!selected) return false;
 
 			const answerIndex = parseInt(selected.value, 10);
-			if (!isNaN(answerIndex) && answerIndex >= 0 && answerIndex <= 3) {
-				punteggi[answerIndex]++;
-			}
+			if (isNaN(answerIndex) || answerIndex < 0 || answerIndex > 3) return false;
+
+			risposteSelezionate[domandaCorrente] = answerIndex;
+			return true;
+		}
+
+		backBtn.addEventListener('click', () => {
+			if (domandaCorrente === 0) return;
+			salvaRispostaCorrente();
+			domandaCorrente--;
+			renderDomanda(domandaCorrente);
+		});
+
+		nextBtn.addEventListener('click', () => {
+			if (!salvaRispostaCorrente()) return;
 
 			domandaCorrente++;
 
 			if (domandaCorrente < domande.length) {
 				renderDomanda(domandaCorrente);
 			} else {
+				const punteggi: number[] = [0, 0, 0, 0];
+				risposteSelezionate.forEach((answerIndex) => {
+					if (typeof answerIndex === 'number' && answerIndex >= 0 && answerIndex <= 3) {
+						punteggi[answerIndex]++;
+					}
+				});
+
 				// Calcola l'accademia vincente
 				const maxPunteggio = Math.max(...punteggi);
 				const indiceVincente = punteggi.indexOf(maxPunteggio);
