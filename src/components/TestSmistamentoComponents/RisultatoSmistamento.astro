@@ -94,6 +94,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		--sorting-result-shadow: 0 1.125rem 3rem color-mix(in srgb, var(--sorting-result-accent) 14%, transparent);
 		--sorting-result-visual-height: clamp(22rem, 118vw, 29rem);
 		--sorting-result-banner-height: clamp(20rem, 108vw, 26.5rem);
+		--sorting-result-panel-width: 100%;
 		--sorting-result-cta-width: min(100%, 20.5rem);
 		--sorting-result-cta-height: clamp(3rem, 12vw, 3.5rem);
 		--sorting-result-cta-gap: clamp(0.75rem, 3.2vw, 1rem);
@@ -262,8 +263,12 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 	@media (min-width: 768px) {
 		.sorting-result-page {
 			--sorting-result-banner-height: 27.5rem;
+			--sorting-result-panel-width: min(69rem, calc(100vw - 12rem));
 			--sorting-result-panel-top: clamp(22rem, 40vh, 27rem);
 			--sorting-result-panel-padding-top: clamp(8rem, 7vw, 8.25rem);
+			--sorting-result-avatar-width: clamp(6.25rem, 8vw, 8.75rem);
+			--sorting-result-avatar-right: clamp(3rem, 5.5vw, 4.75rem);
+			--sorting-result-avatar-top-offset: clamp(-11.5rem, -22vh, -10.5rem);
 			--sorting-result-cta-width: 20rem;
 			--sorting-result-cta-height: 3rem;
 			--sorting-result-cta-gap: 0.875rem;
@@ -298,9 +303,9 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 
 		.sorting-result__avatar {
 			position: absolute;
-			right: max(8rem, calc((100vw - min(69rem, calc(100vw - 12rem))) / 2 + 8rem));
-			bottom: clamp(18.75rem, 31vh, 23rem);
-			width: clamp(6.25rem, 7.5vw, 8.5rem);
+			top: calc(var(--sorting-result-panel-top) + var(--sorting-result-avatar-top-offset));
+			right: calc((100vw - var(--sorting-result-panel-width)) / 2 + var(--sorting-result-avatar-right));
+			width: var(--sorting-result-avatar-width);
 			transform: none;
 		}
 
@@ -320,7 +325,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			top: var(--sorting-result-panel-top);
 			bottom: auto;
 			left: 50%;
-			width: min(69rem, calc(100vw - 12rem));
+			width: var(--sorting-result-panel-width);
 			align-content: start;
 			justify-items: center;
 			min-height: auto;
@@ -358,6 +363,9 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		.sorting-result-page {
 			--sorting-result-banner-height: 27rem;
 			--sorting-result-panel-padding-top: 8rem;
+			--sorting-result-avatar-width: clamp(7.75rem, 7vw, 8.75rem);
+			--sorting-result-avatar-right: clamp(3.5rem, 4.8vw, 5rem);
+			--sorting-result-avatar-top-offset: clamp(-11.75rem, -18vh, -10.5rem);
 		}
 	}
 </style>

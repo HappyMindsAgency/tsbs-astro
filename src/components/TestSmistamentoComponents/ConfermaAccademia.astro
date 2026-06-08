@@ -61,6 +61,10 @@ const normalizedAcademy = academies.some((academy) => academy.id === selectedAca
 		--sorting-selected-accent: var(--tsbs-theme-accent);
 	}
 
+	.sorting-academy-choice__form {
+		--mission-proof-question-accent: var(--sorting-selected-accent);
+	}
+
 	.sorting-academy-choice__answer {
 		color: var(--tsbs-color-white);
 		background: var(--tsbs-theme-accent);
@@ -109,6 +113,9 @@ const normalizedAcademy = academies.some((academy) => academy.id === selectedAca
 		--bs-btn-focus-bg: color-mix(in srgb, var(--sorting-selected-accent) 30%, var(--tsbs-color-white));
 		--bs-btn-focus-border-color: var(--sorting-selected-accent);
 		--bs-btn-focus-color: var(--tsbs-color-heading);
+		--bs-btn-disabled-bg: var(--sorting-selected-accent);
+		--bs-btn-disabled-border-color: var(--sorting-selected-accent);
+		--bs-btn-disabled-color: var(--tsbs-color-white);
 	}
 
 	.sorting-academy-choice__form:has(#academy-astraria:checked) .sorting-academy-choice__cta--astraria,
