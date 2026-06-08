@@ -21,6 +21,20 @@ const academyBanners = {
 	arborea: arboreaBanner,
 };
 
+const academyResultCopy: Partial<Record<AcademyKey, string>> = {
+	astraria:
+		"C’è una luce che brilla solo nell’oscurità. Benvenuto tra chi sa leggere tra le righe e oltre le stelle.\n\nAstraria è il rifugio dei notturni e degli visionari. Qui si esplora l'invisibile: il lato onirico della Biblioteca, i messaggi cifrati, ciò che è rimasto non detto. Non cerchiamo risposte ovvie, ma domande che aprano nuovi mondi nel silenzio della mezzanotte.\n\nTi attendono decifrazioni di segni invisibili e sfide da superare. Dovrai spingerti dove gli altri vedono solo ombre, usando la tua intuizione per sollevare il velo sui segreti più profondi e silenziosi che la Biblioteca sussurra solo a chi sa ascoltare.",
+	arcadia:
+		"La tua ambizione ha trovato il suo specchio.\nBenvenuto dove la parola è potere e la forma è sostanza.\n\nSei nel cuore nobile della Società segreta. Arcadia custodisce il rigore del pensiero classico e la precisione del linguaggio. Qui studiare non è solo apprendere, è dominare la complessità per distinguersi dalla massa.\n\nTi attendono prove di rango e sfide di logica testuale. Sarai chiamato a conquistare la verità celata tra le righe, dimostrando che la tua mente possiede il rigore necessario per ordinare il caos e reclamare il tuo posto tra i custodi dell'eccellenza.",
+	armonia:
+		"Le pagine si animano solo quando vengono condivise. Unisciti al coro che trasforma il silenzio in musica.\n\nIn Armonia, il sapere non è mai un atto isolato. Ci ispiriamo agli artisti e ai viaggiatori, che hanno trovato in Classense una scintilla creativa. Crediamo nel dialogo, nella bellezza degli incontri e nella capacità della letteratura di unire anime diverse in un’unica visione.\n\nTi attendono incontri inaspettati e creazioni corali. Ogni enigma sarà l'occasione per riallacciare un dialogo interrotto con i membri passati della società segreta, trasformando la tua ricerca in un ponte vibrante tra la storia e il presente della Biblioteca.",
+	arborea:
+		'Ascolta il respiro dei chiostri.\nSei a casa, custode di tutto ciò che cresce e resiste al tempo.\n\nArborea è il legame indissolubile tra la Biblioteca e la sua terra. Come le piccole anime che abitano i nostri cortili, impariamo la pazienza. Il tuo ruolo è proteggere la fragilità della materia, dai libri antichi alle pinete storiche, curando le radici che alimentano il presente.\n\nTi attendono atti di protezione e indagini sul campo. Sarai chiamato a presidiare il patrimonio della Classense, rintracciando le storie che hanno messo radici tra questi chiostri e assicurandoti che nessun frammento del nostro passato vada perduto o dimenticato.',
+};
+
+const fallbackResultCopy =
+	'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque.';
+
 const normalizeAcademy = (value: unknown): AcademyKey => {
 	if (typeof value !== 'string') {
 		return 'arborea';
@@ -34,6 +48,7 @@ const { academy = 'arborea', lang = 'it' } = Astro.props;
 const currentAcademy = normalizeAcademy(academy);
 const academyName = academyLabels[currentAcademy];
 const academyBanner = academyBanners[currentAcademy];
+const resultCopy = academyResultCopy[currentAcademy] ?? fallbackResultCopy;
 const avatarChoiceUrl = '/test-smistamento/scegli-avatar/';
 const confirmHref = `${avatarChoiceUrl}?academy=${encodeURIComponent(currentAcademy)}`;
 const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeURIComponent(currentAcademy)}`;
@@ -66,9 +81,20 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 				<span class="sorting-result__title-light">Benvenut* in</span>
 				<span class="sorting-result__title-bold">Accademia {academyName}</span>
 			</h1>
-			<p class="fw-bold">
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque.
-			</p>
+			<div class="sorting-result__copy">
+				{
+					resultCopy.split('\n\n').map((paragraph) => (
+						<p>
+							{paragraph.split('\n').map((line, lineIndex, lines) => (
+								<>
+									{line}
+									{lineIndex < lines.length - 1 && <br />}
+								</>
+							))}
+						</p>
+					))
+				}
+			</div>
 
 			<div class="sorting-result__actions">
 				<button
@@ -76,8 +102,11 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 					class="btn tsbs-cta-primary mission-proof-question__cta sorting-result__button"
 					data-confirm-result-academy={currentAcademy}
 					data-confirm-result-href={confirmHref}
-				>Conferma</button>
-				<a class="sorting-result__link" href={chooseHref}>oppure Scegli l’Accademia</a>
+				>Entra in {academyName}</button>
+				<a class="sorting-result__link" href={chooseHref}>
+					<span>Vuoi seguire un’altra via?</span>
+					<strong>Cambia Accademia</strong>
+				</a>
 			</div>
 		</div>
 	</article>
@@ -211,11 +240,16 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		font-weight: 700;
 	}
 
-	.sorting-result__panel p:not(.sorting-result__eyebrow) {
+	.sorting-result__copy {
+		display: grid;
+		gap: 0.875rem;
+	}
+
+	.sorting-result__copy p {
 		margin: 0;
 		color: var(--tsbs-color-heading);
-		font-size: 0.9375rem;
-		line-height: 1.35;
+		font-size: var(--tsbs-font-size-body);
+		line-height: var(--tsbs-line-height-body);
 	}
 
 	.sorting-result__actions {
@@ -238,6 +272,8 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 	}
 
 	.sorting-result__link {
+		display: grid;
+		gap: 0.125rem;
 		color: color-mix(in srgb, var(--sorting-result-accent) 80%, var(--tsbs-color-heading));
 		font-size: 0.9375rem;
 		font-weight: 600;
@@ -253,6 +289,10 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		text-underline-offset: 0.18em;
 	}
 
+	.sorting-result__link strong {
+		font-weight: 800;
+	}
+
 	@media (max-width: 374.98px) {
 		.sorting-result__panel {
 			padding-right: 1rem;
@@ -263,7 +303,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 	@media (min-width: 768px) {
 		.sorting-result-page {
 			--sorting-result-banner-height: 27.5rem;
-			--sorting-result-panel-width: min(69rem, calc(100vw - 12rem));
+			--sorting-result-panel-width: min(82rem, calc(100vw - 8rem));
 			--sorting-result-panel-top: clamp(22rem, 40vh, 27rem);
 			--sorting-result-panel-padding-top: clamp(8rem, 7vw, 8.25rem);
 			--sorting-result-avatar-width: clamp(6.25rem, 8vw, 8.75rem);
@@ -354,9 +394,6 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			font-size: clamp(1.875rem, 2.35vw, 2.25rem);
 		}
 
-		.sorting-result__panel p:not(.sorting-result__eyebrow) {
-			max-width: 49rem;
-		}
 	}
 
 	@media (min-width: 1200px) {
