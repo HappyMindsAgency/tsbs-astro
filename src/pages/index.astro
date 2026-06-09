@@ -160,11 +160,12 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 		--login-button-active: var(--tsbs-global-cta-var1-active-bg);
 		--login-page-padding-y: clamp(2rem, 7vw, 3.875rem);
 		--login-page-padding-x: clamp(0.9375rem, 4vw, 1.875rem);
-		--login-page-padding-bottom: calc(clamp(3.5rem, 14vw, 5rem) + env(safe-area-inset-bottom));
 		--login-submit-margin-top: clamp(2rem, 9vw, 3rem);
 
 		min-height: 100vh;
-		padding: var(--login-page-padding-y) var(--login-page-padding-x) var(--login-page-padding-bottom);
+		min-height: 100dvh;
+		padding-block: var(--login-page-padding-y) calc(clamp(3.5rem, 14vw, 5rem) + env(safe-area-inset-bottom));
+		padding-inline: var(--login-page-padding-x);
 		color: var(--login-text);
 		background: var(--tsbs-color-surface);
 	}
@@ -341,18 +342,18 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 		.login-page {
 			--login-page-padding-y: clamp(1.0625rem, 1.2vw, 1.75rem);
 			--login-page-padding-x: clamp(1.875rem, 5vw, 4.5rem);
-			--login-page-padding-bottom: clamp(1.0625rem, 1.2vw, 1.75rem);
 			--login-submit-margin-top: clamp(2rem, 2vw, 2.25rem);
 
 			display: grid;
 			place-items: center;
+			padding-block: var(--login-page-padding-y);
 		}
 
 		.login-stage {
 			display: grid;
 			place-items: center;
 			width: min(100%, 80.9375rem);
-			min-height: calc(100vh - 2.125rem);
+			min-height: 100%;
 		}
 
 		.login-panel {
