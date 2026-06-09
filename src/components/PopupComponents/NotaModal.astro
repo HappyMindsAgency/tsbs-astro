@@ -23,7 +23,10 @@ const shouldRender = isOpen || renderHidden;
 		<section class="nota-modal__panel">
 			<div class="nota-modal__content">
 				<h2 id="nota-modal-title">Vuoi inviare la tua nota al prefetto?</h2>
-				<p id="nota-modal-copy">Una volta che la tua nota sarà inoltrata non potrai più modificarla, solo eliminarla.</p>
+				<div id="nota-modal-copy">
+					<p>Una volta inviata, la nota non potrà più essere modificata.</p>
+					<p>Potrai comunque eliminarla dal tuo Grimorio.</p>
+				</div>
 			</div>
 
 			<div class="nota-modal__actions">
@@ -31,7 +34,7 @@ const shouldRender = isOpen || renderHidden;
 					Annulla
 				</button>
 				<button class="btn tsbs-cta-primary nota-modal__button nota-modal__button--confirm" type="button" data-nota-modal-confirm>
-					<span>Invia</span>
+					<span>Invia al prefetto</span>
 					<i class="bi bi-send" aria-hidden="true"></i>
 				</button>
 			</div>
@@ -145,6 +148,10 @@ const shouldRender = isOpen || renderHidden;
 		font-size: 1rem;
 		font-weight: 400;
 		line-height: 1.35;
+	}
+
+	.nota-modal__content p + p {
+		margin-top: 0.25rem;
 	}
 
 	.nota-modal__actions {
