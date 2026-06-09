@@ -2169,9 +2169,10 @@ body:has(.tsbs-legal-page) {
 
 	.biblioteca-archive-card {
 		display: grid;
-		grid-template-columns: 4rem minmax(0, 1fr);
-		align-items: center;
-		gap: 1rem;
+		grid-template-columns: 1fr;
+		align-items: start;
+		justify-items: start;
+		gap: 1.25rem;
 		min-height: 6.25rem;
 		padding: 1.125rem 1rem;
 		color: var(--tsbs-color-body);
@@ -2208,21 +2209,32 @@ body:has(.tsbs-legal-page) {
 
 	.biblioteca-archive-card__copy {
 		display: grid;
-		gap: 0.25rem;
+		gap: 0.5rem;
+		width: 100%;
 		min-width: 0;
 	}
 
-	.biblioteca-archive-card__copy strong {
+	.biblioteca-archive-card__title {
 		color: var(--tsbs-theme-accent);
 		font-size: 1rem;
 		font-weight: 800;
 		line-height: 1.2;
 	}
 
-	.biblioteca-archive-card__copy span {
+	.biblioteca-archive-card__description {
+		display: grid;
+		gap: 0.5rem;
 		color: var(--tsbs-color-body);
 		font-size: 0.875rem;
 		line-height: 1.35;
+	}
+
+	.biblioteca-archive-card__description span {
+		display: block;
+	}
+
+	.biblioteca-archive-card__description strong {
+		font-weight: 800;
 	}
 
 	@media (min-width: 768px) {
@@ -2238,6 +2250,9 @@ body:has(.tsbs-legal-page) {
 
 		.biblioteca-archive-card {
 			grid-template-columns: 4.25rem minmax(0, 1fr);
+			align-items: center;
+			justify-items: stretch;
+			gap: 1rem;
 			min-height: 5.625rem;
 			padding: 1rem;
 		}

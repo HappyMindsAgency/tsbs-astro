@@ -10,13 +10,15 @@ const { lang = 'it' } = Astro.props;
 
 const archiveItems = [
 	{
-		title: 'La Società Segreta - TSBS',
+		id: 'societa-segreta',
+		title: 'The Secret Bookish Society',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		image: societaSegretaImage,
 		iconClass: 'biblioteca-archive-card__icon--tsbs',
 		href: '#societa-segreta',
 	},
 	{
+		id: 'accademie',
 		title: 'Le Accademie',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		image: accademieImage,
@@ -24,7 +26,8 @@ const archiveItems = [
 		href: '/biblioteca/accademie/',
 	},
 	{
-		title: 'La Classense',
+		id: 'classense',
+		title: 'La Biblioteca Classense',
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		image: classenseImage,
 		iconClass: '',
@@ -65,8 +68,29 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 								<img src={item.image.src} alt="" loading="lazy" />
 							</span>
 							<span class="biblioteca-archive-card__copy">
-								<strong>{item.title}</strong>
-								<span>{item.text}</span>
+								<strong class="biblioteca-archive-card__title">{item.title}</strong>
+								<span class="biblioteca-archive-card__description">
+									{item.id === 'societa-segreta' ? (
+										<>
+											<span>The Secret Bookish Society nasce per proteggere, tramandare e rinnovare un sapere che non può essere rivelato a chiunque.</span>
+											<span><strong>Le sue radici affondano in tradizioni antiche tra libri, viaggiatori, accademie e presenze importanti</strong> che hanno attraversato Ravenna lasciando tracce più profonde di quanto sembri.</span>
+											<span>Chi entra impara a leggere oltre la superficie: nelle pagine, negli spazi, nei simboli e nei silenzi della Biblioteca.</span>
+										</>
+									) : item.id === 'accademie' ? (
+										<>
+											<span>All’interno della Società, ogni Iniziato trova il proprio posto all'interno di una delle quattro Accademie: <strong>Astraria, Arcadia, Armonia e Arborea.</strong></span>
+											<span>Non sono semplici gruppi, ma modi diversi di vivere il sapere. C’è chi osserva nel silenzio, chi affina la parola, chi crea attraverso la relazione e chi custodisce ciò che cresce lentamente.</span>
+											<span>Ogni Accademia ha un tempo, un simbolo, una Guida. Scoprire a quale appartieni significa riconoscere il modo in cui sei chiamato a contribuire alla Società.</span>
+										</>
+									) : item.id === 'classense' ? (
+										<>
+											<span><strong>La Classense è il cuore pulsante di The Secret Bookish Society.</strong></span>
+											<span>Un luogo reale, antico e vivo, dove la memoria della città incontra il sapere custodito nei libri, nei manoscritti, nelle mappe, nelle immagini e negli archivi.</span>
+										</>
+									) : (
+										item.text
+									)}
+								</span>
 							</span>
 						</a>
 					))}
