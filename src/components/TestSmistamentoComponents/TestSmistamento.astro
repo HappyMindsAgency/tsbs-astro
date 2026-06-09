@@ -194,17 +194,11 @@ const { lang = 'it' } = Astro.props;
 				input.value = String(rIdx);
 				input.checked = risposteSelezionate[index] === rIdx;
 
-				const spanLabel = document.createElement('span');
-				spanLabel.className = 'choice-question__answer-label';
-				// Etichetta A/B/C/D
-				spanLabel.textContent = String.fromCharCode(65 + rIdx);
-
 				const spanDesc = document.createElement('span');
 				spanDesc.className = 'choice-question__answer-description';
 				spanDesc.textContent = risposta.risposta;
 
 				label.appendChild(input);
-				label.appendChild(spanLabel);
 				label.appendChild(spanDesc);
 				answersEl!.appendChild(label);
 
