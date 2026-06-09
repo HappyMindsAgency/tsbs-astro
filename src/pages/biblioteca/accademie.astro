@@ -48,15 +48,16 @@ if (!Astro.cookies.has('jwt')) {
 
 	<main class="tsbs-app-shell missions-shell biblioteca-academies-page">
 		<header class="missions-header biblioteca-academies-header">
-			<h1>Le Accademie</h1>
+			<h1>Le quattro Accademie</h1>
 		</header>
 
 		<section class="container-xl tsbs-app-container biblioteca-academies-content" aria-labelledby="biblioteca-academies-title">
-			<h2 id="biblioteca-academies-title" class="visually-hidden">Le Accademie</h2>
+			<h2 id="biblioteca-academies-title" class="visually-hidden">Le quattro Accademie</h2>
 
-			<p class="biblioteca-academies-intro">
-				Sed bibendum nunc eget nunc iaculis sollicitudin. Pellentesque lacinia ultrices tempus. Vivamus vel libero eget mauris placerat rhoncus et ac ex.
-			</p>
+			<div class="biblioteca-academies-intro">
+				<p>La Società vive attraverso quattro Accademie, ciascuna legata a un modo diverso di conoscere, scegliere e custodire il sapere.</p>
+				<p>Ogni Accademia è accompagnata da una Guida: una figura che, nel tempo, ha incarnato il suo spirito e continua a custodirne la memoria.</p>
+			</div>
 
 			<div class="biblioteca-academies-list" aria-label="Elenco Accademie">
 				{academies.map((academy) => (
@@ -73,7 +74,33 @@ if (!Astro.cookies.has('jwt')) {
 						</span>
 						<div class="biblioteca-academy-card__copy">
 							<h3>{academy.name}</h3>
-							<p>{academy.text}</p>
+							{academy.theme === 'astraria' ? (
+								<>
+									<p><strong>L’Accademia della notte e delle stelle.</strong></p>
+									<p>Nel silenzio osserva, interpreta e immagina. Chi appartiene ad Astraria sa attendere, leggere nella notte e riconoscere ciò che non si mostra al primo sguardo.</p>
+									<p>La sua memoria è custodita da <strong>Maria Ponti Pasolini</strong>, presenza legata alla profondità dello sguardo, alla ricerca silenziosa e alla capacità di leggere il passato per immaginare ciò che verrà.</p>
+								</>
+							) : academy.theme === 'arcadia' ? (
+								<>
+									<p><strong>L’Accademia dell’eccellenza e della parola.</strong></p>
+									<p>Coltiva studio, precisione e prestigio culturale. Chi appartiene ad Arcadia conosce il potere del linguaggio e la responsabilità di usarlo con misura.</p>
+									<p>A vegliare sul suo spirito è <strong>Santi Muratori</strong>, custode della disciplina, della memoria bibliografica e di quella dedizione allo studio che trasforma la conoscenza in autorevolezza.</p>
+								</>
+							) : academy.theme === 'armonia' ? (
+								<>
+									<p><strong>L’Accademia della creatività e della condivisione.</strong></p>
+									<p>Qui il sapere prende voce attraverso arte, dialogo e relazione. Chi appartiene ad Armonia sa che le idee crescono quando vengono messe in comune.</p>
+									<p>La sua Guida è <strong>Barbara Longhi</strong>, figura capace di unire sensibilità, espressione e visione artistica. Attraverso di lei, Armonia ricorda che la conoscenza non vive solo nei libri, ma anche nei gesti, nelle immagini e nelle voci che si incontrano.</p>
+								</>
+							) : academy.theme === 'arborea' ? (
+								<>
+									<p><strong>L’Accademia delle radici e della cura.</strong></p>
+									<p>Procede con pazienza, ascolto e attenzione. Chi appartiene ad Arborea custodisce ciò che cresce lentamente e protegge il legame tra persone, luoghi e memoria.</p>
+									<p>A custodirne lo spirito è <strong>Corrado Ricci</strong>, guida legata alla tutela del patrimonio, alla memoria dei luoghi e alla responsabilità di proteggere la cultura e il sapere.</p>
+								</>
+							) : (
+								<p>{academy.text}</p>
+							)}
 						</div>
 					</a>
 				))}

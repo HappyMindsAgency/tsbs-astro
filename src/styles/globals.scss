@@ -2353,12 +2353,21 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.biblioteca-academies-intro {
-		max-width: 25rem;
+		width: 100%;
+		max-width: none;
 		margin: 0 auto;
 		color: var(--tsbs-color-body);
 		font-size: 1rem;
 		line-height: 1.45;
 		text-align: center;
+	}
+
+	.biblioteca-academies-intro p {
+		margin: 0;
+	}
+
+	.biblioteca-academies-intro p + p {
+		margin-top: 0.75rem;
 	}
 
 	.biblioteca-academies-list {
@@ -2369,9 +2378,10 @@ body:has(.tsbs-legal-page) {
 	.biblioteca-academy-card {
 		--biblioteca-academy-card-bg: var(--tsbs-theme-accent);
 		display: grid;
-		grid-template-columns: 4.25rem minmax(0, 1fr);
-		align-items: center;
-		gap: 1rem;
+		grid-template-columns: 1fr;
+		align-items: start;
+		justify-items: start;
+		gap: 1.25rem;
 		min-height: 7.5rem;
 		padding: 1.25rem 1rem;
 		color: var(--tsbs-color-white);
@@ -2441,6 +2451,15 @@ body:has(.tsbs-legal-page) {
 		line-height: 1.35;
 	}
 
+	.biblioteca-academy-card p + p {
+		margin-top: 0.25rem;
+	}
+
+	.biblioteca-academy-card strong {
+		color: var(--tsbs-color-white);
+		font-weight: 800;
+	}
+
 	@media (min-width: 768px) {
 		.biblioteca-academies-content {
 			width: min(100%, 63rem);
@@ -2449,7 +2468,7 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.biblioteca-academies-intro {
-			max-width: 44rem;
+			width: min(100%, 63rem);
 		}
 
 		.biblioteca-academies-list {
@@ -2458,6 +2477,9 @@ body:has(.tsbs-legal-page) {
 
 		.biblioteca-academy-card {
 			grid-template-columns: 5rem minmax(0, 1fr);
+			align-items: center;
+			justify-items: stretch;
+			gap: 1rem;
 			min-height: 8rem;
 			padding: 1.375rem 1.25rem;
 		}
@@ -2472,6 +2494,7 @@ body:has(.tsbs-legal-page) {
 	@media (min-width: 992px) {
 		.biblioteca-academies-intro {
 			font-size: 1.125rem;
+			text-align: left;
 		}
 	}
 
