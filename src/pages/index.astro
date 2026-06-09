@@ -1,6 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import loginHero from '../assets/login.png';
 
 const { lang = 'it' } = Astro.props;
 
@@ -24,13 +23,7 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 		<div class="login-stage">
 			<section class="login-panel" aria-labelledby="login-title">
 				<div class="login-media" aria-hidden="true">
-					<img
-						class="login-visual"
-						src={loginHero.src}
-						width={loginHero.width}
-						height={loginHero.height}
-						alt=""
-					/>
+					<canvas id="login-lottie" class="login-visual"></canvas>
 				</div>
 
 				<div class="login-content">
@@ -90,6 +83,31 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 		</div>
 	</main>
 </Layout>
+
+<script>
+	import { DotLottie } from '@lottiefiles/dotlottie-web';
+
+	const initLottie = () => {
+		const canvas = document.getElementById('login-lottie');
+		if (!(canvas instanceof HTMLCanvasElement)) return;
+
+		const dpr = Math.min(window.devicePixelRatio ?? 1, 2);
+		const rect = canvas.getBoundingClientRect();
+		canvas.width = Math.round(rect.width * dpr) || 832;
+		canvas.height = Math.round(rect.height * dpr) || 592;
+
+		new DotLottie({
+			canvas,
+			src: '/animation/santi-muratori.lottie',
+			autoplay: true,
+			loop: true,
+			renderConfig: { devicePixelRatio: dpr },
+		});
+	};
+
+	initLottie();
+	document.addEventListener('astro:page-load', initLottie);
+</script>
 
 <script>
 	const loginPasswordWindow = window as Window & { tsbsLoginPasswordToggleReady?: boolean };
@@ -161,9 +179,9 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 	}
 
 	.login-visual {
+		display: block;
 		width: 100%;
 		aspect-ratio: 416 / 296;
-		object-fit: contain;
 	}
 
 	.login-panel {
@@ -361,8 +379,6 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 			width: 100%;
 			height: 100%;
 			aspect-ratio: auto;
-			object-fit: contain;
-			object-position: center;
 		}
 
 		.login-content {
