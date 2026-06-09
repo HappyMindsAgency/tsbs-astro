@@ -43,7 +43,14 @@ src/lib/strapi/
   epistole.ts
   grimorio.ts
   missioni.ts
+  trofei.ts
 ```
+
+`trofei.ts` contiene solo logica del dominio Trofei:
+- tipo `TrofeoConquistato` (`nome`, `descrizione`, `punti`, `forma`, `immagineUrl`, `dataOttenimento`)
+- risoluzione del Membro loggato via JWT (email + token readonly), come in `missioni.ts`
+- query `getTrofeiConquistatiByJwt` sui soli trofei ottenuti dal membro, da `trofei-membro` filtrando su `filters[membri][documentId]`, con `populate` di `trofeo` (`nome`, `descrizione`, `punti`, `forma`, `immagine`)
+- utility `resolveStrapiMediaUrl` per URL media assoluti (Strapi Cloud puo restituire URL gia assoluti o relativi)
 
 `client.ts` contiene solo logica generica e riusabile:
 - costruzione della base URL Strapi da `STRAPI_API_URL` o `STRAPI_URL`
@@ -432,13 +439,14 @@ Esempio Epistole:
 - Nome Strapi tecnico: `api::trofeo.trofeo`
 - Tipo: collection type
 - Endpoint/collection: `trofei`
-- Campi principali: `nome`, `descrizione`, `punti`, `immagine`
+- Campi principali: `nome`, `descrizione`, `punti`, `forma`, `immagine`
 - Campi required: `nome`
 - Campi localizzati: `nome`, `descrizione`
 - Relazioni: `eventi`, `missioni`, `trofei_membro`
 - Media/componenti: `immagine`
 - draftAndPublish: `true`
-- Note binding Astro: fonte per catalogo trofei e premi di missioni/eventi.
+- Note schema: `forma` e una enumeration non localizzata (`default: "punto"`) con valori `punto`, `barraOrizzontale`, `barraVerticale`, `quadrato`, `elle`, `coppa`; guida la silhouette "Tetris" del trofeo nella Stanza Trofei. Le matrici 2D corrispondenti restano nel frontend (`SHAPES` in `scrivania/trofei.astro`); l'admin sceglie solo la forma dal menu.
+- Note binding Astro: fonte per catalogo trofei e premi di missioni/eventi. La Stanza Trofei usa `immagine` come visual e `forma` per la geometria.
 - Dubbi aperti: confermare differenza tra trofeo disponibile e trofeo ottenuto.
 
 ### Trofeo Membro

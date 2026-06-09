@@ -20,6 +20,76 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-09 - Resa Dinamica Trofei Conquistati Da Strapi
+
+Decisione:
+- rendere dinamica la pagina `scrivania/trofei.astro`: il catalogo non e piu hardcoded ma deriva dai trofei effettivamente conquistati dal Membro loggato
+- creare il file di binding dedicato `src/lib/strapi/trofei.ts`, coerente con `grimorio.ts` e `missioni.ts`
+- leggere i trofei ottenuti da `trofei-membro` filtrando su `filters[membri][documentId][$eq]` del Membro risolto via JWT, con `status=draft` e `populate` di `trofeo` (`nome`, `descrizione`, `punti`, `immagine`)
+- usare il campo media `immagine` di `Trofeo` come visual del trofeo, con fallback ai PNG locali in `src/assets/`
+- mostrare nella palette solo i trofei conquistati (scelta confermata: niente trofei bloccati/non ottenuti)
+- mantenere la forma/dimensione "stile Tetris" (matrice 2D) lato frontend in una mappa unica `TROPHY_SHAPES`, con forma di default `1x1` per trofei non ancora mappati, in attesa di un campo dedicato su Strapi
+
+Motivo:
+- lo schema reale `Trofeo` (`nome`, `descrizione` richtext, `punti`, `immagine`) e `Trofeo Membro` (`dataOttenimento`, relazioni `membri` manyToMany, `trofeo` manyToOne) non contiene dati di forma/dimensione, che restano una scelta di design
+- centralizzare la geometria in un solo punto evita di disperdere dati di presentazione e prepara la migrazione a Strapi
+- coerenza con il pattern di binding gia approvato (file per area, auth server-side, token readonly)
+
+Impatto:
+- `src/lib/strapi/trofei.ts` (nuovo)
+- `src/pages/scrivania/trofei.astro`
+- `docs/wiki/schema-strapi.md`
+
+Stato:
+- approvata
+
+## 2026-06-09 - Salvataggio Disposizione Trofei In datiAggiuntivi
+
+Decisione:
+- salvare la disposizione personale della griglia trofei in `Membro.datiAggiuntivi.trofeiLayout`, senza creare nuove collection
+- formato minimo per ogni trofeo posizionato: `{ id, row, col }` dove `id` e il `documentId` del Trofeo; forma e immagine non si salvano, si ricavano dal catalogo tramite l'id
+- riusare la route esistente `PUT /api/user/dati-aggiuntivi` (merge shallow), che preserva `avatar`/`ultimoLogin`
+- salvataggio in background, auto-save con debounce (~600ms) a ogni posiziona/sposta/rimuovi/reset; nessun bottone "Salva"
+- idratazione lato server: la pagina legge `datiAggiuntivi.trofeiLayout` insieme ai trofei (stesso lookup membro) e ricolloca i pezzi al load; durante l'idratazione il salvataggio e disattivato
+- robustezza: in lettura si scartano voci malformate e trofei non posseduti; in posizionamento si ignorano celle non valide
+
+Motivo:
+- coerente col precedente uso di `datiAggiuntivi` come contenitore JSON non strutturato per dati di contorno dell'utente
+- evitare una collection dedicata per un dato puramente cosmetico/personale
+- l'id stabile del Trofeo rende il layout indipendente da rinomine e da forma/immagine
+
+Impatto:
+- `src/lib/strapi/trofei.ts` (`getTrofeiStanzaByJwt`: trofei + layout; lettura `datiAggiuntivi`)
+- `src/pages/scrivania/trofei.astro` (idratazione griglia + auto-save)
+- `src/pages/api/user/dati-aggiuntivi.ts` (riuso, nessuna modifica)
+
+Stato:
+- approvata
+
+## 2026-06-09 - Campo Forma Trofeo Su Strapi
+
+Decisione:
+- aggiungere alla collection `Trofeo` un attributo `forma` di tipo enumeration, non localizzato, con `default: "punto"`
+- i valori enum corrispondono al catalogo forme deduplicato del frontend: `punto`, `barraOrizzontale`, `barraVerticale`, `quadrato`, `elle`, `coppa` (estendibile in futuro)
+- il frontend abbina la matrice tramite il valore `forma` (stabile) invece del `nome` normalizzato (fragile)
+- mantenere la mappatura per nome come fallback retro-compatibile per i trofei storici privi di `forma`; quando tutti i trofei hanno `forma` valorizzata, la mappa per nome puo essere rimossa
+- le silhouette precise (matrici 2D) restano definite nel frontend in `SHAPES`, perche sono dato di design legato all'immagine; l'admin sceglie solo quale forma assegnare
+
+Motivo:
+- l'admin assegna la forma in modo user-friendly (menu a tendina), senza inserire JSON o matrici
+- `larghezza`/`altezza` da sole non bastano: le silhouette sono non rettangolari
+- disaccoppiare la forma dal `nome`: rinominare un trofeo non rompe il layout
+- una sagoma del tutto nuova (non tra le voci di `SHAPES`) richiede comunque uno sviluppatore per definirne la matrice
+
+Impatto:
+- Strapi: `src/api/trofeo/content-types/trofeo/schema.json` (nuovo attributo `forma` enumeration)
+- `src/lib/strapi/trofei.ts` (campo `forma` in query, tipo e mapper)
+- `src/pages/scrivania/trofei.astro` (catalogo `SHAPES` + priorita `forma` Strapi / nome / default)
+- `docs/wiki/schema-strapi.md`
+
+Stato:
+- approvata
+
 ## 2026-05-28 - Missione 01 Per Inserimento Tessera Biblioteca
 
 Decisione:

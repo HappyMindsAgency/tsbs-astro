@@ -11,100 +11,107 @@ import trofeoScudo from '../../assets/trofeo-scudo.png';
 import trofeoStendardo from '../../assets/trofeo-stendardo.png';
 import trofeoTartaruga from '../../assets/trofeo-tartaruga.png';
 import { resolveUserContext } from '../../lib/theme';
+import { getTrofeiStanzaByJwt } from '../../lib/strapi/trofei';
 
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
 const { lang = 'it' } = Astro.props;
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+const jwt = Astro.cookies.get('jwt')?.value;
+const { theme, accademia } = await resolveUserContext(jwt);
 
 const board = {
 	rows: 8,
 	cols: 5,
 };
 
-// Ogni trofeo usa una matrice stile Tetris: 1 = cella occupata, 0 = cella libera.
-const trophyCatalog = [
-	{
-		id: 'tartaruga',
-		label: 'Tartaruga',
-		src: trofeoTartaruga.src,
-		width: 1,
-		height: 1,
-		matrix: [[1]],
-	},
-	{
-		id: 'candela',
-		label: 'Candela',
-		src: trofeoCandela.src,
-		width: 2,
-		height: 3,
-		matrix: [
-			[1, 0],
-			[1, 0],
-			[1, 1],
-		],
-	},
-	{
-		id: 'chiave',
-		label: 'Chiave',
-		src: trofeoChiave.src,
-		width: 2,
-		height: 1,
-		matrix: [[1, 1]],
-	},
-	{
-		id: 'scudo',
-		label: 'Scudo',
-		src: trofeoScudo.src,
-		width: 1,
-		height: 1,
-		matrix: [[1]],
-	},
-	{
-		id: 'stendardo',
-		label: 'Stendardo',
-		src: trofeoStendardo.src,
-		width: 2,
-		height: 2,
-		matrix: [
-			[1, 1],
-			[1, 1],
-		],
-	},
-	{
-		id: 'calice',
-		label: 'Calice',
-		src: trofeoCalice.src,
-		width: 1,
-		height: 2,
-		matrix: [[1], [1]],
-	},
-	{
-		id: 'bandiera',
-		label: 'Bandiera',
-		src: trofeoBandiera.src,
-		width: 2,
-		height: 3,
-		matrix: [
-			[1, 1],
-			[1, 0],
-			[1, 1],
-		],
-	},
-	{
-		id: 'medaglia',
-		label: 'Medaglia',
-		src: trofeoMedaglia.src,
-		width: 1,
-		height: 2,
-		matrix: [[1], [1]],
-	},
-];
+// Catalogo delle forme disponibili sulla griglia, senza duplicati e con nomi che richiamano
+// i pezzi del Tetris. La matrice e l'unica fonte: larghezza/altezza si derivano da essa
+// (1 = cella occupata, 0 = cella libera). `quadrato` ed `elle` sono veri tetramini; gli altri
+// sono piu piccoli (punto/barra) o piu grandi (coppa), nominati per silhouette.
+type Forma = 'punto' | 'barraOrizzontale' |'barraOrizLunga' | 'barraVerticale' | 'barraVertLunga' | 'quadrato' | 'quadratoGrande' | 'elle' | 'coppa';
 
+const SHAPES: Record<Forma, number[][]> = {
+	punto: [[1]],
+	barraOrizzontale: [[1, 1]],
+	barraOrizLunga: [[1, 1, 1, 1]],
+	barraVerticale: [[1], [1]],
+	barraVertLunga: [[1], [1], [1], [1]],
+	quadrato: [
+		[1, 1],
+		[1, 1],
+	],
+	quadratoGrande: [
+		[1, 1, 1],
+		[1, 1, 1],
+		[1, 1, 1]
+	],
+	elle: [
+		[1, 0],
+		[1, 0],
+		[1, 1],
+	],
+	coppa: [
+		[1, 1],
+		[1, 0],
+		[1, 1],
+	],
+};
+
+// Forma usata quando un trofeo non ha `forma` valida su Strapi ne mappatura per nome.
+const DEFAULT_FORMA: Forma = 'punto';
+
+function toForma(value: string | null | undefined): Forma | undefined {
+	return value && value in SHAPES ? (value as Forma) : undefined;
+}
+
+// Fallback per i trofei storici privi del campo `forma` su Strapi: quale forma usa + immagine
+// locale di fallback. Chiave = nome del trofeo normalizzato. Quando tutti i trofei avranno
+// `forma` valorizzata su Strapi, questa mappa diventa superflua e si puo rimuovere.
+const TROPHIES: Record<string, { forma: Forma; fallbackSrc: string }> = {
+	tartaruga: { forma: 'punto', fallbackSrc: trofeoTartaruga.src },
+	scudo: { forma: 'punto', fallbackSrc: trofeoScudo.src },
+	chiave: { forma: 'barraOrizzontale', fallbackSrc: trofeoChiave.src },
+	calice: { forma: 'barraVerticale', fallbackSrc: trofeoCalice.src },
+	medaglia: { forma: 'barraVerticale', fallbackSrc: trofeoMedaglia.src },
+	stendardo: { forma: 'quadrato', fallbackSrc: trofeoStendardo.src },
+	candela: { forma: 'elle', fallbackSrc: trofeoCandela.src },
+	bandiera: { forma: 'coppa', fallbackSrc: trofeoBandiera.src },
+};
+
+function normalizeTrophyKey(nome: string) {
+	// NFD scompone gli accenti in lettera base + segno combinante; lo strip finale rimuove
+	// i segni combinanti insieme a spazi e punteggiatura, lasciando solo [a-z0-9].
+	return nome
+		.toLowerCase()
+		.normalize('NFD')
+		.replace(/[^a-z0-9]+/g, '');
+}
+
+const { trofei: trofeiConquistati, layout: savedLayout } = await getTrofeiStanzaByJwt(jwt);
+
+// Mappa i trofei conquistati alla forma attesa dallo script client.
+// Priorita: `forma` da Strapi (se valida) -> mappatura storica per nome -> forma di default.
+const trophyCatalog = trofeiConquistati.map((trofeo) => {
+	const known = TROPHIES[normalizeTrophyKey(trofeo.nome)];
+	const forma = toForma(trofeo.forma) ?? known?.forma ?? DEFAULT_FORMA;
+	const matrix = SHAPES[forma];
+
+	return {
+		id: trofeo.trofeoDocumentId,
+		label: trofeo.nome,
+		src: trofeo.immagineUrl ?? known?.fallbackSrc ?? '',
+		width: matrix[0]?.length ?? 1,
+		height: matrix.length || 1,
+		matrix,
+	};
+});
+
+const hasTrofei = trophyCatalog.length > 0;
 const cells = Array.from({ length: board.rows * board.cols });
 const trophyCatalogJson = JSON.stringify(trophyCatalog);
+const savedLayoutJson = JSON.stringify(savedLayout);
 
 ---
 
@@ -126,6 +133,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 				aria-label="Stanza personale dei trofei"
 				data-trophy-room
 				data-catalog={trophyCatalogJson}
+				data-layout={savedLayoutJson}
 				data-rows={board.rows}
 				data-cols={board.cols}
 			>
@@ -157,6 +165,9 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 									<span>{trophy.label}</span>
 								</button>
 							))}
+							{!hasTrofei && (
+								<p class="trophy-palette__empty">Lorem ipsum dolor sit amet.</p>
+							)}
 						</div>
 					</div>
 				</aside>
@@ -243,6 +254,7 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 			const rows = Number(room.dataset.rows ?? 8);
 			const cols = Number(room.dataset.cols ?? 5);
 			const catalog = JSON.parse(room.dataset.catalog ?? '[]') as TrophyDefinition[];
+			const savedLayout = JSON.parse(room.dataset.layout ?? '[]') as Array<{ id: string; row: number; col: number }>;
 			const paletteItems = Array.from(room.querySelectorAll<HTMLButtonElement>('[data-trophy-source]'));
 			let placedTrophies: PlacedTrophy[] = [];
 			let instanceCount = 0;
@@ -250,6 +262,11 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 			let suppressPaletteClick = false;
 			let suppressBoardClick = false;
 			let selectedInstanceId = '';
+			// Persistenza: durante l'idratazione iniziale non si salva; dopo, ogni cambio di
+			// disposizione viene salvato (debounced) solo se diverso dall'ultimo snapshot inviato.
+			let isHydrating = true;
+			let savedSnapshot = '[]';
+			let saveTimer: ReturnType<typeof setTimeout> | undefined;
 
 			if (!board || !piecesLayer || !palette) return;
 
@@ -427,9 +444,38 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 				});
 			};
 
+			// Snapshot serializzabile della disposizione corrente: solo id + cella.
+			const layoutSnapshot = () =>
+				JSON.stringify(placedTrophies.map((trophy) => ({ id: trophy.id, row: trophy.row, col: trophy.col })));
+
+			const saveLayout = async () => {
+				const snapshot = layoutSnapshot();
+				if (snapshot === savedSnapshot) return;
+				savedSnapshot = snapshot;
+
+				try {
+					await fetch('/api/user/dati-aggiuntivi', {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ trofeiLayout: JSON.parse(snapshot) }),
+					});
+				} catch {
+					// Salvataggio in background: un errore non deve bloccare l'interazione.
+					// Forza un nuovo tentativo al prossimo cambiamento azzerando lo snapshot inviato.
+					savedSnapshot = ' ';
+				}
+			};
+
+			const scheduleSave = () => {
+				if (isHydrating) return;
+				if (saveTimer) clearTimeout(saveTimer);
+				saveTimer = setTimeout(saveLayout, 600);
+			};
+
 			const syncView = () => {
 				renderPieces();
 				syncPaletteAvailability();
+				scheduleSave();
 			};
 
 			const addTrophy = (definition: TrophyDefinition, candidate?: CandidatePosition) => {
@@ -665,6 +711,16 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 				syncView();
 			});
 
+			// Idratazione iniziale: ricolloca i trofei salvati nelle loro celle. Si considerano
+			// solo trofei presenti nel catalogo (effettivamente conquistati) e posizioni valide.
+			savedLayout.forEach((item) => {
+				const definition = catalog.find((trophy) => trophy.id === item.id);
+				if (!definition) return;
+				addTrophy(definition, { row: item.row, col: item.col });
+			});
+
+			isHydrating = false;
+			savedSnapshot = layoutSnapshot();
 			syncView();
 		});
 	};
@@ -1003,6 +1059,16 @@ const trophyCatalogJson = JSON.stringify(trophyCatalog);
 		gap: 0.625rem;
 		padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom));
 		overflow: auto;
+	}
+
+	.trophy-palette__empty {
+		grid-column: 1 / -1;
+		margin: 0;
+		padding: 1.5rem 0.5rem;
+		color: rgba(86, 97, 117, 0.72);
+		font-size: 0.875rem;
+		line-height: 1.4;
+		text-align: center;
 	}
 
 	.trophy-palette__item {
