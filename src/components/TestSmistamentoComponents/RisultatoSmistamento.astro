@@ -322,7 +322,9 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			width: 100%;
 			min-height: 100vh;
 			min-height: 100svh;
-			overflow: hidden;
+			padding-top: var(--sorting-result-panel-top);
+			padding-bottom: 2rem;
+			overflow: visible;
 			background-color: var(--sorting-result-photo-bg);
 			background-image:
 				var(--tsbs-page-pattern-overlay),
@@ -355,16 +357,13 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			left: 50%;
 			width: auto;
 			height: var(--sorting-result-banner-height);
-			filter: brightness(0.68);
+			filter: none;
 			transform: translateX(-50%);
 		}
 
 		.sorting-result__panel {
-			position: absolute;
-			right: auto;
-			top: var(--sorting-result-panel-top);
-			bottom: auto;
-			left: 50%;
+			position: relative;
+			left: auto;
 			width: var(--sorting-result-panel-width);
 			align-content: start;
 			justify-items: center;
@@ -372,7 +371,8 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			padding: var(--sorting-result-panel-padding-top) clamp(3rem, 7vw, 6rem) clamp(2.75rem, 4vw, 4rem);
 			text-align: center;
 			border-radius: 1.25rem;
-			transform: translateX(-50%);
+			margin: 0 auto;
+			transform: none;
 		}
 
 		.sorting-result__button {
