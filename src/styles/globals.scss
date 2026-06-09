@@ -2146,6 +2146,10 @@ body:has(.tsbs-legal-page) {
 		text-align: left;
 	}
 
+	.biblioteca-classense-page .biblioteca-intro {
+		text-align: left;
+	}
+
 	.biblioteca-lore-title {
 		margin: 0;
 		color: var(--tsbs-color-heading);
@@ -2160,6 +2164,10 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.biblioteca-lore-section + .biblioteca-lore-section {
+		margin-top: 1rem;
+	}
+
+	.biblioteca-lore-cta + .biblioteca-lore-section {
 		margin-top: 1rem;
 	}
 
@@ -2189,6 +2197,15 @@ body:has(.tsbs-legal-page) {
 
 	.biblioteca-intro p + p {
 		margin-top: 0.75rem;
+	}
+
+	.biblioteca-character-title {
+		font-size: 1.2em;
+		line-height: 1.25;
+	}
+
+	.biblioteca-intro p.biblioteca-character-title {
+		margin-top: 1.5rem;
 	}
 
 	.biblioteca-archive {
@@ -2298,6 +2315,10 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.biblioteca-lore-section + .biblioteca-lore-section {
+			margin-top: 1.75rem;
+		}
+
+		.biblioteca-lore-cta + .biblioteca-lore-section {
 			margin-top: 1.75rem;
 		}
 

@@ -15,13 +15,51 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 <Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
-	<main class="tsbs-app-shell missions-shell biblioteca-page">
+	<main class="tsbs-app-shell missions-shell biblioteca-page biblioteca-classense-page">
 		<header class="missions-header biblioteca-header">
 			<h1>La Biblioteca Classense</h1>
 		</header>
 
 		<section class="container-xl tsbs-app-container biblioteca-content" aria-labelledby="biblioteca-classense-title">
-			<h2 id="biblioteca-classense-title" class="visually-hidden">La Biblioteca Classense</h2>
+			<h2 id="biblioteca-classense-title" class="tsbs-section-title biblioteca-lore-title">La Biblioteca</h2>
+
+			<div class="biblioteca-intro">
+				<p><strong>La Biblioteca Classense è la biblioteca comunale di Ravenna</strong> e la sede principale del sistema bibliotecario cittadino. Oggi custodisce un patrimonio antico, moderno e contemporaneo: libri, manoscritti, mappe, immagini, archivi e collezioni che attraversano secoli di storia.</p>
+				<p>Il suo nome conserva una memoria precisa: <strong>Classe</strong>, la località a sud-est di Ravenna dove i monaci camaldolesi vivevano prima di trasferirsi entro le mura della città.</p>
+				<p>Dopo i danni subiti dal monastero di Classe durante la Battaglia di Ravenna del 1512, i monaci decisero di spostarsi in un luogo più protetto. <strong>Intorno al 1515 iniziò così la costruzione del nuovo complesso</strong>, che nel tempo sarebbe diventato l’abbazia oggi sede della Biblioteca.</p>
+				<p><strong>Per questo la Classense porta ancora con sé una doppia identità</strong>: è biblioteca pubblica e luogo di memoria, spazio di studio e traccia viva dell’antico monastero.</p>
+				<p>È il luogo da cui tutto ha avuto origine.</p>
+			</div>
+
+			<a class="btn tsbs-cta-primary biblioteca-lore-cta" href="https://www.classense.ra.it/" target="_blank" rel="noopener noreferrer">Scopri la biblioteca</a>
+
+			<section class="biblioteca-lore-section" aria-labelledby="biblioteca-luoghi-title">
+				<h2 id="biblioteca-luoghi-title" class="tsbs-section-title biblioteca-lore-title">I luoghi della Biblioteca</h2>
+
+				<div class="biblioteca-intro">
+					<p>La Biblioteca Classense si attraversa come un edificio stratificato, dove ogni piano custodisce una parte diversa della sua memoria.</p>
+					<p>Al piano terra si incontrano le soglie dell’antico monastero: <strong>i chiostri, la Sala Dantesca, la Sala Muratori e gli spazi oggi dedicati a incontri, mostre e lettura.</strong> Salendo, la Biblioteca rivela luoghi di studio e osservazione, come <strong>la Sala Malkowski e la Sala del Mosaico,</strong> fino ad arrivare al secondo piano, dove potrai visitare diverse sale prestigiose tra cui <strong>l'Aula Magna.</strong></p>
+					<p>Ogni ambiente conserva una funzione, ogni passaggio può diventare un indizio: conoscere i luoghi della Classense significa imparare a leggere la Biblioteca come una mappa viva</p>
+				</div>
+
+				<a class="btn tsbs-cta-primary biblioteca-lore-cta" href="https://www.classense.ra.it/visita-la-classense/" target="_blank" rel="noopener noreferrer">Visita gli ambienti</a>
+			</section>
+
+			<section class="biblioteca-lore-section" aria-labelledby="biblioteca-personaggi-title">
+				<h2 id="biblioteca-personaggi-title" class="tsbs-section-title biblioteca-lore-title">I Personaggi</h2>
+
+				<div class="biblioteca-intro">
+					<p>Tra le sale, i chiostri e gli archivi della Classense si muovono presenze che accompagnano, osservano e custodiscono il cammino degli Iniziati.</p>
+					<p class="biblioteca-character-title"><strong>La Bibliotecaria</strong></p>
+					<p>Il suo nome sembra sempre sul punto di essere ricordato, ma sfugge. La sua presenza sembra intrecciata alla Biblioteca in modo più profondo.<br />Conosce scaffali, fondi antichi, collocazioni dimenticate e corridoi che pochi sanno attraversare davvero. Non conferma mai troppo, non spiega mai tutto. <strong>Ma quando indica una direzione, raramente è per caso.</strong> Alcuni sono convinti che conosca ogni movimento degli Spiriti Custodi e che mantenga un equilibrio sottile tra ciò che può emergere e ciò che deve restare custodito. Nessuno sa con certezza quando sia arrivata. <strong>La sua figura appartiene ormai alla memoria viva della Biblioteca.</strong></p>
+					<p class="biblioteca-character-title"><strong>La Colonia Felina</strong></p>
+					<p>I gatti della Classense abitano chiostri, giardini e passaggi con naturalezza antica.<br />Osservano chi entra, riconoscono abitudini, proteggono silenzi. Per la Società sono sentinelle discrete: presenze capaci di percepire ciò che agli altri sfugge.</p>
+					<p class="biblioteca-character-title"><strong>Santino</strong></p>
+					<p><strong>Santino è il personaggio più temuto.</strong><br />La Tartaruga vive nel <strong>Chiostro Maggiore</strong> e sembra appartenere alla Biblioteca da sempre. Sorveglia il suo territorio con giudizio severo e non concede fiducia facilmente. Gli avvistamenti documentati risalgono a oltre ottant’anni fa, e la sua presenza sembra estendersi ben oltre la memoria ufficiale.</p>
+					<p class="biblioteca-character-title"><strong>Le Guide delle Accademie</strong></p>
+					<p>Ogni Accademia è accompagnata da una <strong>Guida: una figura storica</strong> che, nel tempo, ha incarnato il suo spirito e ne custodisce la memoria. <strong>Maria Ponti Pasolini</strong> veglia su <strong>Astraria, Santi Muratori</strong> su <strong>Arcadia, Barbara Longhi</strong> su <strong>Armonia e Corrado Ricci</strong> su <strong>Arborea</strong>. Le Guide non impongono un cammino: orientano, accolgono e ricordano a ogni Iniziato che appartenere a un’Accademia significa riconoscersi in una visione del sapere, ma anche contribuire alla sua continuità.</p>
+				</div>
+			</section>
 		</section>
 	</main>
 </Layout>
