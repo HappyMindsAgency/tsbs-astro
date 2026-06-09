@@ -24,6 +24,7 @@
   --tsbs-color-neutral-soft: #efe9e3;
   --tsbs-color-surface: #fffbf2;
   --tsbs-color-white: #f5f5f5;
+  --tsbs-color-grimorio-note-bg: #fff6e1;
   --tsbs-color-neutral-title: #f5f5f5;
   --tsbs-color-neutral-paragraph: #666666;
 
@@ -679,7 +680,7 @@ body:has(.tsbs-legal-page) {
 			width: 4rem;
 			height: 4rem;
 			color: var(--tsbs-theme-accent);
-			background: var(--tsbs-color-white);
+			background: #ffffff;
 			border-radius: 50%;
 		}
 
@@ -703,6 +704,7 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.dashboard-username {
+			color: var(--tsbs-color-heading);
 			font-size: 1.125rem;
 			font-weight: 800;
 			line-height: 1.1;
@@ -870,7 +872,7 @@ body:has(.tsbs-legal-page) {
 			min-height: 18.5rem;
 			padding: 1.5rem 1.25rem;
 			color: var(--tsbs-theme-accent);
-			background: #f1e3b8;
+			background: var(--tsbs-color-grimorio-note-bg);
 			border: 1px solid #8d8f95;
 			border-radius: 0.875rem;
 			text-decoration: none;
@@ -927,7 +929,7 @@ body:has(.tsbs-legal-page) {
 			gap: 1rem;
 			min-height: 9.375rem;
 			padding: 1.125rem 1.25rem;
-			background: #f5f5f5;
+			background: var(--tsbs-color-grimorio-note-bg);
 			border: 1px solid #8d8f95;
 			border-radius: 0.875rem;
 			color: inherit;
@@ -4246,7 +4248,7 @@ body:has(.tsbs-legal-page) {
 		grid-template-rows: auto auto minmax(0, 1fr) auto;
 		min-height: 0;
 		overflow: hidden;
-		background: #f5f5f5;
+		background: var(--tsbs-color-grimorio-note-bg);
 		border: 1px solid #8d8f95;
 		border-radius: 0.875rem;
 	}
