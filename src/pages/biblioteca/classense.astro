@@ -1,0 +1,27 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import { resolveUserContext } from '../../lib/theme';
+
+const { lang = 'it' } = Astro.props;
+
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
+
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+---
+
+<Layout lang={lang} theme={theme} accademia={accademia}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell missions-shell biblioteca-page">
+		<header class="missions-header biblioteca-header">
+			<h1>La Biblioteca Classense</h1>
+		</header>
+
+		<section class="container-xl tsbs-app-container biblioteca-content" aria-labelledby="biblioteca-classense-title">
+			<h2 id="biblioteca-classense-title" class="visually-hidden">La Biblioteca Classense</h2>
+		</section>
+	</main>
+</Layout>

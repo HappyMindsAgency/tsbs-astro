@@ -2119,6 +2119,12 @@ body:has(.tsbs-legal-page) {
 	}
 
 // PAGINA BIBLIOTECA
+	body:has(.biblioteca-page),
+	body:has(.biblioteca-academies-page) {
+		background-color: var(--tsbs-color-surface);
+		background-image: none;
+	}
+
 	.biblioteca-page {
 		--biblioteca-card-bg: #f5f5f5;
 		--biblioteca-card-border: color-mix(in srgb, var(--tsbs-color-body) 62%, var(--tsbs-color-white));
@@ -2130,6 +2136,41 @@ body:has(.tsbs-legal-page) {
 		display: grid;
 		gap: 2rem;
 		margin: 0 auto;
+	}
+
+	.biblioteca-lore-page .biblioteca-content {
+		gap: 1.5rem;
+	}
+
+	.biblioteca-lore-page .biblioteca-intro {
+		text-align: left;
+	}
+
+	.biblioteca-lore-title {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-size: clamp(1.75rem, 6vw, 2.125rem);
+		font-weight: 800;
+		line-height: 1.1;
+	}
+
+	.biblioteca-lore-section {
+		display: grid;
+		gap: 1.5rem;
+	}
+
+	.biblioteca-lore-section + .biblioteca-lore-section {
+		margin-top: 1rem;
+	}
+
+	.biblioteca-lore-cta {
+		justify-self: start;
+		min-height: 2.5rem;
+		padding: 0.75rem 1.25rem;
+		font-family: var(--tsbs-font-body);
+		font-weight: 700;
+		line-height: 1.1;
+		border-radius: 0.5rem;
 	}
 
 	.biblioteca-intro {
@@ -2242,6 +2283,26 @@ body:has(.tsbs-legal-page) {
 			max-width: calc(58rem + var(--bs-gutter-x));
 			gap: 2.75rem;
 			padding-top: 2.75rem;
+		}
+
+		.biblioteca-lore-page .biblioteca-content {
+			gap: 2.0625rem;
+		}
+
+		.biblioteca-lore-title {
+			font-size: 2.5rem;
+		}
+
+		.biblioteca-lore-section {
+			gap: 2.0625rem;
+		}
+
+		.biblioteca-lore-section + .biblioteca-lore-section {
+			margin-top: 1.75rem;
+		}
+
+		.biblioteca-lore-cta {
+			justify-self: start;
 		}
 
 		.biblioteca-archive {
