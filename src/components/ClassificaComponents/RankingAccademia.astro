@@ -68,14 +68,18 @@ const chronicleRows = [
 
 	<main class={`tsbs-app-shell academy-page academy-ranking-page${localAcademyThemeClass}`} data-academy={academyTheme} style={localAcademyPatternStyle}>
 		<header class="missions-header academy-ranking-header">
-			<h1>Classifica</h1>
+			<h1>La classifica</h1>
 		</header>
 
 		<div class="container-xl tsbs-app-container academy-ranking-page__content">
-			<p class="academy-ranking-intro">Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
+			<div class="academy-ranking-intro">
+				<p>Ogni missione completata da un Iniziato contribuisce alla crescita della propria Accademia.</p>
+				<p>Passo dopo passo, le azioni dei singoli rafforzano Arcadia, Astraria, Armonia e Arborea, modificando gli equilibri della Società.</p>
+				<p>Scopri chi è in testa!</p>
+			</div>
 
 			<section class="academy-section" aria-labelledby="academy-ranking-title">
-				<h2 id="academy-ranking-title" class="tsbs-section-title">Classifica</h2>
+				<h2 id="academy-ranking-title" class="tsbs-section-title">La classifica</h2>
 
 				<div class="academy-ranking-list">
 					{rankingRows.map((row, index) => (
@@ -132,7 +136,7 @@ const chronicleRows = [
 
 			{showBoxCronache && (
 				<section class="academy-section academy-chronicles" aria-labelledby="academy-chronicles-title">
-					<h2 id="academy-chronicles-title" class="tsbs-section-title">Cronache dell'ordine</h2>
+					<h2 id="academy-chronicles-title" class="tsbs-section-title">Cronache della Società</h2>
 
 					<div class="academy-chronicles-list">
 						{chronicleRows.map((row, index) => (

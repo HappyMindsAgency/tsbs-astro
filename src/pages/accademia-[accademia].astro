@@ -24,26 +24,31 @@ const fallbackAcademy: AcademyKey = 'arborea';
 
 const academies: Record<AcademyKey, {
 	name: string;
+	description: string;
 	logo: ImageMetadata;
 	banner: ImageMetadata;
 }> = {
 	arcadia: {
 		name: 'Arcadia',
+		description: 'Arcadia misura il proprio valore attraverso parola, studio e precisione. Ogni risultato rafforza il prestigio dell’Accademia e la sua voce all’interno della Società.',
 		logo: arcadiaLogo,
 		banner: arcadiaBanner,
 	},
 	arborea: {
 		name: 'Arborea',
+		description: 'Arborea procede come ciò che mette radici: con cura e attenzione. Ogni passo nutre la memoria dell’Accademia e la fa crescere nel tempo.',
 		logo: arboreaLogo,
 		banner: arboreaBanner,
 	},
 	armonia: {
 		name: 'Armonia',
+		description: 'Armonia cresce dove le voci si incontrano. Ogni missione completata, ogni contributo condiviso, aggiunge forza al coro dell’Accademia.',
 		logo: armoniaLogo,
 		banner: armoniaBanner,
 	},
 	astraria: {
 		name: 'Astraria',
+		description: 'Nel silenzio della notte, Astraria avanza con costanza. Ogni missione compiuta è  un segno lasciato tra stelle e memoria.',
 		logo: astrariaLogo,
 		banner: astrariaBanner,
 	},
@@ -97,7 +102,7 @@ const rankingRows = [
 					</span>
 					<div class="academy-hero__mobile-copy">
 						<h1 id="academy-title">{academy.name}</h1>
-						<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
+						<p>{academy.description}</p>
 						<p class="academy-members">
 							<i class="bi bi-people" aria-hidden="true"></i>
 							<span>142 Adepti</span>
@@ -107,7 +112,7 @@ const rankingRows = [
 
 				<div class="academy-hero__desktop-copy">
 					<h1>{academy.name}</h1>
-					<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
+					<p>{academy.description}</p>
 					<p class="academy-members">
 						<i class="bi bi-people" aria-hidden="true"></i>
 						<span>142 Adepti</span>
@@ -123,7 +128,7 @@ const rankingRows = [
 				<div class="academy-section__head">
 					<h2 id="academy-ranking-title" class="tsbs-section-title">Classifica</h2>
 					<a class="missions-load-more academy-ranking-more academy-section__link--desktop d-none" href={rankingHref} style="display: none !important;">
-						<span>Vedi tutta la classifica</span>
+						<span>Guarda tutta la classifica</span>
 						<i class="bi bi-arrow-right" aria-hidden="true"></i>
 					</a>
 				</div>
@@ -159,7 +164,7 @@ const rankingRows = [
 				</div>
 
 				<a class="missions-load-more academy-ranking-more academy-section__link--mobile d-none" href={rankingHref} style="display: none !important;">
-					<span>Vedi tutta la classifica</span>
+					<span>Guarda tutta la classifica</span>
 					<i class="bi bi-arrow-right" aria-hidden="true"></i>
 				</a>
 			</section>
