@@ -49,9 +49,11 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 		<section class="container-xl tsbs-app-container biblioteca-content" aria-labelledby="biblioteca-title">
 			<h2 id="biblioteca-title" class="visually-hidden">Biblioteca</h2>
 
-			<p class="biblioteca-intro">
-				Sed bibendum nunc eget nunc iaculis sollicitudin. Pellentesque lacinia ultrices tempus. Vivamus vel libero eget mauris placerat rhoncus et ac ex. Ut pellentesque lorem ac vehicula tempor. Praesent semper dignissim pharetra. Proin ac rutrum nisl, eget viverra tellus. Etiam iaculis iaculis odio eu sagittis. Integer convallis libero eu ex accumsan, id faucibus velit finibus.
-			</p>
+			<div class="biblioteca-intro">
+				<p>La Biblioteca Classense non è soltanto il luogo in cui la Società ha preso forma. È la sua origine, la sua memoria e il suo territorio più vivo.</p>
+				<p>Tra sale, chiostri, archivi, fondi antichi e tracce nascoste, <strong>ogni spazio custodisce qualcosa di unico</strong>: una storia, un simbolo, una presenza, una domanda rimasta in attesa.</p>
+				<p>In questa sezione puoi conoscere meglio la Biblioteca, la Società e le Accademie che ne custodiscono e preservano intatto lo spirito.</p>
+			</div>
 
 			<section class="biblioteca-archive" aria-labelledby="biblioteca-archive-title">
 				<h2 id="biblioteca-archive-title" class="tsbs-section-title">Esplora l'Archivio</h2>

@@ -72,13 +72,13 @@ function getPrimaryCategory(epistola: typeof epistole[number]) {
 						<p>{getExcerpt(featuredEpistola.contenuto, 150)}</p>
 					</div>
 					<a class="btn tsbs-cta-primary epistole-featured__button" href={`/epistole/${featuredEpistola.slug}/`}>
-						Leggi Epistola
+						Apri l’Epistola
 					</a>
 				</section>
 			)}
 
 			<section class="epistole-archive" aria-labelledby="epistole-archive-title">
-				<h2 id="epistole-archive-title" class="tsbs-section-title">Archivio Epistole</h2>
+				<h2 id="epistole-archive-title" class="tsbs-section-title">Archivio delle Epistole</h2>
 
 				<div class="epistole-list">
 					{archiveEpistole.map((epistola, index) => (

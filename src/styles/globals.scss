@@ -2133,12 +2133,21 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.biblioteca-intro {
-		max-width: 44rem;
+		width: 100%;
+		max-width: none;
 		margin: 0 auto;
 		color: var(--tsbs-color-body);
 		font-size: 1rem;
 		line-height: 1.5;
 		text-align: center;
+	}
+
+	.biblioteca-intro p {
+		margin: 0;
+	}
+
+	.biblioteca-intro p + p {
+		margin-top: 0.75rem;
 	}
 
 	.biblioteca-archive {
@@ -2245,7 +2254,9 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.biblioteca-intro {
+			width: min(100%, 63rem);
 			font-size: 1.125rem;
+			text-align: left;
 		}
 
 		.biblioteca-archive-card__icon--tsbs img {
