@@ -145,6 +145,7 @@ const avatars = [
     --scelta-avatar-card-image-padding: 1.35rem;
     --scelta-avatar-grid-gap: 0.75rem;
     --scelta-avatar-grid-space: 1.75rem;
+    --scelta-avatar-surface: var(--tsbs-color-white);
 
     min-height: 100%;
     padding: clamp(2rem, 8vw, 4rem) var(--bs-gutter-x, 1rem);
@@ -193,7 +194,7 @@ const avatars = [
     overflow: hidden;
     border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 72%, transparent);
     border-radius: 50%;
-    background: var(--tsbs-color-neutral-soft);
+    background: var(--scelta-avatar-surface);
   }
 
   .scelta-avatar__preview-image {
@@ -248,7 +249,7 @@ const avatars = [
     overflow: hidden;
     border: 0.125rem solid color-mix(in srgb, var(--tsbs-theme-accent) 22%, transparent);
     border-radius: 50%;
-    background: var(--tsbs-color-neutral-soft);
+    background: var(--scelta-avatar-surface);
     transition:
       border-color 180ms ease,
       box-shadow 180ms ease,

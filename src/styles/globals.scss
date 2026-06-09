@@ -679,7 +679,7 @@ body:has(.tsbs-legal-page) {
 			width: 4rem;
 			height: 4rem;
 			color: var(--tsbs-theme-accent);
-			background: color-mix(in srgb, var(--tsbs-theme-accent) 18%, var(--tsbs-color-white));
+			background: var(--tsbs-color-white);
 			border-radius: 50%;
 		}
 
