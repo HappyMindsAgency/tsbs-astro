@@ -1,49 +1,56 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import { type AcademySlug, resolveUserContext } from '../../lib/theme';
 import arboreaLogo from '../../assets/Arborea-logo-the-secret-bookish-society.png';
 import arcadiaLogo from '../../assets/Arcadia-logo-the-secret-bookish-society.png';
 import armoniaLogo from '../../assets/Armonia-logo-the-secret-bookish-society.png';
 import astrariaLogo from '../../assets/Astraria-logo-the-secret-bookish-society.png';
 
 const { lang = 'it' } = Astro.props;
+const jwt = Astro.cookies.get('jwt')?.value;
+
+if (!jwt) {
+	return Astro.redirect('/');
+}
+
+const { theme, accademia: userAcademy } = await resolveUserContext(jwt);
+const getAcademyHref = (academy: AcademySlug) =>
+	academy === userAcademy ? `/sala-accademia-${academy}/` : `/accademia-${academy}/`;
 
 const academies = [
 	{
 		name: 'Astraria',
-		theme: 'astraria',
+		theme: 'astraria' as const,
 		logo: astrariaLogo,
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-		href: '/accademia-astraria/',
+		href: getAcademyHref('astraria'),
 	},
 	{
 		name: 'Arcadia',
-		theme: 'arcadia',
+		theme: 'arcadia' as const,
 		logo: arcadiaLogo,
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-		href: '/accademia-arcadia/',
+		href: getAcademyHref('arcadia'),
 	},
 	{
 		name: 'Armonia',
-		theme: 'armonia',
+		theme: 'armonia' as const,
 		logo: armoniaLogo,
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-		href: '/accademia-armonia/',
+		href: getAcademyHref('armonia'),
 	},
 	{
 		name: 'Arborea',
-		theme: 'arborea',
+		theme: 'arborea' as const,
 		logo: arboreaLogo,
 		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-		href: '/sala-accademia-arborea/',
+		href: getAcademyHref('arborea'),
 	},
 ];
-if (!Astro.cookies.has('jwt')) {
-	return Astro.redirect('/');
-}
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={userAcademy}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell biblioteca-academies-page">

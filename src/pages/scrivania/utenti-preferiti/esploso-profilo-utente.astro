@@ -10,6 +10,7 @@ import trofeoScudo from '../../../assets/trofeo-scudo.png';
 import trofeoStendardo from '../../../assets/trofeo-stendardo.png';
 import trofeoTartaruga from '../../../assets/trofeo-tartaruga.png';
 import { mockProfiles } from '../../../data/mockProfiles.js';
+import { resolveUserContext } from '../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 const currentProfile = mockProfiles[0];
@@ -36,9 +37,11 @@ const cells = Array.from({ length: board.rows * board.cols });
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
+
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell desk-page profile-exploded-page">

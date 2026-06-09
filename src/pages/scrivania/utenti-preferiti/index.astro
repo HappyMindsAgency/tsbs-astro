@@ -2,14 +2,17 @@
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import { mockProfiles } from '../../../data/mockProfiles.js';
+import { resolveUserContext } from '../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
+
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell academy-page academy-ranking-page profile-favorites-page">
