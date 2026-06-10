@@ -17,7 +17,10 @@ const firstQuestion = questions[0];
 const title = firstQuestion.question;
 const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 const quote = missione?.quiz?.descrizione?.trim() || '';
-const quoteContent = quote ? marked.parse(quote, { async: false }) : '';
+const openQuoteLinksInNewTab = (html: string) =>
+	html.replace(/<a\s(?![^>]*\btarget=)/g, '<a target="_blank" rel="noopener noreferrer" ');
+const rawQuoteContent = quote ? marked.parse(quote, { async: false }) : '';
+const quoteContent = slugMis === 'missione-01-il-varco' ? openQuoteLinksInNewTab(rawQuoteContent) : rawQuoteContent;
 
 const answerLabel = 'Risposta libera';
 const hasMultipleQuestions = questions.length > 1;
