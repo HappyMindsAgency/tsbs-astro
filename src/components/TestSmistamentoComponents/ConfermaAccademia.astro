@@ -17,7 +17,9 @@ const normalizedAcademy = academies.some((academy) => academy.id === selectedAca
 	<header class="mission-proof-question__header">
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<h1 class="mission-proof-question__title mission-component-title">
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+				L’Iniziazione è quasi completa.
+				Lo Smistamento ha rivelato una via, ma non tutto è già scritto.Scegli l’Accademia che senti più vicina.
+				La Società riconoscerà la tua decisione.
 			</h1>
 		</div>
 	</header>
@@ -25,7 +27,7 @@ const normalizedAcademy = academies.some((academy) => academy.id === selectedAca
 	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
 		<div class="choice-question__form sorting-academy-choice__form">
 			<fieldset class="choice-question__fieldset sorting-academy-choice__fieldset">
-				<legend>Scegli una sola risposta</legend>
+				<legend class="d-none">Scegli una sola risposta</legend>
 
 				<div class="choice-question__answers sorting-academy-choice__answers">
 					{academies.map((academy) => (
@@ -49,7 +51,7 @@ const normalizedAcademy = academies.some((academy) => academy.id === selectedAca
 					class={`btn tsbs-cta-primary mission-proof-question__cta choice-question__cta sorting-academy-choice__cta sorting-academy-choice__cta--${academy.id}`}
 					data-confirm-academy={academy.id}
 				>
-					Scegli
+					Conferma la tua scelta
 				</button>
 			))}
 		</div>
