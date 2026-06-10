@@ -13,7 +13,7 @@ const shouldRender = isOpen || renderHidden;
 ---
 
 {shouldRender && (
-	<div class={`test-result-toast test-result-toast--passed tsbs-toast ${theme}`} data-test-result-toast hidden={!isOpen} role="dialog" aria-modal="true" aria-labelledby="test-passed-title">
+	<div class={`test-result-toast test-result-toast--passed ${theme}`} data-test-result-toast hidden={!isOpen} role="dialog" aria-modal="true" aria-labelledby="test-passed-title">
 		<div class="test-result-toast__backdrop" data-test-result-toast-close></div>
 		<section class="test-result-toast__panel" aria-describedby="test-passed-copy">
 			<div class="test-result-toast__body">

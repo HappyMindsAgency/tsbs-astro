@@ -80,7 +80,8 @@ const hasMultipleQuestions = questions.length > 1;
 <script define:vars={{ questions, slugMis }}>
 	const setupFreeAnswerMission = () => {
 		const root = document.querySelector('[data-free-answer-mission]');
-		if (!root) return;
+		if (!root || root.dataset.freeAnswerMissionReady === 'true') return;
+		root.dataset.freeAnswerMissionReady = 'true';
 
 		const form = root.querySelector('[data-free-answer-form]');
 		const instruction = root.querySelector('[data-free-answer-instruction]');

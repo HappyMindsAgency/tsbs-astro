@@ -110,7 +110,8 @@ const hasMultipleQuestions = questions.length > 1;
 <script define:vars={{ questions, slugMis }}>
 	const setupChoiceQuestion = () => {
 		const root = document.querySelector('[data-choice-question]');
-		if (!root) return;
+		if (!root || root.dataset.choiceQuestionReady === 'true') return;
+		root.dataset.choiceQuestionReady = 'true';
 
 		const form = root.querySelector('[data-choice-question-form]');
 		const title = root.querySelector('[data-choice-question-title]');
