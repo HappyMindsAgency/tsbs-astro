@@ -767,6 +767,10 @@ const { lang = 'it' } = Astro.props;
 	}
 
 	@media (min-width: 768px) {
+		:global(body:has(.sign-in-page)) {
+			overflow: hidden;
+		}
+
 		.sign-in-page {
 			--sign-in-page-padding-y: clamp(1.0625rem, 1.2vw, 1.75rem);
 			--sign-in-page-padding-x: clamp(1.875rem, 5vw, 4.5rem);
@@ -775,13 +779,18 @@ const { lang = 'it' } = Astro.props;
 
 			display: grid;
 			place-items: center;
+			height: 100vh;
+			height: 100dvh;
+			min-height: 0;
+			overflow: hidden;
 		}
 
 		.sign-in-stage {
 			display: grid;
 			place-items: center;
 			width: min(100%, 80.9375rem);
-			min-height: calc(100vh - 2.125rem);
+			height: 100%;
+			min-height: 0;
 		}
 
 		.sign-in-panel {
@@ -833,6 +842,41 @@ const { lang = 'it' } = Astro.props;
 
 		.sign-in-back {
 			margin-top: 1.125rem;
+		}
+	}
+
+	@media (min-width: 768px) and (max-height: 760px) {
+		.sign-in-page {
+			--sign-in-page-padding-y: 0.75rem;
+			--sign-in-page-padding-bottom: 0.75rem;
+			--sign-in-submit-margin-top: 1.125rem;
+		}
+
+		.sign-in-panel {
+			padding: 1.25rem;
+		}
+
+		.sign-in-media {
+			min-height: 15rem;
+		}
+
+		.sign-in-content h1 {
+			margin-bottom: 0.375rem;
+			font-size: 1.75rem;
+		}
+
+		.sign-in-form {
+			gap: 0.875rem 1rem;
+			margin-top: 1rem;
+		}
+
+		.sign-in-consents {
+			gap: 0.625rem;
+			margin-top: 0.5rem;
+		}
+
+		.sign-in-back {
+			margin-top: 0.625rem;
 		}
 	}
 

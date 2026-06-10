@@ -339,6 +339,10 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 	}
 
 	@media (min-width: 768px) {
+		:global(body:has(.login-page)) {
+			overflow: hidden;
+		}
+
 		.login-page {
 			--login-page-padding-y: clamp(1.0625rem, 1.2vw, 1.75rem);
 			--login-page-padding-x: clamp(1.875rem, 5vw, 4.5rem);
@@ -346,14 +350,19 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 
 			display: grid;
 			place-items: center;
+			height: 100vh;
+			height: 100dvh;
+			min-height: 0;
 			padding-block: var(--login-page-padding-y);
+			overflow: hidden;
 		}
 
 		.login-stage {
 			display: grid;
 			place-items: center;
 			width: min(100%, 80.9375rem);
-			min-height: 100%;
+			height: 100%;
+			min-height: 0;
 		}
 
 		.login-panel {
@@ -405,6 +414,28 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 
 		.login-back {
 			margin-top: 0.75rem;
+		}
+	}
+
+	@media (min-width: 768px) and (max-height: 760px) {
+		.login-page {
+			--login-page-padding-y: 0.75rem;
+			--login-submit-margin-top: 1.25rem;
+		}
+
+		.login-panel {
+			min-height: 0;
+			padding: 1.25rem;
+		}
+
+		.login-form {
+			gap: 1rem;
+			margin-top: 1.25rem;
+		}
+
+		.login-forgot,
+		.login-back {
+			margin-top: 0.625rem;
 		}
 	}
 
