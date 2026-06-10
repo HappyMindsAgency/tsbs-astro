@@ -2,9 +2,26 @@
 import TestPassed from '../toastComponents/TestPassed.astro';
 import TestNotPassed from '../toastComponents/TestNotPassed.astro';
 
-const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props;
+interface MissionAnswer {
+	label: string;
+	description?: string;
+}
 
-const fallbackQuestions = [
+interface MissionQuestion {
+	question: string;
+	answers: MissionAnswer[];
+}
+
+interface Props {
+	missione?: { titolo?: string } | null;
+	questions?: MissionQuestion[];
+	lang?: string;
+	slugMis?: string;
+}
+
+const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props as Props;
+
+const fallbackQuestions: MissionQuestion[] = [
 	{
 		question: 'Scegli una sola risposta',
 		answers: [
@@ -34,7 +51,7 @@ const fallbackQuestions = [
 	},
 ];
 
-const questions = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
+const questions: MissionQuestion[] = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
 const firstQuestion = questions[0];
 const title = firstQuestion.question;
 const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';

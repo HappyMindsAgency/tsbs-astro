@@ -3,16 +3,36 @@ import { marked } from 'marked';
 import TestPassed from '../toastComponents/TestPassed.astro';
 import TestNotPassed from '../toastComponents/TestNotPassed.astro';
 
-const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props;
+interface MissionAnswer {
+	label: string;
+	description?: string;
+}
 
-const fallbackQuestions = [
+interface MissionQuestion {
+	question: string;
+	answers: MissionAnswer[];
+}
+
+interface Props {
+	missione?: {
+		titolo?: string;
+		quiz?: { descrizione?: string | null } | null;
+	} | null;
+	questions?: MissionQuestion[];
+	lang?: string;
+	slugMis?: string;
+}
+
+const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props as Props;
+
+const fallbackQuestions: MissionQuestion[] = [
 	{
 		question: 'Descrizione dell’azione da compiere',
 		answers: [{ label: 'Risposta libera' }],
 	},
 ];
 
-const questions = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
+const questions: MissionQuestion[] = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
 const firstQuestion = questions[0];
 const firstQuestionIsFreeAnswer = firstQuestion.answers.length === 1;
 const title = firstQuestion.question;
