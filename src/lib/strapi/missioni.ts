@@ -19,6 +19,7 @@ export type MissioneTrofeo = StrapiRelationBase & {
 export type MissioneLivello = StrapiRelationBase & {
 	nome: string;
 	slug: string | null;
+	ordine: number | null;
 };
 
 export type MissioneStagione = StrapiRelationBase & {
@@ -93,8 +94,14 @@ type StrapiUser = {
 	email?: string;
 };
 
-type MembroMissioni = StrapiRelationBase & {
+type MembroAccademia = StrapiRelationBase & {
+	slug: string | null;
+};
+
+export type MembroMissioni = StrapiRelationBase & {
 	email: string | null;
+	accademia: MembroAccademia | null;
+	livello: MissioneLivello | null;
 };
 
 const STRAPI_LOCALE_BY_LANG: Record<string, string> = {
@@ -124,6 +131,7 @@ function setMissioneRelations(searchParams: URLSearchParams) {
 	searchParams.set('populate[libro][fields][1]', 'autore');
 	searchParams.set('populate[livello][fields][0]', 'nome');
 	searchParams.set('populate[livello][fields][1]', 'slug');
+	searchParams.set('populate[livello][fields][2]', 'ordine');
 	searchParams.set('populate[missione_precedente][fields][0]', 'titolo');
 	searchParams.set('populate[missione_precedente][fields][1]', 'slug');
 	searchParams.set('populate[quiz][fields][0]', 'titolo');
@@ -143,6 +151,7 @@ function setMissioneListRelations(searchParams: URLSearchParams) {
 	searchParams.set('populate[categorie_missione][fields][0]', 'nome');
 	searchParams.set('populate[livello][fields][0]', 'nome');
 	searchParams.set('populate[livello][fields][1]', 'slug');
+	searchParams.set('populate[livello][fields][2]', 'ordine');
 	searchParams.set('populate[missione_precedente][fields][0]', 'titolo');
 	searchParams.set('populate[missione_precedente][fields][1]', 'slug');
 }
@@ -187,13 +196,13 @@ export async function getMissioniAttive(lang = 'it') {
 }
 
 export async function getPartecipazioniMissioneByJwt(jwt: string, lang = 'it') {
-	const membro = await getCurrentMembroMissioniFromJwt(jwt);
+	const membro = await getMembroMissioniByJwt(jwt);
 	if (!membro) return [];
 
 	return getPartecipazioniMissioneByMembro(membro.documentId, lang);
 }
 
-async function getCurrentMembroMissioniFromJwt(jwt: string) {
+export async function getMembroMissioniByJwt(jwt: string) {
 	const apiBaseUrl = getStrapiApiUrl();
 	const userResponse = await fetch(`${apiBaseUrl}/users/me`, {
 		headers: { Authorization: `Bearer ${jwt}`, 'Content-Type': 'application/json' },
@@ -208,6 +217,10 @@ async function getCurrentMembroMissioniFromJwt(jwt: string) {
 	searchParams.set('status', 'draft');
 	searchParams.set('filters[email][$eq]', user.email);
 	searchParams.set('fields[0]', 'email');
+	searchParams.set('populate[accademia][fields][0]', 'slug');
+	searchParams.set('populate[livello][fields][0]', 'nome');
+	searchParams.set('populate[livello][fields][1]', 'slug');
+	searchParams.set('populate[livello][fields][2]', 'ordine');
 	searchParams.set('pagination[pageSize]', '1');
 
 	const membroResponse = await fetch(`${apiBaseUrl}/membri?${searchParams}`, {

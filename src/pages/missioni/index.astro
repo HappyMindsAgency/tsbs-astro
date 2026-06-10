@@ -1,11 +1,11 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import FiltroMissioni from '../../lib/filtri/FiltroMissioni.astro';
 import {
+	getMembroMissioniByJwt,
 	getMissioniAttive,
 	getPartecipazioniMissioneByJwt,
-	type Missione,
-	type PartecipazioneMissione,
 } from '../../lib/strapi/missioni';
 import { resolveUserContext } from '../../lib/theme';
 
@@ -18,104 +18,12 @@ if (!Astro.cookies.has('jwt')) {
 const jwt = Astro.cookies.get('jwt')?.value;
 const { theme, accademia } = await resolveUserContext(jwt);
 
-type MissionCard = {
-	title: string;
-	description: string;
-	href: string;
-	progress: number;
-	meta: string;
-};
-
-type MissionTab = {
-	id: string;
-	label: string;
-	missions: MissionCard[];
-};
-
-function getPlainText(value: string | null | undefined) {
-	if (!value) return '';
-	return value
-		.replace(/[#*_>`[\]()]/g, '')
-		.replace(/\s+/g, ' ')
-		.trim();
-}
-
-function getExcerpt(value: string | null | undefined) {
-	const plainText = getPlainText(value);
-	if (!plainText) return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
-	if (plainText.length <= 110) return plainText;
-
-	return `${plainText.slice(0, 107).trim()}...`;
-}
-
-function normalizeProgress(value: string | null | undefined, fallback = 0) {
-	if (!value) return fallback;
-
-	const progress = Number.parseFloat(value.replace(',', '.').replace('%', '').trim());
-	if (!Number.isFinite(progress)) return fallback;
-
-	return Math.min(100, Math.max(0, Math.round(progress)));
-}
-
-function getMissionProgress(partecipazione: PartecipazioneMissione | undefined) {
-	if (partecipazione?.stato === 'completata') return 100;
-	return normalizeProgress(partecipazione?.progresso, 0);
-}
-
-function toMissionCard(missione: Missione, partecipazione: PartecipazioneMissione | undefined): MissionCard {
-	const progress = getMissionProgress(partecipazione);
-
-	return {
-		title: missione.titolo,
-		description: getExcerpt(missione.descrizione),
-		href: `/missioni/${missione.slug}/`,
-		progress,
-		meta: `${progress}%`,
-	};
-}
-
-function buildMissionTabs(missioni: Missione[], partecipazioni: PartecipazioneMissione[]): MissionTab[] {
-	const partecipazioniByMissione = new Map<string, PartecipazioneMissione>();
-	for (const partecipazione of partecipazioni) {
-		const missioneSlug = partecipazione.missione?.slug;
-		if (missioneSlug) partecipazioniByMissione.set(missioneSlug, partecipazione);
-	}
-
-	const inCorso: MissionCard[] = [];
-	const completate: MissionCard[] = [];
-	const disponibili: MissionCard[] = [];
-
-	for (const missione of missioni) {
-		const partecipazione = partecipazioniByMissione.get(missione.slug);
-		const missionCard = toMissionCard(missione, partecipazione);
-
-		if (partecipazione?.stato === 'completata') {
-			completate.push(missionCard);
-			continue;
-		}
-
-		if (partecipazione?.stato === 'inCorso') {
-			inCorso.push(missionCard);
-			continue;
-		}
-
-		disponibili.push(missionCard);
-	}
-
-	return [
-		{ id: 'in-corso', label: 'In corso', missions: inCorso },
-		{ id: 'completate', label: 'Completate', missions: completate },
-		{ id: 'disponibili', label: 'Disponibili', missions: disponibili },
-	];
-}
-
-const [missioniAttive, partecipazioniMissione] = await Promise.all([
+const [missioniAttive, partecipazioniMissione, membroMissioni] = await Promise.all([
 	getMissioniAttive(lang),
 	jwt ? getPartecipazioniMissioneByJwt(jwt, lang) : Promise.resolve([]),
+	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
 ]);
-const missionTabs = buildMissionTabs(missioniAttive, partecipazioniMissione);
-const firstPopulatedTabIndex = missionTabs.findIndex((tab) => tab.missions.length > 0);
-const activeTabIndex = firstPopulatedTabIndex >= 0 ? firstPopulatedTabIndex : 0;
+const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -129,64 +37,12 @@ const activeTabIndex = firstPopulatedTabIndex >= 0 ? firstPopulatedTabIndex : 0;
 		<section class="container-xl tsbs-app-container missions-content" aria-labelledby="missions-title">
 			<h2 id="missions-title" class="visually-hidden">Elenco missioni</h2>
 
-			<ul class="nav missions-tabs" id="missions-tabs" role="tablist" aria-label="Stato missioni">
-				{missionTabs.map((tab, index) => (
-					<li class="nav-item missions-tabs__item" role="presentation">
-						<button
-							class={`nav-link missions-tabs__button ${index === activeTabIndex ? 'active' : ''}`}
-							id={`${tab.id}-tab`}
-							data-bs-toggle="tab"
-							data-bs-target={`#${tab.id}`}
-							type="button"
-							role="tab"
-							aria-controls={tab.id}
-							aria-selected={index === activeTabIndex ? 'true' : 'false'}
-						>
-							{tab.label}
-						</button>
-					</li>
-				))}
-			</ul>
-
-			<div class="tab-content missions-tab-content" id="missions-tabs-content">
-				{missionTabs.map((tab, tabIndex) => (
-					<div
-						class={`tab-pane fade ${tabIndex === activeTabIndex ? 'show active' : ''}`}
-						id={tab.id}
-						role="tabpanel"
-						aria-labelledby={`${tab.id}-tab`}
-						tabindex="0"
-					>
-						{tab.missions.length > 0 ? (
-							<>
-								<div class="missions-grid dashboard-task-grid">
-									{tab.missions.map((mission) => (
-										<a class="tsbs-card dashboard-task mission-card mission-card-link" href={mission.href} data-mission-card>
-											<div class="dashboard-task__header">
-												<div>
-													<h3 class="tsbs-accent-title">{mission.title}</h3>
-													<p>{mission.description}</p>
-												</div>
-											</div>
-											<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
-												<span style={`width: ${mission.progress}%`}></span>
-											</div>
-											<p class="dashboard-progress-label">{mission.meta}</p>
-										</a>
-									))}
-								</div>
-
-								<button class="missions-load-more" type="button" data-load-more aria-controls={tab.id}>
-									<span>Carica altro</span>
-									<i class="bi bi-arrow-right" aria-hidden="true"></i>
-								</button>
-							</>
-						) : (
-							<p class="missions-empty-message">nessuna missione disponibile</p>
-						)}
-					</div>
-				))}
-			</div>
+			<FiltroMissioni
+				missioni={missioniAttive}
+				partecipazioni={partecipazioniMissione}
+				livelloMembro={membroMissioni?.livello ?? null}
+				testSmistamentoCompletato={testSmistamentoCompletato}
+			/>
 		</section>
 	</main>
 

@@ -9,6 +9,7 @@ const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 const VALID_ACADEMIES = ['arborea', 'arcadia', 'armonia', 'astraria'];
+const FIRST_LEVEL_SLUG = 'livello-1-adepto';
 
 export const PUT: APIRoute = async ({ request, cookies }) => {
     const jwt = cookies.get('jwt')?.value;
@@ -82,11 +83,39 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
         return json({ error: 'academy_not_found' }, 404);
     }
 
-    // Aggiorna il Membro con la relazione accademia
+    // Il completamento del test di smistamento assegna il primo livello.
+    const levelQs = new URLSearchParams({
+        'filters[slug][$eq]': FIRST_LEVEL_SLUG,
+        'fields[0]': 'documentId',
+        'status': 'published',
+    });
+    const levelRes = await fetch(
+        `${STRAPI_API_BASE_URL}/livelli?${levelQs}`,
+        { headers: { 'Authorization': `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' } },
+    );
+
+    if (!levelRes.ok) {
+        logger.error(`[Accademia] Lookup livello iniziale fallito: ${levelRes.status}`);
+        return json({ error: 'level_not_found' }, 404);
+    }
+
+    const levelData = await levelRes.json();
+    const levelDocumentId: string | undefined = levelData?.data?.[0]?.documentId;
+
+    if (!levelDocumentId) {
+        return json({ error: 'level_not_found' }, 404);
+    }
+
+    // Aggiorna il Membro con accademia e livello iniziale.
     const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membro.documentId}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: { accademia: { connect: [{ documentId: accademiaDocumentId }] } } }),
+        body: JSON.stringify({
+            data: {
+                accademia: { connect: [{ documentId: accademiaDocumentId }] },
+                livello: { connect: [{ documentId: levelDocumentId }] },
+            },
+        }),
     });
 
     if (!updateRes.ok) {

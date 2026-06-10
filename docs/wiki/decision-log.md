@@ -20,6 +20,34 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-10 - Filtro Missioni Per Livelli Sbloccati
+
+Decisione:
+- la pagina `/missioni/` mostra solo le missioni attive collegate ai livelli gia sbloccati dal Membro loggato
+- la regola di visibilita e basata sui livelli missione sbloccati dal Membro: dal Livello 2 in poi vale `Missione.livello.ordine <= Membro.livello.ordine`
+- il Livello 1 - Adepto e un'eccezione di accesso: dopo il test di smistamento l'utente e Livello 1, ma nella lista Missioni deve gia vedere tutte le missioni del Livello 2
+- il `Test di Smistamento` e un'eccezione di sistema: serve per assegnare il primo livello ma non deve comparire nella lista Missioni
+- alla conferma dell'Accademia dopo il test di smistamento, il Membro viene aggiornato con `Livello 1 - Adepto`
+- per robustezza, se `Livello.ordine` non e ancora compilato su Strapi, il frontend ricava l'ordine dagli slug noti dei livelli; se un Membro ha Accademia ma livello vuoto, viene trattato come smistato e vede le missioni del Livello 2
+- l'ordinamento delle missioni visibili e dal livello piu alto sbloccato ai livelli precedenti, e dentro ogni livello da `Missione.ordine` piu alto a piu basso
+- le missioni prive di livello non vengono mostrate dalla lista; le missioni extra/finali non ancora pronte devono restare `attiva: false`
+- la logica di sblocco puntuale delle singole missioni non appartiene a questo filtro e resta fuori dallo scope
+
+Motivo:
+- usare la relazione Strapi gia prevista `Missione.livello` evita di duplicare i livelli dentro `Categoria Missione`
+- il filtro deve rispondere al livello del Membro, non alla categoria editoriale della missione
+- mostrare anche i livelli precedenti permette all'utente di recuperare missioni non completate dopo l'avanzamento
+
+Impatto:
+- `src/lib/strapi/missioni.ts`
+- `src/lib/filtri/FiltroMissioni.astro`
+- `src/pages/missioni/index.astro`
+- `src/pages/api/user/accademia.ts`
+- compilazione richiesta su Strapi: `Livello.ordine`, `Missione.livello`, `Membro.livello`
+
+Stato:
+- approvata
+
 ## 2026-06-09 - Resa Dinamica Trofei Conquistati Da Strapi
 
 Decisione:

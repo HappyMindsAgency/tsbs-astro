@@ -267,7 +267,7 @@ Esempio Epistole:
 - Campi localizzati: `nome`, `slug`, `descrizione`
 - Relazioni: `stagione`, `membri`, `missioni`
 - draftAndPublish: `true`
-- Note binding Astro: fonte per progressione, percorso di studi e vincoli missioni.
+- Note binding Astro: fonte per progressione, percorso di studi e vincoli missioni. Per la lista `/missioni/`, `ordine` deve essere compilato per filtrare le missioni dei livelli sbloccati e ordinarle dal livello piu alto ai precedenti; finche manca, il frontend usa un fallback dagli slug noti dei livelli.
 - Dubbi aperti: confermare se il livello utente si calcola o viene assegnato da backend.
 
 ### Membro
@@ -293,7 +293,7 @@ Esempio Epistole:
 - Campi localizzati: `titolo`, `slug`, `descrizione`
 - Relazioni: `categorie_missione`, `eventi`, `libro`, `livello`, `missione_precedente`, `quiz`, `trofeo`, `stagione`, `partecipazioni_missione`
 - draftAndPublish: `true`
-- Note binding Astro: per lista/dettaglio usare contenuti pubblicati e probabilmente `attiva: true`; la route Astro `missioni/[slugMis]/` puo filtrare su `slug`; stato personale da `partecipazioni_missione`.
+- Note binding Astro: per lista/dettaglio usare contenuti pubblicati e probabilmente `attiva: true`; la route Astro `missioni/[slugMis]/` puo filtrare su `slug`; stato personale da `partecipazioni_missione`. La lista `/missioni/` mostra missioni dei livelli sbloccati, escludendo il `Test di Smistamento`: per un Membro Livello 1 mostra gia le missioni di Livello 2, dal Livello 2 in poi usa `livello.ordine <= Membro.livello.ordine`.
 - Note schema: `slug` e un campo UID localizzato con `targetField: titolo`.
 - Dubbi aperti: confermare valori reali di `tipoFruizione`, tipo prova, tipo esito e regole di sblocco.
 

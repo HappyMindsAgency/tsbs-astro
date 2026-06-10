@@ -1,0 +1,226 @@
+---
+import type { Missione, MissioneLivello, PartecipazioneMissione } from '../strapi/missioni';
+
+type MissionCard = {
+	title: string;
+	description: string;
+	href: string;
+	progress: number;
+	meta: string;
+};
+
+type MissionTab = {
+	id: string;
+	label: string;
+	missions: MissionCard[];
+};
+
+type Props = {
+	missioni: Missione[];
+	partecipazioni: PartecipazioneMissione[];
+	livelloMembro: MissioneLivello | null;
+	testSmistamentoCompletato?: boolean;
+};
+
+const TEST_SMISTAMENTO_SLUG = 'test-smistamento';
+const FIRST_MISSION_LEVEL_ORDER = 2;
+const LEVEL_ORDER_BY_SLUG: Record<string, number> = {
+	'livello-1-adepto': 1,
+	'livello-2-iniziato': 2,
+	'livello-3-custode-novizio': 3,
+	'livello-4-custode': 4,
+};
+
+const { missioni = [], partecipazioni = [], livelloMembro = null, testSmistamentoCompletato = false } = Astro.props;
+
+function getPlainText(value: string | null | undefined) {
+	if (!value) return '';
+	return value
+		.replace(/[#*_>`[\]()]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+function getExcerpt(value: string | null | undefined) {
+	const plainText = getPlainText(value);
+	if (!plainText) return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
+	if (plainText.length <= 110) return plainText;
+
+	return `${plainText.slice(0, 107).trim()}...`;
+}
+
+function normalizeProgress(value: string | null | undefined, fallback = 0) {
+	if (!value) return fallback;
+
+	const progress = Number.parseFloat(value.replace(',', '.').replace('%', '').trim());
+	if (!Number.isFinite(progress)) return fallback;
+
+	return Math.min(100, Math.max(0, Math.round(progress)));
+}
+
+function normalizeOrder(value: number | string | null | undefined) {
+	const order = typeof value === 'number' ? value : Number.parseInt(String(value ?? ''), 10);
+	return Number.isFinite(order) ? order : null;
+}
+
+function getLevelOrder(level: MissioneLivello | null | undefined) {
+	const explicitOrder = normalizeOrder(level?.ordine);
+	if (explicitOrder !== null) return explicitOrder;
+
+	const slug = level?.slug?.trim();
+	if (slug && LEVEL_ORDER_BY_SLUG[slug]) return LEVEL_ORDER_BY_SLUG[slug];
+
+	return null;
+}
+
+function getMissionProgress(partecipazione: PartecipazioneMissione | undefined) {
+	if (partecipazione?.stato === 'completata') return 100;
+	return normalizeProgress(partecipazione?.progresso, 0);
+}
+
+function getUnlockedMissionLevelOrder(currentLevel: MissioneLivello | null, hasCompletedSorting: boolean) {
+	const currentLevelOrder = getLevelOrder(currentLevel);
+	if (currentLevelOrder === null && hasCompletedSorting) return FIRST_MISSION_LEVEL_ORDER;
+	if (currentLevelOrder === null) return null;
+
+	return Math.max(currentLevelOrder, FIRST_MISSION_LEVEL_ORDER);
+}
+
+function isMissioneVisibilePerLivello(missione: Missione, currentLevel: MissioneLivello | null, hasCompletedSorting: boolean) {
+	if (missione.slug === TEST_SMISTAMENTO_SLUG) return false;
+
+	const unlockedLevelOrder = getUnlockedMissionLevelOrder(currentLevel, hasCompletedSorting);
+	const missionLevelOrder = getLevelOrder(missione.livello);
+
+	if (unlockedLevelOrder === null || missionLevelOrder === null) return false;
+	return missionLevelOrder <= unlockedLevelOrder;
+}
+
+function sortMissioniByUnlockedLevel(a: Missione, b: Missione) {
+	const levelDiff = (getLevelOrder(b.livello) ?? 0) - (getLevelOrder(a.livello) ?? 0);
+	if (levelDiff !== 0) return levelDiff;
+
+	const missionDiff = (normalizeOrder(b.ordine) ?? 0) - (normalizeOrder(a.ordine) ?? 0);
+	if (missionDiff !== 0) return missionDiff;
+
+	return a.titolo.localeCompare(b.titolo, 'it-IT');
+}
+
+function toMissionCard(missione: Missione, partecipazione: PartecipazioneMissione | undefined): MissionCard {
+	const progress = getMissionProgress(partecipazione);
+
+	return {
+		title: missione.titolo,
+		description: getExcerpt(missione.descrizione),
+		href: `/missioni/${missione.slug}/`,
+		progress,
+		meta: `${progress}%`,
+	};
+}
+
+function buildMissionTabs(
+	missioni: Missione[],
+	partecipazioni: PartecipazioneMissione[],
+	currentLevel: MissioneLivello | null,
+	hasCompletedSorting: boolean,
+): MissionTab[] {
+	const partecipazioniByMissione = new Map<string, PartecipazioneMissione>();
+	for (const partecipazione of partecipazioni) {
+		const missioneSlug = partecipazione.missione?.slug;
+		if (missioneSlug) partecipazioniByMissione.set(missioneSlug, partecipazione);
+	}
+
+	const inCorso: MissionCard[] = [];
+	const completate: MissionCard[] = [];
+	const disponibili: MissionCard[] = [];
+	const visibleMissioni = missioni
+		.filter((missione) => isMissioneVisibilePerLivello(missione, currentLevel, hasCompletedSorting))
+		.sort(sortMissioniByUnlockedLevel);
+
+	for (const missione of visibleMissioni) {
+		const partecipazione = partecipazioniByMissione.get(missione.slug);
+		const missionCard = toMissionCard(missione, partecipazione);
+
+		if (partecipazione?.stato === 'completata') {
+			completate.push(missionCard);
+			continue;
+		}
+
+		if (partecipazione?.stato === 'inCorso') {
+			inCorso.push(missionCard);
+			continue;
+		}
+
+		disponibili.push(missionCard);
+	}
+
+	return [
+		{ id: 'in-corso', label: 'In corso', missions: inCorso },
+		{ id: 'completate', label: 'Completate', missions: completate },
+		{ id: 'disponibili', label: 'Disponibili', missions: disponibili },
+	];
+}
+
+const missionTabs = buildMissionTabs(missioni, partecipazioni, livelloMembro, testSmistamentoCompletato);
+const firstPopulatedTabIndex = missionTabs.findIndex((tab) => tab.missions.length > 0);
+const activeTabIndex = firstPopulatedTabIndex >= 0 ? firstPopulatedTabIndex : 0;
+---
+
+<ul class="nav missions-tabs" id="missions-tabs" role="tablist" aria-label="Stato missioni">
+	{missionTabs.map((tab, index) => (
+		<li class="nav-item missions-tabs__item" role="presentation">
+			<button
+				class={`nav-link missions-tabs__button ${index === activeTabIndex ? 'active' : ''}`}
+				id={`${tab.id}-tab`}
+				data-bs-toggle="tab"
+				data-bs-target={`#${tab.id}`}
+				type="button"
+				role="tab"
+				aria-controls={tab.id}
+				aria-selected={index === activeTabIndex ? 'true' : 'false'}
+			>
+				{tab.label}
+			</button>
+		</li>
+	))}
+</ul>
+
+<div class="tab-content missions-tab-content" id="missions-tabs-content">
+	{missionTabs.map((tab, tabIndex) => (
+		<div
+			class={`tab-pane fade ${tabIndex === activeTabIndex ? 'show active' : ''}`}
+			id={tab.id}
+			role="tabpanel"
+			aria-labelledby={`${tab.id}-tab`}
+			tabindex="0"
+		>
+			{tab.missions.length > 0 ? (
+				<>
+					<div class="missions-grid dashboard-task-grid">
+						{tab.missions.map((mission) => (
+							<a class="tsbs-card dashboard-task mission-card mission-card-link" href={mission.href} data-mission-card>
+								<div class="dashboard-task__header">
+									<div>
+										<h3 class="tsbs-accent-title">{mission.title}</h3>
+										<p>{mission.description}</p>
+									</div>
+								</div>
+								<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
+									<span style={`width: ${mission.progress}%`}></span>
+								</div>
+								<p class="dashboard-progress-label">{mission.meta}</p>
+							</a>
+						))}
+					</div>
+
+					<button class="missions-load-more" type="button" data-load-more aria-controls={tab.id}>
+						<span>Carica altro</span>
+						<i class="bi bi-arrow-right" aria-hidden="true"></i>
+					</button>
+				</>
+			) : (
+				<p class="missions-empty-message">nessuna missione disponibile</p>
+			)}
+		</div>
+	))}
+</div>
