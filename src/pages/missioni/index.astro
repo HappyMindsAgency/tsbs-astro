@@ -182,20 +182,7 @@ const activeTabIndex = firstPopulatedTabIndex >= 0 ? firstPopulatedTabIndex : 0;
 								</button>
 							</>
 						) : (
-							<div class="missions-grid dashboard-task-grid">
-								<article class="tsbs-card dashboard-task mission-card">
-									<div class="dashboard-task__header">
-										<div>
-											<h3 class="tsbs-accent-title">Nessuna missione</h3>
-											<p>Nessuna missione in questa sezione.</p>
-										</div>
-									</div>
-									<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label="Progresso 0%">
-										<span style="width: 0%"></span>
-									</div>
-									<p class="dashboard-progress-label">0%</p>
-								</article>
-							</div>
+							<p class="missions-empty-message">nessuna missione disponibile</p>
 						)}
 					</div>
 				))}

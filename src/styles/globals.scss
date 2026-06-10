@@ -1892,6 +1892,15 @@ body:has(.tsbs-legal-page) {
 		display: grid;
 	}
 
+	.missions-empty-message {
+		margin: 2.5rem auto 0;
+		color: var(--tsbs-color-heading);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.35;
+		text-align: center;
+	}
+
 	.mission-card.is-hidden {
 		display: none;
 	}
@@ -3650,6 +3659,10 @@ body:has(.tsbs-legal-page) {
 		.mission-proof-question__panel {
 			padding-top: 5rem;
 		}
+	}
+
+	.mission-proof .mission-component-title {
+		font-size: 1.8rem;
 	}
 // GRIMORIO
 	.grimorio-content,
