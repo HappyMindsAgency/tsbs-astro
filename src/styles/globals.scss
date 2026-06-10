@@ -4258,12 +4258,16 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.note-editor {
+		--note-editor-bg: color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-grimorio-note-bg));
+		--note-editor-border: #8d8f95;
+		--note-editor-line: color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
+
 		display: grid;
 		grid-template-rows: auto auto minmax(0, 1fr) auto;
 		min-height: 0;
 		overflow: hidden;
-		background: var(--tsbs-color-grimorio-note-bg);
-		border: 1px solid #8d8f95;
+		background: var(--note-editor-bg);
+		border: 1px solid var(--note-editor-border);
 		border-radius: 0.875rem;
 	}
 
@@ -4362,8 +4366,8 @@ body:has(.tsbs-legal-page) {
 			to bottom,
 			transparent 0,
 			transparent calc(1.75rem - 2px),
-			rgba(84, 97, 118, 0.22) calc(1.75rem - 2px),
-			rgba(84, 97, 118, 0.22) calc(1.75rem - 1px),
+			var(--note-editor-line) calc(1.75rem - 2px),
+			var(--note-editor-line) calc(1.75rem - 1px),
 			transparent calc(1.75rem - 1px),
 			transparent 1.75rem
 		);
@@ -4416,8 +4420,8 @@ body:has(.tsbs-legal-page) {
 			to bottom,
 			transparent 0,
 			transparent calc(1.15em - 0.18em),
-			rgba(84, 97, 118, 0.22) calc(1.15em - 0.18em),
-			rgba(84, 97, 118, 0.22) calc(1.15em - 0.15em),
+			var(--note-editor-line) calc(1.15em - 0.18em),
+			var(--note-editor-line) calc(1.15em - 0.15em),
 			transparent calc(1.15em - 0.15em),
 			transparent 1.15em
 		);
@@ -4433,8 +4437,8 @@ body:has(.tsbs-legal-page) {
 			to bottom,
 			transparent 0,
 			transparent calc(1.75rem - 0.1875rem),
-			rgba(84, 97, 118, 0.22) calc(1.75rem - 0.1875rem),
-			rgba(84, 97, 118, 0.22) calc(1.75rem - 0.125rem),
+			var(--note-editor-line) calc(1.75rem - 0.1875rem),
+			var(--note-editor-line) calc(1.75rem - 0.125rem),
 			transparent calc(1.75rem - 0.125rem),
 			transparent 1.75rem
 		);

@@ -3,6 +3,7 @@ import Layout from '../../../../layouts/Layout.astro';
 import Nav from '../../../../components/Nav.astro';
 import RitchText from '../../../../components/RitchText.astro';
 import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro } from '../../../../lib/strapi/grimorio';
+import { resolveUserContext } from '../../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
@@ -18,13 +19,14 @@ if (!slugNotaPub) {
 
 const membro = await getCurrentMembroFromJwt(jwt);
 const nota = membro ? await getGrimorioNotaBySlugForMembro(slugNotaPub, membro.id, lang) : null;
+const { theme, accademia } = await resolveUserContext(jwt);
 
 if (!nota) {
 	return Astro.redirect('/scrivania/grimorio/');
 }
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell note-page">

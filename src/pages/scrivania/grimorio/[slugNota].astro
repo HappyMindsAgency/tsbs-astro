@@ -3,15 +3,19 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import NotaModal from '../../../components/PopupComponents/NotaModal.astro';
 import NotaToast from '../../../components/toastComponents/NotaToast.astro';
+import { resolveUserContext } from '../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
+const jwt = Astro.cookies.get('jwt')?.value;
 
-if (!Astro.cookies.has('jwt')) {
+if (!jwt) {
 	return Astro.redirect('/');
 }
+
+const { theme, accademia } = await resolveUserContext(jwt);
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell note-page">
