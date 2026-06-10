@@ -50,7 +50,7 @@ const hasMultipleQuestions = questions.length > 1;
 								<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
 							</button>
 							<p class="mission-proof-question__progress" data-free-answer-progress aria-live="polite">
-								1/{questions.length}
+								Step 1/{questions.length}
 							</p>
 						</div>
 					)}
@@ -140,7 +140,7 @@ const hasMultipleQuestions = questions.length > 1;
 			submit.disabled = !hasAnswer();
 
 			if (back) back.disabled = currentPromptIndex === 0;
-			if (progress) progress.textContent = `${currentPromptIndex + 1}/${questions.length}`;
+			if (progress) progress.textContent = `Step ${currentPromptIndex + 1}/${questions.length}`;
 		};
 
 		input.addEventListener('input', () => {

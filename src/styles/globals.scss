@@ -3340,10 +3340,9 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.mission-proof-question__prompt-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		display: grid;
 		gap: 1rem;
+		justify-items: start;
 		width: 100%;
 	}
 
@@ -3351,20 +3350,20 @@ body:has(.tsbs-legal-page) {
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
+		justify-self: end;
 		gap: 0.5rem;
-		flex: 0 0 auto;
 	}
 
 	.mission-proof-question__back {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 2.25rem;
-		height: 2.25rem;
+		width: 1.75rem;
+		height: 1.75rem;
 		padding: 0;
 		color: var(--mission-proof-question-accent);
 		font-weight: 800;
-		font-size: 1.35rem;
+		font-size: 1.05rem;
 		line-height: 1;
 		background: transparent;
 		border: 0;
@@ -3379,6 +3378,7 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.mission-proof-question__back:disabled {
+		display: none;
 		color: #6f7280;
 		pointer-events: none;
 		background: transparent;
@@ -3389,9 +3389,9 @@ body:has(.tsbs-legal-page) {
 	.mission-proof-question__progress {
 		margin: 0;
 		color: var(--tsbs-color-heading);
-		font-size: 0.875rem;
+		font-size: 0.95rem;
 		font-weight: 800;
-		line-height: 1;
+		line-height: 1.15;
 		white-space: nowrap;
 	}
 
@@ -3430,7 +3430,7 @@ body:has(.tsbs-legal-page) {
 
 	.free-answer-mission__field {
 		display: grid;
-		gap: 0.75rem;
+		gap: 0.375rem;
 	}
 
 	.free-answer-mission__field label {
@@ -3480,7 +3480,7 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.choice-question__fieldset {
-		gap: 2.25rem;
+		gap: 0.75rem;
 		padding: 0;
 		margin: 0;
 		border: 0;

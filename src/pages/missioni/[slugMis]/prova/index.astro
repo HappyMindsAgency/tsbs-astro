@@ -3,6 +3,7 @@ import Layout from '../../../../layouts/Layout.astro';
 import Nav from '../../../../components/Nav.astro';
 import SceltaDomanda from '../../../../components/MissioniComponents/SceltaDomanda.astro';
 import RispostaLibera from '../../../../components/MissioniComponents/RispostaLibera.astro';
+import ProvaMissioneMista from '../../../../components/MissioniComponents/ProvaMissioneMista.astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
 import { resolveUserTheme } from '../../../../lib/theme';
 
@@ -38,8 +39,13 @@ const questions = rawQuestions.map((domanda) => ({
 	})),
 }));
 
-const isFreeAnswer = questions.every((domanda) => domanda.answers.length === 1);
-const ProvaComponent = isFreeAnswer ? RispostaLibera : SceltaDomanda;
+const questionComponentTypes = questions.map((domanda) => (domanda.answers.length === 1 ? 'free-answer' : 'choice-question'));
+const hasMixedQuestionComponents = new Set(questionComponentTypes).size > 1;
+const ProvaComponent = hasMixedQuestionComponents
+	? ProvaMissioneMista
+	: questionComponentTypes[0] === 'free-answer'
+		? RispostaLibera
+		: SceltaDomanda;
 ---
 
 <Layout lang={locale} theme={theme}>

@@ -1,0 +1,306 @@
+---
+import { marked } from 'marked';
+import TestPassed from '../toastComponents/TestPassed.astro';
+import TestNotPassed from '../toastComponents/TestNotPassed.astro';
+
+const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props;
+
+const fallbackQuestions = [
+	{
+		question: 'Descrizione dell’azione da compiere',
+		answers: [{ label: 'Risposta libera' }],
+	},
+];
+
+const questions = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
+const firstQuestion = questions[0];
+const firstQuestionIsFreeAnswer = firstQuestion.answers.length === 1;
+const title = firstQuestion.question;
+const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
+const quote = missione?.quiz?.descrizione?.trim() || '';
+const openQuoteLinksInNewTab = (html: string) =>
+	html.replace(/<a\s(?![^>]*\btarget=)/g, '<a target="_blank" rel="noopener noreferrer" ');
+const rawQuoteContent = quote ? marked.parse(quote, { async: false }) : '';
+const quoteContent = slugMis === 'missione-01-il-varco' ? openQuoteLinksInNewTab(rawQuoteContent) : rawQuoteContent;
+const hasMultipleQuestions = questions.length > 1;
+const rootClass = `mission-proof-question ${firstQuestionIsFreeAnswer ? 'free-answer-mission' : 'choice-question'}`;
+const panelClass = `container-xl tsbs-app-container mission-proof-question__panel ${
+	firstQuestionIsFreeAnswer ? 'free-answer-mission__panel' : 'choice-question__panel'
+}`;
+const formClass = firstQuestionIsFreeAnswer ? 'free-answer-mission__form' : 'choice-question__form';
+const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
+	firstQuestionIsFreeAnswer ? 'free-answer-mission__cta' : 'choice-question__cta'
+}`;
+---
+
+<article class={rootClass} data-mixed-question data-lang={lang} aria-label="Prova missione">
+	<header class="mission-proof-question__header">
+		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
+			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
+			<h1 class="mission-proof-question__title mission-component-title">{title}</h1>
+		</div>
+	</header>
+
+	<div class={panelClass} data-mixed-question-panel>
+		{quote && (
+			<blockquote class="free-answer-mission__quote" data-mixed-question-quote hidden={!firstQuestionIsFreeAnswer} set:html={quoteContent} />
+		)}
+
+		<form class={formClass} data-mixed-question-form>
+			<div class="free-answer-mission__field" data-mixed-free-field hidden={!firstQuestionIsFreeAnswer}>
+				<div class="mission-proof-question__prompt-row">
+					<label for="mission-mixed-free-answer" data-mixed-free-instruction>{firstQuestion.question}</label>
+
+					{hasMultipleQuestions && (
+						<div class="mission-proof-question__step-controls">
+							<button class="btn mission-proof-question__back" type="button" data-mixed-question-back disabled aria-label="Torna alla domanda precedente">
+								<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
+								</button>
+								<p class="mission-proof-question__progress" data-mixed-question-progress aria-live="polite">
+									Step 1/{questions.length}
+								</p>
+							</div>
+						)}
+				</div>
+				<textarea
+					id="mission-mixed-free-answer"
+					name="risposta-libera"
+					rows="8"
+					placeholder="Inserisci qui la tua risposta"
+					aria-label="Risposta libera"
+					data-mixed-free-input
+				></textarea>
+			</div>
+
+			<fieldset class="choice-question__fieldset" data-mixed-choice-fieldset hidden={firstQuestionIsFreeAnswer}>
+				<div class="mission-proof-question__prompt-row">
+					<legend data-mixed-choice-title>Scegli una sola risposta</legend>
+
+					{hasMultipleQuestions && (
+						<div class="mission-proof-question__step-controls">
+							<button class="btn mission-proof-question__back" type="button" data-mixed-question-back disabled aria-label="Torna alla domanda precedente">
+								<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
+								</button>
+								<p class="mission-proof-question__progress" data-mixed-question-progress aria-live="polite">
+									Step 1/{questions.length}
+								</p>
+							</div>
+						)}
+				</div>
+
+				<div class="choice-question__answers" data-mixed-choice-answers>
+					{firstQuestion.answers.map((answer, index) => (
+						<label class="choice-question__answer" for={`mission-mixed-answer-0-${index}`}>
+							<input id={`mission-mixed-answer-0-${index}`} type="radio" name="risposta" value={answer.label} />
+							<span class="choice-question__answer-label">{answer.label}</span>
+							{answer.description && <span class="choice-question__answer-description">{answer.description}</span>}
+						</label>
+					))}
+				</div>
+			</fieldset>
+
+			<div class={`mission-proof-question__actions ${firstQuestionIsFreeAnswer ? '' : 'mission-proof-question__actions--choice'}`} data-mixed-question-actions>
+				<button class={submitClass} type="submit" data-mixed-question-submit disabled>
+					Avanti →
+				</button>
+			</div>
+		</form>
+	</div>
+
+	<TestPassed renderHidden={true} />
+	<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
+</article>
+
+<script define:vars={{ questions, slugMis }}>
+	const setupMixedQuestionMission = () => {
+		const root = document.querySelector('[data-mixed-question]');
+		if (!root || root.dataset.mixedQuestionReady === 'true') return;
+		root.dataset.mixedQuestionReady = 'true';
+
+		const panel = root.querySelector('[data-mixed-question-panel]');
+		const quote = root.querySelector('[data-mixed-question-quote]');
+		const form = root.querySelector('[data-mixed-question-form]');
+		const freeField = root.querySelector('[data-mixed-free-field]');
+		const freeInstruction = root.querySelector('[data-mixed-free-instruction]');
+		const freeInput = root.querySelector('[data-mixed-free-input]');
+		const choiceFieldset = root.querySelector('[data-mixed-choice-fieldset]');
+		const choiceTitle = root.querySelector('[data-mixed-choice-title]');
+		const choiceAnswers = root.querySelector('[data-mixed-choice-answers]');
+		const actions = root.querySelector('[data-mixed-question-actions]');
+		const submit = root.querySelector('[data-mixed-question-submit]');
+		const backButtons = root.querySelectorAll('[data-mixed-question-back]');
+		const progressElements = root.querySelectorAll('[data-mixed-question-progress]');
+		const passedToast = root.querySelector('.test-result-toast--passed');
+		const notPassedToast = root.querySelector('.test-result-toast--not-passed');
+
+		if (!panel || !form || !freeField || !freeInstruction || !freeInput || !choiceFieldset || !choiceTitle || !choiceAnswers || !actions || !submit || !passedToast || !notPassedToast) return;
+
+		let currentQuestionIndex = 0;
+		const submittedAnswers = new Array(questions.length).fill('');
+
+		const getQuestionMode = (question) => (question.answers.length === 1 ? 'free' : 'choice');
+		const getSelectedAnswer = () => choiceAnswers.querySelector('input[name="risposta"]:checked')?.value ?? '';
+		const getCurrentAnswer = () => (getQuestionMode(questions[currentQuestionIndex]) === 'free' ? freeInput.value.trim() : getSelectedAnswer());
+		const hasCurrentAnswer = () => getCurrentAnswer().length > 0;
+
+		const showResultToast = (passed) => {
+			passedToast.hidden = !passed;
+			notPassedToast.hidden = passed;
+		};
+
+		const validateMissionProof = async () => {
+			submit.disabled = true;
+
+			try {
+				const response = await fetch(`/api/missioni/${slugMis}/prova`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						answers: submittedAnswers.map((answer, questionIndex) => ({ questionIndex, answer })),
+					}),
+				});
+				const payload = await response.json().catch(() => null);
+
+				showResultToast(response.ok && payload?.passed === true);
+			} catch {
+				showResultToast(false);
+			} finally {
+				submit.disabled = false;
+			}
+		};
+
+		const renderChoiceAnswers = (question, savedAnswer) => {
+			choiceAnswers.replaceChildren(
+				...question.answers.map((answer, answerIndex) => {
+					const id = `mission-mixed-answer-${currentQuestionIndex}-${answerIndex}`;
+					const label = document.createElement('label');
+					const input = document.createElement('input');
+					const answerLabel = document.createElement('span');
+
+					label.className = 'choice-question__answer';
+					label.setAttribute('for', id);
+					input.id = id;
+					input.type = 'radio';
+					input.name = 'risposta';
+					input.value = answer.label;
+					input.checked = answer.label === savedAnswer;
+					answerLabel.className = 'choice-question__answer-label';
+					answerLabel.textContent = answer.label;
+					label.append(input, answerLabel);
+
+					if (answer.description) {
+						const answerDescription = document.createElement('span');
+						answerDescription.className = 'choice-question__answer-description';
+						answerDescription.textContent = answer.description;
+						label.append(answerDescription);
+					}
+
+					return label;
+				}),
+			);
+		};
+
+		const setModeClasses = (mode) => {
+			const isFreeAnswer = mode === 'free';
+
+			root.classList.toggle('free-answer-mission', isFreeAnswer);
+			root.classList.toggle('choice-question', !isFreeAnswer);
+			panel.classList.toggle('free-answer-mission__panel', isFreeAnswer);
+			panel.classList.toggle('choice-question__panel', !isFreeAnswer);
+			form.classList.toggle('free-answer-mission__form', isFreeAnswer);
+			form.classList.toggle('choice-question__form', !isFreeAnswer);
+			submit.classList.toggle('free-answer-mission__cta', isFreeAnswer);
+			submit.classList.toggle('choice-question__cta', !isFreeAnswer);
+			actions.classList.toggle('mission-proof-question__actions--choice', !isFreeAnswer);
+			freeField.hidden = !isFreeAnswer;
+			choiceFieldset.hidden = isFreeAnswer;
+			if (quote) quote.hidden = !isFreeAnswer;
+		};
+
+		const renderQuestion = () => {
+			const currentQuestion = questions[currentQuestionIndex];
+			const mode = getQuestionMode(currentQuestion);
+			const isLastQuestion = currentQuestionIndex === questions.length - 1;
+			const savedAnswer = submittedAnswers[currentQuestionIndex] || '';
+			const headerTitle = root.querySelector('.mission-proof-question__title');
+
+			setModeClasses(mode);
+			if (headerTitle) headerTitle.textContent = currentQuestion.question;
+
+			if (mode === 'free') {
+				freeInstruction.textContent = currentQuestion.question;
+				freeInput.value = savedAnswer;
+				freeInput.setAttribute('placeholder', 'Inserisci qui la tua risposta');
+			} else {
+				choiceTitle.textContent = 'Scegli una sola risposta';
+				renderChoiceAnswers(currentQuestion, savedAnswer);
+			}
+
+			submit.innerHTML = isLastQuestion
+				? `<span>Concludi la prova</span><i class="bi bi-stars ${mode === 'free' ? 'free-answer-mission__complete-icon' : 'choice-question__complete-icon'}" aria-hidden="true"></i>`
+				: 'Avanti →';
+			submit.disabled = !hasCurrentAnswer();
+
+			backButtons.forEach((back) => {
+				back.disabled = currentQuestionIndex === 0;
+			});
+			progressElements.forEach((progress) => {
+				progress.textContent = `Step ${currentQuestionIndex + 1}/${questions.length}`;
+			});
+		};
+
+		freeInput.addEventListener('input', () => {
+			submit.disabled = !hasCurrentAnswer();
+		});
+
+		choiceAnswers.addEventListener('change', () => {
+			submit.disabled = !hasCurrentAnswer();
+		});
+
+		backButtons.forEach((back) => {
+			back.addEventListener('click', () => {
+				if (currentQuestionIndex === 0) return;
+				submittedAnswers[currentQuestionIndex] = getCurrentAnswer();
+				currentQuestionIndex -= 1;
+				renderQuestion();
+			});
+		});
+
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+
+			if (!hasCurrentAnswer()) return;
+			submittedAnswers[currentQuestionIndex] = getCurrentAnswer();
+
+			if (currentQuestionIndex < questions.length - 1) {
+				currentQuestionIndex += 1;
+				renderQuestion();
+				return;
+			}
+
+			validateMissionProof();
+		});
+
+		renderQuestion();
+	};
+
+	document.addEventListener('astro:page-load', setupMixedQuestionMission);
+	setupMixedQuestionMission();
+</script>
+
+<style lang="scss">
+	.free-answer-mission__cta,
+	.choice-question__cta {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.free-answer-mission__complete-icon,
+	.choice-question__complete-icon {
+		color: var(--tsbs-color-white);
+		font-size: 1.125rem;
+		line-height: 1;
+	}
+</style>
