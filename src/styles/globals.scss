@@ -4272,6 +4272,7 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.note-editor--published {
+		align-content: start;
 		grid-template-rows: auto auto;
 		overflow: visible;
 	}
@@ -4421,6 +4422,8 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.note-editor__body--published {
+		--note-editor-published-line: rgba(84, 97, 118, 0.22);
+
 		padding-top: 2rem;
 		line-height: 1.75rem;
 		overflow: visible;
@@ -4436,8 +4439,8 @@ body:has(.tsbs-legal-page) {
 			to bottom,
 			transparent 0,
 			transparent calc(1.15em - 0.18em),
-			var(--note-editor-line) calc(1.15em - 0.18em),
-			var(--note-editor-line) calc(1.15em - 0.15em),
+			var(--note-editor-published-line) calc(1.15em - 0.18em),
+			var(--note-editor-published-line) calc(1.15em - 0.15em),
 			transparent calc(1.15em - 0.15em),
 			transparent 1.15em
 		);
@@ -4453,8 +4456,8 @@ body:has(.tsbs-legal-page) {
 			to bottom,
 			transparent 0,
 			transparent calc(1.75rem - 0.1875rem),
-			var(--note-editor-line) calc(1.75rem - 0.1875rem),
-			var(--note-editor-line) calc(1.75rem - 0.125rem),
+			var(--note-editor-published-line) calc(1.75rem - 0.1875rem),
+			var(--note-editor-published-line) calc(1.75rem - 0.125rem),
 			transparent calc(1.75rem - 0.125rem),
 			transparent 1.75rem
 		);
