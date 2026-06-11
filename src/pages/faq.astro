@@ -1,0 +1,93 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import { resolveUserContext } from '../lib/theme';
+
+const { lang = 'it' } = Astro.props;
+
+const faqItems = [
+	{
+		id: 'faq-accesso',
+		question: 'Lorem ipsum dolor sit amet?',
+		answer: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae sem sed lorem fermentum luctus non vitae risus.',
+	},
+	{
+		id: 'faq-missioni',
+		question: 'Consectetur adipiscing elit?',
+		answer: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.',
+	},
+	{
+		id: 'faq-accademie',
+		question: 'Integer vitae sem sed lorem?',
+		answer: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+	},
+	{
+		id: 'faq-scrivania',
+		question: 'Aliquam erat volutpat?',
+		answer: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+	},
+	{
+		id: 'faq-biblioteca',
+		question: 'Praesent commodo cursus magna?',
+		answer: 'Curabitur blandit tempus porttitor. Donec ullamcorper nulla non metus auctor fringilla.',
+	},
+];
+
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
+
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+---
+
+<Layout lang={lang} theme={theme} accademia={accademia}>
+	<Nav lang={lang} />
+
+	<main class="tsbs-app-shell missions-shell faq-page">
+		<header class="missions-header faq-header">
+			<h1>F.A.Q.</h1>
+		</header>
+
+		<section class="container-xl tsbs-app-container faq-content" aria-labelledby="faq-title">
+			<div class="faq-intro">
+				<h2 id="faq-title">Lorem ipsum dolor sit amet</h2>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed odio dui. Nulla vitae elit libero, a pharetra augue.</p>
+			</div>
+
+			<div class="accordion faq-accordion" id="faq-accordion">
+				{faqItems.map((item) => {
+					const headingId = `${item.id}-heading`;
+					const panelId = `${item.id}-panel`;
+
+					return (
+						<div class="accordion-item faq-accordion__item">
+							<h3 class="accordion-header" id={headingId}>
+								<button
+									class="accordion-button faq-accordion__button collapsed"
+									type="button"
+									data-bs-toggle="collapse"
+									data-bs-target={`#${panelId}`}
+									aria-expanded="false"
+									aria-controls={panelId}
+								>
+									{item.question}
+								</button>
+							</h3>
+
+							<div
+								id={panelId}
+								class="accordion-collapse collapse"
+								aria-labelledby={headingId}
+								data-bs-parent="#faq-accordion"
+							>
+								<div class="accordion-body faq-accordion__body">
+									<p>{item.answer}</p>
+								</div>
+							</div>
+						</div>
+					);
+				})}
+			</div>
+		</section>
+	</main>
+</Layout>

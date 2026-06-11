@@ -2451,6 +2451,154 @@ body:has(.tsbs-legal-page) {
 		}
 	}
 
+// PAGINA FAQ
+	body:has(.faq-page) {
+		background-color: var(--tsbs-color-surface);
+		background-image: none;
+	}
+
+	.faq-page {
+		min-height: 100vh;
+		background: var(--tsbs-color-surface);
+	}
+
+	.faq-content {
+		display: grid;
+		gap: 1.5rem;
+		margin: 0 auto;
+	}
+
+	.faq-intro {
+		display: grid;
+		gap: 0.75rem;
+		color: var(--tsbs-color-body);
+	}
+
+	.faq-intro h2 {
+		width: 100%;
+		max-width: none;
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-size: clamp(1.75rem, 7vw, 2.5rem);
+		font-weight: 800;
+		line-height: 1.08;
+	}
+
+	.faq-intro p {
+		width: 100%;
+		max-width: none;
+		margin: 0;
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+
+	.faq-accordion {
+		display: grid;
+		gap: 0.875rem;
+	}
+
+	.faq-accordion__item {
+		overflow: hidden;
+		color: var(--tsbs-color-body);
+		background: #f5f5f5;
+		border: 1px solid color-mix(in srgb, var(--tsbs-color-body) 38%, var(--tsbs-color-white));
+		border-radius: 0.5rem;
+	}
+
+	.faq-accordion__item:first-of-type,
+	.faq-accordion__item:last-of-type {
+		border-radius: 0.5rem;
+	}
+
+	.faq-accordion__item + .faq-accordion__item {
+		border-top: 1px solid color-mix(in srgb, var(--tsbs-color-body) 38%, var(--tsbs-color-white));
+	}
+
+	.faq-accordion__button {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		min-height: 4rem;
+		padding: 1rem;
+		color: var(--tsbs-color-heading);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1.2;
+		background: #f5f5f5;
+		border-radius: 0.5rem;
+		box-shadow: none;
+	}
+
+	.faq-accordion__item:first-of-type > .accordion-header .faq-accordion__button,
+	.faq-accordion__item:last-of-type > .accordion-header .faq-accordion__button.collapsed {
+		border-radius: 0.5rem;
+	}
+
+	.faq-accordion__button.collapsed,
+	.faq-accordion__button.collapsed:hover,
+	.faq-accordion__button.collapsed:focus {
+		color: var(--tsbs-color-heading);
+		background: #f5f5f5;
+		box-shadow: none;
+	}
+
+	.faq-accordion__button:not(.collapsed) {
+		color: var(--tsbs-theme-accent);
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 9%, #f5f5f5);
+		border-radius: 0.5rem 0.5rem 0 0;
+		box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
+	}
+
+	.faq-accordion__button:not(.collapsed):hover,
+	.faq-accordion__button:not(.collapsed):focus {
+		color: var(--tsbs-theme-accent);
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 7%, #f5f5f5);
+		box-shadow: none;
+	}
+
+	.faq-accordion__button::after {
+		flex: 0 0 auto;
+		margin-left: auto;
+		filter: grayscale(1);
+	}
+
+	.faq-accordion__button:not(.collapsed)::after {
+		filter: none;
+	}
+
+	.faq-accordion__body {
+		padding: 1rem;
+		background: color-mix(in srgb, var(--tsbs-color-surface) 50%, #f5f5f5);
+		border-radius: 0 0 0.5rem 0.5rem;
+	}
+
+	.faq-accordion__body p {
+		margin: 0;
+		font-size: 0.9375rem;
+		line-height: 1.5;
+	}
+
+	@media (min-width: 768px) {
+		.faq-content {
+			max-width: calc(58rem + var(--bs-gutter-x));
+			gap: 2rem;
+			padding-top: 2.75rem;
+		}
+
+		.faq-accordion {
+			gap: 1rem;
+		}
+
+		.faq-accordion__button {
+			padding: 1.125rem 1.25rem;
+			font-size: 1.0625rem;
+		}
+
+		.faq-accordion__body {
+			padding: 1.125rem 1.25rem 1.25rem;
+		}
+	}
+
 // PAGINA BIBLIOTECA - LE ACCADEMIE
 	.biblioteca-academies-page {
 		min-height: 100vh;
