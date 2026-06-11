@@ -4,6 +4,7 @@ import Nav from '../../../../components/Nav.astro';
 import SceltaDomanda from '../../../../components/MissioniComponents/SceltaDomanda.astro';
 import RispostaLibera from '../../../../components/MissioniComponents/RispostaLibera.astro';
 import ProvaMissioneMista from '../../../../components/MissioniComponents/ProvaMissioneMista.astro';
+import NotaEditor from '../../../../components/GrimorioComponents/NotaEditor.astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
 import { resolveUserTheme } from '../../../../lib/theme';
 
@@ -18,6 +19,7 @@ if (!jwt) {
 
 const { slugMis } = Astro.params;
 const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
+const MISSIONE_GRIMORIO_SLUG = 'missione-02-il-segno';
 
 if (!slugMis) {
 	return Astro.redirect('/404');
@@ -25,10 +27,16 @@ if (!slugMis) {
 
 const theme = await resolveUserTheme(jwt);
 const missione = await getMissioneBySlug(slugMis, locale);
+
+if (!missione) {
+	return Astro.redirect('/404');
+}
+
+const isMissioneGrimorio = missione.slug === MISSIONE_GRIMORIO_SLUG;
 const rawQuestions = missione?.quiz?.domande ?? [];
 const hasAnswerElements = rawQuestions.some((domanda) => (domanda.risposte || []).length > 0);
 
-if (!missione?.quiz || rawQuestions.length === 0 || !hasAnswerElements) {
+if (!isMissioneGrimorio && (!missione?.quiz || rawQuestions.length === 0 || !hasAnswerElements)) {
 	return Astro.redirect('/404');
 }
 
@@ -52,6 +60,18 @@ const ProvaComponent = hasMixedQuestionComponents
 	<Nav lang={locale} />
 
 	<main class="tsbs-app-shell mission-proof">
-		<ProvaComponent missione={missione} questions={questions} lang={locale} slugMis={slugMis} />
+		{isMissioneGrimorio ? (
+			<section class="missions-shell note-page">
+				<header class="missions-header">
+					<h1>{missione.titolo}</h1>
+				</header>
+
+				<div class="container-xl tsbs-app-container note-page__content">
+					<NotaEditor missioneSlug={missione.slug} />
+				</div>
+			</section>
+		) : (
+			<ProvaComponent missione={missione} questions={questions} lang={locale} slugMis={slugMis} />
+		)}
 	</main>
 </Layout>

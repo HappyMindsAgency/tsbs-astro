@@ -20,6 +20,33 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-11 - Missione 02 Come Scrittura Nel Grimorio
+
+Decisione:
+- la `Missione 02: Il Segno` usa lo slug `missione-02-il-segno`
+- la prova della missione non richiede `Quiz` e non dipende da `Missione.tipoFruizione`
+- la pagina `/missioni/missione-02-il-segno/prova/` mostra l'editor del Grimorio
+- al salvataggio di una nota valida nel Grimorio, anche come bozza privata, la missione viene considerata superata
+- la nota nasce con `visibilePubblico: false`
+- l'azione `Invia al Prefetto` resta distinta dalla progressione missione: serve a proporre la nota alla valutazione editoriale, senza pubblicarla automaticamente
+- finche Strapi non espone un campo dedicato allo stato editoriale del Grimorio, la pubblicazione pubblica resta governata manualmente da `visibilePubblico`
+
+Motivo:
+- l'obiettivo della missione e far lasciare all'utente il primo segno nel proprio Grimorio
+- la progressione personale non deve dipendere dai tempi di validazione dei Prefetti
+- il flusso mantiene separati dato personale, completamento missione e selezione editoriale pubblica
+
+Impatto:
+- `src/pages/missioni/[slugMis]/prova/index.astro`
+- `src/components/GrimorioComponents/NotaEditor.astro`
+- `src/pages/api/grimorio/note.ts`
+- `src/pages/scrivania/grimorio/[slugNota].astro`
+- `src/styles/globals.scss`
+- compilazione richiesta su Strapi: `Missione.slug = missione-02-il-segno`, `Missione.opzionale = false`, `Missione.attiva = true`, relazione a `Livello 2 - Iniziato`
+
+Stato:
+- approvata
+
 ## 2026-06-10 - Filtro Missioni Per Livelli Sbloccati
 
 Decisione:
