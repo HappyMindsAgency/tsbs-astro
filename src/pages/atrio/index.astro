@@ -5,13 +5,32 @@ import ImpostazioniLogoutModal from '../../components/PopupComponents/Impostazio
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
 import { resolveUserContext } from '../../lib/theme';
 import { getEventiClassense, CLASSENSE_CALENDARIO_URL } from '../../lib/classense';
+import { getFirstIncompleteMissionCards } from '../../lib/filtri/missioni';
+import {
+	getMembroMissioniByJwt,
+	getMissioniAttive,
+	getPartecipazioniMissioneByJwt,
+} from '../../lib/strapi/missioni';
 const { lang = 'it' } = Astro.props;
 
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+const jwt = Astro.cookies.get('jwt')?.value;
+const [
+	{ theme, accademia },
+	eventiClassense,
+	missioniAttive,
+	partecipazioniMissione,
+	membroMissioni,
+] = await Promise.all([
+	resolveUserContext(jwt),
+	getEventiClassense(),
+	getMissioniAttive(lang),
+	jwt ? getPartecipazioniMissioneByJwt(jwt, lang) : Promise.resolve([]),
+	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
+]);
 
 const WELCOME_EPISTOLA_BY_ACADEMY = {
 	arborea: 'arborea-corrado-ricci-al-raggiungimento-del-livello-2-iniziato',
@@ -20,16 +39,17 @@ const WELCOME_EPISTOLA_BY_ACADEMY = {
 	astraria: 'astraria-maria-ponti-pasolini-al-raggiungimento-del-livello-2-iniziato',
 };
 
-const tasks = [
-	{ title: 'Lorem ipsum dolor', progress: 65 },
-	{ title: 'Lorem ipsum dolor', progress: 65 },
-];
-
-const eventiClassense = await getEventiClassense();
-
 const welcomeEpistolaSlug = WELCOME_EPISTOLA_BY_ACADEMY[accademia];
 const featuredEpistleHref = welcomeEpistolaSlug ? `/epistole/${welcomeEpistolaSlug}/` : '/epistole/';
 const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
+const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
+const taskCards = getFirstIncompleteMissionCards(
+	missioniAttive,
+	partecipazioniMissione,
+	membroMissioni?.livello ?? null,
+	testSmistamentoCompletato,
+	2,
+);
 
 ---
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -70,22 +90,26 @@ const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
 				<h2 id="tasks-title" class="tsbs-section-title">Completa le Missioni</h2>
 				<a class="tsbs-accent-link" href="/missioni/">Vedi tutti →</a>
 			</div>
-			<div class="dashboard-task-grid">
-				{tasks.map((task) => (
-					<article class="tsbs-card dashboard-task">
-						<div class="dashboard-task__header">
-							<div>
-								<h3 class="tsbs-accent-title">{task.title}</h3>
-								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+			{taskCards.length > 0 ? (
+				<div class="dashboard-task-grid">
+					{taskCards.map((task) => (
+						<a class="tsbs-card dashboard-task mission-card-link" href={task.href}>
+							<div class="dashboard-task__header">
+								<div>
+									<h3 class="tsbs-accent-title">{task.title}</h3>
+									<p>{task.description}</p>
+								</div>
 							</div>
-						</div>
-						<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${task.progress}%`}>
-							<span style={`width: ${task.progress}%`}></span>
-						</div>
-						<p class="dashboard-progress-label">{task.progress}%</p>
-					</article>
-				))}
-			</div>
+							<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${task.meta}`}>
+								<span style={`width: ${task.progress}%`}></span>
+							</div>
+							<p class="dashboard-progress-label">{task.meta}</p>
+						</a>
+					))}
+				</div>
+			) : (
+				<p class="missions-empty-message">nessuna missione disponibile</p>
+			)}
 		</section>
 
 		<section class="dashboard-section dashboard-grimoire" aria-labelledby="grimoire-title">

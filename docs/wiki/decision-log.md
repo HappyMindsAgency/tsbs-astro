@@ -103,16 +103,20 @@ Decisione:
 - per robustezza, se `Livello.ordine` non e ancora compilato su Strapi, il frontend ricava l'ordine dagli slug noti dei livelli; se un Membro ha Accademia ma livello vuoto, viene trattato come smistato e vede le missioni del Livello 2
 - l'ordinamento delle missioni visibili segue la progressione narrativa: prima il livello piu basso, poi i successivi; dentro ogni livello usa `Missione.ordine` dal numero piu piccolo al piu grande, con le missioni senza ordine in fondo
 - le missioni prive di livello non vengono mostrate dalla lista; le missioni extra/finali non ancora pronte devono restare `attiva: false`
+- l'Atrio usa la stessa regola di visibilita e ordinamento per mostrare le prime due missioni non completate dal Membro
 - la logica di sblocco puntuale delle singole missioni non appartiene a questo filtro e resta fuori dallo scope
 
 Motivo:
 - usare la relazione Strapi gia prevista `Missione.livello` evita di duplicare i livelli dentro `Categoria Missione`
 - il filtro deve rispondere al livello del Membro, non alla categoria editoriale della missione
 - mostrare anche i livelli precedenti permette all'utente di recuperare missioni non completate dopo l'avanzamento
+- condividere la logica tra lista Missioni e Atrio evita ordinamenti o disponibilita divergenti tra hub e archivio missioni
 
 Impatto:
 - `src/lib/strapi/missioni.ts`
+- `src/lib/filtri/missioni.ts`
 - `src/lib/filtri/FiltroMissioni.astro`
+- `src/pages/atrio/index.astro`
 - `src/pages/missioni/index.astro`
 - `src/pages/api/user/accademia.ts`
 - compilazione richiesta su Strapi: `Livello.ordine`, `Missione.livello`, `Membro.livello`
