@@ -96,6 +96,18 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 					))}
 				</div>
 			</section>
+
+			<section class="biblioteca-faq-box" aria-labelledby="biblioteca-faq-title">
+				<div class="biblioteca-faq-box__copy">
+					<h2 id="biblioteca-faq-title">Hai dubbi sul percorso?</h2>
+					<p>Consulta le F.A.Q. per orientarti tra accesso, missioni, Accademie e strumenti della Società.</p>
+				</div>
+
+				<a class="biblioteca-faq-box__link" href="/faq/" aria-label="Vai alla pagina F.A.Q.">
+					<span>Apri le F.A.Q.</span>
+					<i class="bi bi-arrow-right" aria-hidden="true"></i>
+				</a>
+			</section>
 		</section>
 	</main>
 </Layout>
