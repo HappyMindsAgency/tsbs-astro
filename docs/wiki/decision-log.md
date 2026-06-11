@@ -20,6 +20,25 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-11 - Box Epistola In Atrio Collegato All'Accademia
+
+Decisione:
+- il box Epistole dell'Atrio non mostra l'ultima epistola pubblicata
+- il box usa testi statici uguali per tutte le Accademie
+- la CTA `Leggi l'Epistola` punta all'epistola di benvenuto del Livello 2 - Iniziato collegata all'Accademia del Membro
+- gli slug usati sono quelli editoriali Strapi delle quattro epistole di benvenuto: Arborea/Corrado Ricci, Arcadia/Santi Muratori, Armonia/Barbara Longhi, Astraria/Maria Ponti Pasolini
+
+Motivo:
+- l'Atrio deve guidare l'utente verso il messaggio narrativo corretto per la sua Accademia, senza dipendere dall'ordine cronologico dell'Archivio Epistole
+- mantenere testi identici evita varianti narrative non approvate e lascia cambiare solo la destinazione del link
+
+Impatto:
+- `src/pages/atrio/index.astro`
+- compilazione richiesta su Strapi: gli slug delle epistole di benvenuto devono restare coerenti con la mappa frontend
+
+Stato:
+- approvata
+
 ## 2026-06-11 - Filtro Epistole Per Accademia E Livelli Sbloccati
 
 Decisione:
