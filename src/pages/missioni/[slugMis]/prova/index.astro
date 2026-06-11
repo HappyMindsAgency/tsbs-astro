@@ -5,6 +5,7 @@ import SceltaDomanda from '../../../../components/MissioniComponents/SceltaDoman
 import RispostaLibera from '../../../../components/MissioniComponents/RispostaLibera.astro';
 import ProvaMissioneMista from '../../../../components/MissioniComponents/ProvaMissioneMista.astro';
 import NotaEditor from '../../../../components/GrimorioComponents/NotaEditor.astro';
+import TrofeoModal from '../../../../components/PopupComponents/TrofeoModal.astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
 import { resolveUserTheme } from '../../../../lib/theme';
 
@@ -74,4 +75,6 @@ const ProvaComponent = hasMixedQuestionComponents
 			<ProvaComponent missione={missione} questions={questions} lang={locale} slugMis={slugMis} />
 		)}
 	</main>
+
+	<TrofeoModal theme={theme} />
 </Layout>

@@ -180,8 +180,15 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 					}),
 				});
 				const payload = await response.json().catch(() => null);
+				const passed = response.ok && payload?.passed === true;
+				const trofei = Array.isArray(payload?.trofeiSbloccati) ? payload.trofeiSbloccati : [];
 
-				showResultToast(response.ok && payload?.passed === true);
+				// Trofeo confermato dal server: la modale trofeo sostituisce il toast esito.
+				if (passed && trofei.length > 0) {
+					document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', { detail: { trofei } }));
+				} else {
+					showResultToast(passed);
+				}
 			} catch {
 				showResultToast(false);
 			} finally {

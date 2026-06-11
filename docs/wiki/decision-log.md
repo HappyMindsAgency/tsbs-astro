@@ -20,6 +20,64 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-11 - Motore Progressione: Missioni, Trofei, Punti E Level-Up
+
+Decisione:
+- centralizzare in `src/lib/strapi/progressione.ts` la logica server-side di progressione: registrazione tentativi, completamento missione, assegnazione trofei/punti e level-up; il frontend richiede l'azione e renderizza l'esito
+- `datiRuntime` delle partecipazioni usa il formato consigliato `{ "tentativi": [ { "dataTentativo": "YYYY-MM-DD", "esito": bool, "risposte": {...} } ] }` con date ISO e fuso `Europe/Rome`; eventuali chiavi numeriche legacy vengono migrate in lettura
+- idempotenza "solo la prima volta": prima di creare un `Trofeo-membro` si verifica che non esista gia per membro+trofeo; i premi (trofeo + punti) vengono erogati solo al primo completamento della missione
+- punteggio: al primo completamento si sommano `Missione.punteggio` + eventuale `Trofeo.punti` sul cumulativo `Membro.punti` (riletto prima dell'update); `progresso` della partecipazione viaggia come stringa (vincolo schema Strapi)
+- level-up agganciato agli slug missione: `missione-05-le-radici` → `livello-3-custode-novizio`, `missione-11-il-rituale-del-custode` → `livello-4-custode`; mai degradante (confronto su ordine livello) e idempotente
+- la prova `POST /api/missioni/:slug/prova` registra ogni tentativo (anche fallito) e restituisce `trofeiSbloccati`/`puntiAssegnati`/`livelloAggiornato`; il salvataggio nota Grimorio (missione 02) passa dallo stesso motore
+- modale trofeo: `src/components/PopupComponents/TrofeoModal.astro` ascolta `tsbs:trofei-sbloccati`, mostra testo fisso, immagine del trofeo e CTA verso `/scrivania/trofei/`; con piu trofei in una sola azione le modali vengono accodate in sequenza
+- visibilita §missione_precedente: le missioni con `missione_precedente` non completata non compaiono negli elenchi (lista Missioni e Atrio); la precedente `test-smistamento` risulta completata quando il Membro ha l'Accademia
+
+Motivo:
+- l'integrita di trofei, punti e livelli deve stare lato server (token admin) e non puo dipendere dal client
+- un solo motore evita logiche divergenti tra quiz, Grimorio e sfida lettura
+- gli slug dei trigger di livello sono stabili e gia compilati su Strapi
+
+Impatto:
+- `src/lib/strapi/progressione.ts` (nuovo)
+- `src/pages/api/missioni/[slugMis]/prova.ts`
+- `src/pages/api/grimorio/note.ts`
+- `src/components/PopupComponents/TrofeoModal.astro` (nuovo)
+- `src/components/MissioniComponents/SceltaDomanda.astro`, `RispostaLibera.astro`, `ProvaMissioneMista.astro`
+- `src/components/GrimorioComponents/NotaEditor.astro`
+- `src/lib/filtri/missioni.ts`, `src/lib/strapi/missioni.ts`
+- `src/pages/missioni/[slugMis]/prova/index.astro`
+
+Stato:
+- approvata
+
+## 2026-06-11 - Missione 06 Sfida Lettura: Tentativo Giornaliero, Punti E Trofei Soglia
+
+Decisione:
+- la sfida di lettura usa `src/lib/strapi/sfida-lettura.ts` + `POST /api/missioni/:slug/sfida-lettura` (azioni `domanda` e `risposta`)
+- lista chiusa = tutti i `Libro` pubblicati con `estratto` compilato; la pagina li raggruppa per `genere` (fallback `Altro`)
+- ogni domanda propone 4 estratti (1 del libro scelto + 3 distrattori casuali); la rosa viene persistita server-side in `storicoTentativi.propostaCorrente` cosi la validazione non si fida del client; al client arrivano solo i testi
+- un solo inserimento al giorno per membro, giorno calcolato in `Europe/Rome` formato ISO; aprire la domanda non consuma il tentativo, e la risposta a consumarlo (verifica su `dataUltimoTentativo`)
+- `storicoTentativi` adotta il formato `{ "tentativi": [ { "dataTentativo", "estrattiProposti", "indiceScelto", "rispostaDomanda" } ] }`
+- punti: +1 su `Membro.punti` per ogni libro riconosciuto; la partecipazione missione traccia `progresso = letti/totale` e diventa `completata` solo con tutti i libri (in quel momento il motore eroga anche `Missione.punteggio`)
+- trofei soglia (5/10/15/tutti i libri): mappati ai 4 trofei "06a/06b/06c/06d" tramite il codice nel `Trofeo.nome` + nome Accademia del Membro (criterio provvisorio in attesa di relazione/campo `soglia` su Strapi); assegnazione idempotente, modali accodate
+- `DomandaModal.astro` supporta risposte dinamiche via evento `tsbs:question-modal-open` (detail `answers`) ed emette `tsbs:question-modal-submit` con l'indice scelto
+- il dettaglio missione instrada la CTA della missione 06 verso `sfida-lettura/` invece di `prova/`
+
+Motivo:
+- la correttezza della risposta e il limite giornaliero devono essere decisi dal server
+- i 16 trofei sfida (4 soglie x 4 accademie) non sono collegati alla missione su Strapi e non esiste un campo soglia: la convenzione sul nome e l'unico criterio disponibile senza modifiche al modello
+
+Impatto:
+- `src/lib/strapi/sfida-lettura.ts` (nuovo)
+- `src/pages/api/missioni/[slugMis]/sfida-lettura.ts` (nuovo)
+- `src/pages/missioni/[slugMis]/sfida-lettura.astro`
+- `src/components/PopupComponents/DomandaModal.astro`
+- `src/pages/missioni/[slugMis]/index.astro`
+- compilazione richiesta su Strapi: `Libro.estratto` e `Libro.genere`; nomi trofei sfida coerenti con codici `06a..06d` + nome Accademia
+
+Stato:
+- approvata
+
 ## 2026-06-11 - Box Epistola In Atrio Collegato All'Accademia
 
 Decisione:

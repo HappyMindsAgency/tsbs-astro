@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
 import { getStrapiApiUrl } from '../../../../lib/strapi/api-url';
+import { getMembroProgressioneByJwt, registraEsitoProva } from '../../../../lib/strapi/progressione';
+import { logger } from '../../../../services/logger';
 
 type SubmittedAnswer = {
 	questionIndex?: number;
@@ -35,17 +37,10 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 		return json({ error: 'invalid_answers' }, 400);
 	}
 
-	const userRes = await fetch(`${STRAPI_API_BASE_URL}/users/me`, {
-		headers: {
-			Authorization: `Bearer ${jwt}`,
-			'Content-Type': 'application/json',
-		},
-	});
-
-	if (!userRes.ok) {
+	const membro = await getMembroProgressioneByJwt(jwt);
+	if (!membro) {
 		return json({ error: 'unauthorized' }, 401);
 	}
-	const user = await userRes.json();
 
 	const missione = await getMissioneBySlug(slugMis);
 	const domande = missione?.quiz?.domande ?? [];
@@ -83,10 +78,19 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 	const passed = correctCount === domande.length;
 
 	if (isLibraryCardMission && passed) {
-		const saved = await saveLibraryCardCode(user.id, libraryCardCode);
+		const saved = await saveLibraryCardCode(membro.documentId, libraryCardCode);
 		if (!saved) {
 			return json({ error: 'library_card_save_failed' }, 500);
 		}
+	}
+
+	// Registra il tentativo nello storico e, al primo superamento, eroga
+	// trofeo/punti e verifica il level-up (tutto idempotente, lato server).
+	const risposte = Object.fromEntries(results.map((result) => [`domanda${result.questionIndex + 1}`, result.correct]));
+	const progressione = await registraEsitoProva({ membro, missione, esito: passed, risposte });
+
+	if (!progressione) {
+		logger.error(`[Prova] Registrazione esito fallita per ${missione.slug}`);
 	}
 
 	return json({
@@ -94,27 +98,14 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 		passed,
 		correctCount,
 		total: domande.length,
+		trofeiSbloccati: progressione?.trofeiSbloccati ?? [],
+		puntiAssegnati: progressione?.puntiAssegnati ?? 0,
+		livelloAggiornato: progressione?.livelloAggiornato ?? null,
 	});
 };
 
-async function saveLibraryCardCode(userId: number, libraryCardCode: string) {
+async function saveLibraryCardCode(membroDocumentId: string, libraryCardCode: string) {
 	if (!STRAPI_API) return false;
-
-	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
-	searchParams.set('filters[user][id][$eq]', String(userId));
-	searchParams.set('fields[0]', 'documentId');
-	searchParams.set('pagination[pageSize]', '1');
-
-	const membroRes = await fetch(`${STRAPI_API_BASE_URL}/membri?${searchParams}`, {
-		headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
-	});
-
-	if (!membroRes.ok) return false;
-
-	const membroPayload = await membroRes.json();
-	const membroDocumentId = membroPayload?.data?.[0]?.documentId;
-	if (!membroDocumentId) return false;
 
 	const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}`, {
 		method: 'PUT',

@@ -1,0 +1,207 @@
+---
+// Modale mostrata a ogni conseguimento di un trofeo confermato dal server.
+// Ascolta l'evento `tsbs:trofei-sbloccati` (detail: { trofei: [...] }) e, se
+// una singola azione sblocca piu trofei, li accoda mostrandoli in sequenza.
+const { theme = '' } = Astro.props;
+---
+
+<div
+	class={`trophy-modal ${theme}`}
+	data-trophy-modal
+	hidden
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="trophy-modal-title"
+>
+	<div class="trophy-modal__backdrop" data-trophy-modal-close></div>
+
+	<section class="trophy-modal__panel">
+		<div class="trophy-modal__body">
+			<h2 id="trophy-modal-title">Congratulazioni! Hai sbloccato questo trofeo!</h2>
+
+			<div class="trophy-modal__visual" data-trophy-modal-visual>
+				<img class="trophy-modal__image" data-trophy-modal-image src="" alt="" hidden />
+				<i class="bi bi-award trophy-modal__fallback-icon" data-trophy-modal-fallback aria-hidden="true"></i>
+			</div>
+
+			<p class="trophy-modal__name" data-trophy-modal-name></p>
+		</div>
+
+		<div class="trophy-modal__footer">
+			<a class="btn tsbs-cta-primary trophy-modal__button" href="/scrivania/trofei/" data-trophy-modal-cta>
+				<span>Colleziona</span>
+				<i class="bi bi-check-lg" aria-hidden="true"></i>
+			</a>
+		</div>
+	</section>
+</div>
+
+<script>
+	type TrofeoSbloccatoView = {
+		nome?: string;
+		immagineUrl?: string | null;
+	};
+
+	const setupTrophyModal = () => {
+		const modal = document.querySelector<HTMLElement>('[data-trophy-modal]');
+		if (!modal || modal.dataset.trophyModalReady === 'true') return;
+		modal.dataset.trophyModalReady = 'true';
+
+		const image = modal.querySelector<HTMLImageElement>('[data-trophy-modal-image]');
+		const fallback = modal.querySelector<HTMLElement>('[data-trophy-modal-fallback]');
+		const name = modal.querySelector<HTMLElement>('[data-trophy-modal-name]');
+		const closeControls = modal.querySelectorAll<HTMLElement>('[data-trophy-modal-close]');
+
+		if (!image || !fallback || !name) return;
+
+		let queue: TrofeoSbloccatoView[] = [];
+
+		const renderCurrent = () => {
+			const trofeo = queue[0];
+			if (!trofeo) {
+				modal.hidden = true;
+				return;
+			}
+
+			const hasImage = Boolean(trofeo.immagineUrl);
+			image.hidden = !hasImage;
+			fallback.hidden = hasImage;
+			image.src = trofeo.immagineUrl || '';
+			image.alt = trofeo.nome || 'Trofeo sbloccato';
+			name.textContent = trofeo.nome || '';
+			modal.hidden = false;
+		};
+
+		// Chiudere la modale mostra il trofeo successivo in coda, se presente.
+		const advanceQueue = () => {
+			queue = queue.slice(1);
+			renderCurrent();
+		};
+
+		document.addEventListener('tsbs:trofei-sbloccati', (event) => {
+			if (!(event instanceof CustomEvent)) return;
+
+			const trofei = Array.isArray(event.detail?.trofei) ? event.detail.trofei : [];
+			if (trofei.length === 0) return;
+
+			queue = [...queue, ...trofei];
+			if (modal.hidden) renderCurrent();
+		});
+
+		closeControls.forEach((control) => {
+			control.addEventListener('click', advanceQueue);
+		});
+
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape' && !modal.hidden) advanceQueue();
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupTrophyModal);
+	setupTrophyModal();
+</script>
+
+<style lang="scss">
+	.trophy-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 1250;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		padding: 1.75rem;
+	}
+
+	.trophy-modal[hidden] {
+		display: none;
+	}
+
+	.trophy-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-surface) 68%, transparent);
+		backdrop-filter: grayscale(0.7) blur(0.0625rem);
+	}
+
+	.trophy-modal__panel {
+		position: relative;
+		width: min(100%, 23.4375rem);
+		overflow: hidden;
+		background: var(--tsbs-color-white);
+		border-radius: 0.75rem;
+		box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--tsbs-theme-accent) 20%, transparent);
+	}
+
+	.trophy-modal__body {
+		display: grid;
+		justify-items: center;
+		gap: 1.25rem;
+		padding: 1.375rem 1.5rem 1.625rem;
+		text-align: center;
+	}
+
+	.trophy-modal__body h2 {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.25;
+	}
+
+	.trophy-modal__visual {
+		display: grid;
+		place-items: center;
+		width: 9.75rem;
+		aspect-ratio: 1;
+		color: color-mix(in srgb, var(--tsbs-theme-accent) 46%, #737373);
+	}
+
+	.trophy-modal__image {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	.trophy-modal__fallback-icon {
+		font-size: 7.5rem;
+		line-height: 1;
+	}
+
+	.trophy-modal__name {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.25rem;
+		margin: 0;
+		color: var(--tsbs-theme-accent);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1.25;
+	}
+
+	.trophy-modal__footer {
+		padding: 0.9375rem 1rem;
+		border-top: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-surface));
+	}
+
+	.trophy-modal__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.625rem;
+		width: 100%;
+		min-height: 3rem;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1;
+		border-radius: 0.25rem;
+	}
+
+	@media (min-width: 992px) {
+		.trophy-modal {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.75rem);
+		}
+	}
+</style>

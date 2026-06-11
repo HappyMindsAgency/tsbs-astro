@@ -70,18 +70,56 @@ const {
 
 			const form = modal.querySelector<HTMLFormElement>('[data-question-modal-form]');
 			const submit = modal.querySelector<HTMLButtonElement>('[data-question-modal-submit]');
-			const answers = modal.querySelectorAll<HTMLInputElement>('input[name="domanda-modal-risposta"]');
+			const answersContainer = modal.querySelector<HTMLElement>('.question-modal__answers');
 			const closeControls = modal.querySelectorAll<HTMLElement>('[data-question-modal-close]');
 			let activeInput: HTMLInputElement | null = null;
 			let previousFocus: HTMLElement | null = null;
 
-			if (!form || !submit) return;
+			if (!form || !submit || !answersContainer) return;
+
+			const getAnswerInputs = () => modal.querySelectorAll<HTMLInputElement>('input[name="domanda-modal-risposta"]');
 
 			const resetAnswers = () => {
-				answers.forEach((answer) => {
+				getAnswerInputs().forEach((answer) => {
 					answer.checked = false;
 				});
 				submit.hidden = true;
+			};
+
+			// Risposte dinamiche: usate dalla sfida lettura per proporre gli
+			// estratti del giorno generati dal server.
+			const renderAnswers = (answers: Array<{ label?: string; description?: string }>) => {
+				answersContainer.replaceChildren(
+					...answers.map((answer, index) => {
+						const id = `question-modal-answer-${index}`;
+						const label = document.createElement('label');
+						const input = document.createElement('input');
+
+						label.className = 'question-modal__answer';
+						label.setAttribute('for', id);
+						input.id = id;
+						input.type = 'radio';
+						input.name = 'domanda-modal-risposta';
+						input.value = String(index);
+						label.append(input);
+
+						if (answer.label) {
+							const answerLabel = document.createElement('span');
+							answerLabel.className = 'question-modal__answer-label';
+							answerLabel.textContent = answer.label;
+							label.append(answerLabel);
+						}
+
+						if (answer.description) {
+							const answerDescription = document.createElement('span');
+							answerDescription.className = 'question-modal__answer-description';
+							answerDescription.textContent = answer.description;
+							label.append(answerDescription);
+						}
+
+						return label;
+					}),
+				);
 			};
 
 			const closeModal = ({ undoSelection = true }: { undoSelection?: boolean } = {}) => {
@@ -99,9 +137,14 @@ const {
 				}
 			};
 
-			const openModal = (input: HTMLInputElement | null) => {
+			const openModal = (input: HTMLInputElement | null, answers?: Array<{ label?: string; description?: string }>) => {
 				activeInput = input || null;
 				previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+				if (Array.isArray(answers) && answers.length > 0) {
+					renderAnswers(answers);
+				}
+
 				resetAnswers();
 				modal.hidden = false;
 
@@ -115,23 +158,30 @@ const {
 				if (!(event instanceof CustomEvent)) return;
 
 				const input = event.detail?.input instanceof HTMLInputElement ? event.detail.input : null;
-				openModal(input);
+				openModal(input, event.detail?.answers);
 			});
 
 			closeControls.forEach((control) => {
 				control.addEventListener('click', () => closeModal());
 			});
 
-			answers.forEach((answer) => {
-				answer.addEventListener('change', () => {
-					submit.hidden = false;
-				});
+			// Delegazione: le risposte possono essere rigenerate dinamicamente.
+			answersContainer.addEventListener('change', () => {
+				submit.hidden = !modal.querySelector('input[name="domanda-modal-risposta"]:checked');
 			});
 
 			form.addEventListener('submit', (event) => {
 				event.preventDefault();
 
-				if (!modal.querySelector('input[name="domanda-modal-risposta"]:checked')) return;
+				const selected = modal.querySelector<HTMLInputElement>('input[name="domanda-modal-risposta"]:checked');
+				if (!selected) return;
+
+				// Notifica la pagina ospite della risposta confermata (es. sfida lettura).
+				document.dispatchEvent(
+					new CustomEvent('tsbs:question-modal-submit', {
+						detail: { value: selected.value, input: activeInput },
+					}),
+				);
 
 				closeModal({ undoSelection: false });
 			});

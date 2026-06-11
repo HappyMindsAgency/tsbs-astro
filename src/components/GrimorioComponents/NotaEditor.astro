@@ -184,6 +184,12 @@ const {
 						}));
 					}
 
+					// Trofei confermati dal server al completamento missione: coda modale.
+					const trofei = Array.isArray(payload?.trofeiSbloccati) ? payload.trofeiSbloccati : [];
+					if (trofei.length > 0) {
+						document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', { detail: { trofei } }));
+					}
+
 					if (payload?.missionCompleted && action === 'submit') {
 						setFeedback('Nota inviata al Prefetto. Missione superata.');
 					} else if (payload?.missionCompleted) {

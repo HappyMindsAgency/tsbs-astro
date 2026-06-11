@@ -28,7 +28,11 @@ if (!missione) {
 
 const hasDescription = Boolean(missione.descrizione?.trim());
 const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.punteggio} punti` : '');
-const missionProofHref = `/missioni/${missione.slug}/prova/`;
+// La sfida di lettura ha una fruizione dedicata, fuori dal flusso prova/quiz.
+const READING_CHALLENGE_MISSION_SLUGS = new Set(['missione-06-i-custodi-del-sapere']);
+const missionProofHref = READING_CHALLENGE_MISSION_SLUGS.has(missione.slug)
+	? `/missioni/${missione.slug}/sfida-lettura/`
+	: `/missioni/${missione.slug}/prova/`;
 ---
 
 <Layout lang={lang} theme={theme}>

@@ -12,6 +12,7 @@ import trofeoStendardo from '../../assets/trofeo-stendardo.png';
 import trofeoTartaruga from '../../assets/trofeo-tartaruga.png';
 import { resolveUserContext } from '../../lib/theme';
 import { getTrofeiStanzaByJwt } from '../../lib/strapi/trofei';
+import BackButton from '../../components/BackButton.astro';
 
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
@@ -22,7 +23,7 @@ const jwt = Astro.cookies.get('jwt')?.value;
 const { theme, accademia } = await resolveUserContext(jwt);
 
 const board = {
-	rows: 8,
+	rows: 6,
 	cols: 5,
 };
 
@@ -118,9 +119,10 @@ const savedLayoutJson = JSON.stringify(savedLayout);
 <Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
-	<main class="tsbs-app-shell trophies-page">
+	<main class="tsbs-app-shell trophies-page" style={`--trophy-rows: ${board.rows}; --trophy-cols: ${board.cols};`}>
 		<header class="trophies-header" aria-labelledby="trophies-title">
 			<h1 id="trophies-title">Trofei</h1>
+			<BackButton href="/scrivania/" label="Torna alla scrivania" />
 		</header>
 
 		<div class="container-xl tsbs-app-container trophies-content">
@@ -740,7 +742,11 @@ const savedLayoutJson = JSON.stringify(savedLayout);
 			100dvh - var(--trophies-header-height) - var(--trophies-content-top) - var(--trophies-toolbar-height) -
 				var(--trophies-workspace-gap) - var(--trophies-board-bottom-space)
 		);
-		--trophies-board-size: min(100%, var(--trophies-board-max-width), calc(var(--trophies-board-height-space) * 5 / 8));
+		--trophies-board-size: min(
+			100%,
+			var(--trophies-board-max-width),
+			calc(var(--trophies-board-height-space) * var(--trophy-cols) / var(--trophy-rows))
+		);
 
 		min-height: 100vh;
 		background-color: #fffaf0;
@@ -751,8 +757,10 @@ const savedLayoutJson = JSON.stringify(savedLayout);
 	}
 
 	.trophies-header {
-		display: grid;
-		place-items: center;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
 		min-height: var(--trophies-header-height);
 		padding: 1.125rem 1.875rem;
 		background: var(--tsbs-theme-accent);
@@ -851,7 +859,9 @@ const savedLayoutJson = JSON.stringify(savedLayout);
 		position: relative;
 		display: grid;
 		width: var(--trophies-board-size);
-		aspect-ratio: 5 / 8;
+		// Rapporto = colonne / righe: le celle restano quadrate, cambia solo la dimensione
+		// totale della griglia al variare di righe/colonne (board.rows / board.cols).
+		aspect-ratio: var(--trophy-cols) / var(--trophy-rows);
 		gap: var(--trophy-gap);
 		touch-action: none;
 	}
@@ -1137,7 +1147,6 @@ const savedLayoutJson = JSON.stringify(savedLayout);
 		}
 
 		.trophies-header {
-			place-items: center start;
 			padding: 0 3rem;
 		}
 

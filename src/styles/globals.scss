@@ -1846,6 +1846,13 @@ body:has(.tsbs-legal-page) {
 		line-height: 1;
 	}
 
+	.missions-header--note {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
 	.missions-content {
 		margin: 0 auto;
 	}

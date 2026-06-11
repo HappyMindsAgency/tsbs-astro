@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
 import Nav from '../../../../components/Nav.astro';
+import BackButton from '../../../../components/BackButton.astro';
 import RitchText from '../../../../components/RitchText.astro';
 import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro } from '../../../../lib/strapi/grimorio';
 import { resolveUserContext } from '../../../../lib/theme';
@@ -30,8 +31,9 @@ if (!nota) {
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell note-page">
-		<header class="missions-header">
+		<header class="missions-header missions-header--note">
 			<h1>Nota</h1>
+			<BackButton href="/scrivania/grimorio/" label="Torna al grimorio" />
 		</header>
 
 		<div class="container-xl tsbs-app-container note-page__content">

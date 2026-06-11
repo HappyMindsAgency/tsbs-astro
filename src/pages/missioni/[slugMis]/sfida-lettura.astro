@@ -1,54 +1,75 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import RitchText from '../../../components/RitchText.astro';
 import DomandaModal from '../../../components/PopupComponents/DomandaModal.astro';
+import TrofeoModal from '../../../components/PopupComponents/TrofeoModal.astro';
+import { getMissioneBySlug } from '../../../lib/strapi/missioni';
+import { getMembroProgressioneByJwt } from '../../../lib/strapi/progressione';
+import { getStatoSfidaLettura, type LibroSfida } from '../../../lib/strapi/sfida-lettura';
+import { resolveUserTheme } from '../../../lib/theme';
 
 export const prerender = false;
 
-if (!Astro.cookies.has('jwt')) {
+const { lang = 'it' } = Astro.props;
+const jwt = Astro.cookies.get('jwt')?.value;
+
+if (!jwt) {
 	return Astro.redirect('/');
 }
 
-interface ReadingChallengeBook {
-	title: string;
-	checked?: boolean;
-}
-
-interface ReadingChallengeCategory {
-	id: string;
-	label: string;
-	books?: ReadingChallengeBook[];
-}
-
-const { lang = 'it' } = Astro.props;
 const { slugMis } = Astro.params;
 const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
 const missionPath = `/missioni/${slugMis ?? ''}/`;
 
-const categories: ReadingChallengeCategory[] = [
-	{
-		id: 'giallo',
-		label: 'Giallo',
-		books: [
-			{ title: 'Dieci Piccoli Indiani - Agatha Christie' },
-			{ title: 'Il Mastino dei Baskerville - Arthur Conan Doyle' },
-			{ title: 'Il Nome della Rosa - Umberto Eco' },
-			{ title: 'Il Codice da Vinci - Dan Brown' },
-			{ title: 'La Ragazza con il Tatuaggio del Drago - Stieg Larsson' },
-		],
-	},
-	{ id: 'fantasy', label: 'Fantasy' },
-	{ id: 'fantascienza', label: 'Fantascienza' },
-	{ id: 'romantico', label: 'Romantico' },
-	{ id: 'thriller', label: 'Thriller' },
-	{ id: 'horror', label: 'Horror' },
-	{ id: 'storico', label: 'Storico' },
-	{ id: 'biografia', label: 'Biografia' },
-	{ id: 'classico', label: 'Classico' },
-];
+if (!slugMis) {
+	return Astro.redirect('/404');
+}
+
+const [theme, missione, membro] = await Promise.all([
+	resolveUserTheme(jwt),
+	getMissioneBySlug(slugMis, locale),
+	getMembroProgressioneByJwt(jwt),
+]);
+
+if (!missione || !membro) {
+	return Astro.redirect('/404');
+}
+
+const stato = await getStatoSfidaLettura(membro.documentId);
+const riconosciuti = new Set(stato.libriRiconosciuti);
+
+// Raggruppa la lista chiusa dei libri per genere (accordion).
+const FALLBACK_GENERE = 'Altro';
+const categorieMap = new Map<string, LibroSfida[]>();
+for (const libro of stato.libri) {
+	const genere = libro.genere?.trim() || FALLBACK_GENERE;
+	const gruppo = categorieMap.get(genere) ?? [];
+	gruppo.push(libro);
+	categorieMap.set(genere, gruppo);
+}
+
+const slugify = (value: string) =>
+	value
+		.toLocaleLowerCase('it-IT')
+		.normalize('NFD')
+		.replace(/\p{Diacritic}/gu, '')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '') || 'categoria';
+
+const categories = [...categorieMap.entries()].map(([label, books]) => ({
+	id: slugify(label),
+	label,
+	books,
+}));
+
+const totaleLibri = stato.libri.length;
+const libriLetti = stato.libriRiconosciuti.length;
+const hasDescription = Boolean(missione.descrizione?.trim());
+const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.punteggio} punti` : '');
 ---
 
-<Layout lang={locale}>
+<Layout lang={locale} theme={theme}>
 	<Nav lang={locale} />
 
 	<main class="tsbs-app-shell reading-challenge">
@@ -59,25 +80,35 @@ const categories: ReadingChallengeCategory[] = [
 			</a>
 		</header>
 
-		<section class="container-xl tsbs-app-container reading-challenge__content" aria-labelledby="reading-challenge-title">
+		<section
+			class="container-xl tsbs-app-container reading-challenge__content"
+			aria-labelledby="reading-challenge-title"
+			data-reading-challenge
+			data-slug-mis={slugMis}
+			data-tentativo-effettuato={stato.tentativoOdiernoEffettuato ? 'true' : 'false'}
+		>
 			<div class="mission-detail__media reading-challenge__media" aria-label="Immagine sfida di lettura">
 				<i class="bi bi-image" aria-hidden="true"></i>
 			</div>
 
 			<div class="reading-challenge__body">
-				<h1 id="reading-challenge-title">Nome della sfida di lettura</h1>
+				<h1 id="reading-challenge-title">{missione.titolo}</h1>
 
 				<hr class="mission-detail__rule reading-challenge__rule" />
 
-				<article class="mission-detail__objective reading-challenge__objective" aria-labelledby="reading-challenge-objective-title">
-					<h2 id="reading-challenge-objective-title">Obiettivo:</h2>
-					<p>Raggiungi X letture, contribuisci al prestigio della tua Accademia e conquista il trofeo insieme agli altri membri.</p>
-				</article>
+				{hasDescription && (
+					<article class="mission-detail__objective reading-challenge__objective" aria-labelledby="reading-challenge-objective-title">
+						<h2 id="reading-challenge-objective-title">Obiettivo:</h2>
+						<RitchText block={missione.descrizione} />
+					</article>
+				)}
 
 				<div class="reading-challenge__progress" aria-label="Progresso letture">
-					<strong>0 / 50</strong>
+					<strong data-sfida-progress>{libriLetti} / {totaleLibri}</strong>
 					<span>libri letti</span>
 				</div>
+
+				<p class="reading-challenge__feedback" data-sfida-feedback hidden aria-live="polite"></p>
 
 				<div class="accordion reading-challenge__accordion" id="reading-challenge-categories">
 					{categories.map((category, index) => (
@@ -101,55 +132,187 @@ const categories: ReadingChallengeCategory[] = [
 								aria-labelledby={`heading-${category.id}`}
 								data-bs-parent="#reading-challenge-categories"
 							>
-								{category.books && (
-									<div class="accordion-body reading-challenge__book-list">
-										{category.books.map((book) => (
-											<label class="reading-challenge__book">
-												<input type="checkbox" checked={book.checked ?? false} />
-												<span>{book.title}</span>
-											</label>
-										))}
-									</div>
-								)}
+								<div class="accordion-body reading-challenge__book-list">
+									{category.books.map((book) => (
+										<label class="reading-challenge__book">
+											<input
+												type="checkbox"
+												data-sfida-libro={book.documentId}
+												checked={riconosciuti.has(book.documentId)}
+												disabled={riconosciuti.has(book.documentId)}
+											/>
+											<span>{book.autore ? `${book.titolo} - ${book.autore}` : book.titolo}</span>
+										</label>
+									))}
+								</div>
 							</div>
 						</div>
 					))}
 				</div>
 
-				<hr class="mission-detail__rule reading-challenge__rule reading-challenge__rule--reward" />
+				{trophyLabel && (
+					<>
+						<hr class="mission-detail__rule reading-challenge__rule reading-challenge__rule--reward" />
 
-				<div class="mission-detail__reward reading-challenge__reward" aria-label="Ricompensa sfida lettura">
-					<p>Completando questa missione otterrai:</p>
-					<p class="mission-detail__trophy">
-						<i class="bi bi-award" aria-hidden="true"></i>
-						<strong>Trofeo "Topo da biblioteca"</strong>
-					</p>
-				</div>
+						<div class="mission-detail__reward reading-challenge__reward" aria-label="Ricompensa sfida lettura">
+							<p>Completando questa missione otterrai:</p>
+							<p class="mission-detail__trophy">
+								<i class="bi bi-award" aria-hidden="true"></i>
+								<strong>{trophyLabel}</strong>
+							</p>
+						</div>
+					</>
+				)}
 			</div>
 		</section>
 	</main>
 
 	<DomandaModal />
+	<TrofeoModal theme={theme} />
 </Layout>
 
 <script>
-	const setupReadingChallengeModal = () => {
-		document.querySelectorAll<HTMLInputElement>('.reading-challenge__book input[type="checkbox"]').forEach((input) => {
-			if (input.dataset.readingChallengeQuestionReady === 'true') return;
-			input.dataset.readingChallengeQuestionReady = 'true';
+	const setupReadingChallenge = () => {
+		const root = document.querySelector<HTMLElement>('[data-reading-challenge]');
+		if (!root || root.dataset.readingChallengeReady === 'true') return;
+		root.dataset.readingChallengeReady = 'true';
 
-			input.addEventListener('change', () => {
-				if (!input.checked) return;
+		const slugMis = root.dataset.slugMis || '';
+		const progress = root.querySelector<HTMLElement>('[data-sfida-progress]');
+		const feedback = root.querySelector<HTMLElement>('[data-sfida-feedback]');
+		const checkboxes = root.querySelectorAll<HTMLInputElement>('[data-sfida-libro]');
+
+		let dayLocked = root.dataset.tentativoEffettuato === 'true';
+		let activeLibroId = '';
+		let activeInput: HTMLInputElement | null = null;
+
+		const setFeedback = (message: string) => {
+			if (!feedback) return;
+			feedback.textContent = message;
+			feedback.hidden = !message;
+		};
+
+		const messages: Record<string, string> = {
+			tentativo_gia_effettuato_oggi: 'Hai già effettuato il tentativo di oggi. Torna domani.',
+			libro_gia_riconosciuto: 'Hai già riconosciuto questo libro.',
+			generico: 'Operazione non riuscita. Riprova.',
+		};
+
+		const apiUrl = `/api/missioni/${slugMis}/sfida-lettura`;
+
+		const richiediDomanda = async (input: HTMLInputElement, libroId: string) => {
+			try {
+				const response = await fetch(apiUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ azione: 'domanda', libro: libroId }),
+				});
+				const payload = await response.json().catch(() => null);
+
+				if (!response.ok || !Array.isArray(payload?.estratti)) {
+					input.checked = false;
+					if (payload?.error === 'tentativo_gia_effettuato_oggi') dayLocked = true;
+					setFeedback(messages[payload?.error] || messages.generico);
+					return;
+				}
+
+				activeLibroId = libroId;
+				activeInput = input;
+				setFeedback('');
 
 				document.dispatchEvent(
 					new CustomEvent('tsbs:question-modal-open', {
-						detail: { input },
-					})
+						detail: {
+							input,
+							answers: payload.estratti.map((estratto: string) => ({ description: estratto })),
+						},
+					}),
 				);
+			} catch {
+				input.checked = false;
+				setFeedback(messages.generico);
+			}
+		};
+
+		const inviaRisposta = async (indice: number) => {
+			if (!activeLibroId) return;
+			const input = activeInput;
+
+			try {
+				const response = await fetch(apiUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ azione: 'risposta', libro: activeLibroId, indice }),
+				});
+				const payload = await response.json().catch(() => null);
+
+				if (!response.ok || typeof payload?.corretta !== 'boolean') {
+					if (input) input.checked = false;
+					if (payload?.error === 'tentativo_gia_effettuato_oggi') dayLocked = true;
+					setFeedback(messages[payload?.error] || messages.generico);
+					return;
+				}
+
+				// Un solo inserimento al giorno: la risposta consuma il tentativo.
+				dayLocked = true;
+
+				if (payload.corretta) {
+					if (input) {
+						input.checked = true;
+						input.disabled = true;
+					}
+					if (progress) progress.textContent = `${payload.libriRiconosciuti} / ${payload.totaleLibri}`;
+					setFeedback('Risposta corretta! Hai guadagnato 1 punto.');
+				} else {
+					if (input) input.checked = false;
+					setFeedback('Risposta sbagliata. Potrai riprovare domani.');
+				}
+
+				const trofei = Array.isArray(payload.trofeiSbloccati) ? payload.trofeiSbloccati : [];
+				if (trofei.length > 0) {
+					document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', { detail: { trofei } }));
+				}
+			} catch {
+				if (input) input.checked = false;
+				setFeedback(messages.generico);
+			} finally {
+				activeLibroId = '';
+				activeInput = null;
+			}
+		};
+
+		checkboxes.forEach((input) => {
+			input.addEventListener('change', () => {
+				if (!input.checked) return;
+
+				if (dayLocked) {
+					input.checked = false;
+					setFeedback(messages.tentativo_gia_effettuato_oggi);
+					return;
+				}
+
+				void richiediDomanda(input, input.dataset.sfidaLibro || '');
 			});
+		});
+
+		document.addEventListener('tsbs:question-modal-submit', (event) => {
+			if (!(event instanceof CustomEvent)) return;
+
+			const indice = Number.parseInt(String(event.detail?.value ?? ''), 10);
+			if (!Number.isFinite(indice) || indice < 0) return;
+
+			void inviaRisposta(indice);
 		});
 	};
 
-	document.addEventListener('astro:page-load', setupReadingChallengeModal);
-	setupReadingChallengeModal();
+	document.addEventListener('astro:page-load', setupReadingChallenge);
+	setupReadingChallenge();
 </script>
+
+<style lang="scss">
+	.reading-challenge__feedback {
+		margin: 0;
+		font-size: 0.9375rem;
+		color: var(--tsbs-theme-accent);
+	}
+</style>

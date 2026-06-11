@@ -1,6 +1,7 @@
 ﻿---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import BackButton from '../../../components/BackButton.astro';
 import { resolveUserContext } from '../../../lib/theme';
 import { formatGrimorioDate, getCurrentMembroFromJwt, getGrimorioExcerpt, getGrimorioNoteByMembro, getGrimorioVisibilityLabel } from '../../../lib/strapi/grimorio';
 
@@ -30,8 +31,9 @@ const getNoteMeta = (publishedAt: string | null | undefined, visibilePubblico: b
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell grimorio-page">
-		<header class="missions-header">
+		<header class="missions-header missions-header--note">
 			<h1>Grimorio</h1>
+			<BackButton href="/scrivania/" label="Torna alla scrivania" />
 		</header>
 
 		<div class="container-xl tsbs-app-container grimorio-content">

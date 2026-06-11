@@ -128,13 +128,31 @@ export function toMissionCard(missione: Missione, partecipazione: Partecipazione
 	};
 }
 
+// §4.4: una missione con `missione_precedente` compilata non compare negli
+// elenchi finche la missione referenziata non risulta completata (§4.1).
+export function isMissionePrecedenteCompletata(
+	missione: Missione,
+	partecipazioniByMissione: Map<string, PartecipazioneMissione>,
+	hasCompletedSorting: boolean,
+) {
+	const precedenteSlug = missione.missione_precedente?.slug?.trim();
+	if (!precedenteSlug) return true;
+	if (precedenteSlug === TEST_SMISTAMENTO_SLUG) return hasCompletedSorting;
+
+	return partecipazioniByMissione.get(precedenteSlug)?.stato === 'completata';
+}
+
 export function getVisibleMissioni(
 	missioni: Missione[],
+	partecipazioni: PartecipazioneMissione[],
 	currentLevel: MissioneLivello | null,
 	hasCompletedSorting: boolean,
 ) {
+	const partecipazioniByMissione = getPartecipazioniByMissione(partecipazioni);
+
 	return missioni
 		.filter((missione) => isMissioneVisibilePerLivello(missione, currentLevel, hasCompletedSorting))
+		.filter((missione) => isMissionePrecedenteCompletata(missione, partecipazioniByMissione, hasCompletedSorting))
 		.sort(sortMissioniByProgressionOrder);
 }
 
@@ -149,7 +167,7 @@ export function buildMissionTabs(
 	const completate: MissionCard[] = [];
 	const disponibili: MissionCard[] = [];
 
-	for (const missione of getVisibleMissioni(missioni, currentLevel, hasCompletedSorting)) {
+	for (const missione of getVisibleMissioni(missioni, partecipazioni, currentLevel, hasCompletedSorting)) {
 		const partecipazione = partecipazioniByMissione.get(missione.slug);
 		const missionCard = toMissionCard(missione, partecipazione);
 
@@ -182,7 +200,7 @@ export function getFirstIncompleteMissionCards(
 ) {
 	const partecipazioniByMissione = getPartecipazioniByMissione(partecipazioni);
 
-	return getVisibleMissioni(missioni, currentLevel, hasCompletedSorting)
+	return getVisibleMissioni(missioni, partecipazioni, currentLevel, hasCompletedSorting)
 		.filter((missione) => partecipazioniByMissione.get(missione.slug)?.stato !== 'completata')
 		.slice(0, limit)
 		.map((missione) => toMissionCard(missione, partecipazioniByMissione.get(missione.slug)));

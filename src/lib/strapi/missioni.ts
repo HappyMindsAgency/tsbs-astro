@@ -14,6 +14,7 @@ export type MissioneTrofeo = StrapiRelationBase & {
 	nome: string;
 	descrizione: string | null;
 	punti: number | null;
+	immagine: { url: string | null; alternativeText?: string | null } | null;
 };
 
 export type MissioneLivello = StrapiRelationBase & {
@@ -143,6 +144,8 @@ function setMissioneRelations(searchParams: URLSearchParams) {
 	searchParams.set('populate[trofeo][fields][0]', 'nome');
 	searchParams.set('populate[trofeo][fields][1]', 'descrizione');
 	searchParams.set('populate[trofeo][fields][2]', 'punti');
+	searchParams.set('populate[trofeo][populate][immagine][fields][0]', 'url');
+	searchParams.set('populate[trofeo][populate][immagine][fields][1]', 'alternativeText');
 	searchParams.set('populate[stagione][fields][0]', 'titolo');
 	searchParams.set('populate[stagione][fields][1]', 'slug');
 }

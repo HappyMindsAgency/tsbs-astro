@@ -1,5 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
+import { getMissioneBySlug } from '../../../lib/strapi/missioni';
+import { registraEsitoProva, type TrofeoSbloccato } from '../../../lib/strapi/progressione';
 import { sendNotification } from '../../../lib/mailer';
 import { logger } from '../../../services/logger';
 
@@ -12,11 +14,6 @@ type MembroRecord = StrapiRecord & {
 	email?: string | null;
 	nickname?: string | null;
 	accademia?: StrapiRecord | null;
-};
-
-type MissioneRecord = StrapiRecord & {
-	titolo?: string | null;
-	slug?: string | null;
 };
 
 type GrimorioPayload = {
@@ -79,16 +76,39 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 	}
 
 	let missionCompleted = false;
+	let trofeiSbloccati: TrofeoSbloccato[] = [];
 	if (missioneSlug) {
 		const missione = await getMissioneBySlug(missioneSlug);
 		if (!missione) {
 			return json({ error: 'mission_not_found' }, 404);
 		}
 
-		missionCompleted = await completeMissioneGrimorio(membro.documentId, missione, note.documentId, action);
-		if (!missionCompleted) {
+		// Il salvataggio di una nota valida supera la missione: il motore di
+		// progressione gestisce partecipazione, trofeo e punti (idempotenti).
+		const progressione = await registraEsitoProva({
+			membro: {
+				id: membro.id,
+				documentId: membro.documentId,
+				email: membro.email ?? null,
+				punti: null,
+				livello: null,
+				accademia: null,
+			},
+			missione,
+			esito: true,
+			extraRuntime: {
+				grimorioDocumentId: note.documentId,
+				azioneGrimorio: action,
+				source: missione.slug,
+			},
+		});
+
+		if (!progressione) {
 			return json({ error: 'mission_completion_failed', message: 'Nota salvata, ma completamento missione non riuscito.' }, 500);
 		}
+
+		missionCompleted = progressione.missioneCompletata;
+		trofeiSbloccati = progressione.trofeiSbloccati;
 	}
 
 	if (action === 'submit') {
@@ -99,6 +119,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		success: true,
 		noteDocumentId: note.documentId,
 		missionCompleted,
+		trofeiSbloccati,
 		action,
 	});
 };
@@ -128,25 +149,6 @@ async function getMembroByUserId(userId: number) {
 	if (!response.ok) return null;
 	const payload = await response.json();
 	return (payload?.data?.[0] ?? null) as MembroRecord | null;
-}
-
-async function getMissioneBySlug(slug: string) {
-	const searchParams = new URLSearchParams();
-	searchParams.set('locale', 'it-IT');
-	searchParams.set('status', 'published');
-	searchParams.set('filters[slug][$eq]', slug);
-	searchParams.set('filters[attiva][$eq]', 'true');
-	searchParams.set('fields[0]', 'titolo');
-	searchParams.set('fields[1]', 'slug');
-	searchParams.set('pagination[pageSize]', '1');
-
-	const response = await fetch(`${STRAPI_API_BASE_URL}/missioni?${searchParams}`, {
-		headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
-	});
-
-	if (!response.ok) return null;
-	const payload = await response.json();
-	return (payload?.data?.[0] ?? null) as MissioneRecord | null;
 }
 
 async function createNota(membro: MembroRecord, nota: { title: string; body: string }) {
@@ -223,92 +225,6 @@ async function getNotaForMembro(documentId: string, membroDocumentId: string) {
 	return (payload?.data?.[0] ?? null) as StrapiRecord | null;
 }
 
-async function completeMissioneGrimorio(
-	membroDocumentId: string,
-	missione: MissioneRecord,
-	noteDocumentId: string,
-	action: 'draft' | 'submit',
-) {
-	const now = new Date().toISOString();
-	const existing = await getPartecipazione(membroDocumentId, missione.documentId);
-	const runtime = {
-		grimorioDocumentId: noteDocumentId,
-		azioneGrimorio: action,
-		source: missione.slug,
-	};
-
-	if (existing) {
-		const response = await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione/${existing.documentId}`, {
-			method: 'PUT',
-			headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				data: {
-					stato: 'completata',
-					progresso: 100,
-					dataCompletamento: existing.dataCompletamento || now,
-					datiRuntime: {
-						...(isRecord(existing.datiRuntime) ? existing.datiRuntime : {}),
-						...runtime,
-					},
-				},
-			}),
-		});
-
-		if (!response.ok) {
-			const error = await response.text();
-			logger.error(`[Missione Grimorio] Aggiornamento partecipazione fallito: ${error}`);
-		}
-
-		return response.ok;
-	}
-
-	const response = await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
-		method: 'POST',
-		headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			data: {
-				stato: 'completata',
-				progresso: 100,
-				dataInizio: now,
-				dataCompletamento: now,
-				datiRuntime: runtime,
-				membro: { connect: [membroDocumentId] },
-				missione: { connect: [missione.documentId] },
-			},
-		}),
-	});
-
-	if (!response.ok) {
-		const error = await response.text();
-		logger.error(`[Missione Grimorio] Creazione partecipazione fallita: ${error}`);
-	}
-
-	return response.ok;
-}
-
-async function getPartecipazione(membroDocumentId: string, missioneDocumentId: string) {
-	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
-	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
-	searchParams.set('filters[missione][documentId][$eq]', missioneDocumentId);
-	searchParams.set('fields[0]', 'stato');
-	searchParams.set('fields[1]', 'progresso');
-	searchParams.set('fields[2]', 'dataCompletamento');
-	searchParams.set('fields[3]', 'datiRuntime');
-	searchParams.set('pagination[pageSize]', '1');
-
-	const response = await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione?${searchParams}`, {
-		headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
-	});
-
-	if (!response.ok) return null;
-	const payload = await response.json();
-	return (payload?.data?.[0] ?? null) as (StrapiRecord & {
-		dataCompletamento?: string | null;
-		datiRuntime?: unknown;
-	}) | null;
-}
-
 async function notifyPrefetti(data: {
 	user: { email?: string; username?: string };
 	membro: MembroRecord;
@@ -376,10 +292,6 @@ function buildNoteSlug(title: string) {
 		.slice(0, 60) || 'nota';
 
 	return `${base}-${Date.now().toString(36)}`;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function escapeHtml(str: string): string {
