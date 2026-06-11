@@ -29,7 +29,7 @@ Decisione:
 - il `Test di Smistamento` e un'eccezione di sistema: serve per assegnare il primo livello ma non deve comparire nella lista Missioni
 - alla conferma dell'Accademia dopo il test di smistamento, il Membro viene aggiornato con `Livello 1 - Adepto`
 - per robustezza, se `Livello.ordine` non e ancora compilato su Strapi, il frontend ricava l'ordine dagli slug noti dei livelli; se un Membro ha Accademia ma livello vuoto, viene trattato come smistato e vede le missioni del Livello 2
-- l'ordinamento delle missioni visibili e dal livello piu alto sbloccato ai livelli precedenti, e dentro ogni livello da `Missione.ordine` piu alto a piu basso
+- l'ordinamento delle missioni visibili segue la progressione narrativa: prima il livello piu basso, poi i successivi; dentro ogni livello usa `Missione.ordine` dal numero piu piccolo al piu grande, con le missioni senza ordine in fondo
 - le missioni prive di livello non vengono mostrate dalla lista; le missioni extra/finali non ancora pronte devono restare `attiva: false`
 - la logica di sblocco puntuale delle singole missioni non appartiene a questo filtro e resta fuori dallo scope
 

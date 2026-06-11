@@ -267,7 +267,7 @@ Esempio Epistole:
 - Campi localizzati: `nome`, `slug`, `descrizione`
 - Relazioni: `stagione`, `membri`, `missioni`
 - draftAndPublish: `true`
-- Note binding Astro: fonte per progressione, percorso di studi e vincoli missioni. Per la lista `/missioni/`, `ordine` deve essere compilato per filtrare le missioni dei livelli sbloccati e ordinarle dal livello piu alto ai precedenti; finche manca, il frontend usa un fallback dagli slug noti dei livelli.
+- Note binding Astro: fonte per progressione, percorso di studi e vincoli missioni. Per la lista `/missioni/`, `ordine` deve essere compilato per ordinare le missioni visibili dal numero piu piccolo al piu grande dentro ogni livello; finche manca l'ordine del livello, il frontend usa un fallback dagli slug noti dei livelli per il filtro e l'ordinamento.
 - Dubbi aperti: confermare se il livello utente si calcola o viene assegnato da backend.
 
 ### Membro

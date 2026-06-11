@@ -96,11 +96,17 @@ function isMissioneVisibilePerLivello(missione: Missione, currentLevel: Missione
 	return missionLevelOrder <= unlockedLevelOrder;
 }
 
-function sortMissioniByUnlockedLevel(a: Missione, b: Missione) {
-	const levelDiff = (getLevelOrder(b.livello) ?? 0) - (getLevelOrder(a.livello) ?? 0);
+function sortMissioniByProgressionOrder(a: Missione, b: Missione) {
+	const levelDiff = (getLevelOrder(a.livello) ?? 0) - (getLevelOrder(b.livello) ?? 0);
 	if (levelDiff !== 0) return levelDiff;
 
-	const missionDiff = (normalizeOrder(b.ordine) ?? 0) - (normalizeOrder(a.ordine) ?? 0);
+	const orderA = normalizeOrder(a.ordine);
+	const orderB = normalizeOrder(b.ordine);
+
+	if (orderA === null && orderB !== null) return 1;
+	if (orderA !== null && orderB === null) return -1;
+
+	const missionDiff = (orderA ?? 0) - (orderB ?? 0);
 	if (missionDiff !== 0) return missionDiff;
 
 	return a.titolo.localeCompare(b.titolo, 'it-IT');
@@ -135,7 +141,7 @@ function buildMissionTabs(
 	const disponibili: MissionCard[] = [];
 	const visibleMissioni = missioni
 		.filter((missione) => isMissioneVisibilePerLivello(missione, currentLevel, hasCompletedSorting))
-		.sort(sortMissioniByUnlockedLevel);
+		.sort(sortMissioniByProgressionOrder);
 
 	for (const missione of visibleMissioni) {
 		const partecipazione = partecipazioniByMissione.get(missione.slug);
