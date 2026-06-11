@@ -14,6 +14,14 @@ const { entita, documentId, lang = 'it' } = Astro.props;
 
 const defaultTitle = 'The Secret Bookish Society - Biblioteca Classense';
 
+const STRAPI_LOCALE_BY_LANG: Record<string, string> = {
+  it: 'it-IT',
+};
+
+function getStrapiLocale(pageLang = 'it') {
+  return STRAPI_LOCALE_BY_LANG[pageLang] || STRAPI_LOCALE_BY_LANG.it;
+}
+
 const client = strapi({
   baseURL: import.meta.env.STRAPI_API_URL || 'http://localhost:1337',
 });
@@ -112,7 +120,7 @@ if (documentId && entita) {
 }
 
 
-if (entita === 'pagina-privacy-policy' || entita === 'pagina-cookie-policy') {
+if (entita === 'privacy-policy' || entita === 'pagina-privacy-policy' || entita === 'pagina-cookie-policy') {
     populate = [
         'seo'
     ];
@@ -139,25 +147,29 @@ let getSEORawData : any;
 let seo : any;
 
 
-if (documentId) {
-    getSEOdataFetch = client.collection(endpoint);
+try {
+    if (documentId) {
+        getSEOdataFetch = client.collection(endpoint);
 
-    getSEORawData = await getSEOdataFetch.find({
-        populate: populate,
-        locale: lang,
-        filters: filters
-    });
+        getSEORawData = await getSEOdataFetch.find({
+            populate: populate,
+            locale: getStrapiLocale(lang),
+            filters: filters
+        });
 
-    seo = getSEORawData.data[0].seo;
-} else if (endpoint!= 'pagina-home') {
-    getSEOdataFetch = client.single(endpoint);
+        seo = getSEORawData.data[0].seo;
+    } else if (endpoint!= 'pagina-home') {
+        getSEOdataFetch = client.single(endpoint);
 
-    getSEORawData = await getSEOdataFetch.find({
-        populate: populate,
-        locale: lang,
-    });
+        getSEORawData = await getSEOdataFetch.find({
+            populate: populate,
+            locale: getStrapiLocale(lang),
+        });
 
-    seo = getSEORawData.data.seo;
+        seo = getSEORawData.data.seo;
+    }
+} catch {
+    seo = null;
 }
 
 
