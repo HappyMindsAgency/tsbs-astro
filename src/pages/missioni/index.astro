@@ -65,6 +65,10 @@ const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 			if (!grid || !button) return;
 
 			const cards = [...pane.querySelectorAll<HTMLElement>('[data-mission-card]')];
+			if (cards.length === 0) {
+				button.hidden = true;
+				return;
+			}
 
 			if (button.dataset.expanded === 'true') {
 				cards.forEach((card) => card.classList.remove('is-hidden'));
@@ -79,7 +83,10 @@ const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 			const columnCount = getColumnCount(grid);
 			const rowGap = parseFloat(gridStyles.rowGap) || 0;
 			const firstCardHeight = cards[0]?.offsetHeight || 0;
-			if (firstCardHeight === 0) return;
+			if (firstCardHeight === 0) {
+				button.hidden = true;
+				return;
+			}
 
 			const totalRows = Math.ceil(cards.length / columnCount);
 			const fullGridHeight = (totalRows * firstCardHeight) + (Math.max(totalRows - 1, 0) * rowGap);
@@ -103,7 +110,7 @@ const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 				card.classList.toggle('is-hidden', index >= visibleLimit);
 			});
 
-			button.hidden = cards.length <= visibleLimit;
+			button.hidden = !cards.some((card) => card.classList.contains('is-hidden'));
 			button.dataset.expanded ||= 'false';
 		};
 
@@ -113,11 +120,13 @@ const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 		};
 
 		updateActivePane();
+		requestAnimationFrame(updateActivePane);
 
 		document.querySelectorAll('[data-bs-toggle="tab"]').forEach((tabButton) => {
 			tabButton.addEventListener('shown.bs.tab', updateActivePane);
 		});
 
+		window.addEventListener('load', updateActivePane);
 		window.addEventListener('resize', updateActivePane);
 
 		document.querySelectorAll<HTMLButtonElement>('[data-load-more]').forEach((button) => {
