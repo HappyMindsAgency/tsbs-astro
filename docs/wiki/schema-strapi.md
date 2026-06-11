@@ -207,7 +207,8 @@ Esempio Epistole:
 
 - Nome Strapi tecnico: `api::faq.faq`
 - Tipo: single type
-- Endpoint/collection: `faqs`
+- Endpoint REST: `/faq`
+- Collection name: `faqs`
 - Campi principali: `contenuto`, `faq`
 - Campi required: nessuno
 - Campi localizzati: `contenuto`, `faq`

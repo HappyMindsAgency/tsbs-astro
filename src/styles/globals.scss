@@ -2492,6 +2492,23 @@ body:has(.tsbs-legal-page) {
 		line-height: 1.5;
 	}
 
+	.faq-intro__richtext {
+		width: 100%;
+		max-width: none;
+	}
+
+	.faq-intro__richtext.block-richtext.custombody :where(h1, h2, h3, h4, h5, h6) {
+		color: var(--tsbs-color-heading);
+	}
+
+	.faq-intro__richtext.block-richtext.custombody a,
+	.faq-accordion__richtext.block-richtext.custombody a {
+		color: var(--tsbs-theme-accent);
+		font-weight: 700;
+		text-decoration: underline;
+		text-underline-offset: 0.18em;
+	}
+
 	.faq-accordion {
 		display: grid;
 		gap: 0.875rem;
@@ -2576,6 +2593,21 @@ body:has(.tsbs-legal-page) {
 		margin: 0;
 		font-size: 0.9375rem;
 		line-height: 1.5;
+	}
+
+	.faq-accordion__richtext.block-richtext.custombody :where(p, ul, ol, blockquote) {
+		margin-top: 0;
+		margin-bottom: 0.75rem;
+		font-size: 0.9375rem;
+		line-height: 1.5;
+	}
+
+	.faq-accordion__richtext.block-richtext.custombody :where(h1, h2, h3, h4, h5, h6) {
+		color: var(--tsbs-color-heading);
+	}
+
+	.faq-accordion__richtext.block-richtext.custombody > :last-child {
+		margin-bottom: 0;
 	}
 
 	@media (min-width: 768px) {
