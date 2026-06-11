@@ -12,8 +12,10 @@ type Props = {
 const { missioni = [], partecipazioni = [], livelloMembro = null, testSmistamentoCompletato = false } = Astro.props;
 
 const missionTabs = buildMissionTabs(missioni, partecipazioni, livelloMembro, testSmistamentoCompletato);
+const requestedTabId = Astro.url.searchParams.get('tab');
+const requestedTabIndex = missionTabs.findIndex((tab) => tab.id === requestedTabId);
 const firstPopulatedTabIndex = missionTabs.findIndex((tab) => tab.missions.length > 0);
-const activeTabIndex = firstPopulatedTabIndex >= 0 ? firstPopulatedTabIndex : 0;
+const activeTabIndex = requestedTabIndex >= 0 ? requestedTabIndex : firstPopulatedTabIndex >= 0 ? firstPopulatedTabIndex : 0;
 ---
 
 <ul class="nav missions-tabs" id="missions-tabs" role="tablist" aria-label="Stato missioni">
