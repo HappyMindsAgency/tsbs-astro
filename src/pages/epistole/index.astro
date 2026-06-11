@@ -1,7 +1,9 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import FiltroEpistole from '../../lib/filtri/FiltroEpistole.astro';
 import { getEpistole } from '../../lib/strapi/epistole';
+import { getMembroMissioniByJwt } from '../../lib/strapi/missioni';
 import { resolveUserContext } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -10,49 +12,14 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+const jwt = Astro.cookies.get('jwt')?.value;
+const { theme, accademia } = await resolveUserContext(jwt);
 
-const epistole = await getEpistole();
-const featuredEpistola = epistole[0] || null;
-const archiveEpistole = epistole.slice(1);
-
-function getPlainText(value: string | null) {
-	if (!value) return '';
-
-	return value
-		.replace(/```[\s\S]*?```/g, ' ')
-		.replace(/`([^`]+)`/g, '$1')
-		.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-		.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-		.replace(/[#>*_\-~]/g, ' ')
-		.replace(/\s+/g, ' ')
-		.trim();
-}
-
-function getExcerpt(value: string | null, maxLength = 130) {
-	const plainText = getPlainText(value);
-
-	if (plainText.length <= maxLength) return plainText;
-
-	return `${plainText.slice(0, maxLength).trim()}...`;
-}
-
-function formatEpistolaDate(value?: string | null) {
-	if (!value) return '';
-
-	const date = new Date(value);
-	if (Number.isNaN(date.getTime())) return '';
-
-	return new Intl.DateTimeFormat('it-IT', {
-		day: 'numeric',
-		month: 'long',
-		year: 'numeric',
-	}).format(date);
-}
-
-function getPrimaryCategory(epistola: typeof epistole[number]) {
-	return epistola.categorie_epistola?.[0]?.nome || "L'EPISTOLA";
-}
+const [epistole, membroMissioni] = await Promise.all([
+	getEpistole(),
+	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
+]);
+const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -64,39 +31,12 @@ function getPrimaryCategory(epistola: typeof epistole[number]) {
 		</header>
 
 		<div class="container-xl tsbs-app-container epistole-content">
-			{featuredEpistola && (
-				<section class="tsbs-card epistole-featured" aria-labelledby="epistole-featured-title">
-					<div class="epistole-featured__copy">
-						<p class="epistole-eyebrow">{getPrimaryCategory(featuredEpistola)}</p>
-						<h2 id="epistole-featured-title">{featuredEpistola.titolo}</h2>
-						<p>{getExcerpt(featuredEpistola.contenuto, 150)}</p>
-					</div>
-					<a class="btn tsbs-cta-primary epistole-featured__button" href={`/epistole/${featuredEpistola.slug}/`}>
-						Apri l’Epistola
-					</a>
-				</section>
-			)}
-
-			<section class="epistole-archive" aria-labelledby="epistole-archive-title">
-				<h2 id="epistole-archive-title" class="tsbs-section-title">Archivio delle Epistole</h2>
-
-				<div class="epistole-list">
-					{archiveEpistole.map((epistola, index) => (
-						<a class={`epistole-card ${index >= 3 ? 'is-hidden' : ''}`} href={`/epistole/${epistola.slug}/`} data-epistole-card>
-							<p class="epistole-card__meta">{formatEpistolaDate(epistola.publishedAt)}</p>
-							<h3>{epistola.titolo}</h3>
-							<p>{getExcerpt(epistola.contenuto)}</p>
-						</a>
-					))}
-				</div>
-
-				{archiveEpistole.length > 0 && (
-					<button class="missions-load-more epistole-load-more" type="button" data-epistole-load-more aria-controls="epistole-archive-title">
-						<span>Carica altro</span>
-						<i class="bi bi-arrow-right" aria-hidden="true"></i>
-					</button>
-				)}
-			</section>
+			<FiltroEpistole
+				epistole={epistole}
+				accademiaMembro={membroMissioni?.accademia?.slug ?? null}
+				livelloMembro={membroMissioni?.livello ?? null}
+				testSmistamentoCompletato={testSmistamentoCompletato}
+			/>
 		</div>
 	</main>
 

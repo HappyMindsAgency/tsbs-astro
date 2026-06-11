@@ -2,7 +2,9 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import RitchText from '../../components/RitchText.astro';
+import { isEpistolaVisible } from '../../lib/filtri/epistole';
 import { getEpistolaBySlug } from '../../lib/strapi/epistole';
+import { getMembroMissioniByJwt } from '../../lib/strapi/missioni';
 import { resolveUserContext } from '../../lib/theme';
 
 export const prerender = false;
@@ -18,10 +20,24 @@ if (!slugEpis) {
 	return Astro.redirect('/404');
 }
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
-const epistola = await getEpistolaBySlug(slugEpis);
+const jwt = Astro.cookies.get('jwt')?.value;
+const { theme, accademia } = await resolveUserContext(jwt);
+const [epistola, membroMissioni] = await Promise.all([
+	getEpistolaBySlug(slugEpis),
+	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
+]);
 
 if (!epistola) {
+	return Astro.redirect('/404');
+}
+
+const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
+
+if (!isEpistolaVisible(epistola, {
+	accademiaMembro: membroMissioni?.accademia?.slug ?? null,
+	livelloMembro: membroMissioni?.livello ?? null,
+	testSmistamentoCompletato,
+})) {
 	return Astro.redirect('/404');
 }
 ---

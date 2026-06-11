@@ -20,6 +20,32 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-11 - Filtro Epistole Per Accademia E Livelli Sbloccati
+
+Decisione:
+- la lista `/epistole/` mostra solo epistole pubblicate visibili al Membro loggato
+- la visibilita per Accademia usa `Epistola.accademia`: epistole senza Accademia sono globali, epistole con Accademia sono visibili solo ai membri di quella Accademia
+- la visibilita per progressione usa `Epistola.livellos`: epistole senza `livellos` sono globali per livello, epistole con `livellos` sono visibili quando almeno un livello collegato e sbloccato dal Membro
+- il Livello 1 - Adepto mantiene l'eccezione gia usata nelle Missioni: dopo lo smistamento l'utente vede gia i contenuti del Livello 2
+- l'ordinamento delle epistole resta cronologico, con `publishedAt` piu recente prima
+- `categorie_epistola` resta tassonomia editoriale e non viene usata per simulare livelli o Accademie
+
+Motivo:
+- usare la relazione `livellos` dedicata evita di sovraccaricare `Categoria Epistola`
+- le Epistole sono un canale narrativo/messaggistico, quindi la data di pubblicazione resta la priorita di lettura
+- mantenere la stessa eccezione di accesso del Livello 1 evita incoerenze tra Missioni ed Epistole dopo il test di smistamento
+
+Impatto:
+- `src/lib/strapi/epistole.ts`
+- `src/lib/filtri/epistole.ts`
+- `src/lib/filtri/FiltroEpistole.astro`
+- `src/pages/epistole/index.astro`
+- `src/pages/epistole/[slugEpis].astro`
+- compilazione richiesta su Strapi: `Epistola.livellos`, `Epistola.accademia` quando specifica, `Membro.livello`, `Membro.accademia`
+
+Stato:
+- approvata
+
 ## 2026-06-11 - Missione 02 Come Scrittura Nel Grimorio
 
 Decisione:

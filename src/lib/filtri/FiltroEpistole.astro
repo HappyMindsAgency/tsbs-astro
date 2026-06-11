@@ -1,0 +1,102 @@
+---
+import { isEpistolaVisible, sortEpistoleByDateDesc } from './epistole';
+import type { Epistola } from '../strapi/epistole';
+import type { MissioneLivello } from '../strapi/missioni';
+
+type Props = {
+	epistole: Epistola[];
+	accademiaMembro?: string | null;
+	livelloMembro: MissioneLivello | null;
+	testSmistamentoCompletato?: boolean;
+};
+
+const {
+	epistole = [],
+	accademiaMembro = null,
+	livelloMembro = null,
+	testSmistamentoCompletato = false,
+} = Astro.props;
+
+function getPlainText(value: string | null) {
+	if (!value) return '';
+
+	return value
+		.replace(/```[\s\S]*?```/g, ' ')
+		.replace(/`([^`]+)`/g, '$1')
+		.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+		.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+		.replace(/[#>*_\-~]/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+function getExcerpt(value: string | null, maxLength = 130) {
+	const plainText = getPlainText(value);
+
+	if (plainText.length <= maxLength) return plainText;
+
+	return `${plainText.slice(0, maxLength).trim()}...`;
+}
+
+function formatEpistolaDate(value?: string | null) {
+	if (!value) return '';
+
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return '';
+
+	return new Intl.DateTimeFormat('it-IT', {
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+	}).format(date);
+}
+
+function getPrimaryCategory(epistola: Epistola) {
+	return epistola.categorie_epistola?.[0]?.nome || "L'EPISTOLA";
+}
+
+const visibleEpistole = epistole
+	.filter((epistola) => isEpistolaVisible(epistola, { accademiaMembro, livelloMembro, testSmistamentoCompletato }))
+	.sort(sortEpistoleByDateDesc);
+
+const featuredEpistola = visibleEpistole[0] || null;
+const archiveEpistole = visibleEpistole.slice(1);
+---
+
+{featuredEpistola && (
+	<section class="tsbs-card epistole-featured" aria-labelledby="epistole-featured-title">
+		<div class="epistole-featured__copy">
+			<p class="epistole-eyebrow">{getPrimaryCategory(featuredEpistola)}</p>
+			<h2 id="epistole-featured-title">{featuredEpistola.titolo}</h2>
+			<p>{getExcerpt(featuredEpistola.contenuto, 150)}</p>
+		</div>
+		<a class="btn tsbs-cta-primary epistole-featured__button" href={`/epistole/${featuredEpistola.slug}/`}>
+			Apri l’Epistola
+		</a>
+	</section>
+)}
+
+<section class="epistole-archive" aria-labelledby="epistole-archive-title">
+	<h2 id="epistole-archive-title" class="tsbs-section-title">Archivio delle Epistole</h2>
+
+	{archiveEpistole.length > 0 ? (
+		<>
+			<div class="epistole-list">
+				{archiveEpistole.map((epistola, index) => (
+					<a class={`epistole-card ${index >= 3 ? 'is-hidden' : ''}`} href={`/epistole/${epistola.slug}/`} data-epistole-card>
+						<p class="epistole-card__meta">{formatEpistolaDate(epistola.publishedAt)}</p>
+						<h3>{epistola.titolo}</h3>
+						<p>{getExcerpt(epistola.contenuto)}</p>
+					</a>
+				))}
+			</div>
+
+			<button class="missions-load-more epistole-load-more" type="button" data-epistole-load-more aria-controls="epistole-archive-title">
+				<span>Carica altro</span>
+				<i class="bi bi-arrow-right" aria-hidden="true"></i>
+			</button>
+		</>
+	) : (
+		<p class="missions-empty-message">nessuna epistola disponibile</p>
+	)}
+</section>

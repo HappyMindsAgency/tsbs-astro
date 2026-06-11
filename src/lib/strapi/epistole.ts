@@ -20,6 +20,12 @@ export type EpistolaStagione = StrapiRelationBase & {
 	slug: string | null;
 };
 
+export type EpistolaLivello = StrapiRelationBase & {
+	nome: string;
+	slug: string | null;
+	ordine: number | null;
+};
+
 export type Epistola = {
 	id: number;
 	documentId: string;
@@ -30,6 +36,7 @@ export type Epistola = {
 	accademia: EpistolaAccademia | null;
 	categorie_epistola: EpistolaCategoria[];
 	stagioni: EpistolaStagione[];
+	livellos: EpistolaLivello[];
 };
 
 function setEpistolaRelations(searchParams: URLSearchParams) {
@@ -40,6 +47,9 @@ function setEpistolaRelations(searchParams: URLSearchParams) {
 	searchParams.set('populate[categorie_epistola][fields][1]', 'slug');
 	searchParams.set('populate[stagioni][fields][0]', 'titolo');
 	searchParams.set('populate[stagioni][fields][1]', 'slug');
+	searchParams.set('populate[livellos][fields][0]', 'nome');
+	searchParams.set('populate[livellos][fields][1]', 'slug');
+	searchParams.set('populate[livellos][fields][2]', 'ordine');
 }
 
 // Binding della lista epistole /epistole.

@@ -185,9 +185,9 @@ Esempio Epistole:
 - Campi principali: `titolo`, `slug`, `contenuto`
 - Campi required: `titolo`
 - Campi localizzati: `titolo`, `slug`, `contenuto`
-- Relazioni: `accademia`, `categorie_epistola`, `stagioni`
+- Relazioni: `accademia`, `categorie_epistola`, `stagioni`, `livellos`
 - draftAndPublish: `true`
-- Note binding Astro: prima area consigliata per binding lista/dettaglio; fetch pubblico su contenuti pubblicati.
+- Note binding Astro: prima area consigliata per binding lista/dettaglio; fetch pubblico su contenuti pubblicati. La lista `/epistole/` filtra per Accademia e per livelli sbloccati tramite `livellos`: epistole senza `livellos` sono globali per livello, epistole con `livellos` sono visibili quando almeno un livello collegato e sbloccato dal Membro.
 - Dubbi aperti: il dettaglio pagina prevede parti visibili solo a utenti loggati; separare contenuto pubblico da blocchi privati.
 
 ### Evento
