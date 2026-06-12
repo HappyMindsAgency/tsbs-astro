@@ -28,11 +28,9 @@ if (!missione) {
 
 const hasDescription = Boolean(missione.descrizione?.trim());
 const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.punteggio} punti` : '');
-// La sfida di lettura ha una fruizione dedicata, fuori dal flusso prova/quiz.
-const READING_CHALLENGE_MISSION_SLUGS = new Set(['missione-06-i-custodi-del-sapere']);
-const missionProofHref = READING_CHALLENGE_MISSION_SLUGS.has(missione.slug)
-	? `/missioni/${missione.slug}/sfida-lettura/`
-	: `/missioni/${missione.slug}/prova/`;
+// "Avvia la missione" crea la Partecipazione (inCorso, progresso 50) e
+// reindirizza alla prova: il target è calcolato lato server dall'endpoint.
+const avviaActionHref = `/api/missioni/${missione.slug}/avvia`;
 ---
 
 <Layout lang={lang} theme={theme}>
@@ -70,8 +68,18 @@ const missionProofHref = READING_CHALLENGE_MISSION_SLUGS.has(missione.slug)
 					</>
 				)}
 
-				<a class="btn tsbs-cta-primary mission-detail__cta" href={missionProofHref}>Avvia la missione</a>
+				<form class="mission-detail__cta-form" method="POST" action={avviaActionHref}>
+					<button class="btn tsbs-cta-primary mission-detail__cta" type="submit">Avvia la missione</button>
+				</form>
 			</div>
 		</section>
 	</main>
 </Layout>
+
+<style>
+	/* Il form wrappa solo il pulsante: display:contents lo toglie dal layout
+	   così il bottone resta l'elemento del grid e conserva centratura/margini. */
+	.mission-detail__cta-form {
+		display: contents;
+	}
+</style>

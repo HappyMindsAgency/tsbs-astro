@@ -100,6 +100,7 @@ export const RegistrationError = {
     NICKNAME_BLACKLISTED: 'nickname_blacklisted',
     WEAK_PASSWORD: 'weak_password',
     ALREADY_TAKEN: 'already_taken',
+    EMAIL_ALREADY_REGISTERED: 'email_already_registered',
     INTERNAL_SERVER_ERROR: 'internal_server_error',
 } as const;
 

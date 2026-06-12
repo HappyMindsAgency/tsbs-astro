@@ -9,7 +9,8 @@ const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 const VALID_ACADEMIES = ['arborea', 'arcadia', 'armonia', 'astraria'];
-const FIRST_LEVEL_SLUG = 'livello-1-adepto';
+// Il completamento del test di smistamento promuove il Membro al Livello 2 - Iniziato.
+const SMISTAMENTO_LEVEL_SLUG = 'livello-2-iniziato';
 
 export const PUT: APIRoute = async ({ request, cookies }) => {
     const jwt = cookies.get('jwt')?.value;
@@ -83,9 +84,9 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
         return json({ error: 'academy_not_found' }, 404);
     }
 
-    // Il completamento del test di smistamento assegna il primo livello.
+    // Il completamento del test di smistamento promuove il Membro al Livello 2 - Iniziato.
     const levelQs = new URLSearchParams({
-        'filters[slug][$eq]': FIRST_LEVEL_SLUG,
+        'filters[slug][$eq]': SMISTAMENTO_LEVEL_SLUG,
         'fields[0]': 'documentId',
         'status': 'published',
     });
@@ -106,7 +107,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
         return json({ error: 'level_not_found' }, 404);
     }
 
-    // Aggiorna il Membro con accademia e livello iniziale.
+    // Aggiorna il Membro con accademia e livello raggiunto (Livello 2 - Iniziato).
     const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membro.documentId}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },

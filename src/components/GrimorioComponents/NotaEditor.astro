@@ -6,21 +6,41 @@ interface Props {
 	missioneSlug?: string;
 	storageKey?: string;
 	titleValue?: string;
+	/** HTML della nota esistente da precaricare nell'editor (vuoto per una nuova nota). */
+	bodyValue?: string;
+	/** documentId della nota esistente: se presente, il salvataggio aggiorna invece di creare. */
+	noteDocumentId?: string;
+	/** Token per-membro (documentId del Membro) usato per isolare le bozze in localStorage. */
+	storageScope?: string;
 }
 
 const {
 	missioneSlug = '',
-	storageKey = missioneSlug ? `tsbs-grimorio-note-draft-${missioneSlug}` : 'tsbs-grimorio-note-draft',
 	titleValue = 'Titolo della nota',
+	bodyValue = '',
+	noteDocumentId = '',
+	storageScope = '',
+	storageKey,
 } = Astro.props as Props;
+
+// La chiave localStorage è isolata per Membro (storageScope) per evitare che le
+// bozze di un membro restino visibili a un altro sullo stesso browser.
+const scope = storageScope || 'anon';
+const resolvedStorageKey = storageKey
+	?? (missioneSlug
+		? `tsbs-grimorio-note-draft-${scope}-${missioneSlug}`
+		: noteDocumentId
+			? `tsbs-grimorio-note-${scope}-${noteDocumentId}`
+			: `tsbs-grimorio-note-nuova-${scope}`);
 ---
 
 <section
 	class="note-editor"
 	aria-labelledby="note-editor-title"
 	data-note-editor
-	data-note-storage-key={storageKey}
+	data-note-storage-key={resolvedStorageKey}
 	data-note-missione-slug={missioneSlug}
+	data-note-document-id={noteDocumentId}
 >
 	<div class="note-editor__head">
 		<label class="visually-hidden" for="note-title-input">Titolo della nota</label>
@@ -66,6 +86,7 @@ const {
 		aria-multiline="true"
 		data-placeholder="Scrivi qui le tue annotazioni"
 		data-note-body
+		set:html={bodyValue}
 	></div>
 
 	<p class="note-editor__feedback" data-note-feedback hidden></p>
@@ -216,13 +237,21 @@ const {
 				bodyEditor.classList.toggle('is-empty', getPlainBody().length === 0);
 			};
 
+			// documentId reso dal server (nota esistente): resta sempre la fonte di
+			// verità, così una bozza locale non può puntare alla nota di un altro membro.
+			const serverDocumentId = editor.dataset.noteDocumentId || '';
+
 			const savedDraft = noteStorage?.getItem(storageKey);
 			if (savedDraft) {
 				try {
 					const draft = JSON.parse(savedDraft);
 					if (titleInput && draft.title) titleInput.value = draft.title;
 					if (bodyEditor && draft.body) bodyEditor.innerHTML = draft.body;
-					if (draft.noteDocumentId) editor.dataset.noteDocumentId = draft.noteDocumentId;
+					if (serverDocumentId) {
+						editor.dataset.noteDocumentId = serverDocumentId;
+					} else if (draft.noteDocumentId) {
+						editor.dataset.noteDocumentId = draft.noteDocumentId;
+					}
 					if (draft.status === 'submitted') setSubmittedState();
 				} catch {
 					noteStorage?.removeItem(storageKey);

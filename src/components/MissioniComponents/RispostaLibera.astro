@@ -24,6 +24,9 @@ const quoteContent = slugMis === 'missione-01-il-varco' ? openQuoteLinksInNewTab
 
 const answerLabel = 'Risposta libera';
 const hasMultipleQuestions = questions.length > 1;
+// Missione 1: la prova raccoglie il numero tessera e lo mette in verifica
+// (nessun trofeo immediato, la missione resta in corso).
+const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 ---
 
 <article class="mission-proof-question free-answer-mission" data-free-answer-mission data-lang={lang} aria-label="Prova missione">
@@ -70,11 +73,30 @@ const hasMultipleQuestions = questions.length > 1;
 					Avanti →
 				</button>
 			</div>
+
+			{isLibraryCardMission && (
+				<p class="library-card-error" data-library-card-error role="alert" hidden></p>
+			)}
 		</form>
 	</div>
 
-	<TestPassed renderHidden={true} />
-	<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
+	{isLibraryCardMission ? (
+		<div class="library-card-result" data-library-card-result hidden role="dialog" aria-modal="true" aria-labelledby="library-card-result-title">
+			<div class="library-card-result__backdrop" data-library-card-result-close></div>
+			<section class="library-card-result__panel">
+				<div class="library-card-result__icon" aria-hidden="true">
+					<i class="bi bi-hourglass-split"></i>
+				</div>
+				<h2 id="library-card-result-title">Tessera inviata. È in attesa di verifica da parte della redazione.</h2>
+				<a class="btn tsbs-cta-primary library-card-result__button" href="/missioni/">Torna alle missioni</a>
+			</section>
+		</div>
+	) : (
+		<>
+			<TestPassed renderHidden={true} />
+			<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
+		</>
+	)}
 </article>
 
 <script define:vars={{ questions, slugMis }}>
@@ -92,7 +114,13 @@ const hasMultipleQuestions = questions.length > 1;
 		const passedToast = root.querySelector('.test-result-toast--passed');
 		const notPassedToast = root.querySelector('.test-result-toast--not-passed');
 
-		if (!form || !instruction || !input || !submit || !passedToast || !notPassedToast) return;
+		const isLibraryCardMission = slugMis === 'missione-01-il-varco';
+		const libraryCardResult = root.querySelector('[data-library-card-result]');
+		const libraryCardError = root.querySelector('[data-library-card-error]');
+
+		// Le missioni standard usano i toast esito; la M1 (tessera) usa il proprio pannello.
+		if (!form || !instruction || !input || !submit) return;
+		if (!isLibraryCardMission && (!passedToast || !notPassedToast)) return;
 
 		let currentPromptIndex = 0;
 		const submittedAnswers = new Array(questions.length).fill('');
@@ -100,8 +128,22 @@ const hasMultipleQuestions = questions.length > 1;
 		const hasAnswer = () => input.value.trim().length > 0;
 
 		const showResultToast = (passed) => {
-			passedToast.hidden = !passed;
-			notPassedToast.hidden = passed;
+			if (passedToast) passedToast.hidden = !passed;
+			if (notPassedToast) notPassedToast.hidden = passed;
+		};
+
+		// Missione 1: la risposta del server riguarda l'invio tessera in verifica,
+		// non il superamento di un quiz. Mostra il pannello di conferma o l'errore inline.
+		const handleLibraryCardResponse = (ok, message) => {
+			if (ok) {
+				if (libraryCardError) libraryCardError.hidden = true;
+				if (libraryCardResult) libraryCardResult.hidden = false;
+				return;
+			}
+			if (libraryCardError) {
+				libraryCardError.textContent = message || 'Non è stato possibile inviare la tessera. Riprova.';
+				libraryCardError.hidden = false;
+			}
 		};
 
 		const validateMissionProof = async () => {
@@ -116,6 +158,12 @@ const hasMultipleQuestions = questions.length > 1;
 					}),
 				});
 				const payload = await response.json().catch(() => null);
+
+				if (isLibraryCardMission) {
+					handleLibraryCardResponse(response.ok && payload?.success === true, payload?.message);
+					return;
+				}
+
 				const passed = response.ok && payload?.passed === true;
 				const trofei = Array.isArray(payload?.trofeiSbloccati) ? payload.trofeiSbloccati : [];
 
@@ -126,7 +174,11 @@ const hasMultipleQuestions = questions.length > 1;
 					showResultToast(passed);
 				}
 			} catch {
-				showResultToast(false);
+				if (isLibraryCardMission) {
+					handleLibraryCardResponse(false);
+				} else {
+					showResultToast(false);
+				}
 			} finally {
 				submit.disabled = false;
 			}
@@ -153,7 +205,16 @@ const hasMultipleQuestions = questions.length > 1;
 
 		input.addEventListener('input', () => {
 			submit.disabled = !hasAnswer();
+			if (libraryCardError) libraryCardError.hidden = true;
 		});
+
+		if (libraryCardResult) {
+			libraryCardResult.querySelectorAll('[data-library-card-result-close]').forEach((element) => {
+				element.addEventListener('click', () => {
+					libraryCardResult.hidden = true;
+				});
+			});
+		}
 
 		if (back) {
 			back.addEventListener('click', () => {
@@ -198,6 +259,79 @@ const hasMultipleQuestions = questions.length > 1;
 		color: var(--tsbs-color-white);
 		font-size: 1.125rem;
 		line-height: 1;
+	}
+
+	.library-card-error {
+		margin: 0.75rem 0 0;
+		color: #c0392b;
+		font-size: 0.875rem;
+		line-height: 1.35;
+	}
+
+	.library-card-result {
+		position: fixed;
+		inset: 0;
+		z-index: 1200;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		padding: 1.75rem;
+	}
+
+	.library-card-result__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-surface) 68%, transparent);
+		backdrop-filter: grayscale(0.7) blur(0.0625rem);
+	}
+
+	.library-card-result__panel {
+		position: relative;
+		display: grid;
+		justify-items: center;
+		gap: 1.25rem;
+		width: min(100%, 23.4375rem);
+		padding: 1.75rem 1.5rem;
+		text-align: center;
+		background: var(--tsbs-color-white);
+		border-radius: 0.75rem;
+		box-shadow: 0 1.25rem 3rem color-mix(in srgb, var(--tsbs-theme-accent) 20%, transparent);
+	}
+
+	.library-card-result__icon {
+		display: grid;
+		place-items: center;
+		color: var(--tsbs-theme-accent);
+	}
+
+	.library-card-result__icon .bi {
+		font-size: 3.5rem;
+		line-height: 1;
+	}
+
+	.library-card-result__panel h2 {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.3;
+	}
+
+	.library-card-result__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		min-height: 3rem;
+		font-weight: 800;
+		border-radius: 0.25rem;
+	}
+
+	@media (min-width: 992px) {
+		.library-card-result {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.75rem);
+		}
 	}
 
 </style>

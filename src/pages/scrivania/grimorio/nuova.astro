@@ -4,34 +4,16 @@ import Nav from '../../../components/Nav.astro';
 import BackButton from '../../../components/BackButton.astro';
 import NotaEditor from '../../../components/GrimorioComponents/NotaEditor.astro';
 import { resolveUserContext } from '../../../lib/theme';
-import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro } from '../../../lib/strapi/grimorio';
+import { getCurrentMembroFromJwt } from '../../../lib/strapi/grimorio';
 
 const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
-const slugNota = Astro.params.slugNota;
 
 if (!jwt) {
 	return Astro.redirect('/');
 }
 
-if (!slugNota) {
-	return Astro.redirect('/scrivania/grimorio/');
-}
-
 const membro = await getCurrentMembroFromJwt(jwt);
-const nota = membro ? await getGrimorioNotaBySlugForMembro(slugNota, membro.id, lang) : null;
-
-// Nota inesistente o non di proprietà del membro: torna al grimorio.
-if (!nota) {
-	return Astro.redirect('/scrivania/grimorio/');
-}
-
-// Le note rese pubbliche dalla redazione si visualizzano (sola lettura) nella
-// pagina dedicata: qui si modificano solo le note private del membro.
-if (nota.visibilePubblico) {
-	return Astro.redirect(`/scrivania/grimorio/pubblicate/${nota.slug}/`);
-}
-
 const { theme, accademia } = await resolveUserContext(jwt);
 ---
 
@@ -40,17 +22,12 @@ const { theme, accademia } = await resolveUserContext(jwt);
 
 	<main class="tsbs-app-shell missions-shell note-page">
 		<header class="missions-header missions-header--note">
-			<h1>Nota</h1>
+			<h1>Nuova nota</h1>
 			<BackButton href="/scrivania/grimorio/" label="Torna al grimorio" />
 		</header>
 
 		<div class="container-xl tsbs-app-container note-page__content">
-			<NotaEditor
-				noteDocumentId={nota.documentId}
-				titleValue={nota.titolo}
-				bodyValue={nota.contenuto ?? ''}
-				storageScope={membro?.documentId}
-			/>
+			<NotaEditor storageScope={membro?.documentId} />
 		</div>
 	</main>
 </Layout>

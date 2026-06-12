@@ -20,6 +20,52 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-12 - Missione 1 (Tessera) E Avvio Partecipazione
+
+Decisione:
+- "Avvia la missione" crea (se assente) una `Partecipazione Missioni` con `stato: inCorso` e `progresso: '50'`, in modo idempotente per tutte le missioni; nessun duplicato e nessun overwrite di una partecipazione esistente
+- la Missione 1 (`missione-01-il-varco`) e un caso speciale: NON segue il flusso quiz → trofeo
+- il numero tessera inserito nella prova della M1 viene salvato con lo **stesso meccanismo** della pagina Impostazioni (valida 14 cifre, imposta `statoTessera: in_verifica`, invia email alla Redazione), estratto nel servizio condiviso `src/lib/strapi/tessera.ts`
+- dopo l'invio tessera la M1 resta **in corso**: il trofeo NON e assegnato dall'app, ma manualmente dalla Redazione su Strapi una volta verificata la tessera (assegnazione manuale)
+- Caso B (utente senza tessera): nessuna UI dedicata; la missione resta semplicemente `inCorso` con `progresso 50` (lo stato creato dall'avvio)
+
+Motivo:
+- la partecipazione deve nascere al gesto esplicito di avvio, coerente per tutte le missioni
+- la M1 raccoglie un dato reale (tessera Biblioteca Classense) la cui validita e verificata dalla Redazione: il trofeo non puo dipendere dal solo inserimento
+- riusare il meccanismo tessera evita logiche divergenti tra Impostazioni e Missione 1
+
+Impatto:
+- `src/lib/strapi/progressione.ts` (nuova `avviaPartecipazione`)
+- `src/lib/strapi/missioni.ts` (nuovo `getMissionProofHref`)
+- `src/lib/strapi/tessera.ts` (nuovo servizio condiviso)
+- `src/pages/api/missioni/[slugMis]/avvia.ts` (nuovo endpoint)
+- `src/pages/api/missioni/[slugMis]/prova.ts` (branch M1), `src/pages/api/user/tessera.ts` (wrapper)
+- `src/pages/missioni/[slugMis]/index.astro`, `src/components/MissioniComponents/RispostaLibera.astro`
+- compilazione richiesta su Strapi: M1 con quiz a 1 domanda (campo tessera) e relativo `Trofeo` da assegnare a mano dopo verifica
+
+Stato:
+- approvata
+
+## 2026-06-12 - Smistamento Promuove A Livello 2 - Iniziato
+
+Decisione:
+- alla conferma dell'Accademia dopo il test di smistamento, il Membro viene aggiornato con `Livello 2 - Iniziato` (slug `livello-2-iniziato`), non piu con `Livello 1 - Adepto`
+- questa decisione supera le voci precedenti (2026-06-10 "Filtro Missioni Per Livelli Sbloccati" e 2026-06-11 "Filtro Epistole Per Accademia E Livelli Sbloccati") nella parte in cui assegnavano `Livello 1 - Adepto` dopo lo smistamento
+- l'eccezione di accesso `FIRST_MISSION_LEVEL_ORDER` / `FIRST_EPISTOLA_LEVEL_ORDER = 2` nei filtri resta invariata: ora e ridondante per i nuovi smistati (a Livello 2 il `Math.max` non cambia il risultato) ma garantisce continuita ai Membri smistati prima di questa modifica, ancora memorizzati a Livello 1 in Strapi
+- `Livello 1 - Adepto` resta lo stato del Membro appena registrato e non ancora smistato
+
+Motivo:
+- allineare lo stato reale del Membro a cio che vede: dopo lo smistamento l'utente accede ai contenuti del Livello 2, quindi il suo livello deve essere `Livello 2 - Iniziato` anche nel profilo
+- evitare l'incoerenza percepita tra label di profilo ("Livello 1 - Adepto") e contenuti gia accessibili
+
+Impatto:
+- `src/pages/api/user/accademia.ts`
+- `src/lib/filtri/missioni.ts` e `src/lib/filtri/epistole.ts` (nessuna modifica: l'eccezione resta come fallback retrocompatibile)
+- compilazione richiesta su Strapi: livello con slug `livello-2-iniziato` pubblicato
+
+Stato:
+- approvata
+
 ## 2026-06-11 - Motore Progressione: Missioni, Trofei, Punti E Level-Up
 
 Decisione:

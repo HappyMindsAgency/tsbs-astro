@@ -11,7 +11,7 @@ const jwt = Astro.cookies.get('jwt')?.value;
 const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 
 
-const featuredNoteHref = '/scrivania/grimorio/titolo-della-nota/';
+const featuredNoteHref = '/scrivania/grimorio/nuova/';
 if (!jwt) {
 	return Astro.redirect('/');
 }
@@ -58,7 +58,9 @@ const getNoteMeta = (publishedAt: string | null | undefined, visibilePubblico: b
 					{notes.map((note, index) => (
 						<a
 							class={`tsbs-note-card ${index >= 3 ? 'is-hidden' : ''}`}
-							href={`/scrivania/grimorio/pubblicate/${note.slug}/`}
+							href={note.visibilePubblico
+								? `/scrivania/grimorio/pubblicate/${note.slug}/`
+								: `/scrivania/grimorio/${note.slug}/`}
 							data-grimorio-card
 						>
 							<div class="tsbs-note-card__copy">

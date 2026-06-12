@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
-import { getStrapiApiUrl } from '../../../../lib/strapi/api-url';
-import { getMembroProgressioneByJwt, registraEsitoProva } from '../../../../lib/strapi/progressione';
+import { getMembroProgressioneByJwt, registraEsitoProva, avviaPartecipazione } from '../../../../lib/strapi/progressione';
+import { inviaTesseraInVerifica } from '../../../../lib/strapi/tessera';
 import { logger } from '../../../../services/logger';
 
 type SubmittedAnswer = {
@@ -9,10 +9,8 @@ type SubmittedAnswer = {
 	answer?: string;
 };
 
-const STRAPI_API_BASE_URL = getStrapiApiUrl();
-const STRAPI_API = import.meta.env.AUTH_READONLY;
+// Missioni che raccolgono il numero tessera invece di seguire il flusso quiz→trofeo.
 const LIBRARY_CARD_MISSION_SLUGS = new Set(['missione-01-il-varco']);
-const LIBRARY_CARD_CODE_PATTERN = /^\d{14}$/;
 
 export const POST: APIRoute = async ({ params, request, cookies }) => {
 	const jwt = cookies.get('jwt')?.value;
@@ -53,12 +51,25 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 		return json({ error: 'answers_count_mismatch' }, 400);
 	}
 
-	const isLibraryCardMission = LIBRARY_CARD_MISSION_SLUGS.has(missione.slug);
-	const libraryCardAnswer = isLibraryCardMission ? body.answers[0]?.answer ?? '' : '';
-	const libraryCardCode = normalizeLibraryCardCode(libraryCardAnswer);
+	// --- Missione 1 (tessera): caso speciale, NON segue il flusso quiz→trofeo. ---
+	// Il numero inserito viene salvato con lo stesso meccanismo della pagina
+	// Impostazioni (statoTessera: in_verifica + email Redazione). La missione
+	// resta "in corso": il trofeo è assegnato manualmente dalla Redazione.
+	if (LIBRARY_CARD_MISSION_SLUGS.has(missione.slug)) {
+		// Garantisce la partecipazione inCorso/50 anche per accesso diretto alla prova.
+		await avviaPartecipazione(membro.documentId, missione.documentId);
 
-	if (isLibraryCardMission && !isValidLibraryCardCode(libraryCardCode)) {
-		return json({ error: 'invalid_library_card_code' }, 400);
+		const libraryCardCode = body.answers[0]?.answer ?? '';
+		const result = await inviaTesseraInVerifica(jwt, libraryCardCode);
+
+		if (!result.ok) {
+			return json(
+				{ success: false, mission: 'library-card', error: result.code, message: result.message },
+				result.status,
+			);
+		}
+
+		return json({ success: true, mission: 'library-card', tesseraStato: result.statoTessera });
 	}
 
 	const results = domande.map((domanda, index) => {
@@ -66,23 +77,15 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 		const value = submittedAnswer?.answer ?? '';
 		const availableAnswers = domanda.risposte ?? [];
 		const correctAnswers = availableAnswers.filter((risposta) => risposta.corretta === true);
-		const acceptsAnyValidatedValue = isLibraryCardMission && correctAnswers.some((risposta) => !risposta.risposta?.trim());
 		const acceptedAnswers = correctAnswers.length > 0 ? correctAnswers : availableAnswers.length === 1 ? availableAnswers : [];
 		const normalizedValue = normalizeAnswer(value);
-		const correct = acceptsAnyValidatedValue || acceptedAnswers.some((risposta) => normalizeAnswer(risposta.risposta ?? '') === normalizedValue);
+		const correct = acceptedAnswers.some((risposta) => normalizeAnswer(risposta.risposta ?? '') === normalizedValue);
 
 		return { questionIndex: index, correct };
 	});
 
 	const correctCount = results.filter((result) => result.correct).length;
 	const passed = correctCount === domande.length;
-
-	if (isLibraryCardMission && passed) {
-		const saved = await saveLibraryCardCode(membro.documentId, libraryCardCode);
-		if (!saved) {
-			return json({ error: 'library_card_save_failed' }, 500);
-		}
-	}
 
 	// Registra il tentativo nello storico e, al primo superamento, eroga
 	// trofeo/punti e verifica il level-up (tutto idempotente, lato server).
@@ -103,26 +106,6 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 		livelloAggiornato: progressione?.livelloAggiornato ?? null,
 	});
 };
-
-async function saveLibraryCardCode(membroDocumentId: string, libraryCardCode: string) {
-	if (!STRAPI_API) return false;
-
-	const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}`, {
-		method: 'PUT',
-		headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
-		body: JSON.stringify({ data: { tessera: libraryCardCode } }),
-	});
-
-	return updateRes.ok;
-}
-
-function normalizeLibraryCardCode(value: string) {
-	return value.replace(/[\s-]+/g, '').trim();
-}
-
-function isValidLibraryCardCode(value: string) {
-	return LIBRARY_CARD_CODE_PATTERN.test(value);
-}
 
 function normalizeAnswer(value: string) {
 	return value

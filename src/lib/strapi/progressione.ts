@@ -140,6 +140,40 @@ export async function getPartecipazione(membroDocumentId: string, missioneDocume
 	return (payload?.data?.[0] ?? null) as PartecipazioneRaw | null;
 }
 
+// Avvio missione: garantisce una Partecipazione "inCorso" con progresso 50.
+// Idempotente: crea SOLO se assente, senza sovrascrivere stato/progresso di una
+// partecipazione esistente (inclusa una già "completata"). Evita duplicati.
+export async function avviaPartecipazione(
+	membroDocumentId: string,
+	missioneDocumentId: string,
+): Promise<boolean> {
+	const existing = await getPartecipazione(membroDocumentId, missioneDocumentId);
+	if (existing) return true;
+
+	const now = new Date().toISOString();
+	const created = await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
+		method: 'POST',
+		headers: adminHeaders(),
+		body: JSON.stringify({
+			data: {
+				stato: 'inCorso',
+				progresso: '50',
+				dataInizio: now,
+				dataCompletamento: null,
+				membro: { connect: [membroDocumentId] },
+				missione: { connect: [missioneDocumentId] },
+			},
+		}),
+	});
+
+	if (!created.ok) {
+		logger.error(`[Progressione] Avvio partecipazione fallito: ${await created.text()}`);
+		return false;
+	}
+
+	return true;
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

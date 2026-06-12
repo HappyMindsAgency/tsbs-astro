@@ -50,7 +50,7 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
             </td>
           </tr>
 
-          <!-- Corpo principale — {{content}} viene iniettato qui -->
+          <!-- Corpo principale — il contenuto specifico viene iniettato qui -->
           <tr>
             <td style="padding:40px 40px 32px;color:#333333;font-size:15px;line-height:1.6;">
               {{content}}
@@ -147,10 +147,13 @@ export async function sendNotification(payload: NotificationPayload): Promise<Se
     // Versione testuale: usa quella fornita o stripa i tag HTML come fallback minimale
     const text = payload.text ?? html.replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, ' ').trim();
 
-    // Inietta il contenuto nel template
+    // Inietta il contenuto nel template.
+    // Usa un replacer-funzione globale: sostituisce tutte le occorrenze del
+    // placeholder ed evita l'interpretazione dei pattern speciali ($&, $1, ...)
+    // se subject/html contengono il carattere "$". (html è già markup — non va escaped.)
     const fullHtml = HTML_TEMPLATE
-        .replace('{{subject}}', escapeHtml(subject))
-        .replace('{{content}}', html);   // html è già markup — non va escaped
+        .replace(/\{\{subject\}\}/g, () => escapeHtml(subject))
+        .replace(/\{\{content\}\}/g, () => html);
 
     const transporter = getTransporter();
 

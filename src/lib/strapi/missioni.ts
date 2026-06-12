@@ -113,6 +113,18 @@ function getItalianStrapiLocale(lang = 'it') {
 	return STRAPI_LOCALE_BY_LANG[lang] || STRAPI_LOCALE_BY_LANG.it;
 }
 
+// Missioni con fruizione "sfida di lettura" dedicata, fuori dal flusso prova/quiz.
+const READING_CHALLENGE_MISSION_SLUGS = new Set(['missione-06-i-custodi-del-sapere']);
+
+// URL della "prova" della missione: sfida-lettura per le missioni dedicate,
+// altrimenti la prova/quiz standard. Centralizzato per riuso (pagina dettaglio
+// e endpoint "avvia") ed evitare logiche duplicate.
+export function getMissionProofHref(slug: string): string {
+	return READING_CHALLENGE_MISSION_SLUGS.has(slug)
+		? `/missioni/${slug}/sfida-lettura/`
+		: `/missioni/${slug}/prova/`;
+}
+
 function setMissioneFields(searchParams: URLSearchParams) {
 	searchParams.set('fields[0]', 'titolo');
 	searchParams.set('fields[1]', 'slug');
