@@ -3,6 +3,7 @@ import Layout from '../../../../layouts/Layout.astro';
 import Nav from '../../../../components/Nav.astro';
 import BackButton from '../../../../components/BackButton.astro';
 import RitchText from '../../../../components/RitchText.astro';
+import ConfermaEliminaNota from '../../../../components/toastComponents/ConfermaEliminaNota.astro';
 import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro } from '../../../../lib/strapi/grimorio';
 import { resolveUserContext } from '../../../../lib/theme';
 
@@ -19,7 +20,7 @@ if (!slugNotaPub) {
 }
 
 const membro = await getCurrentMembroFromJwt(jwt);
-const nota = membro ? await getGrimorioNotaBySlugForMembro(slugNotaPub, membro.id, lang) : null;
+const nota = membro ? await getGrimorioNotaBySlugForMembro(slugNotaPub, membro.documentId, lang) : null;
 const { theme, accademia } = await resolveUserContext(jwt);
 
 if (!nota) {
@@ -37,10 +38,10 @@ if (!nota) {
 		</header>
 
 		<div class="container-xl tsbs-app-container note-page__content">
-			<section class="note-editor note-editor--published" aria-labelledby="published-note-title">
+			<section class="note-editor note-editor--published" aria-labelledby="published-note-title" data-published-note data-note-document-id={nota.documentId}>
 				<div class="note-editor__head">
 					<h2 id="published-note-title" class="note-editor__title note-editor__title--static">{nota.titolo}</h2>
-					<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" disabled>
+					<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" data-published-note-delete>
 						<i class="bi bi-trash" aria-hidden="true"></i>
 					</button>
 				</div>
@@ -52,4 +53,58 @@ if (!nota) {
 		</div>
 	</main>
 
+	<ConfermaEliminaNota renderHidden />
+
+	<script>
+		const setupPublishedNoteDelete = () => {
+			document.querySelectorAll<HTMLElement>('[data-published-note]').forEach((note) => {
+				if (note.dataset.publishedNoteReady === 'true') return;
+				note.dataset.publishedNoteReady = 'true';
+
+				const deleteButton = note.querySelector<HTMLButtonElement>('[data-published-note-delete]');
+				let isDeleting = false;
+
+				const deleteNote = async () => {
+					if (isDeleting) return;
+
+					const noteDocumentId = note.dataset.noteDocumentId || '';
+					if (!noteDocumentId) return;
+
+					isDeleting = true;
+					if (deleteButton) deleteButton.disabled = true;
+
+					try {
+						const response = await fetch('/api/grimorio/note', {
+							method: 'DELETE',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ noteDocumentId }),
+						});
+
+						if (!response.ok) {
+							if (deleteButton) deleteButton.disabled = false;
+							isDeleting = false;
+							return;
+						}
+
+						window.location.assign('/scrivania/grimorio/');
+					} catch {
+						if (deleteButton) deleteButton.disabled = false;
+						isDeleting = false;
+					}
+				};
+
+				deleteButton?.addEventListener('click', () => {
+					if (isDeleting) return;
+					document.dispatchEvent(new CustomEvent('tsbs:nota-delete-open'));
+				});
+
+				document.addEventListener('tsbs:nota-delete-confirm', () => {
+					void deleteNote();
+				});
+			});
+		};
+
+		document.addEventListener('astro:page-load', setupPublishedNoteDelete);
+		setupPublishedNoteDelete();
+	</script>
 </Layout>

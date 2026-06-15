@@ -7,7 +7,6 @@ import ProvaMissioneMista from '../../../../components/MissioniComponents/ProvaM
 import NotaEditor from '../../../../components/GrimorioComponents/NotaEditor.astro';
 import TrofeoModal from '../../../../components/PopupComponents/TrofeoModal.astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
-import { getCurrentMembroFromJwt } from '../../../../lib/strapi/grimorio';
 import { resolveUserTheme } from '../../../../lib/theme';
 
 export const prerender = false;
@@ -35,7 +34,6 @@ if (!missione) {
 }
 
 const isMissioneGrimorio = missione.slug === MISSIONE_GRIMORIO_SLUG;
-const membro = isMissioneGrimorio ? await getCurrentMembroFromJwt(jwt) : null;
 const rawQuestions = missione?.quiz?.domande ?? [];
 const hasAnswerElements = rawQuestions.some((domanda) => (domanda.risposte || []).length > 0);
 
@@ -70,7 +68,7 @@ const ProvaComponent = hasMixedQuestionComponents
 				</header>
 
 				<div class="container-xl tsbs-app-container note-page__content">
-					<NotaEditor missioneSlug={missione.slug} storageScope={membro?.documentId} />
+					<NotaEditor missioneSlug={missione.slug} />
 				</div>
 			</section>
 		) : (

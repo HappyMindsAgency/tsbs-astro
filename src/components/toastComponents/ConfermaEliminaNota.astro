@@ -1,0 +1,152 @@
+---
+interface Props {
+	isOpen?: boolean;
+	renderHidden?: boolean;
+}
+
+const { isOpen = false, renderHidden = false } = Astro.props as Props;
+const shouldRender = isOpen || renderHidden;
+---
+
+{shouldRender && (
+	<div
+		class="delete-note-toast"
+		data-delete-note-toast
+		hidden={!isOpen}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="delete-note-toast-title"
+	>
+		<div class="delete-note-toast__backdrop" data-delete-note-toast-close></div>
+
+		<section class="delete-note-toast__panel">
+			<button class="delete-note-toast__close" type="button" aria-label="Chiudi" data-delete-note-toast-close>
+				<i class="bi bi-x-lg" aria-hidden="true"></i>
+			</button>
+
+			<p id="delete-note-toast-title">Stai eliminando definitivamente questa traccia dal Grimorio.</p>
+
+			<button class="btn tsbs-cta-primary delete-note-toast__confirm" type="button" data-delete-note-toast-confirm>
+				Conferma
+			</button>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupDeleteNoteToast = () => {
+		document.querySelectorAll<HTMLElement>('[data-delete-note-toast]').forEach((toast) => {
+			if (toast.dataset.deleteNoteToastReady === 'true') return;
+			toast.dataset.deleteNoteToastReady = 'true';
+
+			const closeControls = toast.querySelectorAll<HTMLElement>('[data-delete-note-toast-close]');
+			const confirmButton = toast.querySelector<HTMLButtonElement>('[data-delete-note-toast-confirm]');
+			let previousFocus: HTMLElement | null = null;
+
+			const closeToast = () => {
+				toast.hidden = true;
+				previousFocus?.focus();
+			};
+
+			const openToast = () => {
+				previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+				toast.hidden = false;
+				confirmButton?.focus();
+			};
+
+			document.addEventListener('tsbs:nota-delete-open', openToast);
+
+			closeControls.forEach((control) => {
+				control.addEventListener('click', closeToast);
+			});
+
+			confirmButton?.addEventListener('click', () => {
+				closeToast();
+				document.dispatchEvent(new CustomEvent('tsbs:nota-delete-confirm'));
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !toast.hidden) {
+					closeToast();
+				}
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupDeleteNoteToast);
+	setupDeleteNoteToast();
+</script>
+
+<style lang="scss">
+	.delete-note-toast {
+		position: fixed;
+		inset: 0;
+		z-index: 1220;
+		display: grid;
+		align-items: center;
+		justify-items: center;
+		padding: 1.875rem;
+	}
+
+	.delete-note-toast[hidden] {
+		display: none;
+	}
+
+	.delete-note-toast__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-white) 68%, transparent);
+		backdrop-filter: grayscale(0.65) blur(0.0625rem);
+	}
+
+	.delete-note-toast__panel {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		gap: 1.25rem;
+		width: min(100%, 22.625rem);
+		padding: 3rem 1.25rem 1.25rem;
+		background: var(--tsbs-color-white);
+		border-radius: 0.875rem;
+		box-shadow: 0 1.25rem 3rem rgba(84, 97, 118, 0.16);
+	}
+
+	.delete-note-toast__close {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		aspect-ratio: 1;
+		padding: 0;
+		color: var(--tsbs-theme-body);
+		background: transparent;
+		border: 0;
+	}
+
+	.delete-note-toast__panel p {
+		margin: 0;
+		color: var(--tsbs-theme-body);
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.35;
+		text-align: center;
+	}
+
+	.delete-note-toast__confirm {
+		min-height: 3rem;
+		border-radius: 0.25rem;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 800;
+		line-height: 1;
+	}
+
+	@media (min-width: 992px) {
+		.delete-note-toast {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.875rem);
+		}
+	}
+</style>

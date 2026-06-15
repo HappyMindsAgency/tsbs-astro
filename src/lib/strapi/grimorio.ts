@@ -113,6 +113,20 @@ export function getGrimorioVisibilityLabel(visibilePubblico: boolean) {
 	return visibilePubblico ? 'Pubblica' : 'Privata';
 }
 
+export function getGrimorioCategorySlug(nota: Pick<GrimorioNota, 'categorie_grimorio'>) {
+	return nota.categorie_grimorio.find((categoria) => categoria.slug === 'salvata' || categoria.slug === 'inviata')?.slug ?? null;
+}
+
+export function getGrimorioStateLabel(nota: Pick<GrimorioNota, 'categorie_grimorio' | 'visibilePubblico'>) {
+	if (nota.visibilePubblico) return 'Pubblica';
+
+	const categorySlug = getGrimorioCategorySlug(nota);
+	if (categorySlug === 'inviata') return 'In attesa di approvazione';
+	if (categorySlug === 'salvata') return 'Salvata';
+
+	return getGrimorioVisibilityLabel(nota.visibilePubblico);
+}
+
 export async function getCurrentMembroFromJwt(jwt: string) {
 	const apiBaseUrl = getStrapiApiBaseUrl();
 	const userResponse = await fetch(`${apiBaseUrl}/users/me`, {
@@ -137,11 +151,11 @@ export async function getCurrentMembroFromJwt(jwt: string) {
 	return membriResponse.data?.[0] || null;
 }
 
-export async function getGrimorioNoteByMembro(membroId: number, lang = 'it') {
+export async function getGrimorioNoteByMembro(membroDocumentId: string, lang = 'it') {
 	const searchParams = new URLSearchParams();
 	searchParams.set('locale', getItalianStrapiLocale(lang));
 	searchParams.set('status', 'published');
-	searchParams.set('filters[membro][id][$eq]', String(membroId));
+	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
 	searchParams.set('sort[0]', 'publishedAt:desc');
 	searchParams.set('pagination[pageSize]', '100');
 	setGrimorioFields(searchParams);
@@ -152,12 +166,12 @@ export async function getGrimorioNoteByMembro(membroId: number, lang = 'it') {
 	return (response.data || []).map(normalizeNota);
 }
 
-export async function getGrimorioNotaBySlugForMembro(slug: string, membroId: number, lang = 'it') {
+export async function getGrimorioNotaBySlugForMembro(slug: string, membroDocumentId: string, lang = 'it') {
 	const searchParams = new URLSearchParams();
 	searchParams.set('locale', getItalianStrapiLocale(lang));
 	searchParams.set('status', 'published');
 	searchParams.set('filters[slug][$eq]', slug);
-	searchParams.set('filters[membro][id][$eq]', String(membroId));
+	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
 	searchParams.set('pagination[pageSize]', '1');
 	setGrimorioFields(searchParams);
 	setGrimorioRelations(searchParams);
