@@ -2,6 +2,7 @@
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import AvatarProfiloModal from '../../../components/PopupComponents/AvatarProfiloModal.astro';
+import ConfermaCambioPassword from '../../../components/toastComponents/ConfermaCambioPassword.astro';
 import avatar01 from '../../../assets/Avatar_01_tartaruga.svg';
 import { resolveUserContext } from '../../../lib/theme';
 
@@ -250,6 +251,7 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 	</div>
 
 	<AvatarProfiloModal renderHidden />
+	<ConfermaCambioPassword renderHidden />
 </Layout>
 
 <script>
@@ -328,6 +330,10 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 			errorEl.hidden = false;
 		};
 
+		const showPasswordToast = (status: 'success' | 'error') => {
+			document.dispatchEvent(new CustomEvent('tsbs:password-change-toast-open', { detail: { status } }));
+		};
+
 		const clearPasswordError = () => {
 			if (!errorEl) return;
 			errorEl.textContent = '';
@@ -374,14 +380,17 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 			if (wantsPassword) {
 				if (!currentPassword || !password || !passwordConfirmation) {
 					showPasswordError('Compila tutti i campi per cambiare la password.');
+					showPasswordToast('error');
 					return;
 				}
 				if (password !== passwordConfirmation) {
 					showPasswordError('La nuova password e la conferma non coincidono.');
+					showPasswordToast('error');
 					return;
 				}
 				if (password.length < 8) {
 					showPasswordError('La nuova password deve contenere almeno 8 caratteri.');
+					showPasswordToast('error');
 					return;
 				}
 			}
@@ -423,13 +432,16 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 					const data = await res.json();
 					if (!res.ok) {
 						errors.push(data.message ?? 'Errore durante il cambio password.');
+						showPasswordToast('error');
 					} else {
 						currentPwInput.value = '';
 						newPwInput.value = '';
 						confirmPwInput.value = '';
+						showPasswordToast('success');
 					}
 				} catch {
 					errors.push('Errore di rete durante il cambio password.');
+					showPasswordToast('error');
 				}
 			}
 
