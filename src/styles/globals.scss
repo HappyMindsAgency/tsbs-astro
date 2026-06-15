@@ -4739,6 +4739,10 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.note-editor__button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.625rem;
 		min-height: 3rem;
 		padding: 0.75rem 1rem;
 		font-family: var(--tsbs-font-body);
@@ -4747,6 +4751,25 @@ body:has(.tsbs-legal-page) {
 			line-height: 1;
 			border-radius: 0.375rem;
 		}
+
+	.note-editor__button-loader {
+		width: 1rem;
+		aspect-ratio: 1;
+		border: 0.125rem solid currentColor;
+		border-right-color: transparent;
+		border-radius: 999rem;
+		animation: tsbs-note-loader 0.75s linear infinite;
+	}
+
+	.note-editor__button-loader[hidden] {
+		display: none;
+	}
+
+	@keyframes tsbs-note-loader {
+		to {
+			transform: rotate(360deg);
+		}
+	}
 
 	@media (min-width: 768px) {
 		.note-page__content {

@@ -1,17 +1,18 @@
 ---
 import NotaModal from '../PopupComponents/NotaModal.astro';
-import NotaToast from '../toastComponents/NotaToast.astro';
+import ConfermaEliminaNota from '../toastComponents/ConfermaEliminaNota.astro';
+import LoadNotaError from '../toastComponents/LoadNotaError.astro';
+import LoadNotaOk from '../toastComponents/LoadNotaOk.astro';
 
 interface Props {
 	missioneSlug?: string;
-	storageKey?: string;
 	titleValue?: string;
 	/** HTML della nota esistente da precaricare nell'editor (vuoto per una nuova nota). */
 	bodyValue?: string;
 	/** documentId della nota esistente: se presente, il salvataggio aggiorna invece di creare. */
 	noteDocumentId?: string;
-	/** Token per-membro (documentId del Membro) usato per isolare le bozze in localStorage. */
-	storageScope?: string;
+	/** Slug Categoria Grimorio ricevuto da Strapi: "salvata" oppure "inviata". */
+	categorySlug?: string | null;
 }
 
 const {
@@ -19,28 +20,17 @@ const {
 	titleValue = 'Titolo della nota',
 	bodyValue = '',
 	noteDocumentId = '',
-	storageScope = '',
-	storageKey,
+	categorySlug = '',
 } = Astro.props as Props;
-
-// La chiave localStorage è isolata per Membro (storageScope) per evitare che le
-// bozze di un membro restino visibili a un altro sullo stesso browser.
-const scope = storageScope || 'anon';
-const resolvedStorageKey = storageKey
-	?? (missioneSlug
-		? `tsbs-grimorio-note-draft-${scope}-${missioneSlug}`
-		: noteDocumentId
-			? `tsbs-grimorio-note-${scope}-${noteDocumentId}`
-			: `tsbs-grimorio-note-nuova-${scope}`);
 ---
 
 <section
 	class="note-editor"
 	aria-labelledby="note-editor-title"
 	data-note-editor
-	data-note-storage-key={resolvedStorageKey}
 	data-note-missione-slug={missioneSlug}
 	data-note-document-id={noteDocumentId}
+	data-note-category-slug={categorySlug ?? ''}
 >
 	<div class="note-editor__head">
 		<label class="visually-hidden" for="note-title-input">Titolo della nota</label>
@@ -52,7 +42,7 @@ const resolvedStorageKey = storageKey
 			autocomplete="off"
 			data-note-title
 		/>
-		<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" data-note-delete>
+		<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" data-note-delete hidden={!noteDocumentId}>
 			<i class="bi bi-trash" aria-hidden="true"></i>
 		</button>
 	</div>
@@ -93,12 +83,17 @@ const resolvedStorageKey = storageKey
 
 	<div class="note-editor__actions">
 		<button class="btn tsbs-cta-primary-soft note-editor__button" type="button" data-note-save>Salva bozza</button>
-		<button class="btn tsbs-cta-primary note-editor__button" type="button" data-note-submit>Invia al Prefetto</button>
+		<button class="btn tsbs-cta-primary note-editor__button" type="button" data-note-submit>
+			<span data-note-submit-label>Invia al Prefetto</span>
+			<span class="note-editor__button-loader" data-note-submit-loader hidden aria-hidden="true"></span>
+		</button>
 	</div>
 </section>
 
 <NotaModal renderHidden />
-<NotaToast renderHidden />
+<ConfermaEliminaNota renderHidden />
+<LoadNotaOk renderHidden />
+<LoadNotaError renderHidden />
 
 <script>
 	const setupNotaEditors = () => {
@@ -106,31 +101,26 @@ const resolvedStorageKey = storageKey
 			if (editor.dataset.noteEditorReady === 'true') return;
 			editor.dataset.noteEditorReady = 'true';
 
-			const storageKey = editor.dataset.noteStorageKey || 'tsbs-grimorio-note-draft';
 			const missioneSlug = editor.dataset.noteMissioneSlug || '';
-			const noteStorage = (() => {
-				try {
-					return window.localStorage;
-				} catch {
-					return null;
-				}
-			})();
 			const titleInput = editor.querySelector<HTMLInputElement>('[data-note-title]');
 			const bodyEditor = editor.querySelector<HTMLElement>('[data-note-body]');
 			const saveButton = editor.querySelector<HTMLButtonElement>('[data-note-save]');
 			const submitButton = editor.querySelector<HTMLButtonElement>('[data-note-submit]');
+			const submitLabel = editor.querySelector<HTMLElement>('[data-note-submit-label]');
+			const submitLoader = editor.querySelector<HTMLElement>('[data-note-submit-loader]');
 			const deleteButton = editor.querySelector<HTMLButtonElement>('[data-note-delete]');
 			const feedback = editor.querySelector<HTMLElement>('[data-note-feedback]');
 			const commandButtons = editor.querySelectorAll<HTMLButtonElement>('[data-command]');
+			let isSubmitted = editor.dataset.noteCategorySlug === 'inviata';
+			let isPending = false;
 
 			const getPlainBody = () => bodyEditor?.textContent?.replace(/\s+/g, ' ').trim() || '';
 
-			const getDraft = () => ({
+			const getNotePayload = () => ({
 				title: titleInput?.value.trim() || '',
 				body: bodyEditor?.innerHTML || '',
 				plainBody: getPlainBody(),
 				noteDocumentId: editor.dataset.noteDocumentId || '',
-				updatedAt: new Date().toISOString(),
 			});
 
 			const setFeedback = (message: string, type: 'success' | 'error' = 'success') => {
@@ -146,18 +136,17 @@ const resolvedStorageKey = storageKey
 				feedback.hidden = true;
 			};
 
-			const saveLocalDraft = (status = 'draft') => {
-				const draft = { ...getDraft(), status };
-				noteStorage?.setItem(storageKey, JSON.stringify(draft));
-				return draft;
-			};
-
 			const setPending = (pending: boolean) => {
-				if (saveButton) saveButton.disabled = pending;
-				if (submitButton) submitButton.disabled = pending;
+				isPending = pending;
+				if (saveButton) saveButton.disabled = pending || isSubmitted;
+				if (submitButton) submitButton.disabled = pending || isSubmitted;
+				if (deleteButton) deleteButton.disabled = pending;
+				if (submitLoader) submitLoader.hidden = !pending;
+				if (submitLabel) submitLabel.textContent = pending ? 'Invio in corso' : 'Invia al Prefetto';
 			};
 
 			const setSubmittedState = () => {
+				isSubmitted = true;
 				if (titleInput) titleInput.readOnly = true;
 				if (bodyEditor) bodyEditor.contentEditable = 'false';
 				commandButtons.forEach((button) => {
@@ -168,11 +157,16 @@ const resolvedStorageKey = storageKey
 			};
 
 			const persistDraft = async (action: 'draft' | 'submit') => {
-				const draft = saveLocalDraft(action);
+				if (isPending) return null;
+
+				const note = getNotePayload();
 				clearFeedback();
 
-				if (!draft.plainBody) {
+				if (!note.plainBody) {
 					setFeedback('Scrivi una nota prima di salvarla.', 'error');
+					if (action === 'submit') {
+						document.dispatchEvent(new CustomEvent('tsbs:load-nota-error-open'));
+					}
 					return null;
 				}
 
@@ -183,11 +177,11 @@ const resolvedStorageKey = storageKey
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
-							title: draft.title,
-							body: draft.body,
+							title: note.title,
+							body: note.body,
 							action,
 							missioneSlug,
-							noteDocumentId: draft.noteDocumentId,
+							noteDocumentId: note.noteDocumentId,
 						}),
 					});
 					const payload = await response.json().catch(() => null);
@@ -198,11 +192,11 @@ const resolvedStorageKey = storageKey
 
 					if (payload?.noteDocumentId) {
 						editor.dataset.noteDocumentId = payload.noteDocumentId;
-						noteStorage?.setItem(storageKey, JSON.stringify({
-							...draft,
-							noteDocumentId: payload.noteDocumentId,
-							status: action,
-						}));
+						if (deleteButton) deleteButton.hidden = false;
+					}
+
+					if (payload?.categorySlug) {
+						editor.dataset.noteCategorySlug = payload.categorySlug;
 					}
 
 					// Trofei confermati dal server al completamento missione: coda modale.
@@ -221,12 +215,51 @@ const resolvedStorageKey = storageKey
 
 					if (action === 'submit') {
 						setSubmittedState();
+						document.dispatchEvent(new CustomEvent('tsbs:load-nota-ok-open'));
 					}
 
 					return payload;
 				} catch (error) {
 					setFeedback(error instanceof Error ? error.message : 'Salvataggio non riuscito.', 'error');
+					if (action === 'submit') {
+						document.dispatchEvent(new CustomEvent('tsbs:load-nota-error-open'));
+					}
 					return null;
+				} finally {
+					setPending(false);
+				}
+			};
+
+			const deleteCurrentNote = async () => {
+				if (isPending) return;
+
+				const noteDocumentId = editor.dataset.noteDocumentId || '';
+				if (!noteDocumentId) {
+					if (titleInput) titleInput.value = 'Titolo della nota';
+					if (bodyEditor) bodyEditor.innerHTML = '';
+					clearFeedback();
+					updatePlaceholder();
+					return;
+				}
+
+				setPending(true);
+				clearFeedback();
+
+				try {
+					const response = await fetch('/api/grimorio/note', {
+						method: 'DELETE',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ noteDocumentId }),
+					});
+					const payload = await response.json().catch(() => null);
+
+					if (!response.ok) {
+						throw new Error(payload?.message || payload?.error || 'Eliminazione non riuscita.');
+					}
+
+					window.location.assign('/scrivania/grimorio/');
+				} catch (error) {
+					setFeedback(error instanceof Error ? error.message : 'Eliminazione non riuscita.', 'error');
 				} finally {
 					setPending(false);
 				}
@@ -237,28 +270,8 @@ const resolvedStorageKey = storageKey
 				bodyEditor.classList.toggle('is-empty', getPlainBody().length === 0);
 			};
 
-			// documentId reso dal server (nota esistente): resta sempre la fonte di
-			// verità, così una bozza locale non può puntare alla nota di un altro membro.
-			const serverDocumentId = editor.dataset.noteDocumentId || '';
-
-			const savedDraft = noteStorage?.getItem(storageKey);
-			if (savedDraft) {
-				try {
-					const draft = JSON.parse(savedDraft);
-					if (titleInput && draft.title) titleInput.value = draft.title;
-					if (bodyEditor && draft.body) bodyEditor.innerHTML = draft.body;
-					if (serverDocumentId) {
-						editor.dataset.noteDocumentId = serverDocumentId;
-					} else if (draft.noteDocumentId) {
-						editor.dataset.noteDocumentId = draft.noteDocumentId;
-					}
-					if (draft.status === 'submitted') setSubmittedState();
-				} catch {
-					noteStorage?.removeItem(storageKey);
-				}
-			}
-
 			updatePlaceholder();
+			if (isSubmitted) setSubmittedState();
 
 			commandButtons.forEach((button) => {
 				button.addEventListener('click', () => {
@@ -273,11 +286,6 @@ const resolvedStorageKey = storageKey
 
 			bodyEditor?.addEventListener('input', () => {
 				updatePlaceholder();
-				saveLocalDraft('draft');
-			});
-
-			titleInput?.addEventListener('input', () => {
-				saveLocalDraft('draft');
 			});
 
 			saveButton?.addEventListener('click', () => {
@@ -285,31 +293,21 @@ const resolvedStorageKey = storageKey
 			});
 
 			submitButton?.addEventListener('click', () => {
+				if (isPending || isSubmitted) return;
 				document.dispatchEvent(new CustomEvent('tsbs:nota-modal-open'));
 			});
 
 			document.addEventListener('tsbs:nota-submit-confirm', async () => {
-				const payload = await persistDraft('submit');
-				if (payload) {
-					document.dispatchEvent(new CustomEvent('tsbs:nota-toast-open'));
-				}
+				await persistDraft('submit');
 			});
 
 			deleteButton?.addEventListener('click', () => {
-				if (!editor.dataset.noteDocumentId) {
-					setFeedback('La cancellazione delle note salvate non è ancora disponibile.', 'error');
-					return;
-				}
+				if (isPending) return;
+				document.dispatchEvent(new CustomEvent('tsbs:nota-delete-open'));
+			});
 
-				const shouldDelete = window.confirm('Eliminare questa nota?');
-				if (!shouldDelete) return;
-
-				noteStorage?.removeItem(storageKey);
-				delete editor.dataset.noteDocumentId;
-				if (titleInput) titleInput.value = 'Titolo della nota';
-				if (bodyEditor) bodyEditor.innerHTML = '';
-				clearFeedback();
-				updatePlaceholder();
+			document.addEventListener('tsbs:nota-delete-confirm', () => {
+				void deleteCurrentNote();
 			});
 		});
 	};

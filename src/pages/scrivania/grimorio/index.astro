@@ -3,7 +3,7 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import BackButton from '../../../components/BackButton.astro';
 import { resolveUserContext } from '../../../lib/theme';
-import { formatGrimorioDate, getCurrentMembroFromJwt, getGrimorioExcerpt, getGrimorioNoteByMembro, getGrimorioVisibilityLabel } from '../../../lib/strapi/grimorio';
+import { formatGrimorioDate, getCurrentMembroFromJwt, getGrimorioExcerpt, getGrimorioNoteByMembro, getGrimorioStateLabel } from '../../../lib/strapi/grimorio';
 
 const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
@@ -17,11 +17,11 @@ if (!jwt) {
 }
 
 const membro = await getCurrentMembroFromJwt(jwt);
-const notes = membro ? await getGrimorioNoteByMembro(membro.id, lang) : [];
+const notes = membro ? await getGrimorioNoteByMembro(membro.documentId, lang) : [];
 
-const getNoteMeta = (publishedAt: string | null | undefined, visibilePubblico: boolean) => {
-	const dayLabel = formatGrimorioDate(publishedAt);
-	const scopeLabel = getGrimorioVisibilityLabel(visibilePubblico);
+const getNoteMeta = (note: (typeof notes)[number]) => {
+	const dayLabel = formatGrimorioDate(note.publishedAt);
+	const scopeLabel = getGrimorioStateLabel(note);
 
 	return [dayLabel, scopeLabel].filter(Boolean).join(' • ');
 };
@@ -58,14 +58,12 @@ const getNoteMeta = (publishedAt: string | null | undefined, visibilePubblico: b
 					{notes.map((note, index) => (
 						<a
 							class={`tsbs-note-card ${index >= 3 ? 'is-hidden' : ''}`}
-							href={note.visibilePubblico
-								? `/scrivania/grimorio/pubblicate/${note.slug}/`
-								: `/scrivania/grimorio/${note.slug}/`}
+							href={`/scrivania/grimorio/pubblicate/${note.slug}/`}
 							data-grimorio-card
 						>
 							<div class="tsbs-note-card__copy">
 								<p class="tsbs-note-card__meta">
-									{getNoteMeta(note.publishedAt, note.visibilePubblico)}
+									{getNoteMeta(note)}
 								</p>
 								<h3>{note.titolo}</h3>
 								<p>{getGrimorioExcerpt(note.contenuto)}</p>

@@ -4,7 +4,6 @@ import Nav from '../../../components/Nav.astro';
 import BackButton from '../../../components/BackButton.astro';
 import NotaEditor from '../../../components/GrimorioComponents/NotaEditor.astro';
 import { resolveUserContext } from '../../../lib/theme';
-import { getCurrentMembroFromJwt } from '../../../lib/strapi/grimorio';
 
 const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
@@ -13,7 +12,6 @@ if (!jwt) {
 	return Astro.redirect('/');
 }
 
-const membro = await getCurrentMembroFromJwt(jwt);
 const { theme, accademia } = await resolveUserContext(jwt);
 ---
 

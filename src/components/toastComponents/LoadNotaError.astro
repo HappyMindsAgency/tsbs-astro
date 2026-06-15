@@ -1,0 +1,98 @@
+---
+interface Props {
+	isOpen?: boolean;
+	renderHidden?: boolean;
+}
+
+const { isOpen = false, renderHidden = false } = Astro.props as Props;
+const shouldRender = isOpen || renderHidden;
+---
+
+{shouldRender && (
+	<div
+		class="load-note-toast load-note-toast--error"
+		data-load-note-error
+		hidden={!isOpen}
+		role="status"
+		aria-live="assertive"
+		aria-labelledby="load-note-error-title"
+	>
+		<section class="load-note-toast__panel">
+			<i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+			<p id="load-note-error-title">Invio della nota non riuscito.</p>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupLoadNoteError = () => {
+		document.querySelectorAll<HTMLElement>('[data-load-note-error]').forEach((toast) => {
+			if (toast.dataset.loadNoteErrorReady === 'true') return;
+			toast.dataset.loadNoteErrorReady = 'true';
+
+			let closeTimer: number | undefined;
+
+			const closeToast = () => {
+				toast.hidden = true;
+				if (closeTimer) window.clearTimeout(closeTimer);
+			};
+
+			const openToast = () => {
+				if (closeTimer) window.clearTimeout(closeTimer);
+				toast.hidden = false;
+				closeTimer = window.setTimeout(closeToast, 2600);
+			};
+
+			document.addEventListener('tsbs:load-nota-error-open', openToast);
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupLoadNoteError);
+	setupLoadNoteError();
+</script>
+
+<style lang="scss">
+	.load-note-toast--error {
+		position: fixed;
+		right: 1rem;
+		bottom: 1rem;
+		z-index: 1230;
+		width: min(calc(100vw - 2rem), 22rem);
+	}
+
+	.load-note-toast--error[hidden] {
+		display: none;
+	}
+
+	.load-note-toast--error .load-note-toast__panel {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem;
+		color: #8b2f2f;
+		background: var(--tsbs-color-white);
+		border: 1px solid rgba(139, 47, 47, 0.28);
+		border-radius: 0.5rem;
+		box-shadow: 0 1rem 2rem rgba(84, 97, 118, 0.16);
+	}
+
+	.load-note-toast--error .bi {
+		font-size: 1.35rem;
+		line-height: 1;
+	}
+
+	.load-note-toast--error p {
+		margin: 0;
+		font-family: var(--tsbs-font-body);
+		font-size: 0.95rem;
+		font-weight: 800;
+		line-height: 1.25;
+	}
+
+	@media (min-width: 992px) {
+		.load-note-toast--error {
+			right: 1.5rem;
+			bottom: 1.5rem;
+		}
+	}
+</style>

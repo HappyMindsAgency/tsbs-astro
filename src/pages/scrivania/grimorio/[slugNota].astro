@@ -4,7 +4,7 @@ import Nav from '../../../components/Nav.astro';
 import BackButton from '../../../components/BackButton.astro';
 import NotaEditor from '../../../components/GrimorioComponents/NotaEditor.astro';
 import { resolveUserContext } from '../../../lib/theme';
-import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro } from '../../../lib/strapi/grimorio';
+import { getCurrentMembroFromJwt, getGrimorioCategorySlug, getGrimorioNotaBySlugForMembro } from '../../../lib/strapi/grimorio';
 
 const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
@@ -19,7 +19,7 @@ if (!slugNota) {
 }
 
 const membro = await getCurrentMembroFromJwt(jwt);
-const nota = membro ? await getGrimorioNotaBySlugForMembro(slugNota, membro.id, lang) : null;
+const nota = membro ? await getGrimorioNotaBySlugForMembro(slugNota, membro.documentId, lang) : null;
 
 // Nota inesistente o non di proprietà del membro: torna al grimorio.
 if (!nota) {
@@ -49,7 +49,7 @@ const { theme, accademia } = await resolveUserContext(jwt);
 				noteDocumentId={nota.documentId}
 				titleValue={nota.titolo}
 				bodyValue={nota.contenuto ?? ''}
-				storageScope={membro?.documentId}
+				categorySlug={getGrimorioCategorySlug(nota)}
 			/>
 		</div>
 	</main>

@@ -24,9 +24,17 @@ type GrimorioPayload = {
 	noteDocumentId?: string;
 };
 
+type CategoriaGrimorioRecord = StrapiRecord & {
+	slug?: string | null;
+};
+
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 const EMAIL_REDAZIONE = import.meta.env.EMAIL_REDAZIONE ?? 'assistenzaweb@happyminds.it';
+const GRIMORIO_CATEGORY_BY_ACTION = {
+	draft: 'salvata',
+	submit: 'inviata',
+} as const;
 
 export const POST: APIRoute = async ({ request, cookies }) => {
 	const jwt = cookies.get('jwt')?.value;
@@ -67,9 +75,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 		return json({ error: 'membro_not_found' }, 404);
 	}
 
+	const categoriaSlug = GRIMORIO_CATEGORY_BY_ACTION[action];
+	const categoria = await getCategoriaGrimorioBySlug(categoriaSlug);
+	if (!categoria) {
+		return json({ error: 'categoria_grimorio_not_found', message: `Categoria Grimorio "${categoriaSlug}" non trovata.` }, 500);
+	}
+
 	const note = noteDocumentId
-		? await updateNota(noteDocumentId, membro.documentId, { title, body: noteBody })
-		: await createNota(membro, { title, body: noteBody });
+		? await updateNota(noteDocumentId, membro.documentId, categoria.documentId, { title, body: noteBody })
+		: await createNota(membro, categoria.documentId, { title, body: noteBody });
 
 	if (!note) {
 		return json({ error: 'note_save_failed', message: 'Salvataggio non riuscito.' }, 500);
@@ -118,10 +132,57 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 	return json({
 		success: true,
 		noteDocumentId: note.documentId,
+		categorySlug: categoria.slug ?? categoriaSlug,
 		missionCompleted,
 		trofeiSbloccati,
 		action,
 	});
+};
+
+export const DELETE: APIRoute = async ({ request, cookies }) => {
+	const jwt = cookies.get('jwt')?.value;
+
+	if (!jwt) {
+		return json({ error: 'unauthorized' }, 401);
+	}
+
+	if (!STRAPI_API) {
+		return json({ error: 'missing_strapi_token' }, 500);
+	}
+
+	let body: Pick<GrimorioPayload, 'noteDocumentId'>;
+	try {
+		body = await request.json();
+	} catch {
+		return json({ error: 'invalid_body' }, 400);
+	}
+
+	const noteDocumentId = typeof body.noteDocumentId === 'string' ? body.noteDocumentId.trim() : '';
+	if (!noteDocumentId) {
+		return json({ error: 'missing_note_document_id' }, 400);
+	}
+
+	const user = await getCurrentUser(jwt);
+	if (!user) {
+		return json({ error: 'unauthorized' }, 401);
+	}
+
+	const membro = await getMembroByUserId(user.id);
+	if (!membro) {
+		return json({ error: 'membro_not_found' }, 404);
+	}
+
+	const existing = await getNotaForMembro(noteDocumentId, membro.documentId);
+	if (!existing) {
+		return json({ error: 'note_not_found' }, 404);
+	}
+
+	const deleted = await deleteNota(noteDocumentId);
+	if (!deleted) {
+		return json({ error: 'note_delete_failed', message: 'Eliminazione non riuscita.' }, 500);
+	}
+
+	return json({ success: true, noteDocumentId });
 };
 
 async function getCurrentUser(jwt: string) {
@@ -151,13 +212,36 @@ async function getMembroByUserId(userId: number) {
 	return (payload?.data?.[0] ?? null) as MembroRecord | null;
 }
 
-async function createNota(membro: MembroRecord, nota: { title: string; body: string }) {
+async function getCategoriaGrimorioBySlug(slug: string) {
+	const searchParams = new URLSearchParams();
+	searchParams.set('locale', 'it-IT');
+	searchParams.set('status', 'published');
+	searchParams.set('filters[slug][$eq]', slug);
+	searchParams.set('fields[0]', 'slug');
+	searchParams.set('pagination[pageSize]', '1');
+
+	const response = await fetch(`${STRAPI_API_BASE_URL}/categorie-grimorio?${searchParams}`, {
+		headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
+	});
+
+	if (!response.ok) {
+		const error = await response.text();
+		logger.error(`[Grimorio] Lettura categoria ${slug} fallita: ${error}`);
+		return null;
+	}
+
+	const payload = await response.json();
+	return (payload?.data?.[0] ?? null) as CategoriaGrimorioRecord | null;
+}
+
+async function createNota(membro: MembroRecord, categoriaDocumentId: string, nota: { title: string; body: string }) {
 	const data: Record<string, unknown> = {
 		titolo: nota.title,
 		slug: buildNoteSlug(nota.title),
 		contenuto: nota.body,
 		visibilePubblico: false,
 		membro: { connect: [membro.documentId] },
+		categorie_grimorio: { connect: [categoriaDocumentId] },
 	};
 
 	if (membro.accademia?.documentId) {
@@ -181,7 +265,7 @@ async function createNota(membro: MembroRecord, nota: { title: string; body: str
 	return documentId ? ({ documentId, id: payload.data.id } as StrapiRecord) : null;
 }
 
-async function updateNota(documentId: string, membroDocumentId: string, nota: { title: string; body: string }) {
+async function updateNota(documentId: string, membroDocumentId: string, categoriaDocumentId: string, nota: { title: string; body: string }) {
 	const existing = await getNotaForMembro(documentId, membroDocumentId);
 	if (!existing) return null;
 
@@ -193,6 +277,7 @@ async function updateNota(documentId: string, membroDocumentId: string, nota: { 
 				titolo: nota.title,
 				contenuto: nota.body,
 				visibilePubblico: false,
+				categorie_grimorio: { set: [categoriaDocumentId] },
 			},
 		}),
 	});
@@ -206,6 +291,21 @@ async function updateNota(documentId: string, membroDocumentId: string, nota: { 
 	const payload = await response.json();
 	const updatedDocumentId = payload?.data?.documentId ?? documentId;
 	return { id: payload?.data?.id ?? existing.id, documentId: updatedDocumentId } as StrapiRecord;
+}
+
+async function deleteNota(documentId: string) {
+	const response = await fetch(`${STRAPI_API_BASE_URL}/grimori/${documentId}`, {
+		method: 'DELETE',
+		headers: { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' },
+	});
+
+	if (!response.ok) {
+		const error = await response.text();
+		logger.error(`[Grimorio] Eliminazione nota ${documentId} fallita: ${error}`);
+		return false;
+	}
+
+	return true;
 }
 
 async function getNotaForMembro(documentId: string, membroDocumentId: string) {
