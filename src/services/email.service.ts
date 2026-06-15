@@ -80,12 +80,11 @@ export class EmailService {
         logger.info(`[EmailService] Sending password reset email to: ${email}`);
 
         const mailOptions = {
-            from: `"Testone Support" <${this.config.fromEmail}>`,
+            from: `"Supporto TheSecretBookishSociety" <${this.config.fromEmail}>`,
             to: email,
             subject: 'Password Reset Request',
             text: this.getTextContent(resetLink, tokenExpiryMinutes),
-            html: this.getHtmlContent(resetLink, tokenExpiryMinutes),
-            bcc: ['stepgerace@hotmail.com'], // Consider moving to config
+            html: this.getHtmlContent(resetLink, tokenExpiryMinutes)
         };
 
         try {
