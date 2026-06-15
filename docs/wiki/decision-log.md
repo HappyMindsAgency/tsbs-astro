@@ -20,6 +20,36 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-15 - Recupero Password Utente Non Loggato (link frontend + mailer interno)
+
+Decisione:
+- l'utente non riceve mai link Strapi: l'email di reset punta a una pagina frontend dedicata `/auth/reset-password/conferma?token=...`
+- flusso: pagina richiesta → inserimento email (feedback generico in italiano, anti-enumerazione) → se l'email esiste viene generato un token a scadenza (15 min) salvato sull'utente e inviata l'email con il link → la pagina di conferma raccoglie la nuova password e la invia all'endpoint `POST /api/auth/reset-password/confirm`
+- l'endpoint di conferma valida token + scadenza, imposta la nuova password via `PUT /users/:id` con token applicativo (l'hash è gestito dal controller users-permissions), azzera il token e invia DUE notifiche: conferma all'utente + avviso alla Redazione (`EMAIL_REDAZIONE`) con nome utente ed email
+- tutte le email passano dal sistema interno `src/lib/mailer.ts` (`sendNotification`), non più dalla vecchia classe `EmailService` (rimossa)
+- il link assoluto viene costruito dall'origin pubblico ricavato dagli header proxy Vercel (`x-forwarded-host`/`x-forwarded-proto`), non da URL Strapi
+
+Prerequisito backend (Strapi):
+- l'entità User NON aveva i campi `resetToken`/`resetTokenExpiry`: la PUT li scartava silenziosamente e il filtro di lettura dava HTTP 400, quindi il reset non poteva funzionare
+- vanno aggiunti al Content-Type User due campi NON privati: `resetToken` (Text) e `resetTokenExpiry` (Datetime). Devono essere non privati perché il flusso filtra per `resetToken` e legge `resetTokenExpiry` dalla risposta API
+
+Motivo:
+- l'utente non deve mai vedere o ricevere URL tecnici di Strapi
+- coerenza con il resto del progetto: un solo sistema email interno e link costruiti dietro il proxy Vercel
+- tracciabilità lato Redazione di ogni cambio password
+
+Impatto:
+- `src/services/password-reset.service.ts` (riscritto: mailer interno, link frontend, italiano, `confirmPasswordReset` con doppia email)
+- `src/services/auth.service.ts` (+ `getUserByResetToken`, + `resetUserPassword`)
+- `src/pages/api/auth/reset-password/request.ts` (origin frontend dal proxy, niente link Strapi)
+- `src/pages/api/auth/reset-password/confirm.ts` (nuovo endpoint)
+- `src/pages/auth/reset-password/conferma/index.astro` (nuova pagina form)
+- `src/services/email.service.ts` (rimosso, era orfano)
+- Strapi: aggiunta campi `resetToken` e `resetTokenExpiry` su User (da fare manualmente)
+
+Stato:
+- approvata (codice); in attesa dell'aggiunta dei due campi su Strapi per il funzionamento end-to-end
+
 ## 2026-06-15 - Sincronizzazione User.username ↔ Membro.nickname
 
 Decisione:
