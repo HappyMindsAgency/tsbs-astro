@@ -4,17 +4,13 @@ import Nav from '../../components/Nav.astro';
 import arboreaBanner from '../../assets/Arborea-accademia-stendardo-the-secret-bookish-society.png';
 import arboreaLogo from '../../assets/Arborea-logo-the-secret-bookish-society.png';
 import trophyIcon from '../../assets/trofei-icona-scrivania.png';
+import { getAcademyMembersCount, getAcademyRanking } from '../../lib/strapi/accademie';
 
 const { lang = 'it' } = Astro.props;
-const profileHref = '/scrivania/utenti-preferiti/esploso-profilo-utente/';
-
-const rankingRows = [
-	{ position: 'I', medal: 'gold', initials: 'G', name: 'Adepto 1', points: 50 },
-	{ position: 'II', medal: 'silver', initials: 'L', name: 'Adepto 2', points: 45 },
-	{ position: 'III', medal: 'bronze', initials: 'S', name: 'Adepto 3', points: 43 },
-	{ position: '4', initials: 'M', name: 'Adepto 4', points: 39 },
-	{ position: '24', initials: 'Tu', name: 'Adepto Mario', points: 10, current: true },
-];
+const jwt = Astro.cookies.get('jwt')?.value;
+const academyMembersCount = await getAcademyMembersCount('arborea');
+const academyMembersLabel = `${academyMembersCount} ${academyMembersCount === 1 ? 'Adepto' : 'Adepti'}`;
+const rankingRows = await getAcademyRanking('arborea', jwt);
 
 const chronicleRows = [
 	{ meta: 'OGGI • ADEPTO 3' },
@@ -59,7 +55,7 @@ const chronicleRows = [
 						<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
 						<p class="academy-members">
 							<i class="bi bi-people" aria-hidden="true"></i>
-							<span>142 Adepti</span>
+							<span>{academyMembersLabel}</span>
 						</p>
 					</div>
 				</div>
@@ -69,7 +65,7 @@ const chronicleRows = [
 					<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id.</p>
 					<p class="academy-members">
 						<i class="bi bi-people" aria-hidden="true"></i>
-						<span>142 Adepti</span>
+						<span>{academyMembersLabel}</span>
 					</p>
 				</div>
 			</div>
@@ -89,7 +85,7 @@ const chronicleRows = [
 
 				<div class="academy-ranking-list">
 					{rankingRows.map((row) => (
-						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''}`} href={profileHref}>
+						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''}`} href={row.href}>
 							<div class="academy-ranking-card__position">
 								{row.medal ? (
 									<img

@@ -10,6 +10,7 @@ import armoniaLogo from '../assets/Armonia-logo-the-secret-bookish-society.png';
 import astrariaBanner from '../assets/Astraria-accademia-stendardo-the-secret-bookish-society.png';
 import astrariaLogo from '../assets/Astraria-logo-the-secret-bookish-society.png';
 import trophyIcon from '../assets/trofei-icona-scrivania.png';
+import { getAcademyMembersCount, getAcademyRanking } from '../lib/strapi/accademie';
 import { resolveUserAcademy } from '../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -25,7 +26,6 @@ if (accademia !== userAcademy) {
 	return Astro.redirect(`/sala-accademia-${userAcademy}/`, 302);
 }
 
-const profileHref = '/scrivania/utenti-preferiti/esploso-profilo-utente/';
 type AcademyKey = 'arcadia' | 'arborea' | 'armonia' | 'astraria';
 
 const fallbackAcademy: AcademyKey = 'arborea';
@@ -66,14 +66,9 @@ const isAcademyKey = (value: string): value is AcademyKey => value in academies;
 const academyKey = isAcademyKey(userAcademy) ? userAcademy : fallbackAcademy;
 const academy = academies[academyKey];
 const rankingHref = '/classifica-generale/';
-
-const rankingRows = [
-	{ position: 'I', medal: 'gold', initials: 'G', name: 'Adepto 1', points: 50 },
-	{ position: 'II', medal: 'silver', initials: 'L', name: 'Adepto 2', points: 45 },
-	{ position: 'III', medal: 'bronze', initials: 'S', name: 'Adepto 3', points: 43 },
-	{ position: '4', initials: 'M', name: 'Adepto 4', points: 39 },
-	{ position: '24', initials: 'Tu', name: 'Adepto Mario', points: 10, current: true },
-];
+const academyMembersCount = await getAcademyMembersCount(academyKey);
+const academyMembersLabel = `${academyMembersCount} ${academyMembersCount === 1 ? 'Adepto' : 'Adepti'}`;
+const rankingRows = await getAcademyRanking(academyKey, jwt);
 
 const chronicleRows = [
 	{ meta: 'OGGI • ADEPTO 3' },
@@ -118,7 +113,7 @@ const chronicleRows = [
 						<p>{academy.description}</p>
 						<p class="academy-members">
 							<i class="bi bi-people" aria-hidden="true"></i>
-							<span>142 Adepti</span>
+							<span>{academyMembersLabel}</span>
 						</p>
 					</div>
 				</div>
@@ -128,7 +123,7 @@ const chronicleRows = [
 					<p>{academy.description}</p>
 					<p class="academy-members">
 						<i class="bi bi-people" aria-hidden="true"></i>
-						<span>142 Adepti</span>
+						<span>{academyMembersLabel}</span>
 					</p>
 				</div>
 			</div>
@@ -148,7 +143,7 @@ const chronicleRows = [
 
 				<div class="academy-ranking-list">
 					{rankingRows.map((row) => (
-						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''}`} href={profileHref}>
+						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''}`} href={row.href}>
 							<div class="academy-ranking-card__position">
 								{row.medal ? (
 									<img
