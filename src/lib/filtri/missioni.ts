@@ -185,9 +185,9 @@ export function buildMissionTabs(
 	}
 
 	return [
-		{ id: 'in-corso', label: 'In corso', missions: inCorso },
-		{ id: 'completate', label: 'Completate', missions: completate },
 		{ id: 'disponibili', label: 'Disponibili', missions: disponibili },
+		{ id: 'in-corso', label: 'In corso', missions: inCorso },
+		{ id: 'completate', label: 'Completate', missions: completate },		
 	];
 }
 

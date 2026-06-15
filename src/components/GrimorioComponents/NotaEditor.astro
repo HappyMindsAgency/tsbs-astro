@@ -296,7 +296,7 @@ const resolvedStorageKey = storageKey
 			});
 
 			deleteButton?.addEventListener('click', () => {
-				if (editor.dataset.noteDocumentId) {
+				if (!editor.dataset.noteDocumentId) {
 					setFeedback('La cancellazione delle note salvate non è ancora disponibile.', 'error');
 					return;
 				}
