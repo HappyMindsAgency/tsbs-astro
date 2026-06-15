@@ -1,0 +1,163 @@
+---
+interface Props {
+	isOpen?: boolean;
+	renderHidden?: boolean;
+}
+
+const { isOpen = false, renderHidden = false } = Astro.props as Props;
+const shouldRender = isOpen || renderHidden;
+---
+
+{shouldRender && (
+	<div
+		class="reading-check-toast"
+		data-reading-check-toast
+		hidden={!isOpen}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="reading-check-toast-title"
+	>
+		<div class="reading-check-toast__backdrop" data-reading-check-close></div>
+		<section class="reading-check-toast__panel">
+			<div class="reading-check-toast__icon" data-reading-check-icon aria-hidden="true">
+				<i class="bi bi-check-lg"></i>
+			</div>
+			<div class="reading-check-toast__copy">
+				<h2 id="reading-check-toast-title" data-reading-check-title>Risposta corretta</h2>
+				<p data-reading-check-message>Hai riconosciuto il libro.</p>
+			</div>
+			<button class="btn tsbs-cta-primary reading-check-toast__button" type="button" data-reading-check-close>
+				Continua
+			</button>
+		</section>
+	</div>
+)}
+
+<script>
+	const setupReadingCheckToast = () => {
+		document.querySelectorAll<HTMLElement>('[data-reading-check-toast]').forEach((toast) => {
+			if (toast.dataset.readingCheckReady === 'true') return;
+			toast.dataset.readingCheckReady = 'true';
+
+			const title = toast.querySelector<HTMLElement>('[data-reading-check-title]');
+			const message = toast.querySelector<HTMLElement>('[data-reading-check-message]');
+			const icon = toast.querySelector<HTMLElement>('[data-reading-check-icon] .bi');
+
+			const closeToast = () => {
+				toast.hidden = true;
+			};
+
+			const openToast = (event: Event) => {
+				if (!(event instanceof CustomEvent)) return;
+
+				const correct = event.detail?.correct === true;
+				toast.dataset.readingCheckResult = correct ? 'correct' : 'wrong';
+				if (title) title.textContent = correct ? 'Risposta corretta' : 'Risposta sbagliata';
+				if (message) message.textContent = correct ? 'Hai riconosciuto il libro.' : 'Potrai riprovare domani.';
+				if (icon) icon.className = correct ? 'bi bi-check-lg' : 'bi bi-x-lg';
+				toast.hidden = false;
+			};
+
+			toast.querySelectorAll('[data-reading-check-close]').forEach((element) => {
+				element.addEventListener('click', closeToast);
+			});
+
+			document.addEventListener('tsbs:sfida-lettura-check-open', openToast);
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape') closeToast();
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupReadingCheckToast);
+	setupReadingCheckToast();
+</script>
+
+<style lang="scss">
+	.reading-check-toast {
+		position: fixed;
+		inset: 0;
+		z-index: 1230;
+		display: grid;
+		place-items: center;
+		padding: 1.75rem;
+	}
+
+	.reading-check-toast[hidden] {
+		display: none;
+	}
+
+	.reading-check-toast__backdrop {
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-surface) 72%, transparent);
+		backdrop-filter: blur(0.0625rem);
+	}
+
+	.reading-check-toast__panel {
+		position: relative;
+		display: grid;
+		justify-items: center;
+		gap: 1rem;
+		width: min(100%, 23.4375rem);
+		padding: 1.5rem;
+		color: var(--tsbs-color-heading);
+		text-align: center;
+		background: var(--tsbs-color-white);
+		border: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 22%, transparent);
+		border-radius: 0.875rem;
+		box-shadow: 0 1.25rem 3rem rgba(84, 97, 118, 0.18);
+	}
+
+	.reading-check-toast__icon {
+		display: grid;
+		place-items: center;
+		width: 3.5rem;
+		aspect-ratio: 1;
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-accent);
+		border-radius: 999rem;
+		font-size: 1.625rem;
+		line-height: 1;
+	}
+
+	.reading-check-toast[data-reading-check-result="wrong"] .reading-check-toast__icon {
+		background: var(--tsbs-color-danger, #c0392b);
+	}
+
+	.reading-check-toast__copy {
+		display: grid;
+		gap: 0.375rem;
+	}
+
+	.reading-check-toast__copy h2,
+	.reading-check-toast__copy p {
+		margin: 0;
+	}
+
+	.reading-check-toast__copy h2 {
+		font-size: 1.125rem;
+		font-weight: 800;
+		line-height: 1.2;
+	}
+
+	.reading-check-toast__copy p {
+		color: #667084;
+		font-size: 0.9375rem;
+		line-height: 1.35;
+	}
+
+	.reading-check-toast__button {
+		width: 100%;
+		min-height: 3rem;
+		font-family: var(--tsbs-font-cta);
+		font-weight: 400;
+		letter-spacing: 0;
+	}
+
+	@media (min-width: 992px) {
+		.reading-check-toast {
+			padding-left: calc(var(--tsbs-desktop-nav-width) + 1.75rem);
+		}
+	}
+</style>

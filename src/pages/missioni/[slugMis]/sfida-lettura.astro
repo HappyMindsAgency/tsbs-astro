@@ -4,6 +4,7 @@ import Nav from '../../../components/Nav.astro';
 import RitchText from '../../../components/RitchText.astro';
 import DomandaModal from '../../../components/PopupComponents/DomandaModal.astro';
 import TrofeoModal from '../../../components/PopupComponents/TrofeoModal.astro';
+import ConfermaCheackSfidaLettura from '../../../components/toastComponents/ConfermaCheackSfidaLettura.astro';
 import { getMissioneBySlug } from '../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt } from '../../../lib/strapi/progressione';
 import { getStatoSfidaLettura, type LibroSfida } from '../../../lib/strapi/sfida-lettura';
@@ -168,6 +169,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 	</main>
 
 	<DomandaModal />
+	<ConfermaCheackSfidaLettura renderHidden />
 	<TrofeoModal theme={theme} />
 </Layout>
 
@@ -224,6 +226,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 					new CustomEvent('tsbs:question-modal-open', {
 						detail: {
 							input,
+							variant: 'reading-challenge',
 							answers: payload.estratti.map((estratto: string) => ({ description: estratto })),
 						},
 					}),
@@ -255,6 +258,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 
 				// Un solo inserimento al giorno: la risposta consuma il tentativo.
 				dayLocked = true;
+				document.dispatchEvent(new CustomEvent('tsbs:sfida-lettura-check-open', { detail: { correct: payload.corretta } }));
 
 				if (payload.corretta) {
 					if (input) {
@@ -262,10 +266,10 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 						input.disabled = true;
 					}
 					if (progress) progress.textContent = `${payload.libriRiconosciuti} / ${payload.totaleLibri}`;
-					setFeedback('Risposta corretta! Hai guadagnato 1 punto.');
+					setFeedback('');
 				} else {
 					if (input) input.checked = false;
-					setFeedback('Risposta sbagliata. Potrai riprovare domani.');
+					setFeedback('');
 				}
 
 				const trofei = Array.isArray(payload.trofeiSbloccati) ? payload.trofeiSbloccati : [];
