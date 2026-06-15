@@ -1,7 +1,7 @@
 ﻿---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
-import { mockProfiles } from '../../../data/mockProfiles.js';
+import { getFavoriteProfilesByJwt } from '../../../lib/strapi/preferiti';
 import { resolveUserContext } from '../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -9,7 +9,9 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+const jwt = Astro.cookies.get('jwt')?.value;
+const { theme, accademia } = await resolveUserContext(jwt);
+const favoriteProfiles = jwt ? await getFavoriteProfilesByJwt(jwt) : [];
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -22,20 +24,15 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 
 		<div class="container-xl tsbs-app-container academy-ranking-page__content">
 			<section class="academy-section" aria-label="Utenti preferiti">
-				<p class="profile-favorites-empty" data-profile-favorites-empty hidden>
+				<p class="profile-favorites-empty" hidden={favoriteProfiles.length > 0}>
 					In questa pagina, trovi tutti gli utenti preferiti. Attualmente non ci sono utenti preferiti.
 				</p>
 
-				<div class="academy-ranking-list" data-profile-favorites-list>
-					{mockProfiles.map((row) => (
-						<article class={`academy-ranking-card is-academy-${row.academy}`} data-profile-favorite-card data-profile-id={row.id} hidden>
+				<div class="academy-ranking-list">
+					{favoriteProfiles.map((row, index) => (
+						<a class={`academy-ranking-card is-academy-${row.academy}`} href={row.href}>
 							<div class="academy-ranking-card__position">
-								{row.medal ? (
-									<i class={`bi bi-award-fill is-${row.medal}`} aria-hidden="true"></i>
-								) : (
-									<span>{row.position}</span>
-								)}
-								<span class="academy-ranking-card__roman">{row.medal ? row.position : ''}</span>
+								<span>{index + 1}</span>
 							</div>
 							<div class="academy-ranking-card__avatar" aria-hidden="true">{row.initials}</div>
 							<p class="academy-ranking-card__name">{row.name}</p>
@@ -43,45 +40,13 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 								<strong>{row.points}</strong>
 								<i class="bi bi-trophy" aria-hidden="true"></i>
 							</p>
-						</article>
+						</a>
 					))}
 				</div>
 			</section>
 		</div>
 	</main>
 </Layout>
-
-<script>
-	import { getFavorites } from '../../../lib/profileFavorites.js';
-
-	const renderFavoriteProfiles = () => {
-		const favoriteCards = document.querySelectorAll('[data-profile-favorite-card]');
-		const emptyState = document.querySelector('[data-profile-favorites-empty]');
-
-		if (!favoriteCards.length && !emptyState) return;
-
-		const favoriteIds = new Set(getFavorites());
-		let visibleCount = 0;
-
-		favoriteCards.forEach((card) => {
-			const shouldShow = favoriteIds.has(card.dataset.profileId ?? '');
-			card.hidden = !shouldShow;
-
-			if (shouldShow) {
-				visibleCount += 1;
-			}
-		});
-
-		if (emptyState) {
-			emptyState.hidden = visibleCount > 0;
-		}
-	};
-
-	renderFavoriteProfiles();
-	document.addEventListener('astro:page-load', renderFavoriteProfiles);
-	window.addEventListener('storage', renderFavoriteProfiles);
-	window.addEventListener('tsbs:profile-favorites-change', renderFavoriteProfiles);
-</script>
 
 <style lang="scss">
 	.profile-favorites-empty {

@@ -20,6 +20,30 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-15 - Utenti Preferiti Gestiti Da Strapi
+
+Decisione:
+- gli utenti preferiti non vengono piu gestiti con `localStorage`
+- la fonte unica dei preferiti e Strapi tramite la relazione esistente `Membro.membri_preferiti`
+- il client salva/rimuove solo l'identificativo stabile del profilo (`Membro.documentId`) tramite endpoint server-side
+- la pagina "Utenti preferiti" renderizza i dati letti da Strapi, non una lista mock filtrata lato browser
+
+Motivo:
+- i preferiti sono un dato personale dell'utente e devono restare sincronizzati tra dispositivi e sessioni
+- `localStorage` e locale al singolo browser e non garantisce persistenza cross-device, backup o coerenza con Strapi
+- usare la relazione Strapi gia esistente evita nuovi campi o modelli e mantiene il dato nel backend corretto
+
+Impatto:
+- `src/lib/strapi/preferiti.ts`
+- `src/pages/api/user/preferiti.ts`
+- `src/lib/profileFavorites.js`
+- `src/pages/scrivania/utenti-preferiti/index.astro`
+- `src/pages/scrivania/utenti-preferiti/esploso-profilo-utente.astro`
+- Strapi: relazione `Membro.membri_preferiti`
+
+Stato:
+- approvata
+
 ## 2026-06-15 - Recupero Password Utente Non Loggato (link frontend + mailer interno)
 
 Decisione:

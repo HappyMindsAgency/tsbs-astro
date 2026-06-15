@@ -9,11 +9,20 @@ import trofeoMedaglia from '../../../assets/trofeo-medaglia.png';
 import trofeoScudo from '../../../assets/trofeo-scudo.png';
 import trofeoStendardo from '../../../assets/trofeo-stendardo.png';
 import trofeoTartaruga from '../../../assets/trofeo-tartaruga.png';
-import { mockProfiles } from '../../../data/mockProfiles.js';
+import { getProfileDetailByJwt } from '../../../lib/strapi/preferiti';
 import { resolveUserContext } from '../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
-const currentProfile = mockProfiles[0];
+if (!Astro.cookies.has('jwt')) {
+	return Astro.redirect('/');
+}
+
+const jwt = Astro.cookies.get('jwt')?.value;
+const currentProfile = jwt ? await getProfileDetailByJwt(jwt, Astro.url.searchParams.get('membro')) : null;
+
+if (!currentProfile) {
+	return Astro.redirect('/scrivania/utenti-preferiti/');
+}
 
 const board = {
 	rows: 8,
@@ -34,11 +43,8 @@ const trophies = [
 ];
 
 const cells = Array.from({ length: board.rows * board.cols });
-if (!Astro.cookies.has('jwt')) {
-	return Astro.redirect('/');
-}
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+const { theme, accademia } = await resolveUserContext(jwt);
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -48,14 +54,14 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 		<header class="desk-hero profile-exploded-hero" aria-labelledby="profile-exploded-title">
 			<div class="desk-hero__panel profile-exploded-hero__panel">
 				<button
-					class="profile-favorite-button"
+					class={`profile-favorite-button${currentProfile.isFavorite ? ' is-favorite' : ''}`}
 					type="button"
-					aria-label="Aggiungi ai preferiti"
-					aria-pressed="false"
+					aria-label={currentProfile.isFavorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+					aria-pressed={String(currentProfile.isFavorite)}
 					data-profile-favorite-toggle
 					data-profile-id={currentProfile.id}
 				>
-					<i class="bi bi-heart" aria-hidden="true"></i>
+					<i class={`bi ${currentProfile.isFavorite ? 'bi-heart-fill' : 'bi-heart'}`} aria-hidden="true"></i>
 				</button>
 
 				<p class="desk-academy-pill">{currentProfile.academyLabel}</p>
@@ -96,17 +102,13 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 </Layout>
 
 <script>
-	import { isFavorite, toggleFavorite } from '../../../lib/profileFavorites.js';
+	import { toggleFavorite } from '../../../lib/profileFavorites.js';
 
 	const setupProfileFavoriteToggle = () => {
 		const favoriteButton = document.querySelector('[data-profile-favorite-toggle]');
 		if (!favoriteButton || favoriteButton.dataset.profileFavoriteReady === 'true') return;
 
-		const syncFavoriteButton = () => {
-			const profileId = favoriteButton.dataset.profileId;
-			if (!profileId) return;
-
-			const favorite = isFavorite(profileId);
+		const syncFavoriteButton = (favorite) => {
 			const icon = favoriteButton.querySelector('.bi');
 
 			favoriteButton.setAttribute('aria-pressed', String(favorite));
@@ -117,17 +119,23 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 		};
 
 		favoriteButton.dataset.profileFavoriteReady = 'true';
-		favoriteButton.addEventListener('click', () => {
+		favoriteButton.addEventListener('click', async () => {
 			const profileId = favoriteButton.dataset.profileId;
-			if (!profileId) return;
+			if (!profileId || favoriteButton.disabled) return;
 
-			// Strapi TODO: il click deve continuare a passare solo profileId.
-			// Quando lo storage diventera Strapi, toggleFavorite chiamera l'API invece di localStorage.
-			toggleFavorite(profileId);
-			syncFavoriteButton();
+			favoriteButton.disabled = true;
+
+			try {
+				const favorites = await toggleFavorite(profileId);
+				syncFavoriteButton(favorites.includes(profileId));
+			} catch {
+				syncFavoriteButton(favoriteButton.getAttribute('aria-pressed') === 'true');
+			} finally {
+				favoriteButton.disabled = false;
+			}
 		});
 
-		syncFavoriteButton();
+		syncFavoriteButton(favoriteButton.getAttribute('aria-pressed') === 'true');
 	};
 
 	document.addEventListener('astro:page-load', setupProfileFavoriteToggle);

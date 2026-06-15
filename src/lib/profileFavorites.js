@@ -1,42 +1,48 @@
-const FAVORITES_STORAGE_KEY = 'tsbs.profileFavorites.v1';
-
 const normalizeProfileIds = (value) => {
 	if (!Array.isArray(value)) return [];
 
 	return [...new Set(value.filter((item) => typeof item === 'string' && item.trim().length > 0))];
 };
 
-const canUseStorage = () => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+const canUseApi = () => typeof window !== 'undefined' && typeof window.fetch === 'function';
+let cachedFavorites = null;
 
-export const getFavorites = () => {
-	if (!canUseStorage()) return [];
+const notifyFavoriteChange = (favorites) => {
+	if (typeof window === 'undefined') return;
 
-	try {
-		return normalizeProfileIds(JSON.parse(window.localStorage.getItem(FAVORITES_STORAGE_KEY) ?? '[]'));
-	} catch {
-		return [];
-	}
+	window.dispatchEvent(new CustomEvent('tsbs:profile-favorites-change', { detail: { favorites } }));
 };
 
-const setFavorites = (profileIds) => {
-	const favorites = normalizeProfileIds(profileIds);
+const requestFavorites = async (method, profileId) => {
+	if (!canUseApi()) return cachedFavorites ?? [];
 
-	if (canUseStorage()) {
-		window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-		window.dispatchEvent(new CustomEvent('tsbs:profile-favorites-change', { detail: { favorites } }));
+	const response = await fetch('/api/user/preferiti', {
+		method,
+		headers: { 'Content-Type': 'application/json' },
+		body: profileId ? JSON.stringify({ profileId }) : undefined,
+	});
+
+	if (!response.ok) {
+		throw new Error('favorite_request_failed');
 	}
+
+	const payload = await response.json();
+	const favorites = normalizeProfileIds(payload.favoriteIds);
+	cachedFavorites = favorites;
+	notifyFavoriteChange(favorites);
 
 	return favorites;
 };
 
-export const isFavorite = (profileId) => getFavorites().includes(profileId);
+export const getFavorites = () => requestFavorites('GET');
 
-export const addFavorite = (profileId) => setFavorites([...getFavorites(), profileId]);
+export const isFavorite = async (profileId) => (await getFavorites()).includes(profileId);
 
-export const removeFavorite = (profileId) => setFavorites(getFavorites().filter((favoriteId) => favoriteId !== profileId));
+export const addFavorite = (profileId) => requestFavorites('POST', profileId);
 
-export const toggleFavorite = (profileId) => (isFavorite(profileId) ? removeFavorite(profileId) : addFavorite(profileId));
+export const removeFavorite = (profileId) => requestFavorites('DELETE', profileId);
 
-// Strapi TODO: mantenere questa API pubblica e sostituire solo l'implementazione interna.
-// In produzione lo storage locale dovra diventare una relazione Strapi tra utente autenticato e profili preferiti.
-// La UI deve continuare a salvare solo identificativi stabili, non copie complete dei profili.
+export const toggleFavorite = async (profileId) => {
+	const favorites = cachedFavorites ?? (await getFavorites());
+	return favorites.includes(profileId) ? removeFavorite(profileId) : addFavorite(profileId);
+};
