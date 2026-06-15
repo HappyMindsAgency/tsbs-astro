@@ -43,10 +43,12 @@ const HTML_TEMPLATE = `<!DOCTYPE html>
           <tr>
             <td align="center"
                 style="background-color:#1a1a2e;padding:32px 40px;">
+                <img src="https://thesecretbookishsociety.it/assets/tsbs-light-logo.png" alt="The Secret Bookish Society" style="max-width:200px;height:auto;">
               <!-- Sostituisci il testo con un <img> per il logo -->
-              <span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:2px;">
+              <!-- <span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:2px;">
                 THE SECRET BOOKISH SOCIETY
-              </span>
+              </span> -->
+              
             </td>
           </tr>
 
