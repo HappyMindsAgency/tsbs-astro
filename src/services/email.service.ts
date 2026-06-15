@@ -84,8 +84,7 @@ export class EmailService {
             to: email,
             subject: 'Password Reset Request',
             text: this.getTextContent(resetLink, tokenExpiryMinutes),
-            html: this.getHtmlContent(resetLink, tokenExpiryMinutes),
-            bcc: ['stepgerace@hotmail.com'], // Consider moving to config
+            html: this.getHtmlContent(resetLink, tokenExpiryMinutes)
         };
 
         try {
