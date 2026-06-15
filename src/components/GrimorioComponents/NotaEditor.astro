@@ -136,13 +136,13 @@ const {
 				feedback.hidden = true;
 			};
 
-			const setPending = (pending: boolean) => {
+			const setPending = (pending: boolean, showSubmitLoader = false) => {
 				isPending = pending;
 				if (saveButton) saveButton.disabled = pending || isSubmitted;
 				if (submitButton) submitButton.disabled = pending || isSubmitted;
 				if (deleteButton) deleteButton.disabled = pending;
-				if (submitLoader) submitLoader.hidden = !pending;
-				if (submitLabel) submitLabel.textContent = pending ? 'Invio in corso' : 'Invia al Prefetto';
+				if (submitLoader) submitLoader.hidden = !(pending && showSubmitLoader);
+				if (submitLabel) submitLabel.textContent = pending && showSubmitLoader ? 'Invio in corso' : 'Invia al Prefetto';
 			};
 
 			const setSubmittedState = () => {
@@ -164,13 +164,13 @@ const {
 
 				if (!note.plainBody) {
 					setFeedback('Scrivi una nota prima di salvarla.', 'error');
-					if (action === 'submit') {
-						document.dispatchEvent(new CustomEvent('tsbs:load-nota-error-open'));
-					}
 					return null;
 				}
 
-				setPending(true);
+				setPending(true, action === 'submit');
+				if (action === 'submit') {
+					document.dispatchEvent(new CustomEvent('tsbs:load-nota-clear'));
+				}
 
 				try {
 					const response = await fetch('/api/grimorio/note', {
