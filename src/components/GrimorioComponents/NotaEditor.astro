@@ -17,7 +17,7 @@ interface Props {
 
 const {
 	missioneSlug = '',
-	titleValue = 'Titolo della nota',
+	titleValue = '',
 	bodyValue = '',
 	noteDocumentId = '',
 	categorySlug = '',
@@ -40,6 +40,7 @@ const {
 			type="text"
 			value={titleValue}
 			autocomplete="off"
+			placeholder="Titolo della nota"
 			data-note-title
 		/>
 		<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" data-note-delete hidden={!noteDocumentId}>
