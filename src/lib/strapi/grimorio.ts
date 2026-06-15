@@ -127,6 +127,23 @@ export function getGrimorioStateLabel(nota: Pick<GrimorioNota, 'categorie_grimor
 	return getGrimorioVisibilityLabel(nota.visibilePubblico);
 }
 
+export function getGrimorioAuthorLabel(nota: Pick<GrimorioNota, 'membro'>) {
+	return nota.membro?.nickname?.trim() || 'Classense';
+}
+
+export function getGrimorioChronicleMeta(nota: Pick<GrimorioNota, 'publishedAt' | 'membro' | 'visibilePubblico'>) {
+	const dateLabel = formatGrimorioDate(nota.publishedAt);
+	const authorLabel = getGrimorioAuthorLabel(nota);
+	const stateLabel = getGrimorioVisibilityLabel(nota.visibilePubblico);
+	const labels = [dateLabel, authorLabel, stateLabel].filter(Boolean);
+
+	return labels.join(' • ');
+}
+
+export function getGrimorioPublicNoteHref(nota: Pick<GrimorioNota, 'slug'>) {
+	return `/scrivania/grimorio/pubblicate/${nota.slug}/`;
+}
+
 export async function getCurrentMembroFromJwt(jwt: string) {
 	const apiBaseUrl = getStrapiApiBaseUrl();
 	const userResponse = await fetch(`${apiBaseUrl}/users/me`, {
@@ -151,6 +168,21 @@ export async function getCurrentMembroFromJwt(jwt: string) {
 	return membriResponse.data?.[0] || null;
 }
 
+export async function getGrimorioNotePubbliche(lang = 'it') {
+	const searchParams = new URLSearchParams();
+	searchParams.set('locale', getItalianStrapiLocale(lang));
+	searchParams.set('status', 'published');
+	searchParams.set('filters[visibilePubblico][$eq]', 'true');
+	searchParams.set('sort[0]', 'publishedAt:desc');
+	searchParams.set('pagination[pageSize]', '100');
+	setGrimorioFields(searchParams);
+	setGrimorioRelations(searchParams);
+
+	const response = await fetchStrapi<StrapiCollectionResponse<GrimorioNota>>('/grimori', searchParams);
+
+	return (response.data || []).map(normalizeNota);
+}
+
 export async function getGrimorioNoteByMembro(membroDocumentId: string, lang = 'it') {
 	const searchParams = new URLSearchParams();
 	searchParams.set('locale', getItalianStrapiLocale(lang));
@@ -172,6 +204,22 @@ export async function getGrimorioNotaBySlugForMembro(slug: string, membroDocumen
 	searchParams.set('status', 'published');
 	searchParams.set('filters[slug][$eq]', slug);
 	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
+	searchParams.set('pagination[pageSize]', '1');
+	setGrimorioFields(searchParams);
+	setGrimorioRelations(searchParams);
+
+	const response = await fetchStrapi<StrapiCollectionResponse<GrimorioNota>>('/grimori', searchParams);
+	const nota = response.data?.[0];
+
+	return nota ? normalizeNota(nota) : null;
+}
+
+export async function getGrimorioNotaPubblicaBySlug(slug: string, lang = 'it') {
+	const searchParams = new URLSearchParams();
+	searchParams.set('locale', getItalianStrapiLocale(lang));
+	searchParams.set('status', 'published');
+	searchParams.set('filters[slug][$eq]', slug);
+	searchParams.set('filters[visibilePubblico][$eq]', 'true');
 	searchParams.set('pagination[pageSize]', '1');
 	setGrimorioFields(searchParams);
 	setGrimorioRelations(searchParams);

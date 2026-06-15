@@ -6,6 +6,7 @@ import arcadiaPattern from '../../assets/Arcadia-pattern-the-secret-bookish-soci
 import armoniaPattern from '../../assets/Armonia-pattern-the-secret-bookish-society.webp';
 import astrariaPattern from '../../assets/Astraria-pattern-the-secret-bookish-society.webp';
 import trophyIcon from '../../assets/trofei-icona-scrivania.png';
+import { getGrimorioChronicleMeta, getGrimorioExcerpt, getGrimorioNotePubbliche, getGrimorioPublicNoteHref } from '../../lib/strapi/grimorio';
 
 const {
 	lang = 'it',
@@ -55,12 +56,7 @@ const rankingRows = [
 	{ position: '13', initials: 'L', name: 'Adepto 13', points: 28 },
 	{ position: '14', initials: 'G', name: 'Adepto 14', points: 27 },
 ];
-
-const chronicleRows = [
-	{ meta: 'OGGI • ADEPTO 3' },
-	{ meta: 'IERI • ADEPTO 15' },
-	{ meta: 'LUN • ADEPTO 8' },
-];
+const chronicleRows = showBoxCronache ? await getGrimorioNotePubbliche(lang) : [];
 ---
 
 <Layout lang={lang}>
@@ -139,22 +135,24 @@ const chronicleRows = [
 					<h2 id="academy-chronicles-title" class="tsbs-section-title">Cronache della Società</h2>
 
 					<div class="academy-chronicles-list">
-						{chronicleRows.map((row, index) => (
-							<article class={`academy-note-card ${index > 1 ? 'is-hidden' : ''}`} data-academy-note-card>
+						{chronicleRows.map((note, index) => (
+							<a class={`academy-note-card ${index > 1 ? 'is-hidden' : ''}`} href={getGrimorioPublicNoteHref(note)} data-academy-note-card>
 								<div>
-									<p class="academy-note-card__meta">{row.meta}</p>
-									<h3>Titolo della nota</h3>
-									<p>Adepti della Civetta, la Sala Dantesca richiede la vostra attenzione. Nuovi indizi sono apparsi...</p>
+									<p class="academy-note-card__meta">{getGrimorioChronicleMeta(note)}</p>
+									<h3>{note.titolo}</h3>
+									<p>{getGrimorioExcerpt(note.contenuto)}</p>
 								</div>
 								<i class="bi bi-chevron-right" aria-hidden="true"></i>
-							</article>
+							</a>
 						))}
 					</div>
 
-					<button class="missions-load-more academy-load-more" type="button" data-load-more aria-controls="academy-chronicles-title">
-						<span>Carica altro</span>
-						<i class="bi bi-arrow-right" aria-hidden="true"></i>
-					</button>
+					{chronicleRows.length > 2 && (
+						<button class="missions-load-more academy-load-more" type="button" data-load-more aria-controls="academy-chronicles-title">
+							<span>Carica altro</span>
+							<i class="bi bi-arrow-right" aria-hidden="true"></i>
+						</button>
+					)}
 				</section>
 			)}
 		</div>

@@ -4,7 +4,7 @@ import Nav from '../../../../components/Nav.astro';
 import BackButton from '../../../../components/BackButton.astro';
 import RitchText from '../../../../components/RitchText.astro';
 import ConfermaEliminaNota from '../../../../components/toastComponents/ConfermaEliminaNota.astro';
-import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro } from '../../../../lib/strapi/grimorio';
+import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro, getGrimorioNotaPubblicaBySlug } from '../../../../lib/strapi/grimorio';
 import { resolveUserContext } from '../../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -20,8 +20,10 @@ if (!slugNotaPub) {
 }
 
 const membro = await getCurrentMembroFromJwt(jwt);
-const nota = membro ? await getGrimorioNotaBySlugForMembro(slugNotaPub, membro.documentId, lang) : null;
+const notaPersonale = membro ? await getGrimorioNotaBySlugForMembro(slugNotaPub, membro.documentId, lang) : null;
+const nota = notaPersonale ?? await getGrimorioNotaPubblicaBySlug(slugNotaPub, lang);
 const { theme, accademia } = await resolveUserContext(jwt);
+const canDeleteNote = Boolean(notaPersonale);
 
 if (!nota) {
 	return Astro.redirect('/scrivania/grimorio/');
@@ -41,9 +43,11 @@ if (!nota) {
 			<section class="note-editor note-editor--published" aria-labelledby="published-note-title" data-published-note data-note-document-id={nota.documentId}>
 				<div class="note-editor__head">
 					<h2 id="published-note-title" class="note-editor__title note-editor__title--static">{nota.titolo}</h2>
-					<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" data-published-note-delete>
-						<i class="bi bi-trash" aria-hidden="true"></i>
-					</button>
+					{canDeleteNote && (
+						<button class="note-editor__icon-button" type="button" aria-label="Elimina nota" data-published-note-delete>
+							<i class="bi bi-trash" aria-hidden="true"></i>
+						</button>
+					)}
 				</div>
 
 				<div class="note-editor__body note-editor__body--published">
