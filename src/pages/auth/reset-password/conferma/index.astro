@@ -1,0 +1,368 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import loginHero from '../../../../assets/login.png';
+
+const { lang = 'it' } = Astro.props;
+// Token letto dal link ricevuto via email. Validità e scadenza sono verificate server-side.
+const token = Astro.url.searchParams.get('token') ?? '';
+---
+
+<Layout lang={lang} theme="theme-neutral">
+	<main class="reset-page">
+		<div class="reset-stage">
+			<section class="reset-panel" aria-labelledby="reset-title">
+				<div class="reset-media" aria-hidden="true">
+					<img
+						class="reset-visual"
+						src={loginHero.src}
+						width={loginHero.width}
+						height={loginHero.height}
+						alt=""
+					/>
+				</div>
+
+				<div class="reset-content">
+					<h1 id="reset-title">Nuova Password</h1>
+					<p class="reset-intro">
+						Scegli una nuova password per il tuo account. Deve contenere almeno 8 caratteri.
+					</p>
+
+					<div class="reset-message" id="formMessage" role="alert" hidden></div>
+
+					{token ? (
+						<form class="reset-form" id="resetConfirmForm" data-token={token}>
+							<div class="reset-field">
+								<label for="password">Nuova password</label>
+								<input
+									type="password"
+									id="password"
+									name="password"
+									required
+									minlength="8"
+									autocomplete="new-password"
+								/>
+							</div>
+
+							<div class="reset-field">
+								<label for="passwordConfirmation">Conferma password</label>
+								<input
+									type="password"
+									id="passwordConfirmation"
+									name="passwordConfirmation"
+									required
+									minlength="8"
+									autocomplete="new-password"
+								/>
+							</div>
+
+							<button type="submit" class="reset-submit">Reimposta password</button>
+						</form>
+					) : (
+						<p class="reset-intro" style="margin-top:1.5rem;">
+							Il link di reset non è valido o è incompleto. Richiedine uno nuovo dalla
+							<a href="/auth/reset-password/request/">pagina di recupero password</a>.
+						</p>
+					)}
+
+					<a class="reset-back" href="/">Torna al login</a>
+				</div>
+			</section>
+		</div>
+	</main>
+</Layout>
+
+<script>
+function initPasswordResetConfirm() {
+	const form = document.getElementById('resetConfirmForm') as HTMLFormElement | null;
+	const messageDiv = document.getElementById('formMessage') as HTMLElement | null;
+	if (!form || !messageDiv) return;
+	if (form.dataset.ready === 'true') return;
+	form.dataset.ready = 'true';
+
+	const displayMessage = (message: string, type: 'success' | 'error') => {
+		messageDiv.textContent = message;
+		messageDiv.hidden = false;
+		messageDiv.dataset.type = type;
+	};
+
+	form.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		messageDiv.hidden = true;
+
+		const token = form.dataset.token ?? '';
+		const password = (document.getElementById('password') as HTMLInputElement)?.value ?? '';
+		const passwordConfirmation = (document.getElementById('passwordConfirmation') as HTMLInputElement)?.value ?? '';
+
+		if (!password || !passwordConfirmation) {
+			displayMessage('Compila entrambi i campi password.', 'error');
+			return;
+		}
+		if (password !== passwordConfirmation) {
+			displayMessage('Le due password non coincidono.', 'error');
+			return;
+		}
+		if (password.length < 8) {
+			displayMessage('La nuova password deve contenere almeno 8 caratteri.', 'error');
+			return;
+		}
+
+		const submitBtn = form.querySelector('.reset-submit') as HTMLButtonElement | null;
+		if (submitBtn) submitBtn.disabled = true;
+
+		try {
+			const response = await fetch('/api/auth/reset-password/confirm', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ token, password, passwordConfirmation }),
+			});
+
+			const result = await response.json().catch(() => ({}));
+
+			if (response.ok) {
+				displayMessage(result.message || 'Password aggiornata con successo.', 'success');
+				form.reset();
+				form.hidden = true;
+			} else {
+				displayMessage(result.message || 'Si è verificato un errore. Riprova più tardi.', 'error');
+				if (submitBtn) submitBtn.disabled = false;
+			}
+		} catch (error) {
+			displayMessage('Si è verificato un errore di rete. Riprova più tardi.', 'error');
+			if (submitBtn) submitBtn.disabled = false;
+		}
+	});
+}
+
+document.addEventListener('astro:page-load', initPasswordResetConfirm);
+</script>
+
+<style lang="scss">
+	.reset-page {
+		--reset-text: var(--tsbs-color-heading);
+		--reset-muted: var(--tsbs-color-body);
+		--reset-border: #546176;
+		--reset-panel: var(--tsbs-color-neutral-soft);
+		--reset-control: #ffffff;
+		--reset-button: var(--tsbs-global-cta-var1-bg);
+		--reset-button-hover: var(--tsbs-global-cta-var1-hover-bg);
+		--reset-button-active: var(--tsbs-global-cta-var1-active-bg);
+		--reset-page-padding-y: clamp(2rem, 7vw, 3.875rem);
+		--reset-page-padding-x: clamp(0.9375rem, 4vw, 1.875rem);
+		--reset-page-padding-bottom: calc(clamp(3.5rem, 14vw, 5rem) + env(safe-area-inset-bottom));
+
+		min-height: 100vh;
+		padding: var(--reset-page-padding-y) var(--reset-page-padding-x) var(--reset-page-padding-bottom);
+		color: var(--reset-text);
+		background: var(--tsbs-color-surface);
+	}
+
+	.reset-stage {
+		display: grid;
+		gap: clamp(0.75rem, 4vw, 1.25rem);
+	}
+
+	.reset-media {
+		width: 100%;
+	}
+
+	.reset-visual {
+		width: 100%;
+		aspect-ratio: 416 / 296;
+		object-fit: contain;
+	}
+
+	.reset-panel {
+		display: grid;
+		gap: clamp(0.75rem, 4vw, 1.25rem);
+		width: 100%;
+		color: var(--reset-text);
+	}
+
+	.reset-content {
+		display: grid;
+		padding: 0 1.4375rem;
+	}
+
+	.reset-content h1 {
+		margin: 0 0 1rem;
+		color: var(--reset-text);
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 1.1;
+	}
+
+	.reset-intro {
+		margin: 0;
+		color: var(--reset-text);
+		font-size: 1rem;
+		line-height: 1.4;
+	}
+
+	.reset-intro a {
+		color: var(--reset-text);
+		font-weight: 700;
+		text-decoration: underline;
+	}
+
+	.reset-message {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		margin-top: 1rem;
+		padding: 0.75rem 0.875rem;
+		font-size: 0.875rem;
+		line-height: 1.35;
+		border-radius: 0.375rem;
+
+		&[data-type="error"] {
+			color: #c0392b;
+			background: color-mix(in srgb, #c0392b 8%, transparent);
+			border: 1px solid color-mix(in srgb, #c0392b 30%, transparent);
+		}
+
+		&[data-type="success"] {
+			color: #1a6e3c;
+			background: color-mix(in srgb, #1a6e3c 8%, transparent);
+			border: 1px solid color-mix(in srgb, #1a6e3c 30%, transparent);
+		}
+	}
+
+	.reset-form {
+		display: grid;
+		gap: 1.5625rem;
+		margin-top: 2.25rem;
+	}
+
+	.reset-field {
+		display: grid;
+		gap: 0.375rem;
+	}
+
+	.reset-field label {
+		color: var(--reset-muted);
+		font-size: 0.875rem;
+		line-height: 1.2;
+	}
+
+	.reset-field input {
+		width: 100%;
+		height: 3rem;
+		padding: 0.625rem 0.875rem;
+		color: var(--tsbs-color-heading);
+		font: inherit;
+		line-height: 1.2;
+		background: var(--reset-control);
+		border: 1px solid var(--reset-border);
+		border-radius: 0.3125rem;
+	}
+
+	.reset-submit {
+		width: calc(100% - 3.125rem);
+		min-height: 3rem;
+		margin: clamp(2rem, 9vw, 3rem) auto 0;
+		padding: 0.75rem 1rem;
+		color: #ffffff;
+		font-family: var(--tsbs-font-body);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		background: var(--reset-button);
+		border: 0;
+		border-radius: 0.3125rem;
+		cursor: pointer;
+
+		&:hover { background: var(--reset-button-hover); }
+		&:active { background: var(--reset-button-active); }
+		&:disabled { opacity: 0.6; cursor: not-allowed; }
+	}
+
+	.reset-back {
+		justify-self: center;
+		margin-top: 1rem;
+		color: var(--reset-text);
+		font-size: 1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		text-decoration: underline;
+		text-underline-offset: 0.125rem;
+	}
+
+	@media (min-width: 768px) {
+		.reset-page {
+			--reset-page-padding-y: clamp(1.0625rem, 1.2vw, 1.75rem);
+			--reset-page-padding-x: clamp(1.875rem, 5vw, 4.5rem);
+			--reset-page-padding-bottom: clamp(1.0625rem, 1.2vw, 1.75rem);
+
+			display: grid;
+			place-items: center;
+		}
+
+		.reset-stage {
+			display: grid;
+			place-items: center;
+			width: min(100%, 80.9375rem);
+			min-height: calc(100vh - 2.125rem);
+		}
+
+		.reset-panel {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+			align-items: center;
+			column-gap: clamp(2rem, 5vw, 5.5rem);
+			width: min(100%, 58rem);
+			min-height: 18.75rem;
+			padding: clamp(1.75rem, 3vw, 2.5rem);
+			background: var(--reset-panel);
+			border-radius: 0.3125rem;
+		}
+
+		.reset-media {
+			display: grid;
+			place-items: center;
+			align-self: stretch;
+			min-height: 13rem;
+			overflow: hidden;
+		}
+
+		.reset-visual {
+			width: 100%;
+			height: 100%;
+			aspect-ratio: auto;
+			object-fit: contain;
+			object-position: center;
+		}
+
+		.reset-content {
+			padding: 0;
+		}
+
+		.reset-content h1 {
+			font-size: 2rem;
+		}
+
+		.reset-form {
+			margin-top: 1.875rem;
+			gap: 1.5rem;
+		}
+
+		.reset-submit {
+			width: calc(100% - 2.5rem);
+			margin-top: clamp(2rem, 2vw, 2.25rem);
+		}
+
+		.reset-back {
+			margin-top: 1.125rem;
+		}
+	}
+
+	@media (max-width: 374.98px) {
+		.reset-content {
+			padding-right: 1rem;
+			padding-left: 1rem;
+		}
+
+		.reset-submit {
+			width: 100%;
+		}
+	}
+</style>

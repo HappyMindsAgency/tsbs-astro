@@ -233,6 +233,74 @@ export class AuthService {
         }
     }
 
+    /**
+     * Recupera l'utente associato a un token di reset password.
+     * Usa il token applicativo: l'utente non è autenticato durante il reset.
+     * La validità temporale (resetTokenExpiry) va verificata dal chiamante.
+     */
+    async getUserByResetToken(token: string): Promise<StrapiUser | null> {
+        const lookupUrl = `${this.strapiApiBaseUrl}/users?filters[resetToken][$eq]=${encodeURIComponent(token)}`;
+
+        try {
+            const userResponse = await fetch(lookupUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.strapiApiToken}`,
+                },
+            });
+
+            if (!userResponse.ok) {
+                logger.warn(`[AuthService] Reset token lookup failed: ${userResponse.status}`);
+                return null;
+            }
+
+            const userData = await userResponse.json();
+            // users-permissions può restituire un array diretto oppure { data: [...] }
+            const user = Array.isArray(userData) ? userData[0] : userData.data?.[0];
+            return (user as StrapiUser) ?? null;
+        } catch (error) {
+            logger.error('[AuthService] Error during reset token lookup:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Imposta una nuova password per l'utente e azzera il token di reset.
+     * La PUT passa per il controller users-permissions, che effettua l'hash della password.
+     * Usa il token applicativo (utente non autenticato durante il reset).
+     */
+    async resetUserPassword(userId: number, password: string): Promise<boolean> {
+        const url = `${this.strapiApiBaseUrl}/users/${userId}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.strapiApiToken}`,
+                },
+                body: JSON.stringify({
+                    password,
+                    resetToken: null,
+                    resetTokenExpiry: null,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                logger.error(`[AuthService] Password reset update failed: ${response.status}`, { error: errorText });
+                return false;
+            }
+
+            logger.info(`[AuthService] Password reimpostata per userId ${userId}`);
+            return true;
+        } catch (error) {
+            logger.error('[AuthService] Exception during password reset update:', error);
+            return false;
+        }
+    }
+
     async updateUserResetToken(userId: number, token: string, expiryDate: Date): Promise<boolean> {
         console.log(`[AuthService] Updating user ${userId} in Strapi with reset token and expiry.`);
         const url = `${this.strapiApiBaseUrl}/users/${userId}`;
