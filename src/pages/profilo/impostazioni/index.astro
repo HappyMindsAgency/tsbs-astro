@@ -96,15 +96,30 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 						<div class="profile-settings-fields profile-settings-fields--password">
 							<label>
 								<span>Password attuale</span>
-								<input name="current-password" type="password" autocomplete="current-password" />
+								<span class="profile-password-field">
+									<input name="current-password" type="password" autocomplete="current-password" />
+									<button class="profile-password-field__toggle" type="button" aria-label="Mostra password" data-password-toggle>
+										<i class="bi bi-eye" aria-hidden="true"></i>
+									</button>
+								</span>
 							</label>
 							<label>
 								<span>Nuova password</span>
-								<input name="new-password" type="password" autocomplete="new-password" />
+								<span class="profile-password-field">
+									<input name="new-password" type="password" autocomplete="new-password" />
+									<button class="profile-password-field__toggle" type="button" aria-label="Mostra password" data-password-toggle>
+										<i class="bi bi-eye" aria-hidden="true"></i>
+									</button>
+								</span>
 							</label>
 							<label>
 								<span>Conferma password</span>
-								<input name="confirm-password" type="password" autocomplete="new-password" />
+								<span class="profile-password-field">
+									<input name="confirm-password" type="password" autocomplete="new-password" />
+									<button class="profile-password-field__toggle" type="button" aria-label="Mostra password" data-password-toggle>
+										<i class="bi bi-eye" aria-hidden="true"></i>
+									</button>
+								</span>
 							</label>
 						</div>
 						<p class="profile-settings-fields__error" data-password-error hidden></p>
@@ -263,6 +278,31 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 
 	document.addEventListener('astro:page-load', setupProfileAvatarPicker);
 	setupProfileAvatarPicker();
+
+	const setupPasswordToggles = () => {
+		document.querySelectorAll<HTMLButtonElement>('[data-password-toggle]').forEach((button) => {
+			if (button.dataset.passwordToggleReady === 'true') return;
+			button.dataset.passwordToggleReady = 'true';
+
+			const field = button.closest<HTMLElement>('.profile-password-field');
+			const input = field?.querySelector<HTMLInputElement>('input');
+			const icon = button.querySelector<HTMLElement>('.bi');
+
+			if (!input || !icon) return;
+
+			button.addEventListener('click', () => {
+				const shouldShow = input.type === 'password';
+				input.type = shouldShow ? 'text' : 'password';
+				button.setAttribute('aria-label', shouldShow ? 'Nascondi password' : 'Mostra password');
+				icon.classList.toggle('bi-eye', !shouldShow);
+				icon.classList.toggle('bi-eye-slash', shouldShow);
+				input.focus();
+			});
+		});
+	};
+
+	document.addEventListener('astro:page-load', setupPasswordToggles);
+	setupPasswordToggles();
 
 	// --- Salvataggio impostazioni (username + password) ---
 
@@ -889,6 +929,37 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 		background: #ffffff;
 		border: 1px solid color-mix(in srgb, var(--tsbs-color-neutral) 18%, var(--tsbs-color-white));
 		border-radius: var(--tsbs-radius-sm);
+	}
+
+	.profile-password-field {
+		position: relative;
+		display: block;
+	}
+
+	.profile-password-field input {
+		padding-right: 3rem;
+	}
+
+	.profile-password-field__toggle {
+		position: absolute;
+		top: 50%;
+		right: 0.5rem;
+		display: grid;
+		place-items: center;
+		width: 2.25rem;
+		aspect-ratio: 1;
+		padding: 0;
+		color: var(--tsbs-color-neutral);
+		background: transparent;
+		border: 0;
+		border-radius: 999rem;
+		transform: translateY(-50%);
+	}
+
+	.profile-password-field__toggle:hover,
+	.profile-password-field__toggle:focus-visible {
+		color: var(--tsbs-theme-accent);
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 10%, transparent);
 	}
 
 	.profile-settings-academies {
