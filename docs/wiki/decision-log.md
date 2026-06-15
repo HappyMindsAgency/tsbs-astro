@@ -20,6 +20,27 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-15 - Sincronizzazione User.username ↔ Membro.nickname
+
+Decisione:
+- `User.username` (identita di accesso del plugin users-permissions) e `Membro.nickname` (dato di gioco usato in webapp e CMS) devono restare **sempre uguali**
+- il cambio dal form Impostazioni aggiorna entrambi nella stessa richiesta server-side: prima `User.username` (che fa scattare il vincolo di unicita), poi `Membro.nickname`
+- la scrittura su `User` viene fatta lato server con il **token applicativo** `AUTH_READONLY`, non con il JWT utente: questo elimina il `403 Forbidden` (la rotta `PUT /api/users/:id` del plugin e disabilitata per il ruolo Authenticated) senza dover aprire la rotta, evitando il rischio IDOR
+- se l'update del nickname fallisce, lo username viene riportato al valore originale (rollback) per non lasciare i due campi disallineati
+
+Motivo:
+- il nickname e la chiave con cui si gestisce l'utente in Strapi e in webapp e deve coincidere con l'username di login
+- aprire `user.update` per Authenticated esporrebbe un IDOR (un utente potrebbe modificare altri User per id); la scrittura server-side con token applicativo e piu sicura e non richiede modifiche ai permessi
+- il login non e impattato: il JWT e legato all'`id`, e l'accesso via email resta valido
+
+Impatto:
+- `src/pages/api/user/update-username.ts` (riscritto: token applicativo, sync nickname, rollback)
+- dipendenza dai permessi di update su `User` e `Membro` del token `AUTH_READONLY` (gia usato altrove per scritture/cancellazioni)
+- da valutare: la label del campo nel form e ancora "Scegli nuovo username" (`src/pages/profilo/impostazioni/index.astro`)
+
+Stato:
+- approvata
+
 ## 2026-06-12 - Missione 1 (Tessera) E Avvio Partecipazione
 
 Decisione:
