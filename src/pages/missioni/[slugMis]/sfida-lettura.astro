@@ -58,11 +58,17 @@ const slugify = (value: string) =>
 		.replace(/[^a-z0-9]+/g, '-')
 		.replace(/^-+|-+$/g, '') || 'categoria';
 
-const categories = [...categorieMap.entries()].map(([label, books]) => ({
-	id: slugify(label),
-	label,
-	books,
-}));
+const categories = [...categorieMap.entries()]
+	.sort(([labelA], [labelB]) => {
+		if (labelA === FALLBACK_GENERE && labelB !== FALLBACK_GENERE) return 1;
+		if (labelA !== FALLBACK_GENERE && labelB === FALLBACK_GENERE) return -1;
+		return 0;
+	})
+	.map(([label, books]) => ({
+		id: slugify(label),
+		label,
+		books,
+	}));
 
 const totaleLibri = stato.libri.length;
 const libriLetti = stato.libriRiconosciuti.length;

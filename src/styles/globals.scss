@@ -3360,6 +3360,10 @@ body:has(.tsbs-legal-page) {
 		background: var(--tsbs-color-surface);
 	}
 
+	.reading-challenge__media {
+		display: none;
+	}
+
 	.reading-challenge__body {
 		display: grid;
 		gap: 1.5rem;

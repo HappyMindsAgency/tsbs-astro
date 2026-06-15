@@ -52,8 +52,12 @@ const shouldRender = isOpen || renderHidden;
 
 				const correct = event.detail?.correct === true;
 				toast.dataset.readingCheckResult = correct ? 'correct' : 'wrong';
-				if (title) title.textContent = correct ? 'Risposta corretta' : 'Risposta sbagliata';
-				if (message) message.textContent = correct ? 'Hai riconosciuto il libro.' : 'Potrai riprovare domani.';
+				if (title) title.textContent = correct ? 'Risposta corretta' : 'La risposta non è corretta';
+				if (message) {
+					message.textContent = correct
+						? 'Hai riconosciuto il libro.'
+						: 'La prova non è superata ma la sfida resta aperta. Per oggi il tempo è terminato.\nRiprova domani. La Società ti concederà un nuovo tentativo.';
+				}
 				if (icon) icon.className = correct ? 'bi bi-check-lg' : 'bi bi-x-lg';
 				toast.hidden = false;
 			};
@@ -145,6 +149,7 @@ const shouldRender = isOpen || renderHidden;
 		color: #667084;
 		font-size: 0.9375rem;
 		line-height: 1.35;
+		white-space: pre-line;
 	}
 
 	.reading-check-toast__button {
