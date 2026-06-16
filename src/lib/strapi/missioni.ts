@@ -47,6 +47,7 @@ export type MissioneQuizRisposta = {
 export type MissioneQuizDomanda = {
 	id: number;
 	domanda: string | null;
+	lore: string | null;
 	risposte: MissioneQuizRisposta[];
 };
 

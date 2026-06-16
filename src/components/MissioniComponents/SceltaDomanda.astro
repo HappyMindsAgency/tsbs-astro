@@ -9,6 +9,7 @@ interface MissionAnswer {
 
 interface MissionQuestion {
 	question: string;
+	lore?: string;
 	answers: MissionAnswer[];
 }
 
@@ -41,6 +42,8 @@ const hasMultipleQuestions = questions.length > 1;
 	<div class="container-xl tsbs-app-container mission-proof-question__panel choice-question__panel">
 		<form class="choice-question__form" data-choice-question-form>
 			<fieldset class="choice-question__fieldset">
+				<p class="choice-question__lore" data-choice-question-lore hidden={!firstQuestion.lore}>{firstQuestion.lore || ''}</p>
+
 				<div class="mission-proof-question__prompt-row">
 					<legend data-choice-question-title>Scegli una sola risposta</legend>
 
@@ -86,6 +89,7 @@ const hasMultipleQuestions = questions.length > 1;
 		root.dataset.choiceQuestionReady = 'true';
 
 		const form = root.querySelector('[data-choice-question-form]');
+		const lore = root.querySelector('[data-choice-question-lore]');
 		const title = root.querySelector('[data-choice-question-title]');
 		const answers = root.querySelector('[data-choice-question-answers]');
 		const submit = root.querySelector('[data-choice-question-submit]');
@@ -142,6 +146,11 @@ const hasMultipleQuestions = questions.length > 1;
 
 			const headerTitle = root.querySelector('.mission-proof-question__title');
 			if (headerTitle) headerTitle.textContent = currentQuestion.question;
+			if (lore) {
+				const loreText = currentQuestion.lore || '';
+				lore.textContent = loreText;
+				lore.hidden = !loreText;
+			}
 			title.textContent = 'Scegli una sola risposta';
 			answers.replaceChildren(
 				...currentQuestion.answers.map((answer, answerIndex) => {
@@ -227,6 +236,11 @@ const hasMultipleQuestions = questions.length > 1;
 		color: var(--tsbs-color-white);
 		font-size: 1.125rem;
 		line-height: 1;
+	}
+
+	.choice-question__lore {
+		margin: 0 0 1rem;
+		white-space: pre-line;
 	}
 
 </style>

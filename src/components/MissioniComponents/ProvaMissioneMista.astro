@@ -10,6 +10,7 @@ interface MissionAnswer {
 
 interface MissionQuestion {
 	question: string;
+	lore?: string;
 	answers: MissionAnswer[];
 }
 
@@ -69,7 +70,7 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 		<form class={formClass} data-mixed-question-form>
 			<div class="free-answer-mission__field" data-mixed-free-field hidden={!firstQuestionIsFreeAnswer}>
 				<div class="mission-proof-question__prompt-row">
-					<label for="mission-mixed-free-answer" data-mixed-free-instruction>{firstQuestion.question}</label>
+					<label for="mission-mixed-free-answer" data-mixed-free-instruction>{firstQuestion.lore || ''}</label>
 
 					{hasMultipleQuestions && (
 						<div class="mission-proof-question__step-controls">
@@ -264,7 +265,7 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 			if (headerTitle) headerTitle.textContent = currentQuestion.question;
 
 			if (mode === 'free') {
-				freeInstruction.textContent = currentQuestion.question;
+				freeInstruction.textContent = currentQuestion.lore || '';
 				freeInput.value = savedAnswer;
 				freeInput.setAttribute('placeholder', 'Inserisci qui la tua risposta');
 			} else {

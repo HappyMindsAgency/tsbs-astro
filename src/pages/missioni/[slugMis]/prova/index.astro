@@ -44,6 +44,7 @@ if (!isMissioneGrimorio && (!missione?.quiz || rawQuestions.length === 0 || !has
 
 const questions = rawQuestions.map((domanda) => ({
 	question: domanda.domanda?.trim() || '',
+	lore: domanda.lore?.trim() || '',
 	answers: (domanda.risposte || []).map((risposta) => ({
 		label: risposta.risposta?.trim() || '',
 	})),

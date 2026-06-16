@@ -34,7 +34,7 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
 			{console.log("Title:", title)}
-			{console.log("FirstQuestion:", firstQuestion.question)}
+			{console.log("FirstQuestion:", firstQuestion.lore)}
 			<h1 class="mission-proof-question__title mission-component-title">{title}</h1>
 		</div>
 	</header>
@@ -47,7 +47,7 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 		<form class="free-answer-mission__form" data-free-answer-form>
 			<div class="free-answer-mission__field">
 				<div class="mission-proof-question__prompt-row">
-					<label for="mission-free-answer" data-free-answer-instruction>{firstQuestion.question}</label>
+					<label for="mission-free-answer" data-free-answer-instruction>{firstQuestion.lore || ''}</label>
 
 					{hasMultipleQuestions && (
 						<div class="mission-proof-question__step-controls" data-free-answer-step-controls>
@@ -202,7 +202,7 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 
 			const headerTitle = root.querySelector('.mission-proof-question__title');
 			if (headerTitle) headerTitle.textContent = currentPrompt.question;
-			instruction.textContent = currentPrompt.question;
+			instruction.textContent = currentPrompt.lore;
 			input.value = savedAnswer;
 			input.setAttribute('placeholder', 'Inserisci qui la tua risposta');
 			submit.innerHTML = isLastPrompt
