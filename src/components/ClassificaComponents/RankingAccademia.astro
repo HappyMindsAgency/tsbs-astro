@@ -40,6 +40,8 @@ const rankingRows = (await getAcademyRanking(academyTheme, jwt, 100)).map((row) 
 	...row,
 	current: showUserRank && row.current,
 }));
+const visibleRankingRowsCount = 13;
+const hasMoreRankingRows = rankingRows.length > visibleRankingRowsCount;
 const chronicleRows = showBoxCronache ? await getGrimorioNotePubbliche(lang) : [];
 ---
 
@@ -63,7 +65,7 @@ const chronicleRows = showBoxCronache ? await getGrimorioNotePubbliche(lang) : [
 
 				<div class="academy-ranking-list">
 					{rankingRows.map((row, index) => (
-						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''} ${index > 12 ? 'is-hidden' : ''}`} href={row.href} data-academy-ranking-card>
+						<a class={`academy-ranking-card ${row.current ? 'is-current' : ''} ${index >= visibleRankingRowsCount ? 'is-hidden' : ''}`} href={row.href} data-academy-ranking-card>
 							<div class="academy-ranking-card__position">
 								{row.medal ? (
 									<img
@@ -91,12 +93,14 @@ const chronicleRows = showBoxCronache ? await getGrimorioNotePubbliche(lang) : [
 					))}
 				</div>
 
-				<div class="academy-ranking-load-more-row d-lg-flex justify-content-lg-end">
-					<button class="missions-load-more academy-ranking-load-more" type="button" data-ranking-load-more aria-controls="academy-ranking-title">
-						<span>Carica altro</span>
-						<i class="bi bi-arrow-right" aria-hidden="true"></i>
-					</button>
-				</div>
+				{hasMoreRankingRows && (
+					<div class="academy-ranking-load-more-row d-lg-flex justify-content-lg-end">
+						<button class="missions-load-more academy-ranking-load-more" type="button" data-ranking-load-more aria-controls="academy-ranking-title">
+							<span>Carica altro</span>
+							<i class="bi bi-arrow-right" aria-hidden="true"></i>
+						</button>
+					</div>
+				)}
 			</section>
 
 			{showBoxCronache && (
