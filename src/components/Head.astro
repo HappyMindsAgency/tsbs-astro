@@ -3,7 +3,7 @@
  * Quando devi attivare il SEO, devi decommentare riga 163 ~ 172 e eliminare la dichiarazione di defaultSEO che si trova alla riga 175.
  */ 
 
-import { ClientRouter } from "astro:transitions";
+//import { ClientRouter } from "astro:transitions";
 import { SEO } from "astro-seo";
 import { strapi } from "@strapi/client";
 import { getStrapiMediaUrl } from "../lib/utility-functions.js";
@@ -296,6 +296,6 @@ metaSocialTwitter.description = metaSocialTwitter.description || '';
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"></noscript>
     
-    <ClientRouter />
+    {/* <ClientRouter /> */}
 
 </head>
