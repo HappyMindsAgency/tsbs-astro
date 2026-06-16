@@ -8,8 +8,6 @@ if (!Astro.cookies.has('jwt')) {
 }
 
 const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
-
-console.log('Classifica generale - accademia utente:', accademia);
 ---
 
 <RankingAccademia lang={lang} theme={theme} academy={accademia} showBoxCronache={false} showUserRank={true} />
