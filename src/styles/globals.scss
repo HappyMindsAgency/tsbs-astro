@@ -661,6 +661,22 @@ body:has(.tsbs-legal-page) {
 			background: var(--tsbs-color-surface);
 		}
 
+		@media (max-width: 991.98px) {
+			body:has(.dashboard-shell) {
+				height: auto;
+				min-height: 100dvh;
+				overflow-x: hidden;
+				overflow-y: auto;
+			}
+
+			body:has(.dashboard-shell) .dashboard-shell {
+				height: auto;
+				min-height: 100dvh;
+				padding-bottom: var(--tsbs-mobile-nav-viewport-height);
+				overflow: visible;
+			}
+		}
+
 		.dashboard-header {
 			display: flex;
 			align-items: center;
