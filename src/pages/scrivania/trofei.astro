@@ -106,6 +106,7 @@ const trophyCatalog = trofeiConquistati.map((trofeo) => {
 		width: matrix[0]?.length ?? 1,
 		height: matrix.length || 1,
 		matrix,
+		dataOttenimento: trofeo.dataOttenimento,
 	};
 });
 
@@ -113,6 +114,22 @@ const hasTrofei = trophyCatalog.length > 0;
 const cells = Array.from({ length: board.rows * board.cols });
 const trophyCatalogJson = JSON.stringify(trophyCatalog);
 const savedLayoutJson = JSON.stringify(savedLayout);
+
+// Ordine della palette dei "Trofei disponibili": in cima i trofei non ancora
+// inseriti nella griglia (assenti dal layout salvato) e, a parita di stato, i
+// piu recenti per dataOttenimento — cosi un trofeo appena conquistato compare
+// per primo. Non altera `trophyCatalog`, usato dallo script per il lookup by id.
+const placedIds = new Set(savedLayout.map((item) => item.id));
+const paletteOrder = [...trophyCatalog].sort((a, b) => {
+	const aPlaced = placedIds.has(a.id) ? 1 : 0;
+	const bPlaced = placedIds.has(b.id) ? 1 : 0;
+	if (aPlaced !== bPlaced) return aPlaced - bPlaced;
+
+	// dataOttenimento puo essere null: i trofei senza data finiscono in fondo al gruppo.
+	const aTime = a.dataOttenimento ? Date.parse(a.dataOttenimento) : 0;
+	const bTime = b.dataOttenimento ? Date.parse(b.dataOttenimento) : 0;
+	return bTime - aTime;
+});
 
 ---
 
@@ -154,7 +171,7 @@ const savedLayoutJson = JSON.stringify(savedLayout);
 							</button>
 						</div>
 						<div class="trophy-palette__grid">
-							{trophyCatalog.map((trophy) => (
+							{paletteOrder.map((trophy) => (
 								<button
 									class="trophy-palette__item"
 									type="button"

@@ -34,6 +34,12 @@ if (!missione) {
 	return Astro.redirect('/404');
 }
 
+// Le cacce al tesoro hanno una pagina dedicata (indizi in quiz.step, non in
+// quiz.domande): instrada lì chi arriva diretto alla prova standard.
+if (missione.quiz?.cacciaAlTesoro) {
+	return Astro.redirect(`/missioni/${missione.slug}/caccia-tesoro/`);
+}
+
 const isMissioneGrimorio = missione.slug === MISSIONE_GRIMORIO_SLUG || missione.slug === MISSIONE_GRIMORIO_SLUG_ALTERNATIVE;
 const rawQuestions = missione?.quiz?.domande ?? [];
 const hasAnswerElements = rawQuestions.some((domanda) => (domanda.risposte || []).length > 0);

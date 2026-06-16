@@ -51,13 +51,20 @@ export type MissioneQuizDomanda = {
 	risposte: MissioneQuizRisposta[];
 };
 
+export type MissioneQuizStep = {
+	id: number;
+	introduzione: string | null;
+	conclusione: string | null;
+	domanda: MissioneQuizDomanda[];
+};
+
 export type MissioneQuiz = StrapiRelationBase & {
 	titolo: string;
 	descrizione: string | null;
 	sogliaSuperamento: number | null;
 	cacciaAlTesoro: boolean;
 	domande: MissioneQuizDomanda[];
-	step: unknown;
+	step: MissioneQuizStep | null;
 };
 
 export type Missione = StrapiRelationBase & {
@@ -117,13 +124,18 @@ function getItalianStrapiLocale(lang = 'it') {
 // Missioni con fruizione "sfida di lettura" dedicata, fuori dal flusso prova/quiz.
 const READING_CHALLENGE_MISSION_SLUGS = new Set(['missione-06-i-custodi-del-sapere']);
 
-// URL della "prova" della missione: sfida-lettura per le missioni dedicate,
-// altrimenti la prova/quiz standard. Centralizzato per riuso (pagina dettaglio
-// e endpoint "avvia") ed evitare logiche duplicate.
+// Missioni "caccia al tesoro" (quiz.cacciaAlTesoro): indizi step-by-step su una
+// pagina dedicata. Lo slug è qui per coerenza con il routing centralizzato; la
+// pagina valida comunque il flag cacciaAlTesoro lato server.
+const TREASURE_HUNT_MISSION_SLUGS = new Set(['missione-11-il-rituale-del-custode']);
+
+// URL della "prova" della missione: sfida-lettura o caccia al tesoro per le
+// missioni dedicate, altrimenti la prova/quiz standard. Centralizzato per riuso
+// (pagina dettaglio e endpoint "avvia") ed evitare logiche duplicate.
 export function getMissionProofHref(slug: string): string {
-	return READING_CHALLENGE_MISSION_SLUGS.has(slug)
-		? `/missioni/${slug}/sfida-lettura/`
-		: `/missioni/${slug}/prova/`;
+	if (READING_CHALLENGE_MISSION_SLUGS.has(slug)) return `/missioni/${slug}/sfida-lettura/`;
+	if (TREASURE_HUNT_MISSION_SLUGS.has(slug)) return `/missioni/${slug}/caccia-tesoro/`;
+	return `/missioni/${slug}/prova/`;
 }
 
 function setMissioneFields(searchParams: URLSearchParams) {
@@ -153,7 +165,7 @@ function setMissioneRelations(searchParams: URLSearchParams) {
 	searchParams.set('populate[quiz][fields][2]', 'sogliaSuperamento');
 	searchParams.set('populate[quiz][fields][3]', 'cacciaAlTesoro');
 	searchParams.set('populate[quiz][populate][domande][populate][risposte]', 'true');
-	searchParams.set('populate[quiz][populate][step][populate]', '*');
+	searchParams.set('populate[quiz][populate][step][populate][domanda][populate][risposte]', 'true');
 	searchParams.set('populate[trofeo][fields][0]', 'nome');
 	searchParams.set('populate[trofeo][fields][1]', 'descrizione');
 	searchParams.set('populate[trofeo][fields][2]', 'punti');

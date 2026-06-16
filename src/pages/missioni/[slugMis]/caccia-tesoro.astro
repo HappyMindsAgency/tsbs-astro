@@ -1,0 +1,329 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Nav from '../../../components/Nav.astro';
+import RitchText from '../../../components/RitchText.astro';
+import TrofeoModal from '../../../components/PopupComponents/TrofeoModal.astro';
+import { getMissioneBySlug } from '../../../lib/strapi/missioni';
+import { getMembroProgressioneByJwt } from '../../../lib/strapi/progressione';
+import { getStatoCacciaTesoro } from '../../../lib/strapi/caccia-tesoro';
+import { resolveUserTheme } from '../../../lib/theme';
+
+export const prerender = false;
+
+const { lang = 'it' } = Astro.props;
+const jwt = Astro.cookies.get('jwt')?.value;
+
+if (!jwt) {
+	return Astro.redirect('/');
+}
+
+const { slugMis } = Astro.params;
+const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
+const missionPath = `/missioni/${slugMis ?? ''}/`;
+
+if (!slugMis) {
+	return Astro.redirect('/404');
+}
+
+const [theme, missione, membro] = await Promise.all([
+	resolveUserTheme(jwt),
+	getMissioneBySlug(slugMis, locale),
+	getMembroProgressioneByJwt(jwt),
+]);
+
+// Solo i quiz contrassegnati come caccia al tesoro usano questa pagina.
+if (!missione || !membro || !missione.quiz?.cacciaAlTesoro) {
+	return Astro.redirect('/404');
+}
+
+const stato = await getStatoCacciaTesoro(membro, missione);
+
+if (stato.steps.length === 0) {
+	return Astro.redirect('/404');
+}
+
+const totaleStep = stato.steps.length;
+const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.punteggio} punti` : '');
+// Dati passati allo script: gli step non contengono mai la risposta corretta.
+const stepsData = stato.steps;
+---
+
+<Layout lang={locale} theme={theme}>
+	<Nav lang={locale} />
+
+	<main class="tsbs-app-shell treasure-hunt">
+		<header class="mission-detail__topbar">
+			<a class="mission-detail__back" href={missionPath}>
+				<i class="bi bi-arrow-left" aria-hidden="true"></i>
+				<span>Torna alle missioni</span>
+			</a>
+		</header>
+
+		<section
+			class="container-xl tsbs-app-container treasure-hunt__content"
+			aria-labelledby="treasure-hunt-title"
+			data-treasure-hunt
+			data-slug-mis={slugMis}
+			data-step-corrente={stato.stepCorrente}
+			data-totale-step={totaleStep}
+			data-completata={stato.completata ? 'true' : 'false'}
+		>
+			<div class="treasure-hunt__body">
+				<p class="mission-proof-question__eyebrow">{missione.titolo}</p>
+				<h1 id="treasure-hunt-title" class="treasure-hunt__title mission-component-title">Caccia al tesoro</h1>
+
+				{stato.introduzione && (
+					<div class="treasure-hunt__intro">
+						<RitchText block={stato.introduzione} />
+					</div>
+				)}
+
+				<hr class="mission-detail__rule" />
+
+				<!-- Schermata indizio: visibile finché la caccia non è completata. -->
+				<div class="treasure-hunt__stage" data-treasure-stage hidden={stato.completata}>
+					<div class="treasure-hunt__progress" aria-live="polite">
+						<span data-treasure-progress>Indizio {Math.min(stato.stepCorrente + 1, totaleStep)} / {totaleStep}</span>
+					</div>
+
+					<article class="tsbs-card treasure-hunt__clue" aria-labelledby="treasure-hunt-clue-title">
+						<p class="treasure-hunt__clue-text" id="treasure-hunt-clue-title" data-treasure-domanda></p>
+						<p class="treasure-hunt__clue-lore" data-treasure-lore hidden></p>
+
+						<form class="treasure-hunt__form" data-treasure-form>
+							<label class="treasure-hunt__field" data-treasure-input-field>
+								<span class="visually-hidden">La tua risposta</span>
+								<input
+									type="text"
+									class="form-control"
+									placeholder="Inserisci qui la tua risposta"
+									autocomplete="off"
+									data-treasure-input
+								/>
+							</label>
+
+							<p class="treasure-hunt__feedback" data-treasure-feedback hidden aria-live="polite"></p>
+
+							<div class="mission-proof-question__actions">
+								<button class="btn tsbs-cta-primary mission-proof-question__cta" type="submit" data-treasure-submit>
+									Avanti →
+								</button>
+							</div>
+						</form>
+					</article>
+				</div>
+
+				<!-- Schermata finale: conclusione narrativa + ricompensa. -->
+				<div class="treasure-hunt__outro" data-treasure-outro hidden={!stato.completata}>
+					<div class="treasure-hunt__outro-icon" aria-hidden="true">
+						<i class="bi bi-trophy"></i>
+					</div>
+					<h2 class="treasure-hunt__outro-title">Caccia al tesoro completata!</h2>
+					<div class="treasure-hunt__conclusione" data-treasure-conclusione>
+						{stato.conclusione && <RitchText block={stato.conclusione} />}
+					</div>
+
+					{trophyLabel && (
+						<p class="mission-detail__trophy">
+							<i class="bi bi-award" aria-hidden="true"></i>
+							<strong>{trophyLabel}</strong>
+						</p>
+					)}
+
+					<a class="btn tsbs-cta-primary treasure-hunt__outro-cta" href="/missioni/">Torna alle missioni</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<TrofeoModal theme={theme} />
+</Layout>
+
+<script define:vars={{ steps: stepsData, slugMis }}>
+	const setupTreasureHunt = () => {
+		const root = document.querySelector('[data-treasure-hunt]');
+		if (!root || root.dataset.treasureHuntReady === 'true') return;
+		root.dataset.treasureHuntReady = 'true';
+
+		const totale = Number.parseInt(root.dataset.totaleStep || '0', 10);
+		let currentStep = Number.parseInt(root.dataset.stepCorrente || '0', 10);
+
+		const stage = root.querySelector('[data-treasure-stage]');
+		const outro = root.querySelector('[data-treasure-outro]');
+		const progress = root.querySelector('[data-treasure-progress]');
+		const domanda = root.querySelector('[data-treasure-domanda]');
+		const lore = root.querySelector('[data-treasure-lore]');
+		const inputField = root.querySelector('[data-treasure-input-field]');
+		const input = root.querySelector('[data-treasure-input]');
+		const feedback = root.querySelector('[data-treasure-feedback]');
+		const form = root.querySelector('[data-treasure-form]');
+		const submit = root.querySelector('[data-treasure-submit]');
+
+		if (!stage || !outro || !domanda || !input || !form || !submit) return;
+
+		const apiUrl = `/api/missioni/${slugMis}/caccia-tesoro`;
+
+		const messages = {
+			risposta_errata: 'Non è la risposta giusta. Osserva meglio e riprova.',
+			step_fuori_sequenza: 'Questo indizio non è più valido. Ricarica la pagina.',
+			generico: 'Operazione non riuscita. Riprova.',
+		};
+
+		const setFeedback = (message) => {
+			if (!feedback) return;
+			feedback.textContent = message || '';
+			feedback.hidden = !message;
+		};
+
+		// Mostra l'indizio dello step corrente (o la schermata finale).
+		const renderStep = () => {
+			if (currentStep >= totale) {
+				stage.hidden = true;
+				outro.hidden = false;
+				return;
+			}
+
+			const step = steps[currentStep];
+			stage.hidden = false;
+			outro.hidden = true;
+
+			if (progress) progress.textContent = `Indizio ${currentStep + 1} / ${totale}`;
+			domanda.textContent = step.domanda || '';
+			if (lore) {
+				lore.textContent = step.lore || '';
+				lore.hidden = !step.lore;
+			}
+
+			// Step narrativi (senza risposta richiesta): nascondi l'input, il
+			// pulsante fa solo proseguire.
+			if (inputField) inputField.hidden = !step.richiedeRisposta;
+			input.value = '';
+			submit.textContent = currentStep === totale - 1 ? 'Concludi' : 'Avanti →';
+			setFeedback('');
+			if (step.richiedeRisposta) input.focus();
+		};
+
+		const inviaRisposta = async () => {
+			const step = steps[currentStep];
+			if (step?.richiedeRisposta && input.value.trim().length === 0) {
+				setFeedback('Inserisci una risposta per proseguire.');
+				return;
+			}
+
+			submit.disabled = true;
+			setFeedback('');
+
+			try {
+				const response = await fetch(apiUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ azione: 'valida', step: currentStep, risposta: input.value }),
+				});
+				const payload = await response.json().catch(() => null);
+
+				if (!response.ok || typeof payload?.corretta !== 'boolean') {
+					setFeedback(messages[payload?.error] || messages.generico);
+					return;
+				}
+
+				if (!payload.corretta) {
+					setFeedback(messages.risposta_errata);
+					return;
+				}
+
+				currentStep = Number.isInteger(payload.stepCorrente) ? payload.stepCorrente : currentStep + 1;
+
+				// La schermata di conclusione è già renderizzata lato server
+				// (data-treasure-conclusione); qui basta passare allo stato finale.
+				renderStep();
+
+				const trofei = Array.isArray(payload.trofeiSbloccati) ? payload.trofeiSbloccati : [];
+				if (trofei.length > 0) {
+					document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', { detail: { trofei } }));
+				}
+			} catch {
+				setFeedback(messages.generico);
+			} finally {
+				submit.disabled = false;
+			}
+		};
+
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+			void inviaRisposta();
+		});
+
+		renderStep();
+	};
+
+	document.addEventListener('astro:page-load', setupTreasureHunt);
+	setupTreasureHunt();
+</script>
+
+<style lang="scss">
+	.treasure-hunt__title {
+		margin-top: 0.25rem;
+	}
+
+	.treasure-hunt__intro {
+		margin-bottom: 1rem;
+	}
+
+	.treasure-hunt__progress {
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--tsbs-theme-accent);
+		margin-bottom: 0.75rem;
+	}
+
+	.treasure-hunt__clue {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.treasure-hunt__clue-text,
+	.treasure-hunt__clue-lore {
+		margin: 0;
+		white-space: pre-line;
+	}
+
+	.treasure-hunt__clue-lore {
+		color: var(--tsbs-theme-muted, inherit);
+	}
+
+	.treasure-hunt__form {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.treasure-hunt__field {
+		display: block;
+	}
+
+	.treasure-hunt__feedback {
+		margin: 0;
+		font-size: 0.9375rem;
+		color: var(--tsbs-theme-accent);
+	}
+
+	.treasure-hunt__outro {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		padding: 1.5rem 0;
+	}
+
+	.treasure-hunt__outro-icon {
+		font-size: 3rem;
+		color: var(--tsbs-theme-accent);
+	}
+
+	.treasure-hunt__outro-cta {
+		margin-top: 0.5rem;
+	}
+</style>
