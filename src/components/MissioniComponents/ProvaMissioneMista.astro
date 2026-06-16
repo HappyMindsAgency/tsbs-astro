@@ -82,14 +82,23 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 							</div>
 						)}
 				</div>
-				<textarea
+				<!-- <textarea
 					id="mission-mixed-free-answer"
 					name="risposta-libera"
 					rows="8"
 					placeholder="Inserisci qui la tua risposta"
 					aria-label="Risposta libera"
 					data-mixed-free-input
-				></textarea>
+				></textarea> -->
+				<input
+					id="mission-mixed-free-answer"
+					name="risposta-libera"
+					type="text"
+					class="form-control"
+					placeholder="Inserisci qui la tua risposta"
+					aria-label="Risposta libera"
+					data-free-answer-input
+				/>
 			</div>
 
 			<fieldset class="choice-question__fieldset" data-mixed-choice-fieldset hidden={firstQuestionIsFreeAnswer}>
