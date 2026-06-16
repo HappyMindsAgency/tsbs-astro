@@ -142,6 +142,10 @@ video {
   max-width: 100%;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 // Tipografia e link condivisi.
 a {
   color: var(--bs-link-color);
@@ -1026,6 +1030,7 @@ body:has(.tsbs-legal-page) {
 			overscroll-behavior-inline: contain;
 			scroll-snap-type: inline mandatory;
 			scrollbar-width: none;
+			-webkit-overflow-scrolling: touch;
 		}
 
 		.dashboard-event-grid::-webkit-scrollbar {

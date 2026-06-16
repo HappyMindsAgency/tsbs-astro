@@ -1,9 +1,17 @@
 ---
 const { isOpen = false, theme = '' } = Astro.props;
+const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 ---
 
 {isOpen && (
-	<div class={`welcome-toast tsbs-toast ${theme}`} data-welcome-toast role="dialog" aria-modal="true" aria-labelledby="welcome-toast-title">
+	<div
+		class={`welcome-toast tsbs-toast ${theme}`}
+		data-welcome-toast
+		data-welcome-toast-dismissed-key={toastDismissedKey}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="welcome-toast-title"
+	>
 		<div class="welcome-toast__backdrop" data-welcome-toast-close></div>
 		<div class="welcome-toast__panel">
 			<div class="welcome-toast__body">
@@ -51,13 +59,41 @@ const { isOpen = false, theme = '' } = Astro.props;
 	};
 
 	const setupWelcomeToast = () => {
-		loadWelcomeToastProfilo();
-
 		const toast = document.querySelector<HTMLElement>('[data-welcome-toast]');
 		if (!toast) return;
+		if (toast.dataset.welcomeToastReady === 'true') return;
+		toast.dataset.welcomeToastReady = 'true';
+
+		const dismissedKey = toast.dataset.welcomeToastDismissedKey || 'tsbs.welcomeToastDismissed';
+
+		const isDismissed = () => {
+			try {
+				return window.sessionStorage.getItem(dismissedKey) === 'true';
+			} catch {
+				return false;
+			}
+		};
+
+		const markDismissed = () => {
+			try {
+				window.sessionStorage.setItem(dismissedKey, 'true');
+			} catch {
+				// Se lo storage non e disponibile, la chiusura resta valida per il DOM corrente.
+			}
+		};
+
+		if (isDismissed()) {
+			toast.hidden = true;
+			toast.setAttribute('aria-hidden', 'true');
+			return;
+		}
+
+		loadWelcomeToastProfilo();
 
 		const closeToast = () => {
+			markDismissed();
 			toast.hidden = true;
+			toast.setAttribute('aria-hidden', 'true');
 		};
 
 		toast.querySelectorAll('[data-welcome-toast-close]').forEach((element) => {
@@ -81,6 +117,11 @@ const { isOpen = false, theme = '' } = Astro.props;
 		display: grid;
 		place-items: center;
 		padding: 1.75rem;
+	}
+
+	.welcome-toast[hidden] {
+		display: none;
+		pointer-events: none;
 	}
 
 	.welcome-toast__backdrop {
