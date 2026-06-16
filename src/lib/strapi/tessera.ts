@@ -1,6 +1,6 @@
 // src/lib/strapi/tessera.ts
 // Meccanismo condiviso per l'invio del numero tessera della Biblioteca Classense
-// in verifica: valida 14 cifre, imposta statoTessera: in_verifica sul Membro e
+// in verifica: valida un minimo di 9 caratteri alfanumerici, imposta statoTessera: in_verifica sul Membro e
 // notifica la Redazione via email. Usato sia dalla pagina Impostazioni
 // (/api/user/tessera) sia dalla Missione 1 (missione-01-il-varco), così il
 // salvataggio avviene esattamente con lo stesso processo.
@@ -15,7 +15,7 @@ const STRAPI_API = import.meta.env.AUTH_READONLY;
 // Indirizzo email della Redazione — configurabile via .env
 const EMAIL_REDAZIONE = import.meta.env.EMAIL_REDAZIONE ?? 'assistenzaweb@happyminds.it';
 
-const LIBRARY_CARD_CODE_PATTERN = /^\d{14}$/;
+const LIBRARY_CARD_CODE_PATTERN = /^[a-zA-Z0-9]{9,}$/;
 
 export type TesseraErrorCode =
 	| 'invalid_tessera'
@@ -40,7 +40,7 @@ export async function inviaTesseraInVerifica(jwt: string, rawTessera: unknown): 
 			ok: false,
 			code: 'invalid_tessera',
 			status: 400,
-			message: 'Il numero tessera deve essere composto da 14 cifre.',
+			message: 'Il numero tessera deve essere composto da almeno 9 caratteri alfanumerici.',
 		};
 	}
 

@@ -25,10 +25,10 @@ const ESTRATTI_PER_TENTATIVO = 4;
 // Mappatura soglia -> trofeo: i 4 trofei della sfida sono identificati dal
 // codice nel nome ("06a".."06d") e dall'Accademia del Membro (vedi decision log).
 const SOGLIE_TROFEI: Array<{ codice: string; soglia: number | 'tutti' }> = [
-	{ codice: '06a', soglia: 5 },
-	{ codice: '06b', soglia: 10 },
-	{ codice: '06c', soglia: 15 },
-	{ codice: '06d', soglia: 'tutti' },
+	{ codice: '06a', soglia: 4 },
+	{ codice: '06b', soglia: 6 },
+	{ codice: '06c', soglia: 12 },
+	{ codice: '06d', soglia: 20 },
 ];
 
 export type LibroSfida = {

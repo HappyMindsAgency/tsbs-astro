@@ -128,7 +128,7 @@ async function getTrofeiConquistatiByMembro(membroDocumentId: string) {
 	// Coerente con le partecipazioni missione: i record personali di gioco sono in draft.
 	searchParams.set('status', 'draft');
 	searchParams.set('filters[membri][documentId][$eq]', membroDocumentId);
-	searchParams.set('sort[0]', 'dataOttenimento:asc');
+	searchParams.set('sort[0]', 'dataOttenimento:desc');
 	searchParams.set('pagination[pageSize]', '100');
 	searchParams.set('fields[0]', 'dataOttenimento');
 	searchParams.set('populate[trofeo][fields][0]', 'nome');

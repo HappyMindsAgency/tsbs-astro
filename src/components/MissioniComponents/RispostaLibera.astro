@@ -15,7 +15,7 @@ const fallbackQuestions = [
 const questions = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
 const firstQuestion = questions[0];
 const title = firstQuestion.question;
-const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
+const eyebrow = missione?.titolo || '';
 const quote = missione?.quiz?.descrizione?.trim() || '';
 const openQuoteLinksInNewTab = (html: string) =>
 	html.replace(/<a\s(?![^>]*\btarget=)/g, '<a target="_blank" rel="noopener noreferrer" ');
@@ -33,6 +33,8 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 	<header class="mission-proof-question__header">
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
+			{console.log("Title:", title)}
+			{console.log("FirstQuestion:", firstQuestion.question)}
 			<h1 class="mission-proof-question__title mission-component-title">{title}</h1>
 		</div>
 	</header>
@@ -58,14 +60,23 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 						</div>
 					)}
 				</div>
-				<textarea
+				<!-- <textarea
 					id="mission-free-answer"
 					name="risposta-libera"
 					rows="8"
 					placeholder="Inserisci qui la tua risposta"
 					aria-label={answerLabel}
 					data-free-answer-input
-				></textarea>
+				></textarea> -->
+				<input
+					id="mission-free-answer"
+					name="risposta-libera"
+					type="text"
+					class="form-control"
+					placeholder="Inserisci qui la tua risposta"
+					aria-label={answerLabel}
+					data-free-answer-input
+				/>
 			</div>
 
 			<div class="mission-proof-question__actions">
