@@ -21,35 +21,7 @@ interface Props {
 
 const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props as Props;
 
-const fallbackQuestions: MissionQuestion[] = [
-	{
-		question: 'Scegli una sola risposta',
-		answers: [
-			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-		],
-	},
-	{
-		question: 'Scegli una seconda risposta',
-		answers: [
-			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-		],
-	},
-	{
-		question: 'Scegli una terza risposta',
-		answers: [
-			{ label: 'Risposta D', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta B', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta C', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-			{ label: 'Risposta A', description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut' },
-		],
-	},
-];
+const fallbackQuestions: MissionQuestion[] = [];
 
 const questions: MissionQuestion[] = providedQuestions.length > 0 ? providedQuestions : fallbackQuestions;
 const firstQuestion = questions[0];

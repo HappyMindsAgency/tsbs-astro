@@ -100,10 +100,10 @@ const taskCards = getFirstIncompleteMissionCards(
 									<p>{task.description}</p>
 								</div>
 							</div>
-							<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${task.meta}`}>
+							<div class="d-none tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${task.meta}`}>
 								<span style={`width: ${task.progress}%`}></span>
 							</div>
-							<p class="dashboard-progress-label">{task.meta}</p>
+							<p class="dashboard-progress-label d-none">{task.meta}</p>
 						</a>
 					))}
 				</div>
