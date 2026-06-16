@@ -272,6 +272,16 @@ h1,
   letter-spacing: 0;
 }
 
+[role="dialog"][aria-modal="true"],
+[role="alertdialog"][aria-modal="true"] {
+  font-family: var(--tsbs-font-body);
+}
+
+[role="dialog"][aria-modal="true"] :where(.btn, button, input, textarea, select, label),
+[role="alertdialog"][aria-modal="true"] :where(.btn, button, input, textarea, select, label) {
+  font-family: var(--tsbs-font-body);
+}
+
 .btn-primary,
 .tsbs-cta-primary {
   --bs-btn-bg: var(--tsbs-theme-cta-bg);

@@ -1229,12 +1229,15 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 		width: 100%;
 		max-width: 28rem;
 		padding: 1.5rem;
+		color: var(--tsbs-color-text);
+		font-family: var(--tsbs-font-body);
 		background: #fff;
 		border-radius: var(--tsbs-radius-md);
 		box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
 
 		h2 {
 			margin: 0;
+			font-family: var(--tsbs-font-body);
 			font-size: 1.375rem;
 		}
 	}
@@ -1301,6 +1304,7 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 	.delete-account-modal__cancel {
 		min-height: 2.75rem;
 		padding: 0.625rem 1rem;
+		font-family: var(--tsbs-font-body);
 		font-weight: 700;
 		border-radius: var(--tsbs-radius-sm);
 	}
@@ -1312,6 +1316,7 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 		min-height: 2.75rem;
 		padding: 0.625rem 1rem;
 		color: #fff;
+		font-family: var(--tsbs-font-body);
 		font-weight: 700;
 		background: #dc2626;
 		border: 1px solid #dc2626;
