@@ -50,19 +50,19 @@ const {
 
 	<div class="note-editor__toolbar" role="toolbar" aria-label="Formattazione nota">
 		<div class="note-editor__button-group" aria-label="Stile testo">
-			<button type="button" data-command="bold" aria-label="Grassetto">
+			<button type="button" data-command="bold" aria-label="Grassetto" aria-pressed="false">
 				<i class="bi bi-type-bold" aria-hidden="true"></i>
 			</button>
-			<button type="button" data-command="italic" aria-label="Corsivo">
+			<button type="button" data-command="italic" aria-label="Corsivo" aria-pressed="false">
 				<i class="bi bi-type-italic" aria-hidden="true"></i>
 			</button>
 		</div>
 
 		<div class="note-editor__button-group" aria-label="Liste">
-			<button type="button" data-command="insertUnorderedList" aria-label="Elenco puntato">
+			<button type="button" data-command="insertUnorderedList" aria-label="Elenco puntato" aria-pressed="false">
 				<i class="bi bi-list-ul" aria-hidden="true"></i>
 			</button>
-			<button type="button" data-command="insertOrderedList" aria-label="Elenco numerato">
+			<button type="button" data-command="insertOrderedList" aria-label="Elenco numerato" aria-pressed="false">
 				<i class="bi bi-list-ol" aria-hidden="true"></i>
 			</button>
 		</div>
@@ -271,7 +271,41 @@ const {
 				bodyEditor.classList.toggle('is-empty', getPlainBody().length === 0);
 			};
 
+			const isSelectionInsideBody = () => {
+				if (!bodyEditor) return false;
+				const selection = document.getSelection();
+				const anchorNode = selection?.anchorNode;
+				if (!anchorNode) return document.activeElement === bodyEditor;
+
+				return bodyEditor.contains(anchorNode.nodeType === Node.ELEMENT_NODE ? anchorNode : anchorNode.parentNode);
+			};
+
+			const updateCommandStates = () => {
+				const isInBody = isSelectionInsideBody();
+
+				commandButtons.forEach((button) => {
+					const command = button.dataset.command || '';
+					let isActive = false;
+
+					if (isInBody && command) {
+						try {
+							isActive = document.queryCommandState(command);
+						} catch {
+							isActive = false;
+						}
+					}
+
+					button.classList.toggle('is-active', isActive);
+					button.setAttribute('aria-pressed', String(isActive));
+				});
+			};
+
+			const scheduleCommandStateUpdate = () => {
+				window.requestAnimationFrame(updateCommandStates);
+			};
+
 			updatePlaceholder();
+			updateCommandStates();
 			if (isSubmitted) setSubmittedState();
 
 			commandButtons.forEach((button) => {
@@ -282,12 +316,20 @@ const {
 					bodyEditor.focus();
 					document.execCommand(command, false);
 					updatePlaceholder();
+					scheduleCommandStateUpdate();
 				});
 			});
 
 			bodyEditor?.addEventListener('input', () => {
 				updatePlaceholder();
+				scheduleCommandStateUpdate();
 			});
+
+			bodyEditor?.addEventListener('keyup', scheduleCommandStateUpdate);
+			bodyEditor?.addEventListener('mouseup', scheduleCommandStateUpdate);
+			bodyEditor?.addEventListener('focus', scheduleCommandStateUpdate);
+			titleInput?.addEventListener('focus', scheduleCommandStateUpdate);
+			document.addEventListener('selectionchange', scheduleCommandStateUpdate);
 
 			saveButton?.addEventListener('click', () => {
 				void persistDraft('draft');

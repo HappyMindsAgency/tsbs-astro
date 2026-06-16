@@ -4537,7 +4537,7 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.note-editor {
-		--note-editor-bg: color-mix(in srgb, var(--tsbs-theme-accent) 10%, var(--tsbs-color-grimorio-note-bg));
+		--note-editor-bg: #fff6e1;
 		--note-editor-border: #8d8f95;
 		--note-editor-line: color-mix(in srgb, var(--tsbs-theme-accent) 24%, transparent);
 
@@ -4622,10 +4622,21 @@ body:has(.tsbs-legal-page) {
 		color: #1d1715;
 		background: transparent;
 		border: 0;
+		transition:
+			background-color 0.16s ease,
+			box-shadow 0.16s ease,
+			color 0.16s ease;
 	}
 
 	.note-editor__button-group button + button {
 		border-left: 1px solid #546176;
+	}
+
+	.note-editor__button-group button.is-active,
+	.note-editor__button-group button[aria-pressed="true"] {
+		color: #fff6e1;
+		background: var(--tsbs-theme-accent);
+		box-shadow: inset 0 0 0 1px rgba(29, 23, 21, 0.18);
 	}
 
 	.note-editor__button-group .bi {
