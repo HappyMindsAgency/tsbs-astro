@@ -57,10 +57,10 @@ const activeTabIndex = requestedTabIndex >= 0 ? requestedTabIndex : firstPopulat
 										<p>{mission.description}</p>
 									</div>
 								</div>
-								<div class="tsbs-progress tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
+								<div class="tsbs-progress d-none tsbs-progress-accent dashboard-progress" aria-label={`Progresso ${mission.meta}`}>
 									<span style={`width: ${mission.progress}%`}></span>
 								</div>
-								<p class="dashboard-progress-label">{mission.meta}</p>
+								<p class="dashboard-progress-label d-none">{mission.meta}</p>
 							</a>
 						))}
 					</div>
