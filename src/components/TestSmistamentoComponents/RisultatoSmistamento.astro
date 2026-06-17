@@ -35,17 +35,20 @@ const academyResultCopy: Partial<Record<AcademyKey, string>> = {
 const fallbackResultCopy =
 	'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at est et tortor laoreet placerat id in neque.';
 
-const normalizeAcademy = (value: unknown): AcademyKey => {
+const normalizeAcademy = (value: unknown): AcademyKey | null => {
 	if (typeof value !== 'string') {
-		return 'arborea';
+		return null;
 	}
 
 	const normalized = value.toLowerCase().trim();
-	return normalized in academyLabels ? normalized as AcademyKey : 'arborea';
+	return normalized in academyLabels ? normalized as AcademyKey : null;
 };
 
-const { academy = 'arborea', lang = 'it' } = Astro.props;
+const { academy, lang = 'it' } = Astro.props;
 const currentAcademy = normalizeAcademy(academy);
+if (!currentAcademy) {
+	throw new Error('Missing valid academy for sorting result');
+}
 const academyName = academyLabels[currentAcademy];
 const academyBanner = academyBanners[currentAcademy];
 const resultCopy = academyResultCopy[currentAcademy] ?? fallbackResultCopy;
@@ -529,13 +532,16 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			btn.disabled = true;
 
 			try {
-				await fetch('/api/user/accademia', {
+				const response = await fetch('/api/user/accademia', {
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ accademia }),
 				});
+
+				if (!response.ok) throw new Error(`HTTP ${response.status}`);
 			} catch {
-				// best-effort: la navigazione procede comunque
+				btn.disabled = false;
+				return;
 			}
 
 			window.location.assign(href);

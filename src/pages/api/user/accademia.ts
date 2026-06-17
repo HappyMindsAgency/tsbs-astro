@@ -44,6 +44,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     // Trova il Membro collegato allo User (stesso pattern di dati-aggiuntivi.ts).
     const qs = new URLSearchParams({
         'filters[user][id][$eq]': String(user.id),
+        'populate[accademia][fields][0]': 'slug',
     });
     const membroRes = await fetch(
         `${STRAPI_API_BASE_URL}/membri?${qs}`,
@@ -59,6 +60,11 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
 
     if (!membro) {
         return json({ error: 'membro_not_found' }, 404);
+    }
+
+    const existingAcademySlug = typeof membro?.accademia?.slug === 'string' ? membro.accademia.slug : '';
+    if (VALID_ACADEMIES.includes(existingAcademySlug)) {
+        return json({ error: 'academy_already_set' }, 409);
     }
 
     // Trova il documentId dell'accademia tramite slug

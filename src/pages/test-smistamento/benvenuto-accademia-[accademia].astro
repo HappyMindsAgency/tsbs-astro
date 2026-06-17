@@ -3,14 +3,19 @@ import Layout from '../../layouts/Layout.astro';
 import RisultatoSmistamento from '../../components/TestSmistamentoComponents/RisultatoSmistamento.astro';
 import ConfermaAccademia from '../../components/TestSmistamentoComponents/ConfermaAccademia.astro';
 import SceltaAvatar from '../../components/TestSmistamentoComponents/SceltaAvatar.astro';
+import { isAcademySlug } from '../../lib/strapi/user-academy';
 
 const { lang = 'it' } = Astro.props;
-const { accademia = 'arborea' } = Astro.params;
+const { accademia } = Astro.params;
 
-const academies = ['astraria', 'arcadia', 'armonia', 'arborea'];
 const requestedStep = Astro.url.searchParams.get('step') || 'risultato';
-const academy = academies.includes(accademia) ? accademia : 'arborea';
-const theme = academy ? `theme-${academy}` : 'theme-neutral';
+const academy = isAcademySlug(accademia) ? accademia : undefined;
+
+if (!academy) {
+	return Astro.redirect('/test-smistamento/');
+}
+
+const theme = `theme-${academy}`;
 
 const steps = {
 	risultato: RisultatoSmistamento,

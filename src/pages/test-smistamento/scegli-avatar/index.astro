@@ -1,8 +1,7 @@
 ﻿---
 import Layout from '../../../layouts/Layout.astro';
 import SceltaAvatar from '../../../components/TestSmistamentoComponents/SceltaAvatar.astro';
-
-type AcademyKey = 'astraria' | 'arcadia' | 'armonia' | 'arborea';
+import { isAcademySlug } from '../../../lib/strapi/user-academy';
 
 const { lang = 'it' } = Astro.props;
 
@@ -10,15 +9,14 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const academies: AcademyKey[] = ['astraria', 'arcadia', 'armonia', 'arborea'];
 const requestedAcademy = Astro.url.searchParams.get('academy');
-const academy = requestedAcademy && academies.includes(requestedAcademy as AcademyKey)
-	? requestedAcademy
-	: undefined;
-const theme = academy ? `theme-${academy}` : 'theme-neutral';
-if (!Astro.cookies.has('jwt')) {
-	return Astro.redirect('/');
+const academy = isAcademySlug(requestedAcademy) ? requestedAcademy : undefined;
+
+if (!academy) {
+	return Astro.redirect('/test-smistamento/');
 }
+
+const theme = `theme-${academy}`;
 ---
 
 <Layout lang={lang} theme={theme}>

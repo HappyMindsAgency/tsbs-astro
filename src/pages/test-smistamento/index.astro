@@ -4,14 +4,15 @@ import TestSmistamento from '../../components/TestSmistamentoComponents/TestSmis
 import RisultatoSmistamento from '../../components/TestSmistamentoComponents/RisultatoSmistamento.astro';
 import ConfermaAccademia from '../../components/TestSmistamentoComponents/ConfermaAccademia.astro';
 import SceltaAvatar from '../../components/TestSmistamentoComponents/SceltaAvatar.astro';
+import { isAcademySlug } from '../../lib/strapi/user-academy';
 
 const { lang = 'it' } = Astro.props;
 
-const academies = ['astraria', 'arcadia', 'armonia', 'arborea'];
 const requestedStep = Astro.url.searchParams.get('step') || 'test';
 const requestedAcademy = Astro.url.searchParams.get('academy');
-const academy = requestedAcademy && academies.includes(requestedAcademy) ? requestedAcademy : undefined;
+const academy = isAcademySlug(requestedAcademy) ? requestedAcademy : undefined;
 const theme = academy ? `theme-${academy}` : 'theme-neutral';
+const stepsRequiringAcademy = ['risultato', 'conferma-accademia', 'scelta-avatar'];
 
 const steps = {
 	test: TestSmistamento,
@@ -23,6 +24,10 @@ const steps = {
 const CurrentStep = steps[requestedStep as keyof typeof steps] || TestSmistamento;
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
+}
+
+if (stepsRequiringAcademy.includes(requestedStep) && !academy) {
+	return Astro.redirect('/test-smistamento/');
 }
 ---
 

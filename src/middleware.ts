@@ -1,4 +1,5 @@
 import { defineMiddleware } from 'astro:middleware';
+import { getAuthenticatedUserAcademy } from './lib/strapi/user-academy';
 
 const MAINTENANCE_MODE_ENABLED = false;
 const MAINTENANCE_PATH = '/maintenance';
@@ -12,7 +13,10 @@ const BYPASS_COOKIE_MAX_AGE = 60 * 60 * 12;
 const PUBLIC_PATHS = ['/', '/registrazione/', '/auth/'];
 
 function isPublicPath(pathname: string) {
-	return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p));
+	return PUBLIC_PATHS.some((p) => {
+		if (p === '/') return pathname === '/';
+		return pathname === p || pathname.startsWith(p);
+	});
 }
 
 function isLoginPage(pathname: string) {
@@ -21,6 +25,14 @@ function isLoginPage(pathname: string) {
 
 function isApiRoute(pathname: string) {
 	return pathname === API_PATH || pathname.startsWith(`${API_PATH}/`);
+}
+
+function isSortingTestRoute(pathname: string) {
+	return pathname === '/test-smistamento' || pathname.startsWith('/test-smistamento/');
+}
+
+function isSortingAvatarRoute(pathname: string) {
+	return pathname === '/test-smistamento/scegli-avatar' || pathname.startsWith('/test-smistamento/scegli-avatar/');
 }
 
 function isMaintenanceRoute(pathname: string) {
@@ -54,21 +66,36 @@ function getRequestBase(context: Parameters<Parameters<typeof defineMiddleware>[
 	return new URL(`${context.url.protocol}//${context.url.host}`);
 }
 
-export const onRequest = defineMiddleware((context, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
 	const { pathname, searchParams } = context.url;
 
 	// Guarda auth solo per route non-API, non-asset, non-maintenance.
 	if (!isApiRoute(pathname) && !isStaticAsset(pathname) && !isMaintenanceRoute(pathname)) {
 		const hasJwt = context.cookies.has('jwt');
+		const jwt = context.cookies.get('jwt')?.value;
+		const academy = hasJwt ? await getAuthenticatedUserAcademy(jwt) : null;
 
 		if (isLoginPage(pathname) && hasJwt) {
 			const base = getRequestBase(context);
-			return new Response(null, { status: 302, headers: { Location: new URL('/atrio/', base).toString() } });
+			const targetPath = academy ? '/atrio/' : '/test-smistamento/';
+			return new Response(null, { status: 302, headers: { Location: new URL(targetPath, base).toString() } });
 		}
 
 		if (!isPublicPath(pathname) && !hasJwt) {
 			const base = getRequestBase(context);
 			return new Response(null, { status: 302, headers: { Location: new URL('/', base).toString() } });
+		}
+
+		if (hasJwt && academy && isSortingTestRoute(pathname) && !isSortingAvatarRoute(pathname)) {
+			const base = getRequestBase(context);
+			return new Response(null, { status: 302, headers: { Location: new URL('/atrio/', base).toString() } });
+		}
+
+		if (hasJwt && !isPublicPath(pathname) && !isSortingTestRoute(pathname)) {
+			if (!academy) {
+				const base = getRequestBase(context);
+				return new Response(null, { status: 302, headers: { Location: new URL('/test-smistamento/', base).toString() } });
+			}
 		}
 	}
 

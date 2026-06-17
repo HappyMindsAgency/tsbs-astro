@@ -1,5 +1,5 @@
 ---
-const { selectedAcademy = 'arborea', lang = 'it' } = Astro.props;
+const { selectedAcademy, lang = 'it' } = Astro.props;
 
 const academies = [
 	{ id: 'astraria', name: 'Astraria', theme: 'theme-astraria' },
@@ -10,7 +10,7 @@ const academies = [
 
 const normalizedAcademy = academies.some((academy) => academy.id === selectedAcademy)
 	? selectedAcademy
-	: 'arborea';
+	: undefined;
 ---
 
 <article class="mission-proof-question sorting-academy-choice" data-lang={lang} aria-label="Scelta Accademia">
@@ -133,18 +133,6 @@ const normalizedAcademy = academies.some((academy) => academy.id === selectedAca
 		btn.addEventListener('click', async () => {
 			const accademia = btn.dataset.confirmAcademy;
 			if (!accademia) return;
-
-			btn.disabled = true;
-
-			try {
-				await fetch('/api/user/accademia', {
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ accademia }),
-				});
-			} catch {
-				// Navigazione comunque: il salvataggio è best-effort
-			}
 
 			window.location.assign(`/test-smistamento/benvenuto-accademia-${accademia}/`);
 		});

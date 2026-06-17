@@ -20,6 +20,35 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-17 - Smistamento Non Bypassabile E Accademia Non Modificabile
+
+Decisione:
+- il test di smistamento non deve assegnare Accademie di default se viene interrotto, chiuso, ricaricato o abbandonato
+- un Membro senza Accademia reale salvata su Strapi non puo accedere alle aree interne della web app: deve essere rimandato a `/test-smistamento/`
+- dopo il completamento dello smistamento, l'utente non puo piu raggiungere il test o le schermate di risultato/cambio Accademia tramite URL
+- l'Accademia puo essere salvata una sola volta: eventuali richieste successive all'endpoint server-side devono essere rifiutate
+- la scelta avatar puo restare raggiungibile dopo la conferma Accademia, per completare l'onboarding visuale senza riaprire lo smistamento
+
+Motivo:
+- evitare che un'interruzione del test produca appartenenza implicita o fallback ad Arborea
+- impedire il bypass manuale digitando URL interni come `/atrio/`
+- impedire il cambio Accademia dopo la conferma, anche tramite URL o chiamate API manuali
+- mantenere l'Accademia come scelta iniziale stabile del percorso del Membro
+
+Impatto:
+- `src/middleware.ts`
+- `src/lib/strapi/user-academy.ts`
+- `src/lib/theme.ts`
+- `src/pages/api/user/accademia.ts`
+- `src/pages/test-smistamento/index.astro`
+- `src/pages/test-smistamento/benvenuto-accademia-[accademia].astro`
+- `src/pages/test-smistamento/scegli-avatar/index.astro`
+- `src/components/TestSmistamentoComponents/RisultatoSmistamento.astro`
+- `src/components/TestSmistamentoComponents/ConfermaAccademia.astro`
+
+Stato:
+- approvata
+
 ## 2026-06-15 - Utenti Preferiti Gestiti Da Strapi
 
 Decisione:
