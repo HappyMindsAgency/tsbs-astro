@@ -5,7 +5,7 @@
 
 import type { APIRoute } from 'astro';
 import { getMissioneBySlug, getMissionProofHref } from '../../../../lib/strapi/missioni';
-import { getMembroProgressioneByJwt, avviaPartecipazione } from '../../../../lib/strapi/progressione';
+import { getMembroProgressioneByJwt, avviaPartecipazione, getPartecipazione } from '../../../../lib/strapi/progressione';
 import { logger } from '../../../../services/logger';
 
 export const POST: APIRoute = async ({ params, cookies }) => {
@@ -28,6 +28,11 @@ export const POST: APIRoute = async ({ params, cookies }) => {
 	const membro = await getMembroProgressioneByJwt(jwt);
 	if (!membro) {
 		return redirect('/');
+	}
+
+	const partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+	if (partecipazione?.stato === 'completata') {
+		return redirect(`/missioni/${missione.slug}/`);
 	}
 
 	const avviata = await avviaPartecipazione(membro.documentId, missione.documentId);

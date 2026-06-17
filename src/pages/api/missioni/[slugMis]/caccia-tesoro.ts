@@ -5,7 +5,7 @@
 
 import type { APIRoute } from 'astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
-import { getMembroProgressioneByJwt, avviaPartecipazione } from '../../../../lib/strapi/progressione';
+import { getMembroProgressioneByJwt, avviaPartecipazione, getPartecipazione } from '../../../../lib/strapi/progressione';
 import { validaStepCacciaTesoro } from '../../../../lib/strapi/caccia-tesoro';
 
 type CacciaPayload = {
@@ -45,6 +45,11 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 	const missione = await getMissioneBySlug(slugMis);
 	if (!missione || !missione.quiz?.cacciaAlTesoro) {
 		return json({ error: 'mission_not_found' }, 404);
+	}
+
+	const partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+	if (partecipazione?.stato === 'completata') {
+		return json({ error: 'mission_already_completed' }, 409);
 	}
 
 	// Garantisce la partecipazione (inCorso/50) anche per chi arriva diretto.

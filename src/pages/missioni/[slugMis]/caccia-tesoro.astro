@@ -4,7 +4,7 @@ import Nav from '../../../components/Nav.astro';
 import RitchText from '../../../components/RitchText.astro';
 import TrofeoModal from '../../../components/PopupComponents/TrofeoModal.astro';
 import { getMissioneBySlug } from '../../../lib/strapi/missioni';
-import { getMembroProgressioneByJwt } from '../../../lib/strapi/progressione';
+import { getMembroProgressioneByJwt, getPartecipazione } from '../../../lib/strapi/progressione';
 import { getStatoCacciaTesoro } from '../../../lib/strapi/caccia-tesoro';
 import { resolveUserTheme } from '../../../lib/theme';
 
@@ -40,6 +40,11 @@ const stato = await getStatoCacciaTesoro(membro, missione);
 
 if (stato.steps.length === 0) {
 	return Astro.redirect('/404');
+}
+
+const partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+if (partecipazione?.stato === 'completata') {
+	return Astro.redirect(missionPath);
 }
 
 const totaleStep = stato.steps.length;

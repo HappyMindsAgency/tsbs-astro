@@ -7,6 +7,7 @@ import ProvaMissioneMista from '../../../../components/MissioniComponents/ProvaM
 import NotaEditor from '../../../../components/GrimorioComponents/NotaEditor.astro';
 import TrofeoModal from '../../../../components/PopupComponents/TrofeoModal.astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
+import { getMembroProgressioneByJwt, getPartecipazione } from '../../../../lib/strapi/progressione';
 import { resolveUserTheme } from '../../../../lib/theme';
 
 export const prerender = false;
@@ -28,10 +29,18 @@ if (!slugMis) {
 }
 
 const theme = await resolveUserTheme(jwt);
-const missione = await getMissioneBySlug(slugMis, locale);
+const [missione, membro] = await Promise.all([
+	getMissioneBySlug(slugMis, locale),
+	getMembroProgressioneByJwt(jwt),
+]);
 
 if (!missione) {
 	return Astro.redirect('/404');
+}
+
+const partecipazione = membro ? await getPartecipazione(membro.documentId, missione.documentId) : null;
+if (partecipazione?.stato === 'completata') {
+	return Astro.redirect(`/missioni/${missione.slug}/`);
 }
 
 // Le cacce al tesoro hanno una pagina dedicata (indizi in quiz.step, non in

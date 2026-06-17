@@ -6,7 +6,7 @@ import DomandaModal from '../../../components/PopupComponents/DomandaModal.astro
 import TrofeoModal from '../../../components/PopupComponents/TrofeoModal.astro';
 import ConfermaCheackSfidaLettura from '../../../components/toastComponents/ConfermaCheackSfidaLettura.astro';
 import { getMissioneBySlug } from '../../../lib/strapi/missioni';
-import { getMembroProgressioneByJwt } from '../../../lib/strapi/progressione';
+import { getMembroProgressioneByJwt, getPartecipazione } from '../../../lib/strapi/progressione';
 import { getStatoSfidaLettura, type LibroSfida } from '../../../lib/strapi/sfida-lettura';
 import { resolveUserTheme } from '../../../lib/theme';
 
@@ -35,6 +35,11 @@ const [theme, missione, membro] = await Promise.all([
 
 if (!missione || !membro) {
 	return Astro.redirect('/404');
+}
+
+const partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+if (partecipazione?.stato === 'completata') {
+	return Astro.redirect(missionPath);
 }
 
 const stato = await getStatoSfidaLettura(membro.documentId);

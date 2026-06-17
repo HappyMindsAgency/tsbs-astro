@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
-import { getMembroProgressioneByJwt, registraEsitoProva, avviaPartecipazione } from '../../../../lib/strapi/progressione';
+import { getMembroProgressioneByJwt, registraEsitoProva, avviaPartecipazione, getPartecipazione } from '../../../../lib/strapi/progressione';
 import { inviaTesseraInVerifica } from '../../../../lib/strapi/tessera';
 import { logger } from '../../../../services/logger';
 
@@ -45,6 +45,11 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 
 	if (!missione || domande.length === 0) {
 		return json({ error: 'mission_quiz_not_found' }, 404);
+	}
+
+	const partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+	if (partecipazione?.stato === 'completata') {
+		return json({ error: 'mission_already_completed' }, 409);
 	}
 
 	if (body.answers.length !== domande.length) {

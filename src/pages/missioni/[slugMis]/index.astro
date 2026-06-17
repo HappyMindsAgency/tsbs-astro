@@ -3,6 +3,7 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import RitchText from '../../../components/RitchText.astro';
 import { getMissioneBySlug } from '../../../lib/strapi/missioni';
+import { getMembroProgressioneByJwt, getPartecipazione } from '../../../lib/strapi/progressione';
 import { resolveUserTheme } from '../../../lib/theme';
 
 export const prerender = false;
@@ -20,12 +21,17 @@ if (!slugMis) {
 }
 
 const theme = await resolveUserTheme(jwt);
-const missione = await getMissioneBySlug(slugMis, lang);
+const [missione, membro] = await Promise.all([
+	getMissioneBySlug(slugMis, lang),
+	getMembroProgressioneByJwt(jwt),
+]);
 
 if (!missione) {
 	return Astro.redirect('/404');
 }
 
+const partecipazione = membro ? await getPartecipazione(membro.documentId, missione.documentId) : null;
+const missioneCompletata = partecipazione?.stato === 'completata';
 const hasDescription = Boolean(missione.descrizione?.trim());
 const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.punteggio} punti` : '');
 // "Avvia la missione" crea la Partecipazione (inCorso, progresso 50) e
@@ -68,9 +74,13 @@ const avviaActionHref = `/api/missioni/${missione.slug}/avvia`;
 					</>
 				)}
 
-				<form class="mission-detail__cta-form" method="POST" action={avviaActionHref}>
-					<button class="btn tsbs-cta-primary mission-detail__cta" type="submit">Avvia la missione</button>
-				</form>
+				{missioneCompletata ? (
+					<button class="btn tsbs-cta-primary mission-detail__cta" type="button" disabled>Missione completata</button>
+				) : (
+					<form class="mission-detail__cta-form" method="POST" action={avviaActionHref}>
+						<button class="btn tsbs-cta-primary mission-detail__cta" type="submit">Avvia la missione</button>
+					</form>
+				)}
 			</div>
 		</section>
 	</main>
