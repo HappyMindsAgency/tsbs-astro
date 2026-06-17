@@ -2518,15 +2518,18 @@ body:has(.tsbs-legal-page) {
 	.faq-content {
 		display: grid;
 		gap: 1.5rem;
+		min-width: 0;
 		margin: 0 auto;
 	}
 
 	.faq-intro {
 		display: grid;
 		gap: 0.75rem;
+		min-width: 0;
 		color: var(--tsbs-color-body);
 	}
 
+	.faq-intro h1,
 	.faq-intro h2 {
 		width: 100%;
 		max-width: none;
@@ -2535,6 +2538,7 @@ body:has(.tsbs-legal-page) {
 		font-size: clamp(1.75rem, 7vw, 2.5rem);
 		font-weight: 800;
 		line-height: 1.08;
+		overflow-wrap: anywhere;
 	}
 
 	.faq-intro p {
@@ -2543,15 +2547,26 @@ body:has(.tsbs-legal-page) {
 		margin: 0;
 		font-size: 1rem;
 		line-height: 1.5;
+		overflow-wrap: anywhere;
 	}
 
 	.faq-intro__richtext {
+		display: grid;
+		gap: 0.875rem;
+		min-width: 0;
 		width: 100%;
 		max-width: none;
+		overflow-wrap: anywhere;
 	}
 
 	.faq-intro__richtext.block-richtext.custombody :where(h1, h2, h3, h4, h5, h6) {
 		color: var(--tsbs-color-heading);
+		overflow-wrap: anywhere;
+	}
+
+	.faq-intro__richtext.block-richtext.custombody :where(p, li, blockquote),
+	.faq-accordion__richtext.block-richtext.custombody :where(p, li, blockquote) {
+		overflow-wrap: anywhere;
 	}
 
 	.faq-intro__richtext.block-richtext.custombody a,
@@ -2565,9 +2580,11 @@ body:has(.tsbs-legal-page) {
 	.faq-accordion {
 		display: grid;
 		gap: 0.875rem;
+		min-width: 0;
 	}
 
 	.faq-accordion__item {
+		min-width: 0;
 		overflow: hidden;
 		color: var(--tsbs-color-body);
 		background: #f5f5f5;
@@ -2588,12 +2605,15 @@ body:has(.tsbs-legal-page) {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
+		min-width: 0;
 		min-height: 4rem;
 		padding: 1rem;
 		color: var(--tsbs-color-heading);
 		font-size: 1rem;
 		font-weight: 800;
 		line-height: 1.2;
+		white-space: normal;
+		overflow-wrap: anywhere;
 		background: #f5f5f5;
 		border-radius: 0.5rem;
 		box-shadow: none;
@@ -2637,6 +2657,7 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.faq-accordion__body {
+		min-width: 0;
 		padding: 1rem;
 		background: color-mix(in srgb, var(--tsbs-color-surface) 50%, #f5f5f5);
 		border-radius: 0 0 0.5rem 0.5rem;
@@ -2646,6 +2667,7 @@ body:has(.tsbs-legal-page) {
 		margin: 0;
 		font-size: 0.9375rem;
 		line-height: 1.5;
+		overflow-wrap: anywhere;
 	}
 
 	.faq-accordion__richtext.block-richtext.custombody :where(p, ul, ol, blockquote) {
@@ -2653,10 +2675,12 @@ body:has(.tsbs-legal-page) {
 		margin-bottom: 0.75rem;
 		font-size: 0.9375rem;
 		line-height: 1.5;
+		overflow-wrap: anywhere;
 	}
 
 	.faq-accordion__richtext.block-richtext.custombody :where(h1, h2, h3, h4, h5, h6) {
 		color: var(--tsbs-color-heading);
+		overflow-wrap: anywhere;
 	}
 
 	.faq-accordion__richtext.block-richtext.custombody > :last-child {
