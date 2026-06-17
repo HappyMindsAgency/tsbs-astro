@@ -3,7 +3,14 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import BackButton from '../../../components/BackButton.astro';
 import { resolveUserContext } from '../../../lib/theme';
-import { formatGrimorioDate, getCurrentMembroFromJwt, getGrimorioExcerpt, getGrimorioNoteByMembro, getGrimorioStateLabel } from '../../../lib/strapi/grimorio';
+import {
+	formatGrimorioDate,
+	getCurrentMembroFromJwt,
+	getGrimorioCategorySlug,
+	getGrimorioExcerpt,
+	getGrimorioNoteByMembro,
+	getGrimorioStateLabel,
+} from '../../../lib/strapi/grimorio';
 import { getReturnToLabel, getSafeReturnTo, withReturnTo } from '../../../lib/navigation';
 
 const { lang = 'it' } = Astro.props;
@@ -27,6 +34,15 @@ const getNoteMeta = (note: (typeof notes)[number]) => {
 	const scopeLabel = getGrimorioStateLabel(note);
 
 	return [dayLabel, scopeLabel].filter(Boolean).join(' • ');
+};
+
+const getNoteHref = (note: (typeof notes)[number]) => {
+	const isEditableSavedNote = !note.visibilePubblico && getGrimorioCategorySlug(note) === 'salvata';
+	const path = isEditableSavedNote
+		? `/scrivania/grimorio/${note.slug}/`
+		: `/scrivania/grimorio/pubblicate/${note.slug}/`;
+
+	return withReturnTo(path, returnTo);
 };
 ---
 
@@ -61,7 +77,7 @@ const getNoteMeta = (note: (typeof notes)[number]) => {
 					{notes.map((note, index) => (
 						<a
 							class={`tsbs-note-card ${index >= 3 ? 'is-hidden' : ''}`}
-							href={withReturnTo(`/scrivania/grimorio/pubblicate/${note.slug}/`, returnTo)}
+							href={getNoteHref(note)}
 							data-grimorio-card
 						>
 							<div class="tsbs-note-card__copy">

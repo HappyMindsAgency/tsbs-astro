@@ -33,6 +33,14 @@ if (nota.visibilePubblico) {
 	return Astro.redirect(withReturnTo(`/scrivania/grimorio/pubblicate/${nota.slug}/`, Astro.url.searchParams.get('returnTo')));
 }
 
+const categorySlug = getGrimorioCategorySlug(nota);
+
+// Solo le note salvate restano modificabili. Le inviate/in approvazione si
+// aprono nella vista sola lettura anche se si raggiunge direttamente questa rotta.
+if (categorySlug !== 'salvata') {
+	return Astro.redirect(withReturnTo(`/scrivania/grimorio/pubblicate/${nota.slug}/`, Astro.url.searchParams.get('returnTo')));
+}
+
 const { theme, accademia } = await resolveUserContext(jwt);
 const returnTo = getSafeReturnTo(Astro.url);
 const backLabel = getReturnToLabel(returnTo);
@@ -52,7 +60,7 @@ const backLabel = getReturnToLabel(returnTo);
 				noteDocumentId={nota.documentId}
 				titleValue={nota.titolo}
 				bodyValue={nota.contenuto ?? ''}
-				categorySlug={getGrimorioCategorySlug(nota)}
+				categorySlug={categorySlug}
 			/>
 		</div>
 	</main>

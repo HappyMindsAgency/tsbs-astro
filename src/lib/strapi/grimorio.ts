@@ -90,6 +90,12 @@ export function getGrimorioExcerpt(contenuto: string | null, maxLength = 130) {
 	const html = marked.parse(contenuto, { async: false });
 	const text = String(html)
 		.replace(/<[^>]*>/g, ' ')
+		.replace(/&(?:amp;)?nbsp;/g, ' ')
+		.replace(/&amp;/g, '&')
+		.replace(/&quot;/g, '"')
+		.replace(/&#39;/g, "'")
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
 		.replace(/\s+/g, ' ')
 		.trim();
 
