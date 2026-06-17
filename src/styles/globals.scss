@@ -1149,7 +1149,7 @@ body:has(.tsbs-legal-page) {
 			}
 
 			.dashboard-epistle p:not(.dashboard-eyebrow) {
-				max-width: 42rem;
+				max-width: calc(100% - 17rem);
 			}
 
 			.dashboard-epistle-link {
