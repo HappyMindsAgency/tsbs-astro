@@ -82,6 +82,7 @@ const {
 			const resetAnswers = () => {
 				getAnswerInputs().forEach((answer) => {
 					answer.checked = false;
+					answer.disabled = false;
 				});
 				submit.hidden = true;
 			};
@@ -131,6 +132,11 @@ const {
 				}
 
 				resetAnswers();
+				document.dispatchEvent(
+					new CustomEvent('tsbs:question-modal-close', {
+						detail: { confirmed: !undoSelection, input: activeInput },
+					}),
+				);
 				activeInput = null;
 
 				if (previousFocus) {
@@ -173,7 +179,11 @@ const {
 
 			// Delegazione: le risposte possono essere rigenerate dinamicamente.
 			answersContainer.addEventListener('change', () => {
-				submit.hidden = !modal.querySelector('input[name="domanda-modal-risposta"]:checked');
+				const selected = modal.querySelector<HTMLInputElement>('input[name="domanda-modal-risposta"]:checked');
+				getAnswerInputs().forEach((answer) => {
+					answer.disabled = Boolean(selected) && answer !== selected;
+				});
+				submit.hidden = !selected;
 			});
 
 			form.addEventListener('submit', (event) => {

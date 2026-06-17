@@ -115,7 +115,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 					<span>libri letti</span>
 				</div>
 
-				<p class="reading-challenge__feedback" data-sfida-feedback hidden aria-live="polite"></p>
+				<p class="reading-challenge__feedback" data-sfida-feedback hidden aria-live="polite" tabindex="-1"></p>
 
 				<div class="accordion reading-challenge__accordion" id="reading-challenge-categories">
 					{categories.map((category) => (
@@ -193,11 +193,35 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 		let dayLocked = root.dataset.tentativoEffettuato === 'true';
 		let activeLibroId = '';
 		let activeInput: HTMLInputElement | null = null;
+		let selectionLocked = false;
+
+		checkboxes.forEach((input) => {
+			if (input.disabled) input.dataset.sfidaPermanentlyDisabled = 'true';
+		});
+
+		const setSelectionLocked = (locked: boolean) => {
+			selectionLocked = locked;
+			checkboxes.forEach((input) => {
+				if (input.dataset.sfidaPermanentlyDisabled === 'true') return;
+				input.disabled = locked;
+			});
+		};
 
 		const setFeedback = (message: string) => {
 			if (!feedback) return;
 			feedback.textContent = message;
 			feedback.hidden = !message;
+		};
+
+		const focusFeedback = () => {
+			if (!feedback || feedback.hidden) return;
+			feedback.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			feedback.focus({ preventScroll: true });
+		};
+
+		const setFeedbackAndFocus = (message: string) => {
+			setFeedback(message);
+			window.requestAnimationFrame(focusFeedback);
 		};
 
 		const messages: Record<string, string> = {
@@ -219,8 +243,14 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 
 				if (!response.ok || !Array.isArray(payload?.estratti)) {
 					input.checked = false;
+					setSelectionLocked(false);
 					if (payload?.error === 'tentativo_gia_effettuato_oggi') dayLocked = true;
-					setFeedback(messages[payload?.error] || messages.generico);
+					const message = messages[payload?.error] || messages.generico;
+					if (payload?.error === 'tentativo_gia_effettuato_oggi') {
+						setFeedbackAndFocus(message);
+					} else {
+						setFeedback(message);
+					}
 					return;
 				}
 
@@ -239,6 +269,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 				);
 			} catch {
 				input.checked = false;
+				setSelectionLocked(false);
 				setFeedback(messages.generico);
 			}
 		};
@@ -258,7 +289,12 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 				if (!response.ok || typeof payload?.corretta !== 'boolean') {
 					if (input) input.checked = false;
 					if (payload?.error === 'tentativo_gia_effettuato_oggi') dayLocked = true;
-					setFeedback(messages[payload?.error] || messages.generico);
+					const message = messages[payload?.error] || messages.generico;
+					if (payload?.error === 'tentativo_gia_effettuato_oggi') {
+						setFeedbackAndFocus(message);
+					} else {
+						setFeedback(message);
+					}
 					return;
 				}
 
@@ -269,6 +305,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 				if (payload.corretta) {
 					if (input) {
 						input.checked = true;
+						input.dataset.sfidaPermanentlyDisabled = 'true';
 						input.disabled = true;
 					}
 					if (progress) progress.textContent = `${payload.libriRiconosciuti} / ${payload.totaleLibri}`;
@@ -288,6 +325,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 			} finally {
 				activeLibroId = '';
 				activeInput = null;
+				setSelectionLocked(false);
 			}
 		};
 
@@ -295,14 +333,29 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 			input.addEventListener('change', () => {
 				if (!input.checked) return;
 
-				if (dayLocked) {
+				if (selectionLocked) {
 					input.checked = false;
-					setFeedback(messages.tentativo_gia_effettuato_oggi);
 					return;
 				}
 
+				if (dayLocked) {
+					input.checked = false;
+					setFeedbackAndFocus(messages.tentativo_gia_effettuato_oggi);
+					return;
+				}
+
+				setSelectionLocked(true);
 				void richiediDomanda(input, input.dataset.sfidaLibro || '');
 			});
+		});
+
+		document.addEventListener('tsbs:question-modal-close', (event) => {
+			if (!(event instanceof CustomEvent)) return;
+			if (event.detail?.confirmed) return;
+
+			activeLibroId = '';
+			activeInput = null;
+			setSelectionLocked(false);
 		});
 
 		document.addEventListener('tsbs:question-modal-submit', (event) => {
