@@ -3,7 +3,7 @@ const { isOpen = true, theme = '' } = Astro.props;
 ---
 
 {isOpen && (
-	<div class={`intro-sorting-toast ${theme}`} data-intro-sorting-toast role="dialog" aria-labelledby="intro-sorting-toast-title">
+	<div class={`intro-sorting-toast ${theme}`} data-intro-sorting-toast role="dialog" aria-modal="true" aria-labelledby="intro-sorting-toast-title">
 		<section class="intro-sorting-toast__panel" aria-describedby="intro-sorting-toast-copy">
 			<div class="intro-sorting-toast__icon" aria-hidden="true">
 				<i class="bi bi-stars"></i>
@@ -86,8 +86,17 @@ const { isOpen = true, theme = '' } = Astro.props;
 		display: none;
 	}
 
+	.intro-sorting-toast::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: color-mix(in srgb, var(--tsbs-color-surface) 68%, transparent);
+		backdrop-filter: grayscale(0.7) blur(0.0625rem);
+	}
+
 	.intro-sorting-toast__panel {
 		position: relative;
+		z-index: 1;
 		display: grid;
 		gap: 1.25rem;
 		width: min(100%, 24rem);
