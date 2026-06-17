@@ -13,6 +13,7 @@ import trofeoTartaruga from '../../assets/trofeo-tartaruga.png';
 import { resolveUserContext } from '../../lib/theme';
 import { getTrofeiStanzaByJwt } from '../../lib/strapi/trofei';
 import BackButton from '../../components/BackButton.astro';
+import { getReturnToLabel, getSafeReturnTo } from '../../lib/navigation';
 
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
@@ -21,6 +22,8 @@ if (!Astro.cookies.has('jwt')) {
 const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
 const { theme, accademia } = await resolveUserContext(jwt);
+const returnTo = getSafeReturnTo(Astro.url, '/scrivania/');
+const backLabel = getReturnToLabel(returnTo, 'Torna alla scrivania');
 
 const board = {
 	rows: 6,
@@ -139,7 +142,7 @@ const paletteOrder = [...trophyCatalog].sort((a, b) => {
 	<main class="tsbs-app-shell trophies-page" style={`--trophy-rows: ${board.rows}; --trophy-cols: ${board.cols};`}>
 		<header class="trophies-header" aria-labelledby="trophies-title">
 			<h1 id="trophies-title">Trofei</h1>
-			<BackButton href="/scrivania/" label="Torna alla scrivania" />
+			<BackButton href={returnTo} label={backLabel} />
 		</header>
 
 		<div class="container-xl tsbs-app-container trophies-content">

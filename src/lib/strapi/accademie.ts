@@ -103,9 +103,16 @@ function getPositionLabel(index: number): string {
 	return String(index + 1);
 }
 
-function mapMembroToRankingRow(membro: MembroRankingRaw, index: number, currentMembroDocumentId: string | null): AcademyRankingRow {
+function mapMembroToRankingRow(
+	membro: MembroRankingRaw,
+	index: number,
+	currentMembroDocumentId: string | null,
+	accademiaSlug: string,
+): AcademyRankingRow {
 	const name = membro.nickname?.trim() || 'Membro';
 	const points = Number.parseInt(String(membro.punti ?? '0'), 10) || 0;
+	const current = membro.documentId === currentMembroDocumentId;
+	const currentHref = `/scrivania/trofei/?returnTo=${encodeURIComponent(`/sala-accademia-${accademiaSlug}/`)}`;
 
 	return {
 		documentId: membro.documentId,
@@ -114,8 +121,10 @@ function mapMembroToRankingRow(membro: MembroRankingRaw, index: number, currentM
 		initials: name.slice(0, 1).toLocaleUpperCase('it-IT'),
 		name,
 		points,
-		current: membro.documentId === currentMembroDocumentId,
-		href: `/scrivania/utenti-preferiti/esploso-profilo-utente/?membro=${encodeURIComponent(membro.documentId)}`,
+		current,
+		href: current
+			? currentHref
+			: `/scrivania/utenti-preferiti/esploso-profilo-utente/?membro=${encodeURIComponent(membro.documentId)}`,
 	};
 }
 
@@ -153,7 +162,7 @@ export async function getAcademyRanking(accademiaSlug: string, jwt?: string, lim
 				return nameA.localeCompare(nameB, 'it-IT');
 			})
 			.slice(0, limit)
-			.map((membro, index) => mapMembroToRankingRow(membro, index, currentMembroDocumentId));
+			.map((membro, index) => mapMembroToRankingRow(membro, index, currentMembroDocumentId, slug));
 	} catch {
 		return [];
 	}
