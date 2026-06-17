@@ -118,15 +118,15 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 				<p class="reading-challenge__feedback" data-sfida-feedback hidden aria-live="polite"></p>
 
 				<div class="accordion reading-challenge__accordion" id="reading-challenge-categories">
-					{categories.map((category, index) => (
+					{categories.map((category) => (
 						<div class="accordion-item reading-challenge__category">
 							<h2 class="accordion-header" id={`heading-${category.id}`}>
 								<button
-									class={`accordion-button reading-challenge__category-button ${index === 0 ? '' : 'collapsed'}`}
+									class="accordion-button reading-challenge__category-button collapsed"
 									type="button"
 									data-bs-toggle="collapse"
 									data-bs-target={`#collapse-${category.id}`}
-									aria-expanded={index === 0 ? 'true' : 'false'}
+									aria-expanded="false"
 									aria-controls={`collapse-${category.id}`}
 								>
 									{category.label}
@@ -135,7 +135,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 
 							<div
 								id={`collapse-${category.id}`}
-								class={`accordion-collapse collapse ${index === 0 ? 'show' : ''}`}
+								class="accordion-collapse collapse"
 								aria-labelledby={`heading-${category.id}`}
 								data-bs-parent="#reading-challenge-categories"
 							>
