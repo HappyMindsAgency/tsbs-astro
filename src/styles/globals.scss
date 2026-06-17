@@ -4028,6 +4028,7 @@ body:has(.tsbs-legal-page) {
 	.epistole-content {
 		display: grid;
 		gap: 3rem;
+		min-width: 0;
 		margin: 0 auto;
 		padding-top: 2.5rem;
 	}
@@ -4035,6 +4036,7 @@ body:has(.tsbs-legal-page) {
 	.epistole-featured {
 		display: grid;
 		gap: 0.75rem;
+		min-width: 0;
 		padding: 1.5rem 1.5rem 0.9375rem;
 		background-color: var(--tsbs-color-neutral-soft);
 		background-image: url("../assets/Paper_Textures-1.jpg");
@@ -4048,6 +4050,7 @@ body:has(.tsbs-legal-page) {
 	.epistole-featured__copy {
 		display: grid;
 		gap: 0.625rem;
+		min-width: 0;
 	}
 
 	.epistole-eyebrow,
@@ -4075,6 +4078,7 @@ body:has(.tsbs-legal-page) {
 		font-family: var(--tsbs-font-body);
 		font-weight: 800;
 		line-height: 1.15;
+		overflow-wrap: anywhere;
 	}
 
 	.epistole-featured h2 {
@@ -4101,6 +4105,7 @@ body:has(.tsbs-legal-page) {
 	.epistole-archive {
 		display: grid;
 		gap: 1.125rem;
+		min-width: 0;
 	}
 
 	.epistole-archive h2 {
@@ -4114,12 +4119,14 @@ body:has(.tsbs-legal-page) {
 	.epistole-list {
 		display: grid;
 		gap: 1rem;
+		min-width: 0;
 	}
 
 	.epistole-card {
 		display: grid;
 		align-content: start;
 		gap: 0.75rem;
+		min-width: 0;
 		min-height: 9.375rem;
 		padding: 1.125rem 1.25rem;
 		color: var(--tsbs-color-body);
@@ -4149,6 +4156,7 @@ body:has(.tsbs-legal-page) {
 		color: #666666;
 		font-size: 0.9375rem;
 		line-height: 1.55;
+		overflow-wrap: anywhere;
 	}
 
 	.epistole-load-more {
@@ -4216,6 +4224,8 @@ body:has(.tsbs-legal-page) {
 		display: grid;
 		align-content: start;
 		gap: 1.5rem;
+		width: 100%;
+		min-width: 0;
 		max-width: calc(46rem + var(--bs-gutter-x));
 		margin: 0 auto;
 		padding-top: 3rem;
@@ -4226,17 +4236,45 @@ body:has(.tsbs-legal-page) {
 		margin: 0;
 		color: var(--tsbs-theme-accent);
 		font-family: var(--tsbs-font-body);
-		font-size: 2rem;
+		font-size: 1.5rem;
 		font-weight: 800;
-		line-height: 1.08;
+		line-height: 1.15;
+		overflow-wrap: anywhere;
 	}
 
 	.epistle-detail__body {
 		display: grid;
 		gap: 1rem;
+		min-width: 0;
+		max-width: 100%;
 		color: var(--tsbs-color-heading);
 		font-size: 1rem;
 		line-height: 1.65;
+	}
+
+	.epistle-detail__richtext {
+		min-width: 0;
+		max-width: 100%;
+		overflow-wrap: anywhere;
+	}
+
+	.epistle-detail__richtext :where(p, h2, h3, h4, h5, h6, li, blockquote) {
+		max-width: 100%;
+		overflow-wrap: anywhere;
+	}
+
+	.epistle-detail__richtext :where(img, picture, video, iframe) {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.epistle-detail__richtext :where(pre, table) {
+		max-width: 100%;
+		overflow-x: auto;
+	}
+
+	.epistle-detail__richtext table {
+		display: block;
 	}
 
 	.epistle-detail__body p {
