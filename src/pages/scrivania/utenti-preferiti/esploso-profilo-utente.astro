@@ -45,12 +45,14 @@ const trophies = [
 const cells = Array.from({ length: board.rows * board.cols });
 
 const { theme, accademia } = await resolveUserContext(jwt);
+const profileAcademies = ['astraria', 'arcadia', 'armonia', 'arborea'];
+const profileAcademy = profileAcademies.includes(currentProfile.academy) ? currentProfile.academy : accademia;
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
-	<main class="tsbs-app-shell desk-page profile-exploded-page">
+	<main class={`tsbs-app-shell desk-page profile-exploded-page theme-${profileAcademy}`} data-profile-academy={profileAcademy}>
 		<header class="desk-hero profile-exploded-hero" aria-labelledby="profile-exploded-title">
 			<div class="desk-hero__panel profile-exploded-hero__panel">
 				<button
@@ -164,7 +166,7 @@ const { theme, accademia } = await resolveUserContext(jwt);
 
 	.profile-exploded-hero .desk-avatar {
 		color: #ffffff;
-		background: color-mix(in srgb, var(--tsbs-theme-accent) 58%, #ffffff);
+		background: color-mix(in srgb, var(--desk-accent) 58%, #ffffff);
 	}
 
 	.profile-favorite-button {
@@ -177,7 +179,7 @@ const { theme, accademia } = await resolveUserContext(jwt);
 		width: 1.875rem;
 		height: 1.875rem;
 		padding: 0;
-		color: var(--tsbs-theme-accent);
+		color: var(--desk-accent);
 		background: #ffffff;
 		border: 0;
 		border-radius: 50%;
@@ -190,7 +192,7 @@ const { theme, accademia } = await resolveUserContext(jwt);
 	}
 
 	.profile-favorite-button.is-favorite {
-		color: var(--tsbs-theme-accent);
+		color: var(--desk-accent);
 	}
 
 	.profile-exploded-content {
@@ -266,7 +268,7 @@ const { theme, accademia } = await resolveUserContext(jwt);
 	}
 
 	.profile-favorite-button:focus-visible {
-		outline: 3px solid color-mix(in srgb, var(--tsbs-theme-accent) 50%, #ffffff);
+		outline: 3px solid color-mix(in srgb, var(--desk-accent) 50%, #ffffff);
 		outline-offset: 3px;
 	}
 
