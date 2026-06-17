@@ -4,6 +4,7 @@ import Nav from '../../../../components/Nav.astro';
 import BackButton from '../../../../components/BackButton.astro';
 import RitchText from '../../../../components/RitchText.astro';
 import ConfermaEliminaNota from '../../../../components/toastComponents/ConfermaEliminaNota.astro';
+import { getReturnToLabel, getSafeReturnTo } from '../../../../lib/navigation';
 import { getCurrentMembroFromJwt, getGrimorioNotaBySlugForMembro, getGrimorioNotaPubblicaBySlug } from '../../../../lib/strapi/grimorio';
 import { resolveUserContext } from '../../../../lib/theme';
 
@@ -24,6 +25,8 @@ const notaPersonale = membro ? await getGrimorioNotaBySlugForMembro(slugNotaPub,
 const nota = notaPersonale ?? await getGrimorioNotaPubblicaBySlug(slugNotaPub, lang);
 const { theme, accademia } = await resolveUserContext(jwt);
 const canDeleteNote = Boolean(notaPersonale);
+const returnTo = getSafeReturnTo(Astro.url);
+const backLabel = getReturnToLabel(returnTo);
 
 if (!nota) {
 	return Astro.redirect('/scrivania/grimorio/');
@@ -36,7 +39,7 @@ if (!nota) {
 	<main class="tsbs-app-shell missions-shell note-page">
 		<header class="missions-header missions-header--note">
 			<h1>Nota</h1>
-			<BackButton href="/scrivania/grimorio/" label="Torna al grimorio" />
+			<BackButton href={returnTo} label={backLabel} />
 		</header>
 
 		<div class="container-xl tsbs-app-container note-page__content">

@@ -4,6 +4,7 @@ import Nav from '../../../components/Nav.astro';
 import BackButton from '../../../components/BackButton.astro';
 import { resolveUserContext } from '../../../lib/theme';
 import { formatGrimorioDate, getCurrentMembroFromJwt, getGrimorioExcerpt, getGrimorioNoteByMembro, getGrimorioStateLabel } from '../../../lib/strapi/grimorio';
+import { getReturnToLabel, getSafeReturnTo, withReturnTo } from '../../../lib/navigation';
 
 const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
@@ -11,13 +12,15 @@ const jwt = Astro.cookies.get('jwt')?.value;
 const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 
 
-const featuredNoteHref = '/scrivania/grimorio/nuova/';
 if (!jwt) {
 	return Astro.redirect('/');
 }
 
 const membro = await getCurrentMembroFromJwt(jwt);
 const notes = membro ? await getGrimorioNoteByMembro(membro.documentId, lang) : [];
+const returnTo = getSafeReturnTo(Astro.url, '/scrivania/');
+const featuredNoteHref = withReturnTo('/scrivania/grimorio/nuova/', returnTo);
+const backLabel = getReturnToLabel(returnTo, returnTo === '/scrivania/grimorio/' ? 'Torna al grimorio' : 'Torna alla scrivania');
 
 const getNoteMeta = (note: (typeof notes)[number]) => {
 	const dayLabel = formatGrimorioDate(note.publishedAt);
@@ -33,7 +36,7 @@ const getNoteMeta = (note: (typeof notes)[number]) => {
 	<main class="tsbs-app-shell missions-shell grimorio-page">
 		<header class="missions-header missions-header--note">
 			<h1>Grimorio</h1>
-			<BackButton href="/scrivania/" label="Torna alla scrivania" />
+			<BackButton href={returnTo} label={backLabel} />
 		</header>
 
 		<div class="container-xl tsbs-app-container grimorio-content">
@@ -58,7 +61,7 @@ const getNoteMeta = (note: (typeof notes)[number]) => {
 					{notes.map((note, index) => (
 						<a
 							class={`tsbs-note-card ${index >= 3 ? 'is-hidden' : ''}`}
-							href={`/scrivania/grimorio/pubblicate/${note.slug}/`}
+							href={withReturnTo(`/scrivania/grimorio/pubblicate/${note.slug}/`, returnTo)}
 							data-grimorio-card
 						>
 							<div class="tsbs-note-card__copy">

@@ -3,6 +3,7 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import BackButton from '../../../components/BackButton.astro';
 import NotaEditor from '../../../components/GrimorioComponents/NotaEditor.astro';
+import { getReturnToLabel, getSafeReturnTo, withReturnTo } from '../../../lib/navigation';
 import { resolveUserContext } from '../../../lib/theme';
 import { getCurrentMembroFromJwt, getGrimorioCategorySlug, getGrimorioNotaBySlugForMembro } from '../../../lib/strapi/grimorio';
 
@@ -29,10 +30,12 @@ if (!nota) {
 // Le note rese pubbliche dalla redazione si visualizzano (sola lettura) nella
 // pagina dedicata: qui si modificano solo le note private del membro.
 if (nota.visibilePubblico) {
-	return Astro.redirect(`/scrivania/grimorio/pubblicate/${nota.slug}/`);
+	return Astro.redirect(withReturnTo(`/scrivania/grimorio/pubblicate/${nota.slug}/`, Astro.url.searchParams.get('returnTo')));
 }
 
 const { theme, accademia } = await resolveUserContext(jwt);
+const returnTo = getSafeReturnTo(Astro.url);
+const backLabel = getReturnToLabel(returnTo);
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -41,7 +44,7 @@ const { theme, accademia } = await resolveUserContext(jwt);
 	<main class="tsbs-app-shell missions-shell note-page">
 		<header class="missions-header missions-header--note">
 			<h1>Nota</h1>
-			<BackButton href="/scrivania/grimorio/" label="Torna al grimorio" />
+			<BackButton href={returnTo} label={backLabel} />
 		</header>
 
 		<div class="container-xl tsbs-app-container note-page__content">

@@ -11,6 +11,7 @@ import {
 	getMissioniAttive,
 	getPartecipazioniMissioneByJwt,
 } from '../../lib/strapi/missioni';
+import { withReturnTo } from '../../lib/navigation';
 const { lang = 'it' } = Astro.props;
 
 if (!Astro.cookies.has('jwt')) {
@@ -41,7 +42,9 @@ const WELCOME_EPISTOLA_BY_ACADEMY = {
 
 const welcomeEpistolaSlug = WELCOME_EPISTOLA_BY_ACADEMY[accademia];
 const featuredEpistleHref = welcomeEpistolaSlug ? `/epistole/${welcomeEpistolaSlug}/` : '/epistole/';
-const featuredNoteHref = '/scrivania/grimorio/nuova/';
+const atrioReturnTo = '/atrio/';
+const featuredNoteHref = withReturnTo('/scrivania/grimorio/nuova/', atrioReturnTo);
+const grimorioHref = withReturnTo('/scrivania/grimorio/', atrioReturnTo);
 const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 const taskCards = getFirstIncompleteMissionCards(
 	missioniAttive,
@@ -115,7 +118,7 @@ const taskCards = getFirstIncompleteMissionCards(
 		<section class="dashboard-section dashboard-grimoire" aria-labelledby="grimoire-title">
 			<div class="dashboard-section__head dashboard-section__head--desktop">
 				<h2 id="grimoire-title" class="tsbs-section-title">Grimorio</h2>
-				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href="/scrivania/grimorio/">Consulta il tuo Grimorio →</a>
+				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href={grimorioHref}>Consulta il tuo Grimorio →</a>
 			</div>
 			<a class="tsbs-note-pad" href={featuredNoteHref} aria-label="Apri nota del Grimorio">
 				<span class="tsbs-note-pad__action" aria-hidden="true">
@@ -130,7 +133,7 @@ const taskCards = getFirstIncompleteMissionCards(
 					<span></span>
 				</div>
 			</a>
-			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href="/scrivania/grimorio/">Vai al tuo grimorio →</a>
+			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href={grimorioHref}>Vai al tuo grimorio →</a>
 		</section>
 
 		{eventiClassense.length > 0 && (
