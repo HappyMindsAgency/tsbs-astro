@@ -1098,19 +1098,19 @@ body:has(.tsbs-legal-page) {
 			.dashboard-shell {
 				gap: 3.5rem;
 				padding-top: 0;
-				padding-right: 3rem;
-				padding-left: calc(var(--tsbs-desktop-nav-width) + 3rem);
+				padding-right: 2rem;
+				padding-left: calc(var(--tsbs-desktop-nav-width) + 2rem);
 			}
 
 			.dashboard-header {
 				justify-content: flex-end;
 				min-height: 5.625rem;
-				padding-left: 3rem;
-				padding-right: 3rem;
+				padding-left: 2rem;
+				padding-right: 2rem;
 				padding-top: 0;
 				padding-bottom: 0;
-				margin-right: -3rem;
-				margin-left: -3rem;
+				margin-right: -2rem;
+				margin-left: -2rem;
 			}
 
 			.dashboard-profile {
