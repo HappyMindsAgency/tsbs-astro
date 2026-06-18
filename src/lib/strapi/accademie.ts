@@ -1,4 +1,5 @@
 import { getStrapiApiUrl } from './api-url';
+import { resolveAvatarSrc } from '../avatar';
 
 type StrapiCountResponse = {
 	data?: unknown[];
@@ -17,6 +18,7 @@ type MembroRankingRaw = {
 	documentId: string;
 	nickname?: string | null;
 	punti?: number | string | null;
+	datiAggiuntivi?: Record<string, unknown> | null;
 };
 
 type StrapiMembersResponse = {
@@ -28,6 +30,7 @@ export type AcademyRankingRow = {
 	position: string;
 	medal?: 'gold' | 'silver' | 'bronze';
 	initials: string;
+	avatarSrc: string | null;
 	name: string;
 	points: number;
 	current: boolean;
@@ -119,6 +122,7 @@ function mapMembroToRankingRow(
 		position: getPositionLabel(index),
 		medal: getMedalByIndex(index),
 		initials: name.slice(0, 1).toLocaleUpperCase('it-IT'),
+		avatarSrc: resolveAvatarSrc(membro.datiAggiuntivi?.avatar),
 		name,
 		points,
 		current,
@@ -137,6 +141,7 @@ export async function getAcademyRanking(accademiaSlug: string, jwt?: string, lim
 	searchParams.set('fields[0]', 'documentId');
 	searchParams.set('fields[1]', 'nickname');
 	searchParams.set('fields[2]', 'punti');
+	searchParams.set('fields[3]', 'datiAggiuntivi');
 	searchParams.set('sort[0]', 'punti:desc');
 	searchParams.set('sort[1]', 'nickname:asc');
 	searchParams.set('pagination[pageSize]', String(Math.max(limit, 100)));

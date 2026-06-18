@@ -149,7 +149,13 @@ const rankingRows = await getAcademyRanking(academyKey, jwt);
 								)}
 								<span class={`academy-ranking-card__roman ${row.medal ? `is-${row.medal}` : ''}`}>{row.medal ? row.position : ''}</span>
 							</div>
-							<div class="academy-ranking-card__avatar" aria-hidden="true">{row.initials}</div>
+							<div class="academy-ranking-card__avatar" aria-hidden="true">
+								{row.avatarSrc ? (
+									<img src={row.avatarSrc} alt="" loading="lazy" decoding="async" />
+								) : (
+									row.initials
+								)}
+							</div>
 							<p class="academy-ranking-card__name">{row.name}</p>
 							<p class="academy-ranking-card__points">
 								<strong>{row.points}</strong>
