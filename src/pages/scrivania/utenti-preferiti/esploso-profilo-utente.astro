@@ -1,15 +1,9 @@
 ﻿---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
-import trofeoBandiera from '../../../assets/trofeo-bandiera.png';
-import trofeoCalice from '../../../assets/trofeo-calice.png';
-import trofeoCandela from '../../../assets/trofeo-candela.png';
-import trofeoChiave from '../../../assets/trofeo-chiave.png';
-import trofeoMedaglia from '../../../assets/trofeo-medaglia.png';
-import trofeoScudo from '../../../assets/trofeo-scudo.png';
-import trofeoStendardo from '../../../assets/trofeo-stendardo.png';
-import trofeoTartaruga from '../../../assets/trofeo-tartaruga.png';
 import { getProfileDetailByJwt } from '../../../lib/strapi/preferiti';
+import { getTrofeiStanzaByMembroDocumentId } from '../../../lib/strapi/trofei';
+import { buildTrophyCatalog } from '../../../lib/trofei-forme';
 import { resolveUserContext } from '../../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -24,23 +18,22 @@ if (!currentProfile) {
 	return Astro.redirect('/scrivania/utenti-preferiti/');
 }
 
+// Griglia identica a quella di modifica (Stanza Trofei) per rispettare le posizioni salvate.
 const board = {
-	rows: 8,
+	rows: 6,
 	cols: 5,
 };
 
-const trophies = [
-	{ id: 'tartaruga-1', label: 'Tartaruga', src: trofeoTartaruga.src, row: 1, col: 1, width: 1, height: 1 },
-	{ id: 'chiave-1', label: 'Chiave', src: trofeoChiave.src, row: 1, col: 2, width: 2, height: 1 },
-	{ id: 'stendardo-1', label: 'Stendardo', src: trofeoStendardo.src, row: 1, col: 4, width: 2, height: 2 },
-	{ id: 'scudo-1', label: 'Scudo', src: trofeoScudo.src, row: 2, col: 1, width: 1, height: 1 },
-	{ id: 'calice-1', label: 'Calice', src: trofeoCalice.src, row: 2, col: 2, width: 1, height: 2 },
-	{ id: 'tartaruga-2', label: 'Tartaruga', src: trofeoTartaruga.src, row: 2, col: 3, width: 1, height: 1 },
-	{ id: 'medaglia-1', label: 'Medaglia', src: trofeoMedaglia.src, row: 3, col: 1, width: 1, height: 2 },
-	{ id: 'bandiera-1', label: 'Bandiera', src: trofeoBandiera.src, row: 3, col: 3, width: 2, height: 3 },
-	{ id: 'candela-1', label: 'Candela', src: trofeoCandela.src, row: 4, col: 2, width: 2, height: 3 },
-	{ id: 'medaglia-2', label: 'Medaglia', src: trofeoMedaglia.src, row: 4, col: 5, width: 1, height: 2 },
-];
+// Trofei conquistati dall'utente visualizzato + la sua disposizione salvata (sola lettura).
+const { trofei: trofeiUtente, layout: layoutUtente } = await getTrofeiStanzaByMembroDocumentId(currentProfile.id);
+const trophyCatalog = buildTrophyCatalog(trofeiUtente);
+
+// Solo i trofei effettivamente posizionati dall'utente, con forma/dimensione dal catalogo.
+const placedTrophies = layoutUtente.flatMap((item) => {
+	const definition = trophyCatalog.find((trophy) => trophy.id === item.id);
+	if (!definition) return [];
+	return [{ ...definition, row: item.row, col: item.col }];
+});
 
 const cells = Array.from({ length: board.rows * board.cols });
 
@@ -69,7 +62,9 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 				<p class="desk-academy-pill">{currentProfile.academyLabel}</p>
 
 				<div class="desk-avatar" aria-hidden="true">
-					<i class="bi bi-image"></i>
+					{currentProfile.avatarSrc
+						? <img class="desk-avatar__img" src={currentProfile.avatarSrc} alt="" loading="lazy" decoding="async" />
+						: <i class="bi bi-image"></i>}
 				</div>
 
 				<h1 id="profile-exploded-title">{currentProfile.name}</h1>
@@ -88,13 +83,13 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 				</div>
 
 				<div class="profile-trophy-board__pieces">
-					{trophies.map((trophy) => (
+					{placedTrophies.map((trophy) => (
 						<article
 							class="profile-trophy-piece"
 							aria-label={`Trofeo ${trophy.label}`}
-							style={`--piece-row: ${trophy.row}; --piece-col: ${trophy.col}; --piece-width: ${trophy.width}; --piece-height: ${trophy.height};`}
+							style={`--piece-row: ${trophy.row + 1}; --piece-col: ${trophy.col + 1}; --piece-width: ${trophy.width}; --piece-height: ${trophy.height};`}
 						>
-							<img src={trophy.src} alt="" loading="lazy" draggable="false" />
+							<img src={trophy.src} alt={trophy.label} loading="lazy" draggable="false" />
 						</article>
 					))}
 				</div>
@@ -153,7 +148,7 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 			100dvh - var(--profile-hero-space) - var(--profile-content-top) - var(--profile-content-bottom) -
 				var(--tsbs-mobile-nav-height)
 		);
-		--profile-board-size: min(100%, var(--profile-board-max-width), calc(var(--profile-board-height-space) * 5 / 8));
+		--profile-board-size: min(100%, var(--profile-board-max-width), calc(var(--profile-board-height-space) * 5 / 6));
 
 		min-height: 100vh;
 		padding-bottom: var(--tsbs-mobile-nav-height);
@@ -165,8 +160,16 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 	}
 
 	.profile-exploded-hero .desk-avatar {
+		overflow: hidden;
 		color: #ffffff;
 		background: color-mix(in srgb, var(--desk-accent) 58%, #ffffff);
+	}
+
+	.desk-avatar__img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		border-radius: 50%;
 	}
 
 	.profile-favorite-button {
@@ -210,7 +213,7 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 		position: relative;
 		display: grid;
 		width: min(100%, var(--profile-board-max-width), var(--profile-board-size));
-		aspect-ratio: 5 / 8;
+		aspect-ratio: var(--profile-trophy-cols) / var(--profile-trophy-rows);
 		gap: var(--profile-trophy-gap);
 	}
 
