@@ -174,11 +174,14 @@ export async function getCurrentMembroFromJwt(jwt: string) {
 	return membriResponse.data?.[0] || null;
 }
 
-export async function getGrimorioNotePubbliche(lang = 'it') {
+export async function getGrimorioNotePubbliche(lang = 'it', academySlug?: string | null) {
 	const searchParams = new URLSearchParams();
 	searchParams.set('locale', getItalianStrapiLocale(lang));
 	searchParams.set('status', 'published');
 	searchParams.set('filters[visibilePubblico][$eq]', 'true');
+	if (academySlug) {
+		searchParams.set('filters[accademia][slug][$eq]', academySlug);
+	}
 	searchParams.set('sort[0]', 'publishedAt:desc');
 	searchParams.set('pagination[pageSize]', '100');
 	setGrimorioFields(searchParams);

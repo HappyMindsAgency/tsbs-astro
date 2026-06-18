@@ -70,7 +70,7 @@ const rankingHref = '/classifica-generale/';
 const academyMembersCount = await getAcademyMembersCount(academyKey);
 const academyMembersLabel = `${academyMembersCount} ${academyMembersCount === 1 ? 'Adepto' : 'Adepti'}`;
 const rankingRows = await getAcademyRanking(academyKey, jwt);
-const chronicleRows = await getGrimorioNotePubbliche(lang);
+const chronicleRows = await getGrimorioNotePubbliche(lang, academyKey);
 ---
 
 <Layout lang={lang} theme={`theme-${academyKey}`} accademia={academyKey}>

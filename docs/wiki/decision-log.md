@@ -104,6 +104,26 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-06-18 - Cronache Della Società Filtrate Per Accademia
+
+Decisione:
+- le note pubbliche del Grimorio mostrate nelle "Cronache della Società" vengono filtrate anche per Accademia
+- una nota collegata ad Arcadia appare nelle Cronache di Arcadia, non nelle sale delle altre Accademie
+- il filtro resta aggiuntivo rispetto ai criteri gia esistenti: nota pubblicata, `visibilePubblico = true`, locale italiano
+
+Motivo:
+- il campo `accademia` su Grimorio deve governare la destinazione accademica della nota, non essere solo un metadato
+- evitare che comunicazioni specifiche di una Accademia compaiano nelle Cronache delle altre
+
+Impatto:
+- `src/lib/strapi/grimorio.ts`
+- `src/pages/sala-accademia-[accademia].astro`
+- `src/components/ClassificaComponents/RankingAccademia.astro`
+- Strapi: per rendere visibile una nota nelle Cronache di una Accademia va selezionata la relazione `accademia` corretta
+
+Stato:
+- approvata
+
 ## 2026-06-15 - Utenti Preferiti Gestiti Da Strapi
 
 Decisione:

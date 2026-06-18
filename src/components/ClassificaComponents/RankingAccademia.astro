@@ -42,7 +42,7 @@ const rankingRows = (await getAcademyRanking(academyTheme, jwt, 100)).map((row) 
 }));
 const visibleRankingRowsCount = 13;
 const hasMoreRankingRows = rankingRows.length > visibleRankingRowsCount;
-const chronicleRows = showBoxCronache ? await getGrimorioNotePubbliche(lang) : [];
+const chronicleRows = showBoxCronache ? await getGrimorioNotePubbliche(lang, academyTheme) : [];
 ---
 
 <Layout lang={lang} theme={theme ?? `theme-${academyTheme}`} accademia={academyTheme}>
