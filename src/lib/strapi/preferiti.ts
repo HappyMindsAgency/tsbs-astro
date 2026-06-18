@@ -1,4 +1,5 @@
 import { getStrapiApiUrl } from './api-url';
+import { resolveAvatarSrc } from '../avatar';
 
 type StrapiRecord = {
 	id: number;
@@ -19,6 +20,7 @@ type MembroPreferitoRaw = StrapiRecord & {
 	livello?: {
 		nome?: string | null;
 	} | null;
+	datiAggiuntivi?: Record<string, unknown> | null;
 };
 
 type MembroWithFavorites = MembroPreferitoRaw & {
@@ -29,6 +31,7 @@ export type ProfiloPreferito = {
 	id: string;
 	name: string;
 	initials: string;
+	avatarSrc: string | null;
 	points: number;
 	academy: string;
 	academyLabel: string;
@@ -55,6 +58,7 @@ async function getCurrentUser(jwt: string) {
 function setMembroFields(searchParams: URLSearchParams) {
 	searchParams.set('fields[0]', 'nickname');
 	searchParams.set('fields[1]', 'punti');
+	searchParams.set('fields[2]', 'datiAggiuntivi');
 	searchParams.set('populate[accademia][fields][0]', 'nome');
 	searchParams.set('populate[accademia][fields][1]', 'slug');
 	searchParams.set('populate[livello][fields][0]', 'nome');
@@ -81,6 +85,7 @@ export function mapMembroToProfiloPreferito(membro: MembroPreferitoRaw): Profilo
 		id: membro.documentId,
 		name,
 		initials: name.slice(0, 1).toLocaleUpperCase('it-IT'),
+		avatarSrc: resolveAvatarSrc(membro.datiAggiuntivi?.avatar),
 		points,
 		academy,
 		academyLabel,

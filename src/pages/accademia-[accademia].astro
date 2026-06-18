@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
+import BackButton from '../components/BackButton.astro';
 import arcadiaBanner from '../assets/Arcadia-accademia-stendardo-the-secret-bookish-society.png';
 import arcadiaLogo from '../assets/Arcadia-logo-the-secret-bookish-society.png';
 import arboreaBanner from '../assets/Arborea-accademia-stendardo-the-secret-bookish-society.png';
@@ -70,6 +71,8 @@ const rankingRows = await getAcademyRanking(academyKey, jwt);
 
 	<main class={`tsbs-app-shell academy-page theme-${academyKey}`} data-academy={academyKey}>
 		<section class="academy-hero" aria-labelledby="academy-title">
+			<BackButton href="/biblioteca/accademie/" label="Torna alle Accademie" class="academy-hero__back" />
+
 			<img class="academy-hero__crest academy-hero__crest--left" src={academy.banner.src} alt="" aria-hidden="true" />
 
 			<div class="academy-hero__content">

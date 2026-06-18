@@ -157,6 +157,38 @@ function sanitizeLayout(value: unknown): TrofeoLayoutItem[] {
 	});
 }
 
+// Legge datiAggiuntivi di un Membro a partire dal suo documentId (token admin).
+async function getMembroDatiAggiuntiviByDocumentId(membroDocumentId: string) {
+	const apiBaseUrl = getStrapiApiUrl();
+	const searchParams = new URLSearchParams();
+	searchParams.set('status', 'draft');
+	searchParams.set('filters[documentId][$eq]', membroDocumentId);
+	searchParams.set('fields[0]', 'datiAggiuntivi');
+	searchParams.set('pagination[pageSize]', '1');
+
+	const response = await fetch(`${apiBaseUrl}/membri?${searchParams}`, {
+		headers: { Authorization: `Bearer ${import.meta.env.AUTH_READONLY}`, 'Content-Type': 'application/json' },
+	});
+
+	if (!response.ok) return null;
+
+	const payload = (await response.json()) as StrapiCollectionResponse<MembroTrofei>;
+	return payload.data?.[0] ?? null;
+}
+
+// Trofei conquistati + layout salvato di un Membro identificato dal documentId.
+// Usato per la vista (sola lettura) del profilo di un altro utente.
+export async function getTrofeiStanzaByMembroDocumentId(membroDocumentId: string | null | undefined): Promise<TrofeiStanza> {
+	if (!membroDocumentId) return { trofei: [], layout: [] };
+
+	const [trofei, membro] = await Promise.all([
+		getTrofeiConquistatiByMembro(membroDocumentId),
+		getMembroDatiAggiuntiviByDocumentId(membroDocumentId),
+	]);
+
+	return { trofei, layout: sanitizeLayout(membro?.datiAggiuntivi?.[TROFEI_LAYOUT_KEY]) };
+}
+
 // Punto d'ingresso della pagina: trofei conquistati dal membro loggato + layout salvato.
 export async function getTrofeiStanzaByJwt(jwt: string | undefined): Promise<TrofeiStanza> {
 	if (!jwt) return { trofei: [], layout: [] };

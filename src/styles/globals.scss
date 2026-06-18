@@ -1228,6 +1228,23 @@ body:has(.tsbs-legal-page) {
 		background-size: var(--tsbs-page-pattern-size);
 	}
 
+	.academy-hero .academy-hero__back.tsbs-back-button {
+		position: absolute;
+		top: 1rem;
+		left: 1rem;
+		z-index: 2;
+		color: var(--tsbs-theme-accent);
+		background: rgba(255, 255, 255, 0.7);
+		border-color: color-mix(in srgb, var(--tsbs-theme-accent) 45%, transparent);
+	}
+
+	.academy-hero .academy-hero__back.tsbs-back-button:hover,
+	.academy-hero .academy-hero__back.tsbs-back-button:focus {
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-accent);
+		border-color: var(--tsbs-theme-accent);
+	}
+
 	.academy-hero__content {
 		display: grid;
 		justify-items: center;

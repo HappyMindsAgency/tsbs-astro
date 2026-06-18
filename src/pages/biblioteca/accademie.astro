@@ -16,35 +16,34 @@ if (!jwt) {
 
 const { theme, accademia: userAcademy } = await resolveUserContext(jwt);
 const getAcademyHref = (academy: AcademySlug) =>
-	academy === userAcademy ? `/sala-accademia-${academy}/` : `/accademia-${academy}/`;
+	academy === userAcademy ? `/accademia-${academy}/` : `/accademia-${academy}/`;
+
+/* Modificato per rimuovere la logica della sala accademia, poiché non è più necessaria. La logica originale era:
+academy === userAcademy ? `/sala-accademia-${academy}/` : `/accademia-${academy}/`;*/
 
 const academies = [
 	{
 		name: 'Astraria',
 		theme: 'astraria' as const,
 		logo: astrariaLogo,
-		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		href: getAcademyHref('astraria'),
 	},
 	{
 		name: 'Arcadia',
 		theme: 'arcadia' as const,
 		logo: arcadiaLogo,
-		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		href: getAcademyHref('arcadia'),
 	},
 	{
 		name: 'Armonia',
 		theme: 'armonia' as const,
 		logo: armoniaLogo,
-		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		href: getAcademyHref('armonia'),
 	},
 	{
 		name: 'Arborea',
 		theme: 'arborea' as const,
 		logo: arboreaLogo,
-		text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		href: getAcademyHref('arborea'),
 	},
 ];
@@ -105,9 +104,8 @@ const academies = [
 									<p>Procede con pazienza, ascolto e attenzione. Chi appartiene ad Arborea custodisce ciò che cresce lentamente e protegge il legame tra persone, luoghi e memoria.</p>
 									<p>A custodirne lo spirito è <strong>Corrado Ricci</strong>, guida legata alla tutela del patrimonio, alla memoria dei luoghi e alla responsabilità di proteggere la cultura e il sapere.</p>
 								</>
-							) : (
-								<p>{academy.text}</p>
-							)}
+							) : null 
+							}
 						</div>
 					</a>
 				))}
