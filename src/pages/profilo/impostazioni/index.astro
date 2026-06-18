@@ -368,7 +368,7 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 			const passwordConfirmation = confirmPwInput.value;
 
 			const wantsUsername = usernameValue.length > 0 && usernameValue !== originalUsername;
-			const wantsPassword = currentPassword || password || passwordConfirmation;
+			const wantsPassword = password.length > 0 || passwordConfirmation.length > 0;
 
 			// Nessuna modifica da salvare
 			if (!wantsUsername && !wantsPassword) {
