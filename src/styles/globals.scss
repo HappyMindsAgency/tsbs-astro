@@ -1459,11 +1459,11 @@ body:has(.tsbs-legal-page) {
 		width: 2.5rem;
 		height: 2.5rem;
 		overflow: hidden;
-		color: #ffffff;
+		color: var(--tsbs-theme-accent);
 		font-size: 0.9375rem;
 		font-weight: 800;
 		line-height: 1;
-		background: var(--tsbs-theme-accent);
+		background: #ffffff;
 		border-radius: 50%;
 	}
 
