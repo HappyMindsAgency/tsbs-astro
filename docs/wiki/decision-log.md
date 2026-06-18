@@ -20,6 +20,35 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-18 - Avatar E Griglia Trofei (Sola Lettura) Nel Profilo Utente
+
+Decisione:
+- nelle liste degli utenti delle schermate Accademia, cliccando il nome si apre il profilo dell'utente (`/scrivania/utenti-preferiti/esploso-profilo-utente/?membro=<documentId>`); questa vista ora mostra:
+  - l'**avatar** scelto dall'utente nel cerchio della hero (fallback all'icona se assente), risolto via `resolveAvatarSrc` da `src/lib/avatar.ts` (stesso modulo usato per gli avatar nelle classifiche)
+  - la **griglia dei trofei dell'utente** con la sua disposizione salvata, al posto del placeholder hardcoded
+- la griglia del profilo è in **sola lettura**: nessun trascinamento, nessuna rimozione, nessun reset, nessuna palette; rende staticamente (lato server) solo i trofei effettivamente posizionati nel layout salvato
+- la griglia usa le **stesse dimensioni** della Stanza Trofei dell'utente loggato (`/scrivania/trofei/`): board 6×5 con celle sempre quadrate (`aspect-ratio: cols / rows`), così le posizioni salvate combaciano
+- avatar e trofei del profilo target sono letti lato server con il token applicativo:
+  - `getProfileDetailByJwt` (in `preferiti.ts`) ora legge `datiAggiuntivi` del membro target e ne espone `avatarSrc`
+  - nuova `getTrofeiStanzaByMembroDocumentId(documentId)` (in `trofei.ts`) restituisce trofei conquistati + layout salvato di un membro qualsiasi (draft, coerente con la Stanza Trofei)
+- la logica di forma/dimensione dei trofei ("Tetris") è estratta nel modulo condiviso `src/lib/trofei-forme.ts` (`SHAPES`, mappatura per `forma`/nome, `buildTrophyCatalog`), riutilizzabile dalla Stanza Trofei e dalla vista profilo
+
+Motivo:
+- il profilo di un altro utente deve mostrare la sua identità (avatar) e i suoi trofei reali, non dati placeholder
+- la vista di un profilo altrui non deve permettere modifiche: la disposizione è proprietà dell'utente che la possiede
+- celle quadrate e board identica garantiscono che la disposizione salvata appaia uguale a come l'utente l'ha composta nella propria Stanza Trofei
+- estrarre le forme in un modulo condiviso evita la duplicazione tra Stanza Trofei e vista profilo
+
+Impatto:
+- `src/lib/strapi/preferiti.ts` (`ProfiloPreferito.avatarSrc`, lettura `datiAggiuntivi` del target)
+- `src/lib/strapi/trofei.ts` (nuova `getTrofeiStanzaByMembroDocumentId`)
+- `src/lib/trofei-forme.ts` (nuovo modulo condiviso forme/catalogo trofei)
+- `src/pages/scrivania/utenti-preferiti/esploso-profilo-utente.astro` (avatar reale + griglia trofei statica read-only + celle quadrate)
+- riuso: `src/lib/avatar.ts` (`resolveAvatarSrc`)
+
+Stato:
+- approvata
+
 ## 2026-06-18 - Verifica Tessera: Completa M1, Assegna Trofeo E Notifica Al Login
 
 Decisione:
