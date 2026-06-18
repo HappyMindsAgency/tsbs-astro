@@ -149,13 +149,13 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 					<div class="profile-tessera-state" data-tessera-state="nessuna" hidden>
 						<div class="profile-settings-fields">
 							<label for="tessera-input">
-								<span>Numero tessera (14 cifre)</span>
+								<span>Numero tessera (almeno 9 caratteri alfanumerici)</span>
 								<input
 									id="tessera-input"
 									name="tessera"
 									type="text"
 									inputmode="numeric"
-									pattern="\d{14}"
+									pattern="[a-zA-Z0-9]{9,20}"
 									maxlength="14"
 									autocomplete="off"
 									placeholder="Es. 12345678901234"
@@ -609,7 +609,7 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 			const valore = input.value.replace(/[\s-]+/g, '').trim();
 
 			if (!/^\d{14}$/.test(valore)) {
-				showError('Inserisci un numero tessera valido (14 cifre numeriche).');
+				showError('Inserisci un numero tessera valido (almeno 9 caratteri alfanumerici).');
 				input.focus();
 				return;
 			}
