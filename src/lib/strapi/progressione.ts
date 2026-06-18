@@ -38,6 +38,8 @@ export type MissioneProgressione = {
 		descrizione: string | null;
 		punti: number | null;
 		immagine?: { url: string | null } | null;
+		// Immagine dedicata alla modale/toast; se assente si usa `immagine`.
+		imgModale?: { url: string | null } | null;
 	} | null;
 };
 
@@ -307,7 +309,7 @@ async function premiaCompletamento(
 				documentId: missione.trofeo.documentId,
 				nome: missione.trofeo.nome,
 				descrizione: missione.trofeo.descrizione,
-				immagineUrl: resolveStrapiMediaUrl(missione.trofeo.immagine?.url),
+				immagineUrl: resolveStrapiMediaUrl(missione.trofeo.imgModale?.url ?? missione.trofeo.immagine?.url),
 			});
 		}
 	}
