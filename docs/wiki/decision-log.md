@@ -20,6 +20,34 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-18 - Validazione Nickname In Registrazione (Bad Word A Due Livelli + Unicità Live)
+
+Decisione:
+- in registrazione il nickname/username passa due controlli **sul blur** del campo (prima dell'invio del form), con loader inline durante l'attesa di rete:
+  1. **bad word** — italiano **molto stringente** (match per *sottostringa* sulla forma compatta: minuscolo, accenti rimossi, leet-speak normalizzato, sole lettere, così `M4r1o_str0nz0` viene comunque bloccato); inglese **più blando** (match solo se il nickname o un suo token è *esattamente* una bad word, per evitare il problema "Scunthorpe", es. `assassin` passa)
+  2. **unicità** — controllo che il nickname non sia già usato da un altro utente, via Strapi `filters[username][$eqi]` (case-insensitive)
+- entrambi i controlli passano dall'endpoint server-side `POST /api/auth/check-nickname`, che risponde `{ ok: true }` oppure `{ ok: false, reason: 'invalid'|'badword'|'taken'|'error' }`; su errore di rete non blocca l'utente (register resta la fonte di verità)
+- il submit del form è gating: ripassa il controllo (riusando l'esito del blur se il valore non è cambiato) e non invia se il nickname non è valido
+- le liste bad word vivono nel frontend in `src/data/badWords.ts` (radici italiane per sottostringa + parole inglesi per match esatto), affianco alla blacklist di nomi riservati `src/data/nicknameBlacklist.ts`; nessuna gestione da pannello admin Strapi
+- la validazione definitiva resta in `POST /api/auth/register`, che ora applica anche `containsBadWord()` oltre alla blacklist
+
+Motivo:
+- dare feedback immediato all'utente sul nickname senza attendere l'invio del form
+- l'italiano richiede severità maggiore (insulti/bestemmie e loro varianti flesse o "camuffate"), l'inglese richiede tolleranza per evitare falsi positivi su nickname legittimi
+- l'unicità deve essere decisa lato server con il token applicativo, non dal client
+- mantenere la blacklist nickname nel frontend, coerentemente con i guardrail backend
+
+Impatto:
+- `src/data/badWords.ts` (nuovo: `containsItalianBadWord`, `containsEnglishBadWord`, `containsBadWord`)
+- `src/pages/api/auth/check-nickname.ts` (nuovo endpoint: formato + bad word + unicità)
+- `src/pages/api/auth/register.ts` (aggiunto `containsBadWord` accanto alla blacklist)
+- `src/pages/registrazione.astro` (controllo sul blur con loader inline + gating del submit)
+- `src/data/nicknameBlacklist.ts` (resta per i soli nomi di sistema riservati)
+- `docs/wiki/backend-strapi.md` (sezione Nickname)
+
+Stato:
+- approvata
+
 ## 2026-06-17 - Smistamento Non Bypassabile E Accademia Non Modificabile
 
 Decisione:

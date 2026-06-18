@@ -70,10 +70,16 @@ SMTP Biblioteca Classense:
 
 ## Nickname
 
-- Blacklist statica di parole offensive.
-- Salvata in file interno del frontend.
-- Il sistema impedisce nickname non appropriati in fase di registrazione.
-- La lista non e modificabile da pannello admin.
+- Liste statiche salvate in file interni del frontend, non modificabili da pannello admin:
+  - `src/data/nicknameBlacklist.ts` — nomi di sistema riservati (admin, bot, strapi, ecc.).
+  - `src/data/badWords.ts` — parole offensive a due livelli.
+- Filtro bad word a due livelli (`containsBadWord`):
+  - italiano: molto stringente, match per sottostringa sulla forma compatta (minuscolo, senza accenti, leet-speak normalizzato, sole lettere); una radice copre le varianti flesse.
+  - inglese: piu blando, match solo se il nickname o un suo token e esattamente una bad word (evita falsi positivi tipo Scunthorpe).
+- In registrazione il nickname e verificato sul blur del campo (prima dell'invio) tramite `POST /api/auth/check-nickname`: formato valido → bad word/nome riservato → unicita su Strapi (`filters[username][$eqi]`, case-insensitive). Durante l'attesa di rete e mostrato un loader inline.
+- Unicita: il nickname non puo essere uguale a quello di un altro utente gia iscritto; il controllo e case-insensitive.
+- La validazione definitiva resta server-side in `POST /api/auth/register` (blacklist + bad word + unicita gestita da Strapi sullo `username`).
+- Il sistema impedisce nickname non appropriati o gia in uso in fase di registrazione.
 
 ## Tessera Biblioteca
 

@@ -11,6 +11,7 @@ import {
 } from '../../../utils/auth.utils';
 import { AuthService } from '../../../services/auth.service';
 import { isNicknameBlacklisted } from '../../../data/nicknameBlacklist';
+import { containsBadWord } from '../../../data/badWords';
 import { logger } from '../../../services/logger';
 import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 import { sendNotification } from '../../../lib/mailer';
@@ -57,8 +58,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         return errorResponse(RegistrationError.INVALID_NICKNAME, 400);
     }
 
-    if (isNicknameBlacklisted(username)) {
-        logger.warn('[RegisterAPI] Blacklisted username attempt');
+    if (isNicknameBlacklisted(username) || containsBadWord(username)) {
+        logger.warn('[RegisterAPI] Blacklisted/offensive username attempt');
         return errorResponse(RegistrationError.NICKNAME_BLACKLISTED, 400);
     }
 
