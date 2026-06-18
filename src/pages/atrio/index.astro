@@ -5,7 +5,7 @@ import ImpostazioniLogoutModal from '../../components/PopupComponents/Impostazio
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
 import NotificaTrofeiToast from '../../components/PopupComponents/NotificaTrofeiToast.astro';
 import { resolveUserContext } from '../../lib/theme';
-import { getEventiClassense, CLASSENSE_CALENDARIO_URL } from '../../lib/classense';
+import { getEventiClassense } from '../../lib/classense';
 import { getFirstIncompleteMissionCards } from '../../lib/filtri/missioni';
 import {
 	getMembroMissioniByJwt,
@@ -138,7 +138,7 @@ const taskCards = getFirstIncompleteMissionCards(
 			<section class="dashboard-section dashboard-events" aria-labelledby="events-title">
 				<div class="dashboard-section__head">
 					<h2 id="events-title" class="tsbs-section-title">Incontri e raduni</h2>
-					<a class="tsbs-accent-link" href={CLASSENSE_CALENDARIO_URL} target="_blank" rel="noopener noreferrer">Apri il calendario →</a>
+					<a class="tsbs-accent-link" href="/eventi-biblioteca-classense/">Apri il calendario →</a>
 				</div>
 				<div class="dashboard-event-grid">
 					{eventiClassense.map((evento) => (

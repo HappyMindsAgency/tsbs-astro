@@ -1,6 +1,7 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import { formatEventoDate, getEventiSociety, getEventoSocietyHref } from '../../lib/strapi/eventi';
 
 const { lang = 'it' } = Astro.props;
 
@@ -9,7 +10,7 @@ const eventTabs = [
 	{ id: 'biblioteca', label: 'Biblioteca' },
 ];
 
-const events = [
+const bibliotecaEvents = [
 	{ date: '15 Gen', slug: 'lorem-ipsum-dolor-15-gen' },
 	{ date: '07 Feb', slug: 'lorem-ipsum-dolor-07-feb' },
 	{ date: '03 Mar - 12 Apr', slug: 'lorem-ipsum-dolor-mar-apr' },
@@ -26,6 +27,9 @@ const events = [
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
+
+const societyEvents = await getEventiSociety(lang);
+const visibleEventsBeforeLoadMore = 3;
 ---
 
 <Layout lang={lang}>
@@ -67,26 +71,50 @@ if (!Astro.cookies.has('jwt')) {
 					>
 						<h2 id={tabIndex === 0 ? 'events-title' : undefined} class="tsbs-section-title events-section-title">Eventi</h2>
 
-						<div class="events-grid">
-							{events.map((event, index) => (
-								<a
-									class={`events-card ${index > 8 ? 'is-hidden-desktop' : ''} ${index > 2 ? 'is-hidden-mobile' : ''}`}
-									href={`/eventi-biblioteca-classense/${event.slug}/`}
-									data-event-card
-								>
-									<div class="events-card__media">
-										<span class="events-card__date">{event.date}</span>
-										<i class="bi bi-image" aria-hidden="true"></i>
-									</div>
-									<h3>Lorem ipsum dolor sit amet</h3>
-								</a>
-							))}
-						</div>
+						{tab.id === 'society' ? (
+							societyEvents.length > 0 ? (
+								<div class="events-grid">
+									{societyEvents.map((event, index) => (
+										<a
+											class={`events-card ${index > 8 ? 'is-hidden-desktop' : ''} ${index > 2 ? 'is-hidden-mobile' : ''}`}
+											href={getEventoSocietyHref(event)}
+											data-event-card
+										>
+											<div class="events-card__media">
+												{formatEventoDate(event.dataEvento) && <span class="events-card__date">{formatEventoDate(event.dataEvento)}</span>}
+												<i class="bi bi-image" aria-hidden="true"></i>
+											</div>
+											<h3>{event.titolo}</h3>
+										</a>
+									))}
+								</div>
+							) : (
+								<p class="events-empty">Nessun evento Society pubblicato.</p>
+							)
+						) : (
+							<div class="events-grid">
+								{bibliotecaEvents.map((event, index) => (
+									<a
+										class={`events-card ${index > 8 ? 'is-hidden-desktop' : ''} ${index > 2 ? 'is-hidden-mobile' : ''}`}
+										href={`/eventi-biblioteca-classense/${event.slug}/`}
+										data-event-card
+									>
+										<div class="events-card__media">
+											<span class="events-card__date">{event.date}</span>
+											<i class="bi bi-image" aria-hidden="true"></i>
+										</div>
+										<h3>Lorem ipsum dolor sit amet</h3>
+									</a>
+								))}
+							</div>
+						)}
 
-						<button class="missions-load-more events-load-more" type="button" data-events-load-more aria-controls={tab.id}>
-							<span>Carica altro</span>
-							<i class="bi bi-arrow-right" aria-hidden="true"></i>
-						</button>
+						{((tab.id === 'society' ? societyEvents.length : bibliotecaEvents.length) > visibleEventsBeforeLoadMore) && (
+							<button class="missions-load-more events-load-more" type="button" data-events-load-more aria-controls={tab.id}>
+								<span>Carica altro</span>
+								<i class="bi bi-arrow-right" aria-hidden="true"></i>
+							</button>
+						)}
 					</div>
 				))}
 			</div>

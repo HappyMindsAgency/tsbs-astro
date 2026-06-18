@@ -20,6 +20,27 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-18 - Eventi Society Dinamici Da Strapi
+
+Decisione:
+- nella pagina `/eventi-biblioteca-classense/` il tab `Society` legge gli eventi pubblicati dalla collection Strapi `Evento`
+- tutti gli eventi pubblicati nella collection Strapi `Evento` sono trattati come eventi Society; `tipoEvento` resta una label/categoria editoriale, non il discriminante tra Society e Biblioteca
+- il tab `Biblioteca` resta provvisoriamente non dinamico: l'integrazione WordPress Classense non viene toccata in questa fase
+- la pagina dettaglio usa i dati Strapi quando lo slug corrisponde a un evento Society pubblicato; mantiene il fallback placeholder per i link mock non ancora migrati
+
+Motivo:
+- consentire alla Redazione di pubblicare da Strapi solo gli eventi interni della Society senza anticipare il binding degli eventi Biblioteca
+- rispettare la separazione gia prevista tra eventi TSBS su Strapi ed eventi Biblioteca tramite integrazione WordPress
+
+Impatto:
+- `src/lib/strapi/eventi.ts`
+- `src/pages/eventi-biblioteca-classense/index.astro`
+- `src/pages/eventi-biblioteca-classense/[slugEv].astro`
+- compilazione Strapi: `Evento.tipoEvento` può essere usato come categoria/label visuale del dettaglio evento
+
+Stato:
+- approvata
+
 ## 2026-06-18 - Verifica Tessera: Completa M1, Assegna Trofeo E Notifica Al Login
 
 Decisione:
