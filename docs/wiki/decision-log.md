@@ -20,6 +20,33 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-18 - Verifica Tessera: Completa M1, Assegna Trofeo E Notifica Al Login
+
+Decisione:
+- alla verifica manuale della tessera (Redazione imposta `statoTessera → verificata` nel pannello Strapi) il lifecycle `afterUpdate` del Membro esegue automaticamente, oltre all'email di conferma già prevista:
+  - `Partecipazione Missione` (membro + `missione-01-il-varco`): `stato = completata`, `dataCompletamento = oggi` (Europe/Rome); se la partecipazione non esiste viene creata già completata (difensivo)
+  - `Trofeo Membro`: nuovo record per il trofeo della M1 (relazione `Missione.trofeo`), `dataOttenimento = ora` (datetime ISO); idempotente, creato solo se non già presente per quel membro+trofeo
+  - accoda il trofeo in `Membro.datiAggiuntivi.trofeiDaNotificare` (`{ documentId, nome, immagine }`, con dedup) per la notifica al login successivo
+- la notifica usa il pattern flag/coda: il frontend `NotificaTrofeiToast.astro` (montato in `/atrio/`, landing post-login) legge la coda via `GET /api/user/dati-aggiuntivi`, mostra la modale trofeo riusando `TrofeoModal` (evento `tsbs:trofei-sbloccati`) e svuota la coda con `PUT /api/user/dati-aggiuntivi` (merge shallow); una sola verifica per sessione (`sessionStorage`)
+- la missione "tessera" è identificata dallo slug `missione-01-il-varco` (unica costante da cambiare se diverso); i dati di gioco vivono in `draft` come nel resto del progetto
+
+Motivo:
+- finora completamento M1 e assegnazione trofeo erano interamente manuali (vedi 2026-06-12 "Missione 1 (Tessera) E Avvio Partecipazione"): automatizzarli alla verifica evita passaggi manuali e disallineamenti tra stato tessera, partecipazione e trofeo
+- l'assegnazione deve avvenire lato Strapi perché la verifica è un'azione della Redazione nel pannello admin, non un flusso frontend
+- il flag/coda disaccoppia l'assegnazione (può avvenire a utente offline) dalla visualizzazione (al primo login utile), senza dipendere dal confronto di date
+- aggiornare `datiAggiuntivi` non causa ricorsione: l'update non tocca `statoTessera`, quindi il lifecycle rientra ed esce subito
+
+Impatto:
+- `strapi-tsbs/src/api/membro/content-types/membro/lifecycles.ts` (ramo `verificata`: completa M1, crea trofeo-membro, accoda notifica)
+- `src/components/PopupComponents/NotificaTrofeiToast.astro` (nuovo: legge coda, mostra `TrofeoModal`, svuota coda)
+- `src/pages/atrio/index.astro` (monta `NotificaTrofeiToast`)
+- riuso: `src/components/PopupComponents/TrofeoModal.astro`, `src/pages/api/user/dati-aggiuntivi.ts` (merge shallow)
+- compilazione richiesta su Strapi: `missione-01-il-varco` con relazione `trofeo` valorizzata
+- supera la parte di 2026-06-12 in cui il trofeo M1 era assegnato solo manualmente
+
+Stato:
+- approvata
+
 ## 2026-06-18 - Validazione Nickname In Registrazione (Bad Word A Due Livelli + Unicità Live)
 
 Decisione:

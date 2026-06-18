@@ -1,0 +1,76 @@
+---
+// Notifica trofei "in coda": al primo caricamento utile (es. login → Atrio)
+// legge datiAggiuntivi.trofeiDaNotificare del Membro, mostra la modale trofeo
+// riusando TrofeoModal (evento `tsbs:trofei-sbloccati`) e svuota la coda.
+// La coda viene riempita lato Strapi quando la Redazione verifica la tessera.
+import TrofeoModal from './TrofeoModal.astro';
+import { getStrapiApiUrl } from '../../lib/strapi/api-url';
+
+const { theme = '' } = Astro.props;
+// Origin Strapi per risolvere lato client gli URL media relativi (es. /uploads/..).
+const strapiOrigin = getStrapiApiUrl().replace(/\/api$/, '');
+---
+
+<div data-trofei-da-notificare data-strapi-origin={strapiOrigin} hidden></div>
+<TrofeoModal theme={theme} />
+
+<script>
+	type TrofeoCodaItem = {
+		documentId?: string;
+		nome?: string;
+		immagine?: string | null;
+	};
+
+	const SESSION_KEY = 'tsbs:trofei-notificati-check';
+
+	const initNotificaTrofei = () => {
+		const root = document.querySelector('[data-trofei-da-notificare]');
+		if (!(root instanceof HTMLElement)) return;
+
+		// Una sola verifica per sessione: evita refetch a ogni navigazione client-side.
+		if (sessionStorage.getItem(SESSION_KEY) === 'done') return;
+		sessionStorage.setItem(SESSION_KEY, 'done');
+
+		const strapiOrigin = root.dataset.strapiOrigin ?? '';
+
+		const resolveMediaUrl = (url?: string | null): string | null => {
+			if (!url) return null;
+			if (/^https?:\/\//i.test(url)) return url;
+			return `${strapiOrigin}${url.startsWith('/') ? '' : '/'}${url}`;
+		};
+
+		void (async () => {
+			try {
+				const res = await fetch('/api/user/dati-aggiuntivi', { headers: { 'Cache-Control': 'no-store' } });
+				if (!res.ok) return; // 401 (non loggato) o errore: nessuna notifica
+
+				const payload = await res.json();
+				const coda: TrofeoCodaItem[] = Array.isArray(payload?.datiAggiuntivi?.trofeiDaNotificare)
+					? payload.datiAggiuntivi.trofeiDaNotificare
+					: [];
+
+				if (coda.length === 0) return;
+
+				const trofei = coda.map((item) => ({
+					nome: item?.nome ?? '',
+					immagineUrl: resolveMediaUrl(item?.immagine),
+				}));
+
+				// TrofeoModal è in ascolto: mostra le modali in sequenza.
+				document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', { detail: { trofei } }));
+
+				// Svuota la coda (merge shallow: le altre chiavi di datiAggiuntivi restano).
+				await fetch('/api/user/dati-aggiuntivi', {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ trofeiDaNotificare: [] }),
+				});
+			} catch {
+				/* non bloccante: la coda resta e verrà riprovata alla prossima sessione */
+			}
+		})();
+	};
+
+	document.addEventListener('astro:page-load', initNotificaTrofei);
+	initNotificaTrofei();
+</script>

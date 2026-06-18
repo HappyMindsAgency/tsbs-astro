@@ -86,11 +86,25 @@ SMTP Biblioteca Classense:
 La validazione della tessera Biblioteca e manuale.
 
 Flusso previsto:
-- l'utente inserisce il numero tessera nel profilo
-- il sistema invia una notifica alla redazione
-- lo stato utente passa a `In validazione`
-- lo staff verifica manualmente
-- lo staff assegna da backend il trofeo relativo all'attivazione tessera
+- l'utente inserisce il numero tessera nel profilo (o nella prova della Missione 1)
+- il sistema invia una notifica alla Redazione e imposta `statoTessera: in_verifica`
+- lo staff verifica manualmente dal pannello Strapi e imposta `statoTessera`:
+  - `nessuna` → tessera rifiutata
+  - `verificata` → tessera accettata
+
+Automazione alla verifica (lifecycle `afterUpdate` del Membro, repo Strapi `src/api/membro/content-types/membro/lifecycles.ts`):
+- il trigger scatta solo quando l'update tocca `statoTessera` (no invii/azioni doppie su altri salvataggi)
+- su `nessuna`/`verificata`: email all'utente (rifiuto / conferma)
+- su `verificata`, in aggiunta:
+  - `Partecipazione Missione` (membro + `missione-01-il-varco`): `stato = completata`, `dataCompletamento = oggi`; se assente la crea già completata (difensivo)
+  - `Trofeo Membro`: nuovo record per `Missione.trofeo` della M1, `dataOttenimento = ora` (datetime); idempotente (creato solo se non già presente)
+  - accoda il trofeo in `Membro.datiAggiuntivi.trofeiDaNotificare` (`{ documentId, nome, immagine }`, con dedup) per la notifica al login
+- l'assegnazione è non bloccante rispetto all'email; i dati di gioco (partecipazione, trofeo-membro) vivono in `draft`, coerentemente con il resto del progetto
+- aggiornare `datiAggiuntivi` non causa ricorsione: l'update non tocca `statoTessera`, quindi il lifecycle rientra ed esce subito
+
+Notifica trofeo al primo login (frontend):
+- `src/components/PopupComponents/NotificaTrofeiToast.astro` (montato in `/atrio/`, landing post-login) legge `trofeiDaNotificare` via `GET /api/user/dati-aggiuntivi`, mostra la modale trofeo riusando `TrofeoModal` (evento `tsbs:trofei-sbloccati`) e svuota la coda con `PUT /api/user/dati-aggiuntivi` (merge shallow)
+- una sola verifica per sessione (guard `sessionStorage`); gli URL media relativi sono risolti client con l'origin Strapi reso server-side
 
 ## Diagramma Dati
 

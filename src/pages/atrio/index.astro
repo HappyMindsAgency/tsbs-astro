@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import ImpostazioniLogoutModal from '../../components/PopupComponents/ImpostazioniLogoutModal.astro';
 import WelcomeToast from '../../components/toastComponents/WelcomeToast.astro';
+import NotificaTrofeiToast from '../../components/PopupComponents/NotificaTrofeiToast.astro';
 import { resolveUserContext } from '../../lib/theme';
 import { getEventiClassense, CLASSENSE_CALENDARIO_URL } from '../../lib/classense';
 import { getFirstIncompleteMissionCards } from '../../lib/filtri/missioni';
@@ -162,6 +163,7 @@ const taskCards = getFirstIncompleteMissionCards(
 	</main>
 	<ImpostazioniLogoutModal renderHidden={true} />
 	<WelcomeToast isOpen={true} />
+	<NotificaTrofeiToast theme={theme} />
 </Layout>
 
 <script>
