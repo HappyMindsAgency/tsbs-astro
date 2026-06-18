@@ -1006,9 +1006,8 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.tsbs-note-card__actions {
-			display: flex;
-			align-items: start;
-			gap: 0.875rem;
+			display: grid;
+			place-items: start;
 			color: #546176;
 			padding-top: 0.125rem;
 		}
