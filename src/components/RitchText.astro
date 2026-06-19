@@ -1,7 +1,7 @@
 ---
 import { marked } from "marked";
 const { block, className, pstyle }  = Astro.props;
-const content = block ? marked(block) : "nothing";
+const content = block ? marked(block, { breaks: true, gfm: true }) : "nothing";
 ---
 {block && 
 <div class={`block-richtext custombody ${className}`} set:html={content}></div>
