@@ -123,6 +123,14 @@ const hasMultipleQuestions = questions.length > 1;
 					}),
 				});
 				const payload = await response.json().catch(() => null);
+
+				// Missione già completata (es. re-invio dopo aver chiuso il modale trofeo):
+				// non è un fallimento, porta alla collezione trofei invece del toast "fallita".
+				if (response.status === 409 || payload?.error === 'mission_already_completed') {
+					window.location.href = '/scrivania/trofei/';
+					return;
+				}
+
 				const passed = response.ok && payload?.passed === true;
 				const trofei = Array.isArray(payload?.trofeiSbloccati) ? payload.trofeiSbloccati : [];
 

@@ -51,6 +51,10 @@ const { theme = '' } = Astro.props;
 		const fallback = modal.querySelector<HTMLElement>('[data-trophy-modal-fallback]');
 		const name = modal.querySelector<HTMLElement>('[data-trophy-modal-name]');
 		const closeControls = modal.querySelectorAll<HTMLElement>('[data-trophy-modal-close]');
+		// Chiudere il modale fuori dal bottone equivale a "Colleziona": stessa destinazione,
+		// così non si resta bloccati sulla pagina prova con la missione già completata.
+		const cta = modal.querySelector<HTMLAnchorElement>('[data-trophy-modal-cta]');
+		const collectHref = cta?.getAttribute('href') || '/scrivania/trofei/';
 
 		if (!image || !fallback || !name) return;
 
@@ -72,9 +76,14 @@ const { theme = '' } = Astro.props;
 			modal.hidden = false;
 		};
 
-		// Chiudere la modale mostra il trofeo successivo in coda, se presente.
+		// Chiudere la modale mostra il trofeo successivo in coda; esaurita la coda,
+		// si naviga come "Colleziona" (nessun vicolo cieco sulla pagina prova).
 		const advanceQueue = () => {
 			queue = queue.slice(1);
+			if (queue.length === 0) {
+				window.location.href = collectHref;
+				return;
+			}
 			renderCurrent();
 		};
 
