@@ -65,10 +65,110 @@ export function isEpistolaVisible(epistola: Epistola, context: EpistolaVisibilit
 	);
 }
 
+// Rimuove la sintassi Markdown e normalizza gli spazi per ottenere testo semplice.
+function toPlainText(value: string | null | undefined) {
+	if (!value) return '';
+
+	return value
+		.replace(/```[\s\S]*?```/g, ' ')
+		.replace(/`([^`]+)`/g, '$1')
+		.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+		.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+		.replace(/[#>*_\-~]/g, ' ')
+		.replace(/\s+/g, ' ')
+		.trim();
+}
+
+// Estratto testuale limitato a un numero massimo di parole (default 40).
+export function getEpistolaExcerptByWords(value: string | null | undefined, maxWords = 40) {
+	const words = toPlainText(value).split(' ').filter(Boolean);
+	if (words.length <= maxWords) return words.join(' ');
+
+	return `${words.slice(0, maxWords).join(' ')}...`;
+}
+
 export function sortEpistoleByDateDesc(a: Epistola, b: Epistola) {
 	const dateA = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
 	const dateB = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
 	if (dateA !== dateB) return dateB - dateA;
 
 	return a.titolo.localeCompare(b.titolo, 'it-IT');
+}
+
+// Livello rappresentativo dell'epistola per l'ordinamento dell'archivio:
+// il piu alto tra i livelli collegati. Le epistole globali (senza livellos) restano null.
+function getEpistolaLevelOrder(epistola: Epistola) {
+	const orders = (epistola.livellos ?? [])
+		.map((level) => getLevelOrder(level))
+		.filter((order): order is number => order !== null);
+
+	return orders.length > 0 ? Math.max(...orders) : null;
+}
+
+// Match esatto di livello per l'epistola in evidenza:
+// epistola senza livellos = globale (vale per ogni livello),
+// altrimenti almeno un livello collegato deve coincidere con il livello effettivo dell'utente.
+function matchesExactLevel(epistola: Epistola, effectiveLevelOrder: number | null) {
+	const epistolaLevels = epistola.livellos ?? [];
+	if (epistolaLevels.length === 0) return true;
+	if (effectiveLevelOrder === null) return false;
+
+	return epistolaLevels.some((level) => getLevelOrder(level) === effectiveLevelOrder);
+}
+
+/**
+ * Seleziona l'epistola in evidenza (Atrio + featured /epistole):
+ * stessa accademia (o globale), livello ESATTAMENTE uguale a quello dell'utente,
+ * e tra i match quella con `ordine` minore.
+ */
+export function selectFeaturedEpistola(epistole: Epistola[], context: EpistolaVisibilityContext) {
+	const effectiveLevelOrder = getUnlockedEpistolaLevelOrder(
+		context.livelloMembro,
+		context.testSmistamentoCompletato === true,
+	);
+
+	const candidates = epistole.filter(
+		(epistola) =>
+			isVisibleByAcademy(epistola, context.accademiaMembro) &&
+			matchesExactLevel(epistola, effectiveLevelOrder),
+	);
+
+	return candidates.sort(sortEpistoleByOrdineAsc)[0] ?? null;
+}
+
+// Ordinamento per `ordine` crescente (ordine minore prima); i null vanno in fondo.
+function sortEpistoleByOrdineAsc(a: Epistola, b: Epistola) {
+	const orderA = normalizeOrder(a.ordine);
+	const orderB = normalizeOrder(b.ordine);
+	if (orderA === null && orderB === null) return sortEpistoleByDateDesc(a, b);
+	if (orderA === null) return 1;
+	if (orderB === null) return -1;
+	if (orderA !== orderB) return orderA - orderB;
+
+	return sortEpistoleByDateDesc(a, b);
+}
+
+/**
+ * Ordinamento dell'archivio /epistole: livello decrescente (es. 3, 2, 1) e,
+ * a parita di livello, `ordine` decrescente. Le epistole globali (senza livello) vanno in fondo.
+ */
+export function sortEpistoleByLevelDescThenOrdineDesc(a: Epistola, b: Epistola) {
+	// Ordinamento per livello desc, poi ordine desc. Le epistole senza accademia
+	// rientrano nel flusso del proprio livello; quelle senza livello (level null) finiscono in fondo.
+	const levelA = getEpistolaLevelOrder(a);
+	const levelB = getEpistolaLevelOrder(b);
+	if (levelA !== levelB) {
+		if (levelA === null) return 1;
+		if (levelB === null) return -1;
+		return levelB - levelA;
+	}
+
+	const orderA = normalizeOrder(a.ordine);
+	const orderB = normalizeOrder(b.ordine);
+	if (orderA === null && orderB === null) return sortEpistoleByDateDesc(a, b);
+	if (orderA === null) return 1;
+	if (orderB === null) return -1;
+	if (orderA !== orderB) return orderB - orderA;
+
+	return sortEpistoleByDateDesc(a, b);
 }

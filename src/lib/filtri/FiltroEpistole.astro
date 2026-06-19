@@ -1,5 +1,5 @@
 ---
-import { isEpistolaVisible, sortEpistoleByDateDesc } from './epistole';
+import { getEpistolaExcerptByWords, isEpistolaVisible, selectFeaturedEpistola, sortEpistoleByLevelDescThenOrdineDesc } from './epistole';
 import type { Epistola } from '../strapi/epistole';
 import type { MissioneLivello } from '../strapi/missioni';
 
@@ -16,27 +16,6 @@ const {
 	livelloMembro = null,
 	testSmistamentoCompletato = false,
 } = Astro.props;
-
-function getPlainText(value: string | null) {
-	if (!value) return '';
-
-	return value
-		.replace(/```[\s\S]*?```/g, ' ')
-		.replace(/`([^`]+)`/g, '$1')
-		.replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
-		.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-		.replace(/[#>*_\-~]/g, ' ')
-		.replace(/\s+/g, ' ')
-		.trim();
-}
-
-function getExcerpt(value: string | null, maxLength = 130) {
-	const plainText = getPlainText(value);
-
-	if (plainText.length <= maxLength) return plainText;
-
-	return `${plainText.slice(0, maxLength).trim()}...`;
-}
 
 function formatEpistolaDate(value?: string | null) {
 	if (!value) return '';
@@ -55,12 +34,17 @@ function getPrimaryCategory(epistola: Epistola) {
 	return epistola.categorie_epistola?.[0]?.nome || "L'EPISTOLA";
 }
 
-const visibleEpistole = epistole
-	.filter((epistola) => isEpistolaVisible(epistola, { accademiaMembro, livelloMembro, testSmistamentoCompletato }))
-	.sort(sortEpistoleByDateDesc);
+const visibilityContext = { accademiaMembro, livelloMembro, testSmistamentoCompletato };
 
-const featuredEpistola = visibleEpistole[0] || null;
-const archiveEpistole = visibleEpistole.slice(1);
+// In evidenza: stessa accademia + livello esatto dell'utente, ordine minore.
+const featuredEpistola = selectFeaturedEpistola(epistole, visibilityContext);
+
+// Archivio: epistole sbloccate (accademia + livello <=), escludendo quella in evidenza,
+// ordinate per livello decrescente e, a parita di livello, per ordine decrescente.
+const archiveEpistole = epistole
+	.filter((epistola) => isEpistolaVisible(epistola, visibilityContext))
+	.filter((epistola) => epistola.documentId !== featuredEpistola?.documentId)
+	.sort(sortEpistoleByLevelDescThenOrdineDesc);
 ---
 
 {featuredEpistola && (
@@ -68,7 +52,7 @@ const archiveEpistole = visibleEpistole.slice(1);
 		<div class="epistole-featured__copy">
 			<p class="epistole-eyebrow">{getPrimaryCategory(featuredEpistola)}</p>
 			<h2 id="epistole-featured-title">{featuredEpistola.titolo}</h2>
-			<p>{getExcerpt(featuredEpistola.contenuto, 150)}</p>
+			<p>{getEpistolaExcerptByWords(featuredEpistola.contenuto, 40)}</p>
 		</div>
 		<a class="btn tsbs-cta-primary epistole-featured__button" href={`/epistole/${featuredEpistola.slug}/`}>
 			Apri l’Epistola
@@ -84,9 +68,9 @@ const archiveEpistole = visibleEpistole.slice(1);
 			<div class="epistole-list">
 				{archiveEpistole.map((epistola, index) => (
 					<a class={`epistole-card ${index >= 3 ? 'is-hidden' : ''}`} href={`/epistole/${epistola.slug}/`} data-epistole-card>
-						<p class="epistole-card__meta">{formatEpistolaDate(epistola.publishedAt)}</p>
+						<p class="epistole-card__meta d-none">{formatEpistolaDate(epistola.publishedAt)}</p>
 						<h3>{epistola.titolo}</h3>
-						<p>{getExcerpt(epistola.contenuto)}</p>
+						<p>{getEpistolaExcerptByWords(epistola.contenuto, 40)}</p>
 					</a>
 				))}
 			</div>

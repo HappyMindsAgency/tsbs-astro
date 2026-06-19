@@ -32,6 +32,7 @@ export type Epistola = {
 	titolo: string;
 	slug: string;
 	contenuto: string | null;
+	ordine: number | null;
 	publishedAt?: string | null;
 	accademia: EpistolaAccademia | null;
 	categorie_epistola: EpistolaCategoria[];
@@ -61,6 +62,7 @@ export async function getEpistole() {
 	searchParams.set('fields[1]', 'slug');
 	searchParams.set('fields[2]', 'contenuto');
 	searchParams.set('fields[3]', 'publishedAt');
+	searchParams.set('fields[4]', 'ordine');
 	searchParams.set('pagination[pageSize]', '100');
 	setEpistolaRelations(searchParams);
 
@@ -78,6 +80,7 @@ export async function getLastEpistola() {
 	searchParams.set('fields[1]', 'slug');
 	searchParams.set('fields[2]', 'contenuto');
 	searchParams.set('fields[3]', 'publishedAt');
+	searchParams.set('fields[4]', 'ordine');
 	searchParams.set('pagination[pageSize]', '1');
 	setEpistolaRelations(searchParams);
 
