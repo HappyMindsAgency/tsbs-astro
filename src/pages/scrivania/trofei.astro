@@ -1,4 +1,4 @@
-﻿---
+---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import TrofeiIstruzioni from '../../components/PopupComponents/TrofeiIstruzioni.astro';
@@ -1226,6 +1226,7 @@ const paletteOrder = [...trophyCatalog].sort((a, b) => {
 
 		.trophy-palette__grid {
 			grid-template-columns: 1fr;
+			align-content: start;
 			padding: 0 0.5rem 0 0;
 			overflow-y: auto;
 			background: transparent;
