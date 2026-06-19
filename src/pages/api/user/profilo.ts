@@ -8,7 +8,6 @@ import { resolveAvatarSrc } from '../../../lib/avatar';
 
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
-const LIBRARY_CARD_CODE_PATTERN = /^\d{14}$/;
 
 export const GET: APIRoute = async ({ cookies }) => {
     const jwt = cookies.get('jwt')?.value;
@@ -72,7 +71,7 @@ export const GET: APIRoute = async ({ cookies }) => {
         accademiaSlug: (membro?.accademia as Record<string, unknown> | null)?.slug ?? null,
         livello: (membro?.livello as Record<string, unknown> | null)?.nome ?? null,
         punti: (membro?.punti as number | null) ?? null,
-        tessera: LIBRARY_CARD_CODE_PATTERN.test(tessera) ? tessera : null,
+        tessera: tessera || null,
         statoTessera,
     });
 };
