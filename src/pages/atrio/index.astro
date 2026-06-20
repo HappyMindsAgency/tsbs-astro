@@ -174,7 +174,12 @@ const taskCards = getFirstIncompleteMissionCards(
 		)}
 	</main>
 	<ImpostazioniLogoutModal renderHidden={true} />
-	<WelcomeToast isOpen={showWelcomeToast} theme={theme} />
+	<WelcomeToast
+		isOpen={showWelcomeToast}
+		theme={theme}
+		accademia={accademia}
+		epistolaHref={featuredEpistleHref}
+	/>
 	<NotificaTrofeiToast theme={theme} />
 </Layout>
 
