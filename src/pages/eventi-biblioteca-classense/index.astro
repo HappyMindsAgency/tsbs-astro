@@ -2,7 +2,6 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import { formatEventoDate, getEventiSociety, getEventoSocietyHref } from '../../lib/strapi/eventi';
-import { getEventiClassense } from '../../lib/classense';
 import { resolveUserContext } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -16,11 +15,10 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
-
-const [societyEvents, bibliotecaEvents] = await Promise.all([
+const jwt = Astro.cookies.get('jwt')?.value;
+const [{ theme, accademia }, societyEvents] = await Promise.all([
+	resolveUserContext(jwt),
 	getEventiSociety(lang),
-	getEventiClassense(6),
 ]);
 const visibleEventsBeforeLoadMore = 3;
 ---

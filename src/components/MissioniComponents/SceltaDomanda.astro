@@ -105,6 +105,15 @@ const hasMultipleQuestions = questions.length > 1;
 
 		const getSelectedAnswer = () => answers.querySelector('input[name="risposta"]:checked')?.value ?? '';
 		const hasSelectedAnswer = () => Boolean(getSelectedAnswer());
+		const scrollToPageTop = () => {
+			requestAnimationFrame(() => {
+				const scrollContainer = root.closest('.tsbs-app-shell');
+				if (scrollContainer) scrollContainer.scrollTop = 0;
+				document.documentElement.scrollTop = 0;
+				document.body.scrollTop = 0;
+				window.scrollTo(0, 0);
+			});
+		};
 
 		const showResultToast = (passed) => {
 			passedToast.hidden = !passed;
@@ -207,6 +216,7 @@ const hasMultipleQuestions = questions.length > 1;
 				submittedAnswers[currentQuestionIndex] = getSelectedAnswer();
 				currentQuestionIndex -= 1;
 				renderQuestion();
+				scrollToPageTop();
 			});
 		}
 
@@ -219,6 +229,7 @@ const hasMultipleQuestions = questions.length > 1;
 			if (currentQuestionIndex < questions.length - 1) {
 				currentQuestionIndex += 1;
 				renderQuestion();
+				scrollToPageTop();
 				return;
 			}
 

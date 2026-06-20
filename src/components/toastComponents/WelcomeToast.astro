@@ -1,13 +1,14 @@
 ---
-const { isOpen = false, theme = '' } = Astro.props;
-const toastDismissedKey = 'tsbs.welcomeToastDismissed';
+const { isOpen = false, theme = '', accademia = '', epistolaHref = '/epistole/' } = Astro.props;
+const academyName = typeof accademia === 'string' && accademia
+	? accademia.charAt(0).toUpperCase() + accademia.slice(1).toLowerCase()
+	: '';
 ---
 
 {isOpen && (
 	<div
-		class={`welcome-toast tsbs-toast ${theme}`}
+		class={`welcome-toast ${theme}`}
 		data-welcome-toast
-		data-welcome-toast-dismissed-key={toastDismissedKey}
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="welcome-toast-title"
@@ -20,14 +21,14 @@ const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 				</div>
 				<div class="welcome-toast__content">
 					<h2 id="welcome-toast-title" class="welcome-toast__title">
-						<span class="welcome-toast__title-light">Benvenut*</span>
-						<span class="welcome-toast__title-accent" data-welcome-toast-username>Adepto</span>
+						Ti diamo il benvenuto nella Accademia {academyName}
 					</h2>
-					<p>Aenean placerat eros turpis, nec posuere massa fermentum malesuada. Morbi at est et tortor laoreet placerat id in neque. Maecenas vel erat lacinia, sodales ipsum id, porta sapien.</p>
+					<p>Lo Smistamento ha rivelato la tua via.<br />Da questo momento, il tuo cammino nella Società prosegue sotto il segno di questa Accademia.</p>
+					<p>La prima epistola della tua Guida ti attende: aprila e preparati alla prima missione in The Secret Bookish Society.</p>
 				</div>
 			</div>
 			<div class="welcome-toast__footer">
-				<button class="btn tsbs-cta-primary welcome-toast__button" type="button" data-welcome-toast-close>Inizia</button>
+				<a class="btn tsbs-cta-primary welcome-toast__button" href={epistolaHref}>Leggi l’Epistola</a>
 			</div>
 		</div>
 	</div>
@@ -39,9 +40,6 @@ const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 			const res = await fetch('/api/user/profilo');
 			if (!res.ok) return;
 			const profilo = await res.json();
-
-			const nameEl = document.querySelector('[data-welcome-toast-username]');
-			if (nameEl instanceof HTMLElement && profilo.username) nameEl.textContent = profilo.username;
 
 			if (profilo.avatarSrc) {
 				const img = document.querySelector<HTMLImageElement>('[data-welcome-toast-avatar-img]');
@@ -64,34 +62,15 @@ const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 		if (toast.dataset.welcomeToastReady === 'true') return;
 		toast.dataset.welcomeToastReady = 'true';
 
-		const dismissedKey = toast.dataset.welcomeToastDismissedKey || 'tsbs.welcomeToastDismissed';
-
-		const isDismissed = () => {
-			try {
-				return window.sessionStorage.getItem(dismissedKey) === 'true';
-			} catch {
-				return false;
-			}
-		};
-
-		const markDismissed = () => {
-			try {
-				window.sessionStorage.setItem(dismissedKey, 'true');
-			} catch {
-				// Se lo storage non e disponibile, la chiusura resta valida per il DOM corrente.
-			}
-		};
-
-		if (isDismissed()) {
-			toast.hidden = true;
-			toast.setAttribute('aria-hidden', 'true');
-			return;
+		const currentUrl = new URL(window.location.href);
+		if (currentUrl.searchParams.has('welcome')) {
+			currentUrl.searchParams.delete('welcome');
+			window.history.replaceState(window.history.state, '', `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
 		}
 
 		loadWelcomeToastProfilo();
 
 		const closeToast = () => {
-			markDismissed();
 			toast.hidden = true;
 			toast.setAttribute('aria-hidden', 'true');
 		};
@@ -168,9 +147,6 @@ const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 	}
 
 	.welcome-toast__title {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0 0.35rem;
 		margin: 0 0 0.625rem;
 		color: var(--tsbs-theme-accent);
 		font-family: var(--tsbs-font-heading-academy);
@@ -180,15 +156,15 @@ const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 		letter-spacing: 0;
 	}
 
-	.welcome-toast__title-accent {
-		color: inherit;
-	}
-
 	.welcome-toast__content p {
 		margin: 0;
 		color: var(--tsbs-theme-body);
 		font-size: 1rem;
 		line-height: 1.42;
+	}
+
+	.welcome-toast__content p + p {
+		margin-top: 0.875rem;
 	}
 
 	.welcome-toast__footer {
@@ -197,6 +173,9 @@ const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 	}
 
 	.welcome-toast__button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		width: 100%;
 		padding: 0.875rem 1rem;
 		border-radius: 0.375rem;

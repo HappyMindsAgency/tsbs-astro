@@ -125,6 +125,42 @@ const { lang = 'it' } = Astro.props;
 	.sorting-test__error {
 		color: var(--tsbs-color-danger, #c0392b);
 	}
+
+	@media (max-width: 767.98px) {
+		.sorting-test {
+			min-height: 100dvh;
+			grid-template-rows: auto minmax(0, 1fr);
+		}
+
+		.sorting-test .mission-proof-question__header-content {
+			min-height: 8.25rem;
+			padding-top: 2rem;
+			padding-bottom: 1.5rem;
+			gap: 1.25rem;
+		}
+
+		.sorting-test .mission-proof-question__panel {
+			padding-top: 1.5rem;
+			padding-bottom: 1.25rem;
+		}
+
+		.sorting-test__form {
+			gap: 1.25rem;
+		}
+
+		.sorting-test .choice-question__fieldset {
+			gap: 0.875rem;
+		}
+
+		.sorting-test .choice-question__answers {
+			gap: 0.75rem;
+		}
+
+		.sorting-test .choice-question__answer {
+			min-height: 4rem;
+			padding: 0.75rem 1rem;
+		}
+	}
 </style>
 
 <script>
@@ -174,6 +210,15 @@ const { lang = 'it' } = Astro.props;
 
 		let domandaCorrente = 0;
 		const risposteSelezionate: Array<number | null> = [];
+		const scrollToPageTop = () => {
+			requestAnimationFrame(() => {
+				const scrollContainer = article.closest<HTMLElement>('.tsbs-app-shell');
+				if (scrollContainer) scrollContainer.scrollTop = 0;
+				document.documentElement.scrollTop = 0;
+				document.body.scrollTop = 0;
+				window.scrollTo(0, 0);
+			});
+		};
 
 		function renderDomanda(index: number) {
 			const d = domande[index];
@@ -228,6 +273,7 @@ const { lang = 'it' } = Astro.props;
 			salvaRispostaCorrente();
 			domandaCorrente--;
 			renderDomanda(domandaCorrente);
+			scrollToPageTop();
 		});
 
 		nextBtn.addEventListener('click', () => {
@@ -237,6 +283,7 @@ const { lang = 'it' } = Astro.props;
 
 			if (domandaCorrente < domande.length) {
 				renderDomanda(domandaCorrente);
+				scrollToPageTop();
 			} else {
 				const punteggi: number[] = [0, 0, 0, 0];
 				risposteSelezionate.forEach((answerIndex) => {

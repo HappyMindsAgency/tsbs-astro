@@ -22,6 +22,11 @@ if (!Astro.cookies.has('jwt')) {
 }
 
 const jwt = Astro.cookies.get('jwt')?.value;
+const showWelcomeToast = Astro.cookies.get('tsbs_welcome_pending')?.value === '1'
+	|| Astro.url.searchParams.get('welcome') === '1';
+if (showWelcomeToast) {
+	Astro.cookies.delete('tsbs_welcome_pending', { path: '/' });
+}
 const [
 	{ theme, accademia },
 	eventiClassense,
@@ -169,7 +174,12 @@ const taskCards = getFirstIncompleteMissionCards(
 		)}
 	</main>
 	<ImpostazioniLogoutModal renderHidden={true} />
-	<WelcomeToast isOpen={true} />
+	<WelcomeToast
+		isOpen={showWelcomeToast}
+		theme={theme}
+		accademia={accademia}
+		epistolaHref={featuredEpistleHref}
+	/>
 	<NotificaTrofeiToast theme={theme} />
 </Layout>
 

@@ -15,9 +15,11 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
-
-const societyEvent = await getEventoSocietyBySlug(slugEv, lang);
+const jwt = Astro.cookies.get('jwt')?.value;
+const [{ theme, accademia }, societyEvent] = await Promise.all([
+	resolveUserContext(jwt),
+	getEventoSocietyBySlug(slugEv, lang),
+]);
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
