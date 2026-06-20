@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import RitchText from '../../components/RitchText.astro';
 import { formatEventoDate, getEventoSocietyBySlug } from '../../lib/strapi/eventi';
+import { resolveUserContext } from '../../lib/theme';
 
 export const prerender = false;
 
@@ -13,10 +14,14 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const societyEvent = await getEventoSocietyBySlug(slugEv, lang);
+const jwt = Astro.cookies.get('jwt')?.value;
+const [{ theme, accademia }, societyEvent] = await Promise.all([
+	resolveUserContext(jwt),
+	getEventoSocietyBySlug(slugEv, lang),
+]);
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell event-detail-page">

@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import { formatEventoDate, getEventiSociety, getEventoSocietyHref } from '../../lib/strapi/eventi';
+import { resolveUserContext } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 
@@ -28,11 +29,15 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const societyEvents = await getEventiSociety(lang);
+const jwt = Astro.cookies.get('jwt')?.value;
+const [{ theme, accademia }, societyEvents] = await Promise.all([
+	resolveUserContext(jwt),
+	getEventiSociety(lang),
+]);
 const visibleEventsBeforeLoadMore = 3;
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell events-page">
