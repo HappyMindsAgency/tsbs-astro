@@ -9,9 +9,10 @@
 // CONFIGURAZIONE
 // ---------------------------------------------------------------------------
 
-/** Endpoint WordPress REST per gli eventi */
-const CLASSENSE_EVENTI_URL =
-    'https://www.classense.ra.it/wp-json/wp/v2/eventi?per_page=4&orderby=date&order=desc&_fields=title,link,yoast_head_json';
+/** Costruisce l'endpoint WordPress REST per gli eventi, con numero di risultati configurabile */
+function buildEventiUrl(perPage: number): string {
+    return `https://www.classense.ra.it/wp-json/wp/v2/eventi?per_page=${perPage}&orderby=date&order=desc&_fields=title,link,yoast_head_json`;
+}
 
 /** Immagine placeholder mostrata se og_image è assente o vuoto */
 const CLASSENSE_PLACEHOLDER_IMAGE = '/placeholder-evento.svg';
@@ -34,12 +35,12 @@ export type EventoClassense = {
 // ---------------------------------------------------------------------------
 
 /**
- * Recupera gli ultimi 4 eventi dalla Biblioteca Classense.
+ * Recupera gli ultimi eventi dalla Biblioteca Classense (default 4).
  * Restituisce un array vuoto in caso di errore (non rompe la pagina).
  */
-export async function getEventiClassense(): Promise<EventoClassense[]> {
+export async function getEventiClassense(perPage = 4): Promise<EventoClassense[]> {
     try {
-        const res = await fetch(CLASSENSE_EVENTI_URL, {
+        const res = await fetch(buildEventiUrl(perPage), {
             // Timeout tramite AbortController: se l'API esterna è lenta
             // non blocca indefinitamente il rendering SSR
             signal: AbortSignal.timeout(8000),

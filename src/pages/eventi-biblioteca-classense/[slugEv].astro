@@ -1,8 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import BackButton from '../../components/BackButton.astro';
 import RitchText from '../../components/RitchText.astro';
 import { formatEventoDate, getEventoSocietyBySlug } from '../../lib/strapi/eventi';
+import { resolveUserContext } from '../../lib/theme';
 
 export const prerender = false;
 
@@ -13,19 +15,26 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+
 const societyEvent = await getEventoSocietyBySlug(slugEv, lang);
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell missions-shell event-detail-page">
-		<header class="missions-header event-detail-header">
+		<header class="missions-header missions-header--note event-detail-header">
 			<h1>Eventi</h1>
+			<BackButton href="/eventi-biblioteca-classense/" label="Torna agli eventi" />
 		</header>
 
 		<article class="container-xl tsbs-app-container event-detail" aria-labelledby="event-detail-title">
 			<div class="event-detail__hero">
+				{societyEvent?.coverUrl && (
+					<img class="event-detail__cover" src={societyEvent.coverUrl} alt={societyEvent.coverAlt ?? societyEvent.titolo} />
+				)}
+
 				<p class="event-detail__date">{societyEvent ? formatEventoDate(societyEvent.dataEvento) : '04 Feb - 21 Mar 2026'}</p>
 
 				<div class="event-detail__heading">

@@ -2,6 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import { formatEventoDate, getEventiSociety, getEventoSocietyHref } from '../../lib/strapi/eventi';
+import { getEventiClassense } from '../../lib/classense';
+import { resolveUserContext } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 
@@ -10,29 +12,20 @@ const eventTabs = [
 	{ id: 'biblioteca', label: 'Biblioteca' },
 ];
 
-const bibliotecaEvents = [
-	{ date: '15 Gen', slug: 'lorem-ipsum-dolor-15-gen' },
-	{ date: '07 Feb', slug: 'lorem-ipsum-dolor-07-feb' },
-	{ date: '03 Mar - 12 Apr', slug: 'lorem-ipsum-dolor-mar-apr' },
-	{ date: '20 Apr', slug: 'lorem-ipsum-dolor-20-apr' },
-	{ date: '05 Mag', slug: 'lorem-ipsum-dolor-05-mag' },
-	{ date: '18 Mag - 02 Giu', slug: 'lorem-ipsum-dolor-mag-giu' },
-	{ date: '10 Giu', slug: 'lorem-ipsum-dolor-10-giu' },
-	{ date: '25 Giu', slug: 'lorem-ipsum-dolor-25-giu' },
-	{ date: '01 Lug - 15 Lug', slug: 'lorem-ipsum-dolor-lug' },
-	{ date: '22 Lug', slug: 'lorem-ipsum-dolor-22-lug' },
-	{ date: '04 Ago', slug: 'lorem-ipsum-dolor-04-ago' },
-	{ date: '18 Ago - 25 Ago', slug: 'lorem-ipsum-dolor-ago' },
-];
 if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const societyEvents = await getEventiSociety(lang);
+const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+
+const [societyEvents, bibliotecaEvents] = await Promise.all([
+	getEventiSociety(lang),
+	getEventiClassense(6),
+]);
 const visibleEventsBeforeLoadMore = 3;
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell events-page">
@@ -82,7 +75,11 @@ const visibleEventsBeforeLoadMore = 3;
 										>
 											<div class="events-card__media">
 												{formatEventoDate(event.dataEvento) && <span class="events-card__date">{formatEventoDate(event.dataEvento)}</span>}
-												<i class="bi bi-image" aria-hidden="true"></i>
+												{event.coverUrl ? (
+													<img class="events-card__cover" src={event.coverUrl} alt={event.coverAlt ?? event.titolo} loading="lazy" />
+												) : (
+													<i class="bi bi-image" aria-hidden="true"></i>
+												)}
 											</div>
 											<h3>{event.titolo}</h3>
 										</a>
@@ -96,14 +93,15 @@ const visibleEventsBeforeLoadMore = 3;
 								{bibliotecaEvents.map((event, index) => (
 									<a
 										class={`events-card ${index > 8 ? 'is-hidden-desktop' : ''} ${index > 2 ? 'is-hidden-mobile' : ''}`}
-										href={`/eventi-biblioteca-classense/${event.slug}/`}
+										href={event.link}
+											target="_blank"
+											rel="noopener noreferrer"
 										data-event-card
 									>
 										<div class="events-card__media">
-											<span class="events-card__date">{event.date}</span>
-											<i class="bi bi-image" aria-hidden="true"></i>
+											<img class="events-card__cover" src={event.immagine} alt={event.titolo} loading="lazy" />
 										</div>
-										<h3>Lorem ipsum dolor sit amet</h3>
+										<h3>{event.titolo}</h3>
 									</a>
 								))}
 							</div>

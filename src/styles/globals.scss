@@ -2124,8 +2124,17 @@ body:has(.tsbs-legal-page) {
 		line-height: 1;
 	}
 
+	.events-card__cover {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
 	.events-card__date {
 		position: absolute;
+		z-index: 1;
 		top: 0.5rem;
 		right: 0.5rem;
 		display: inline-flex;
@@ -2927,6 +2936,13 @@ body:has(.tsbs-legal-page) {
 	.event-detail__hero {
 		display: grid;
 		gap: 0.875rem;
+	}
+
+	.event-detail__cover {
+		width: 100%;
+		aspect-ratio: 1.86;
+		object-fit: cover;
+		border-radius: 0.75rem;
 	}
 
 	.event-detail__date,

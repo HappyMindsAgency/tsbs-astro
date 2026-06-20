@@ -1,8 +1,15 @@
 import { fetchStrapi, type StrapiCollectionResponse } from './client';
+import { resolveStrapiMediaUrl } from './trofei';
 
 type StrapiRelationBase = {
 	id: number;
 	documentId: string;
+};
+
+// Media singolo Strapi v5: oggetto appiattito, non { data: { attributes } }.
+type StrapiMedia = {
+	url: string | null;
+	alternativeText?: string | null;
 };
 
 export type EventoSociety = StrapiRelationBase & {
@@ -15,6 +22,9 @@ export type EventoSociety = StrapiRelationBase & {
 	codiceValidazione: string | null;
 	publishedAt?: string | null;
 	locale?: string | null;
+	cover?: StrapiMedia | null;
+	coverUrl: string | null;
+	coverAlt: string | null;
 	missione: (StrapiRelationBase & {
 		titolo: string;
 		slug: string | null;
@@ -54,6 +64,8 @@ function normalizeEvento(evento: EventoSociety): EventoSociety | null {
 		tipoEvento: evento.tipoEvento?.trim() || null,
 		luogo: evento.luogo?.trim() || null,
 		codiceValidazione: evento.codiceValidazione?.trim() || null,
+		coverUrl: resolveStrapiMediaUrl(evento.cover?.url),
+		coverAlt: evento.cover?.alternativeText?.trim() || titolo,
 		missione: evento.missione
 			? {
 					...evento.missione,
@@ -69,6 +81,8 @@ function setEventoRelations(searchParams: URLSearchParams) {
 	searchParams.set('populate[missione][fields][0]', 'titolo');
 	searchParams.set('populate[missione][fields][1]', 'slug');
 	searchParams.set('populate[missione][fields][2]', 'descrizione');
+	searchParams.set('populate[cover][fields][0]', 'url');
+	searchParams.set('populate[cover][fields][1]', 'alternativeText');
 }
 
 export function formatEventoDate(value?: string | null) {
