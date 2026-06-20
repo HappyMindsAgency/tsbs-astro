@@ -125,6 +125,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // --- Successo: imposta il cookie JWT e risponde ---
 
     setAuthCookie(cookies, jwt);
+    cookies.set('tsbs_welcome_pending', '1', {
+        httpOnly: true,
+        secure: import.meta.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24,
+    });
     logger.info(`[RegisterAPI] Registration complete for userId ${userId}`);
     return successResponse();
 };

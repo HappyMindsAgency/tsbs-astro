@@ -1,13 +1,11 @@
 ---
 const { isOpen = false, theme = '' } = Astro.props;
-const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 ---
 
 {isOpen && (
 	<div
-		class={`welcome-toast tsbs-toast ${theme}`}
+		class={`welcome-toast ${theme}`}
 		data-welcome-toast
-		data-welcome-toast-dismissed-key={toastDismissedKey}
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="welcome-toast-title"
@@ -64,34 +62,15 @@ const toastDismissedKey = 'tsbs.welcomeToastDismissed';
 		if (toast.dataset.welcomeToastReady === 'true') return;
 		toast.dataset.welcomeToastReady = 'true';
 
-		const dismissedKey = toast.dataset.welcomeToastDismissedKey || 'tsbs.welcomeToastDismissed';
-
-		const isDismissed = () => {
-			try {
-				return window.sessionStorage.getItem(dismissedKey) === 'true';
-			} catch {
-				return false;
-			}
-		};
-
-		const markDismissed = () => {
-			try {
-				window.sessionStorage.setItem(dismissedKey, 'true');
-			} catch {
-				// Se lo storage non e disponibile, la chiusura resta valida per il DOM corrente.
-			}
-		};
-
-		if (isDismissed()) {
-			toast.hidden = true;
-			toast.setAttribute('aria-hidden', 'true');
-			return;
+		const currentUrl = new URL(window.location.href);
+		if (currentUrl.searchParams.has('welcome')) {
+			currentUrl.searchParams.delete('welcome');
+			window.history.replaceState(window.history.state, '', `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
 		}
 
 		loadWelcomeToastProfilo();
 
 		const closeToast = () => {
-			markDismissed();
 			toast.hidden = true;
 			toast.setAttribute('aria-hidden', 'true');
 		};
