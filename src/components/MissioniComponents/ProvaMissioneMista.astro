@@ -172,6 +172,15 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 		const getSelectedAnswer = () => choiceAnswers.querySelector('input[name="risposta"]:checked')?.value ?? '';
 		const getCurrentAnswer = () => (getQuestionMode(questions[currentQuestionIndex]) === 'free' ? freeInput.value.trim() : getSelectedAnswer());
 		const hasCurrentAnswer = () => getCurrentAnswer().length > 0;
+		const scrollToPageTop = () => {
+			requestAnimationFrame(() => {
+				const scrollContainer = root.closest('.tsbs-app-shell');
+				if (scrollContainer) scrollContainer.scrollTop = 0;
+				document.documentElement.scrollTop = 0;
+				document.body.scrollTop = 0;
+				window.scrollTo(0, 0);
+			});
+		};
 
 		const showResultToast = (passed) => {
 			passedToast.hidden = !passed;
@@ -308,6 +317,7 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 				submittedAnswers[currentQuestionIndex] = getCurrentAnswer();
 				currentQuestionIndex -= 1;
 				renderQuestion();
+				scrollToPageTop();
 			});
 		});
 
@@ -320,6 +330,7 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 			if (currentQuestionIndex < questions.length - 1) {
 				currentQuestionIndex += 1;
 				renderQuestion();
+				scrollToPageTop();
 				return;
 			}
 

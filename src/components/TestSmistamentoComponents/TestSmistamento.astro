@@ -174,6 +174,15 @@ const { lang = 'it' } = Astro.props;
 
 		let domandaCorrente = 0;
 		const risposteSelezionate: Array<number | null> = [];
+		const scrollToPageTop = () => {
+			requestAnimationFrame(() => {
+				const scrollContainer = article.closest<HTMLElement>('.tsbs-app-shell');
+				if (scrollContainer) scrollContainer.scrollTop = 0;
+				document.documentElement.scrollTop = 0;
+				document.body.scrollTop = 0;
+				window.scrollTo(0, 0);
+			});
+		};
 
 		function renderDomanda(index: number) {
 			const d = domande[index];
@@ -228,6 +237,7 @@ const { lang = 'it' } = Astro.props;
 			salvaRispostaCorrente();
 			domandaCorrente--;
 			renderDomanda(domandaCorrente);
+			scrollToPageTop();
 		});
 
 		nextBtn.addEventListener('click', () => {
@@ -237,6 +247,7 @@ const { lang = 'it' } = Astro.props;
 
 			if (domandaCorrente < domande.length) {
 				renderDomanda(domandaCorrente);
+				scrollToPageTop();
 			} else {
 				const punteggi: number[] = [0, 0, 0, 0];
 				risposteSelezionate.forEach((answerIndex) => {
