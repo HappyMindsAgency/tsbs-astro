@@ -4,11 +4,9 @@
 // assegna +1 punto per libro riconosciuto e i trofei soglia idempotenti.
 
 import type { APIRoute } from 'astro';
-import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
+import { getMissioneBySlug, MISSIONI_SPECIALI } from '../../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, getPartecipazione } from '../../../../lib/strapi/progressione';
 import { generaDomandaSfida, rispondiDomandaSfida } from '../../../../lib/strapi/sfida-lettura';
-
-export const READING_CHALLENGE_MISSION_SLUGS = new Set(['missione-06-i-custodi-del-sapere']);
 
 type SfidaPayload = {
 	azione?: 'domanda' | 'risposta';
@@ -24,7 +22,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 		return json({ error: 'unauthorized' }, 401);
 	}
 
-	if (!slugMis || !READING_CHALLENGE_MISSION_SLUGS.has(slugMis)) {
+	if (!slugMis) {
 		return json({ error: 'mission_not_found' }, 404);
 	}
 
@@ -46,7 +44,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 	}
 
 	const missione = await getMissioneBySlug(slugMis);
-	if (!missione) {
+	if (!missione || missione.documentId !== MISSIONI_SPECIALI.readingChallenge) {
 		return json({ error: 'mission_not_found' }, 404);
 	}
 

@@ -41,7 +41,7 @@ export const POST: APIRoute = async ({ params, cookies }) => {
 		logger.error(`[Avvia] Partecipazione non creata per ${missione.slug} (membro ${membro.documentId})`);
 	}
 
-	return redirect(getMissionProofHref(missione.slug));
+	return redirect(getMissionProofHref(missione));
 };
 
 function redirect(location: string): Response {

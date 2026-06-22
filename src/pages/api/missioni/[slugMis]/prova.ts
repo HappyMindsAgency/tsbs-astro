@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
+import { getMissioneBySlug, MISSIONI_SPECIALI } from '../../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, registraEsitoProva, avviaPartecipazione, getPartecipazione } from '../../../../lib/strapi/progressione';
 import { inviaTesseraInVerifica } from '../../../../lib/strapi/tessera';
 import { logger } from '../../../../services/logger';
@@ -8,9 +8,6 @@ type SubmittedAnswer = {
 	questionIndex?: number;
 	answer?: string;
 };
-
-// Missioni che raccolgono il numero tessera invece di seguire il flusso quiz→trofeo.
-const LIBRARY_CARD_MISSION_SLUGS = new Set(['missione-01-il-varco']);
 
 export const POST: APIRoute = async ({ params, request, cookies }) => {
 	const jwt = cookies.get('jwt')?.value;
@@ -60,7 +57,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 	// Il numero inserito viene salvato con lo stesso meccanismo della pagina
 	// Impostazioni (statoTessera: in_verifica + email Redazione). La missione
 	// resta "in corso": il trofeo è assegnato manualmente dalla Redazione.
-	if (LIBRARY_CARD_MISSION_SLUGS.has(missione.slug)) {
+	if (missione.documentId === MISSIONI_SPECIALI.libraryCard) {
 		// Garantisce la partecipazione inCorso/50 anche per accesso diretto alla prova.
 		await avviaPartecipazione(membro.documentId, missione.documentId);
 

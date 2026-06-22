@@ -123,21 +123,23 @@ function getItalianStrapiLocale(lang = 'it') {
 	return STRAPI_LOCALE_BY_LANG[lang] || STRAPI_LOCALE_BY_LANG.it;
 }
 
-// Missioni con fruizione "sfida di lettura" dedicata, fuori dal flusso prova/quiz.
-const READING_CHALLENGE_MISSION_SLUGS = new Set(['missione-06-i-custodi-del-sapere']);
-
-// Missioni "caccia al tesoro" (quiz.cacciaAlTesoro): indizi step-by-step su una
-// pagina dedicata. Lo slug è qui per coerenza con il routing centralizzato; la
-// pagina valida comunque il flag cacciaAlTesoro lato server.
-const TREASURE_HUNT_MISSION_SLUGS = new Set(['missione-11-il-rituale-del-custode']);
+// documentId delle missioni con meccaniche fuori dal flusso quiz standard.
+// Lo slug può cambiare, il documentId no: i controlli vanno fatti su questi.
+export const MISSIONI_SPECIALI = {
+	libraryCard:      'nrl5dvlx09vppmmdnpx4olw7', // M01 il-varco — invio tessera
+	grimorio:         'xylq0fby0s04v0ai0kt3kd7b', // M02 il-segno — editor nota
+	levelUpRadici:    'plq11gza9ok008lj2gai3za4', // M05 le-radici — level-up
+	readingChallenge: 'xafn0jxvn8xzsy4svj6m5t29', // M06 i-custodi-del-sapere — sfida lettura
+	treasureHunt:     'j1ht6oi0pfm7ogav2z61h3iq', // M11 il-rituale-del-custode — caccia + level-up
+} as const;
 
 // URL della "prova" della missione: sfida-lettura o caccia al tesoro per le
 // missioni dedicate, altrimenti la prova/quiz standard. Centralizzato per riuso
 // (pagina dettaglio e endpoint "avvia") ed evitare logiche duplicate.
-export function getMissionProofHref(slug: string): string {
-	if (READING_CHALLENGE_MISSION_SLUGS.has(slug)) return `/missioni/${slug}/sfida-lettura/`;
-	if (TREASURE_HUNT_MISSION_SLUGS.has(slug)) return `/missioni/${slug}/caccia-tesoro/`;
-	return `/missioni/${slug}/prova/`;
+export function getMissionProofHref(missione: Pick<Missione, 'documentId' | 'slug'>): string {
+	if (missione.documentId === MISSIONI_SPECIALI.readingChallenge) return `/missioni/${missione.slug}/sfida-lettura/`;
+	if (missione.documentId === MISSIONI_SPECIALI.treasureHunt) return `/missioni/${missione.slug}/caccia-tesoro/`;
+	return `/missioni/${missione.slug}/prova/`;
 }
 
 function setMissioneFields(searchParams: URLSearchParams) {

@@ -6,17 +6,18 @@
 import { getStrapiApiUrl } from './api-url';
 import { getLevelOrder } from '../filtri/missioni';
 import { resolveStrapiMediaUrl } from './trofei';
-import type { MissioneLivello } from './missioni';
+import { MISSIONI_SPECIALI, type MissioneLivello } from './missioni';
 import { logger } from '../../services/logger';
 
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 // Trigger di level-up: il completamento della missione chiave aggiorna il
-// livello del Membro (mai degradante, vedi applicaLevelUp).
-const LEVEL_UP_BY_MISSION_SLUG: Record<string, string> = {
-	'missione-05-le-radici': 'livello-3-custode-novizio',
-	'missione-11-il-rituale-del-custode': 'livello-4-custode',
+// livello del Membro (mai degradante, vedi applicaLevelUp). Mappato per
+// documentId: lo slug può cambiare, il documentId no.
+const LEVEL_UP_BY_MISSION_ID: Record<string, string> = {
+	[MISSIONI_SPECIALI.levelUpRadici]: 'livello-3-custode-novizio',
+	[MISSIONI_SPECIALI.treasureHunt]: 'livello-4-custode',
 };
 
 export type MembroProgressione = {
@@ -319,7 +320,7 @@ async function premiaCompletamento(
 		result.puntiAssegnati = sommati ? punti : 0;
 	}
 
-	result.livelloAggiornato = await applicaLevelUp(membro, missione.slug);
+	result.livelloAggiornato = await applicaLevelUp(membro, missione.documentId);
 	return result;
 }
 
@@ -391,8 +392,8 @@ export async function aggiungiPuntiMembro(membroDocumentId: string, punti: numbe
 
 // Applica il level-up collegato alla missione completata. Idempotente e mai
 // degradante: se il Membro e gia al livello target o oltre, non fa nulla.
-export async function applicaLevelUp(membro: MembroProgressione, missioneSlug: string): Promise<string | null> {
-	const targetSlug = LEVEL_UP_BY_MISSION_SLUG[missioneSlug];
+export async function applicaLevelUp(membro: MembroProgressione, missioneDocumentId: string): Promise<string | null> {
+	const targetSlug = LEVEL_UP_BY_MISSION_ID[missioneDocumentId];
 	if (!targetSlug) return null;
 
 	const targetOrder = getLevelOrder({ id: 0, documentId: '', nome: '', slug: targetSlug, ordine: null });
