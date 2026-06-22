@@ -66,7 +66,7 @@ const getNoteHref = (note: (typeof notes)[number]) => {
 
 				<div class="desk-avatar" aria-hidden="true" data-desk-avatar>
 					<i class="bi bi-eyeglasses" data-desk-avatar-fallback></i>
-					<img data-desk-avatar-img hidden alt="" />
+					<canvas class="avatar-lottie" data-avatar-lottie data-desk-avatar-img hidden></canvas>
 				</div>
 
 				<h1 id="desk-title" data-desk-username>—</h1>
@@ -172,6 +172,8 @@ const getNoteHref = (note: (typeof notes)[number]) => {
 </Layout>
 
 <script>
+	import { setAvatarLottie } from '../../scripts/avatarLottie';
+
 	const getGrimorioBatchSize = () => {
 		if (window.matchMedia('(min-width: 992px)').matches) return 5;
 		if (window.matchMedia('(min-width: 768px)').matches) return 4;
@@ -222,11 +224,11 @@ const getNoteHref = (note: (typeof notes)[number]) => {
 
 			if (profilo.avatarSrc) {
 				const fallback = document.querySelector('[data-desk-avatar-fallback]');
-				const img = document.querySelector<HTMLImageElement>('[data-desk-avatar-img]');
+				const canvas = document.querySelector<HTMLCanvasElement>('[data-desk-avatar-img]');
 				if (fallback instanceof HTMLElement) fallback.hidden = true;
-				if (img instanceof HTMLImageElement) {
-					img.src = profilo.avatarSrc;
-					img.hidden = false;
+				if (canvas instanceof HTMLCanvasElement) {
+					canvas.hidden = false;
+					setAvatarLottie(canvas, profilo.avatarSrc);
 				}
 			}
 		} catch {

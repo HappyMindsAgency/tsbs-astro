@@ -1,6 +1,7 @@
 ﻿---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import AvatarLottie from '../../../components/AvatarLottie.astro';
 import { getProfileDetailByJwt } from '../../../lib/strapi/preferiti';
 import { getTrofeiStanzaByMembroDocumentId } from '../../../lib/strapi/trofei';
 import { buildTrophyCatalog } from '../../../lib/trofei-forme';
@@ -63,7 +64,7 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 
 				<div class="desk-avatar" aria-hidden="true">
 					{currentProfile.avatarSrc
-						? <img class="desk-avatar__img" src={currentProfile.avatarSrc} alt="" loading="lazy" decoding="async" />
+						? <AvatarLottie class="desk-avatar__img" src={currentProfile.avatarSrc} />
 						: <i class="bi bi-image"></i>}
 				</div>
 

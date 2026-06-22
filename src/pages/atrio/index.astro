@@ -76,7 +76,7 @@ const taskCards = getFirstIncompleteMissionCards(
 			<div class="dashboard-profile">
 				<div class="dashboard-avatar-wrap">
 					<div class="dashboard-avatar" aria-hidden="true" data-atrio-avatar>
-						<img data-atrio-avatar-img hidden alt="" />
+						<canvas class="avatar-lottie" data-avatar-lottie data-atrio-avatar-img hidden></canvas>
 					</div>
 				</div>
 				<div>
@@ -184,6 +184,8 @@ const taskCards = getFirstIncompleteMissionCards(
 </Layout>
 
 <script>
+	import { setAvatarLottie } from '../../scripts/avatarLottie';
+
 	const setupAtrioProfileMenu = () => {
 		document.querySelectorAll<HTMLElement>('[data-atrio-profile-menu-open]').forEach((trigger) => {
 			if (trigger.dataset.atrioProfileMenuReady === 'true') return;
@@ -208,13 +210,10 @@ const taskCards = getFirstIncompleteMissionCards(
 			if (livello instanceof HTMLElement && profilo.livello) livello.textContent = profilo.livello;
 
 			if (profilo.avatarSrc) {
-				const img = document.querySelector<HTMLImageElement>('[data-atrio-avatar-img]');
-				if (img instanceof HTMLImageElement) {
-					img.onerror = () => {
-						img.hidden = true;
-					};
-					img.src = profilo.avatarSrc;
-					img.hidden = false;
+				const canvas = document.querySelector<HTMLCanvasElement>('[data-atrio-avatar-img]');
+				if (canvas instanceof HTMLCanvasElement) {
+					canvas.hidden = false;
+					setAvatarLottie(canvas, profilo.avatarSrc);
 				}
 			}
 		} catch {

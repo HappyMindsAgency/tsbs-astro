@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../Nav.astro';
+import AvatarLottie from '../AvatarLottie.astro';
 import arboreaPattern from '../../assets/Arborea-pattern-the-secret-bookish-society.webp';
 import arcadiaPattern from '../../assets/Arcadia-pattern-the-secret-bookish-society.webp';
 import armoniaPattern from '../../assets/Armonia-pattern-the-secret-bookish-society.webp';
@@ -85,7 +86,7 @@ const chronicleRows = showBoxCronache ? await getGrimorioNotePubbliche(lang, aca
 							</div>
 							<div class="academy-ranking-card__avatar" aria-hidden="true">
 								{row.avatarSrc ? (
-									<img src={row.avatarSrc} alt="" loading="lazy" decoding="async" />
+									<AvatarLottie src={row.avatarSrc} />
 								) : (
 									row.initials
 								)}
