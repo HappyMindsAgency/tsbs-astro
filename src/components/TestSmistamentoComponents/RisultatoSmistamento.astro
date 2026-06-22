@@ -1,5 +1,4 @@
 ---
-import welcomeAcademyAvatar from '../../assets/benvenuto-accademia-avatar.png';
 import arboreaBanner from '../../assets/Arborea-accademia-stendardo-the-secret-bookish-society.png';
 import arcadiaBanner from '../../assets/Arcadia-accademia-stendardo-the-secret-bookish-society.png';
 import armoniaBanner from '../../assets/Armonia-accademia-stendardo-the-secret-bookish-society.png';
@@ -51,6 +50,8 @@ if (!currentAcademy) {
 }
 const academyName = academyLabels[currentAcademy];
 const academyBanner = academyBanners[currentAcademy];
+// Avatar animato dell'accademia (loop): file in public/animation/, prefisso = accademia.
+const academyAvatarLottie = `/animation/${currentAcademy}-accademyavatar.lottie`;
 const resultCopy = academyResultCopy[currentAcademy] ?? fallbackResultCopy;
 const avatarChoiceUrl = '/test-smistamento/scegli-avatar/';
 const confirmHref = `${avatarChoiceUrl}?academy=${encodeURIComponent(currentAcademy)}`;
@@ -69,14 +70,12 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 				loading="eager"
 			/>
 
-			<img
+			<canvas
 				class="sorting-result__avatar"
-				src={welcomeAcademyAvatar.src}
-				width={welcomeAcademyAvatar.width}
-				height={welcomeAcademyAvatar.height}
-				alt=""
-				loading="eager"
-			/>
+				data-avatar-lottie
+				data-avatar-lottie-src={academyAvatarLottie}
+				aria-hidden="true"
+			></canvas>
 		</div>
 
 		<div class="sorting-result__panel">
@@ -192,7 +191,10 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		right: clamp(1rem, 7vw, 2rem);
 		bottom: -0.25rem;
 		z-index: 5;
-		width: clamp(3.25rem, 14vw, 4.5rem);
+		width: clamp(8rem, 40vw, 10rem);
+		/* canvas non ha aspect-ratio intrinseco: lo forziamo quadrato */
+		/* ponytail: avatar assunto quadrato; se non lo è, regola qui */
+		aspect-ratio: 1 / 1;
 		height: auto;
 		pointer-events: none;
 	}
@@ -310,7 +312,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			--sorting-result-panel-width: min(44rem, calc(100vw - clamp(2rem, 8vw, 4rem)));
 			--sorting-result-panel-top: clamp(14.25rem, 33svh, 17.25rem);
 			--sorting-result-panel-padding-top: clamp(3rem, 6svh, 4.25rem);
-			--sorting-result-avatar-width: clamp(4.75rem, 10vw, 5.75rem);
+			--sorting-result-avatar-width: clamp(9rem, 26vw, 12rem);
 			--sorting-result-avatar-right: clamp(1.5rem, 4vw, 2.5rem);
 			--sorting-result-avatar-top-offset: clamp(-6.25rem, -12svh, -5rem);
 			--sorting-result-cta-width: min(100%, 18rem);
@@ -416,7 +418,7 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 			--sorting-result-panel-width: min(82rem, calc(100vw - 8rem));
 			--sorting-result-panel-top: clamp(16.5rem, 38svh, 24rem);
 			--sorting-result-panel-padding-top: clamp(4.5rem, 8.5svh, 7.75rem);
-			--sorting-result-avatar-width: clamp(6.25rem, 8vw, 8.75rem);
+			--sorting-result-avatar-width: clamp(13rem, 22vw, 19rem);
 			--sorting-result-avatar-right: clamp(3rem, 5.5vw, 4.75rem);
 			--sorting-result-avatar-top-offset: clamp(-10rem, -17svh, -8.25rem);
 			--sorting-result-cta-width: 20rem;
@@ -511,14 +513,18 @@ const chooseHref = `/test-smistamento/?step=conferma-accademia&academy=${encodeU
 		.sorting-result-page {
 			--sorting-result-banner-height: clamp(20rem, 37svh, 27rem);
 			--sorting-result-panel-padding-top: clamp(5.5rem, 8.5svh, 8rem);
-			--sorting-result-avatar-width: clamp(7.75rem, 7vw, 8.75rem);
-			--sorting-result-avatar-right: clamp(3.5rem, 4.8vw, 5rem);
-			--sorting-result-avatar-top-offset: clamp(-11rem, -17svh, -9rem);
+			--sorting-result-avatar-width: clamp(18rem, 25vw, 30rem);
+			--sorting-result-avatar-right: clamp(2.5rem, 3.8vw, 4rem);
+			--sorting-result-avatar-top-offset: clamp(-16rem, -29svh, -10rem);
 		}
 	}
 </style>
 
 <script>
+	import { initAvatarLotties } from '../../scripts/avatarLottie';
+	initAvatarLotties();
+	document.addEventListener('astro:page-load', () => initAvatarLotties());
+
 	document.querySelectorAll<HTMLButtonElement>('[data-confirm-result-academy]').forEach((btn) => {
 		btn.addEventListener('click', async () => {
 			const accademia = btn.dataset.confirmResultAcademy;
