@@ -96,8 +96,11 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 				<div class="library-card-result__icon" aria-hidden="true">
 					<i class="bi bi-hourglass-split"></i>
 				</div>
-				<h2 id="library-card-result-title">Tessera inviata. È in attesa di verifica da parte della redazione.</h2>
-				<a class="btn tsbs-cta-primary library-card-result__button" href="/missioni/">Torna alle missioni</a>
+				<div class="library-card-result__copy">
+					<h2 id="library-card-result-title">La tua tessera è in verifica</h2>
+					<p>La Società ha ricevuto la tua richiesta.</p>
+				</div>
+				<a class="btn tsbs-cta-primary library-card-result__button" href="/missioni/">Continua le missioni</a>
 			</section>
 		</div>
 	) : (
@@ -325,7 +328,13 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 		line-height: 1;
 	}
 
-	.library-card-result__panel h2 {
+	.library-card-result__copy {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.library-card-result__copy h2,
+	.library-card-result__copy p {
 		margin: 0;
 		color: var(--tsbs-color-heading);
 		font-family: var(--tsbs-font-body);

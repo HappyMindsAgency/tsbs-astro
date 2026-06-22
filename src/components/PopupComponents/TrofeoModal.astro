@@ -17,7 +17,10 @@ const { theme = '' } = Astro.props;
 
 	<section class="trophy-modal__panel">
 		<div class="trophy-modal__body">
-			<h2 id="trophy-modal-title">Congratulazioni! Hai sbloccato questo trofeo!</h2>
+			<div class="trophy-modal__copy">
+				<h2 id="trophy-modal-title" data-trophy-modal-title>Complimenti! La missione è superata.</h2>
+				<p data-trophy-modal-message>Hai ricevuto un nuovo trofeo!</p>
+			</div>
 
 			<div class="trophy-modal__visual" data-trophy-modal-visual>
 				<img class="trophy-modal__image" data-trophy-modal-image src="" alt="" hidden />
@@ -29,7 +32,7 @@ const { theme = '' } = Astro.props;
 
 		<div class="trophy-modal__footer">
 			<a class="btn tsbs-cta-primary trophy-modal__button" href="/scrivania/trofei/" data-trophy-modal-cta>
-				<span>Colleziona</span>
+				<span data-trophy-modal-cta-label>Colleziona</span>
 				<i class="bi bi-check-lg" aria-hidden="true"></i>
 			</a>
 		</div>
@@ -40,6 +43,9 @@ const { theme = '' } = Astro.props;
 	type TrofeoSbloccatoView = {
 		nome?: string;
 		immagineUrl?: string | null;
+		titoloNotifica?: string;
+		messaggioNotifica?: string;
+		ctaLabel?: string;
 	};
 
 	const setupTrophyModal = () => {
@@ -50,13 +56,16 @@ const { theme = '' } = Astro.props;
 		const image = modal.querySelector<HTMLImageElement>('[data-trophy-modal-image]');
 		const fallback = modal.querySelector<HTMLElement>('[data-trophy-modal-fallback]');
 		const name = modal.querySelector<HTMLElement>('[data-trophy-modal-name]');
+		const title = modal.querySelector<HTMLElement>('[data-trophy-modal-title]');
+		const message = modal.querySelector<HTMLElement>('[data-trophy-modal-message]');
+		const ctaLabel = modal.querySelector<HTMLElement>('[data-trophy-modal-cta-label]');
 		const closeControls = modal.querySelectorAll<HTMLElement>('[data-trophy-modal-close]');
 		// Chiudere il modale fuori dal bottone equivale a "Colleziona": stessa destinazione,
 		// così non si resta bloccati sulla pagina prova con la missione già completata.
 		const cta = modal.querySelector<HTMLAnchorElement>('[data-trophy-modal-cta]');
 		const collectHref = cta?.getAttribute('href') || '/scrivania/trofei/';
 
-		if (!image || !fallback || !name) return;
+		if (!image || !fallback || !name || !title || !message || !ctaLabel) return;
 
 		let queue: TrofeoSbloccatoView[] = [];
 
@@ -73,6 +82,9 @@ const { theme = '' } = Astro.props;
 			image.src = trofeo.immagineUrl || '';
 			image.alt = trofeo.nome || 'Trofeo sbloccato';
 			name.textContent = trofeo.nome || '';
+			title.textContent = trofeo.titoloNotifica || 'Complimenti! La missione è superata.';
+			message.textContent = trofeo.messaggioNotifica || 'Hai ricevuto un nuovo trofeo!';
+			ctaLabel.textContent = trofeo.ctaLabel || 'Colleziona';
 			modal.hidden = false;
 		};
 
@@ -90,7 +102,14 @@ const { theme = '' } = Astro.props;
 		document.addEventListener('tsbs:trofei-sbloccati', (event) => {
 			if (!(event instanceof CustomEvent)) return;
 
-			const trofei = Array.isArray(event.detail?.trofei) ? event.detail.trofei : [];
+			const trofei = Array.isArray(event.detail?.trofei)
+				? event.detail.trofei.map((trofeo: TrofeoSbloccatoView) => ({
+					...trofeo,
+					titoloNotifica: event.detail?.titoloNotifica,
+					messaggioNotifica: event.detail?.messaggioNotifica,
+					ctaLabel: event.detail?.ctaLabel,
+				}))
+				: [];
 			if (trofei.length === 0) return;
 
 			queue = [...queue, ...trofei];

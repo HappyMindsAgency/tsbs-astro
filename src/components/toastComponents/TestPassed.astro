@@ -3,7 +3,8 @@ const {
 	isOpen = false,
 	renderHidden = false,
 	theme = '',
-	message = 'Hai completando questa missione, ottieni:',
+	message = 'Complimenti! La missione è superata.',
+	secondaryMessage = 'Hai ricevuto un nuovo trofeo!',
 	trophyLabel = 'Trofeo "Topo da biblioteca"',
 	buttonLabel = 'Colleziona',
 	buttonHref = '/scrivania/trofei/',
@@ -19,6 +20,7 @@ const shouldRender = isOpen || renderHidden;
 			<div class="test-result-toast__body">
 				<div class="test-result-toast__copy" id="test-passed-copy">
 					<h2 id="test-passed-title">{message}</h2>
+					<p>{secondaryMessage}</p>
 					<p>
 						<i class="bi bi-award" aria-hidden="true"></i>
 						<strong>{trophyLabel}</strong>

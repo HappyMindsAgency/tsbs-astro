@@ -322,7 +322,14 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 
 				const trofei = Array.isArray(payload.trofeiSbloccati) ? payload.trofeiSbloccati : [];
 				if (trofei.length > 0) {
-					document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', { detail: { trofei } }));
+					document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', {
+						detail: {
+							trofei,
+							titoloNotifica: 'Hai portato a termine la Sfida di lettura!',
+							messaggioNotifica: 'Hai sbloccato un nuovo trofeo.',
+							ctaLabel: 'Collezionalo',
+						},
+					}));
 				}
 			} catch {
 				if (input) input.checked = false;

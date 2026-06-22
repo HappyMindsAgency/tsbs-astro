@@ -3,8 +3,8 @@ const {
 	isOpen = false,
 	renderHidden = false,
 	theme = '',
-	message = 'Missione non completata questa volta. Riprova e conquista il trofeo alla prossima sfida.',
-	secondaryMessage = 'Ogni lettura è comunque un passo avanti.',
+	message = 'Peccato! La missione non è completata',
+	secondaryMessage = '',
 	buttonLabel = 'Ritenta',
 	buttonHref = '/atrio/',
 } = Astro.props;
@@ -19,7 +19,7 @@ const shouldRender = isOpen || renderHidden;
 			<div class="test-result-toast__body">
 				<div class="test-result-toast__copy" id="test-not-passed-copy">
 					<h2 id="test-not-passed-title">{message}</h2>
-					<p>{secondaryMessage}</p>
+					{secondaryMessage && <p>{secondaryMessage}</p>}
 				</div>
 
 				<div class="test-result-toast__icon" aria-hidden="true">
