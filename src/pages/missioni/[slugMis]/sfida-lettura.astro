@@ -6,7 +6,7 @@ import DomandaModal from '../../../components/PopupComponents/DomandaModal.astro
 import TrofeoModal from '../../../components/PopupComponents/TrofeoModal.astro';
 import ConfermaCheackSfidaLettura from '../../../components/toastComponents/ConfermaCheackSfidaLettura.astro';
 import { getMissioneBySlug } from '../../../lib/strapi/missioni';
-import { getMembroProgressioneByJwt, getPartecipazione } from '../../../lib/strapi/progressione';
+import { getMembroProgressioneByJwt } from '../../../lib/strapi/progressione';
 import { getStatoSfidaLettura, type LibroSfida } from '../../../lib/strapi/sfida-lettura';
 import { resolveUserTheme } from '../../../lib/theme';
 
@@ -35,11 +35,6 @@ const [theme, missione, membro] = await Promise.all([
 
 if (!missione || !membro) {
 	return Astro.redirect('/404');
-}
-
-const partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
-if (partecipazione?.stato === 'completata') {
-	return Astro.redirect(missionPath);
 }
 
 const stato = await getStatoSfidaLettura(membro.documentId);
@@ -75,7 +70,7 @@ const categories = [...categorieMap.entries()]
 		books,
 	}));
 
-const totaleLibri = stato.libri.length;
+const OBIETTIVO_LETTURE = 20;
 const libriLetti = stato.libriRiconosciuti.length;
 const hasDescription = Boolean(missione.descrizione?.trim());
 const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.punteggio} punti` : '');
@@ -116,7 +111,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 				)}
 
 				<div class="reading-challenge__progress" aria-label="Progresso letture">
-					<strong data-sfida-progress>{libriLetti} / {totaleLibri}</strong>
+					<strong data-sfida-progress>{libriLetti} / {OBIETTIVO_LETTURE}</strong>
 					<span>libri letti</span>
 				</div>
 
@@ -313,7 +308,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 						input.dataset.sfidaPermanentlyDisabled = 'true';
 						input.disabled = true;
 					}
-					if (progress) progress.textContent = `${payload.libriRiconosciuti} / ${payload.totaleLibri}`;
+					if (progress) progress.textContent = `${payload.libriRiconosciuti} / 20`;
 					setFeedback('');
 				} else {
 					if (input) input.checked = false;
@@ -322,12 +317,33 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 
 				const trofei = Array.isArray(payload.trofeiSbloccati) ? payload.trofeiSbloccati : [];
 				if (trofei.length > 0) {
-					document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', {
-						detail: {
-							trofei,
+					const thresholdCopy = {
+						4: {
+							titoloNotifica: 'Prima soglia raggiunta!',
+							messaggioNotifica: 'Hai confermato 4 letture.',
+							ctaLabel: 'Ritira il trofeo',
+						},
+						6: {
+							titoloNotifica: 'Seconda soglia raggiunta!',
+							messaggioNotifica: 'Hai confermato 6 letture.',
+							ctaLabel: 'Ritira il trofeo',
+						},
+						12: {
+							titoloNotifica: 'Terza soglia raggiunta!',
+							messaggioNotifica: 'Hai confermato 12 letture!',
+							ctaLabel: 'Ritira il trofeo',
+						},
+						20: {
 							titoloNotifica: 'Hai portato a termine la Sfida di lettura!',
 							messaggioNotifica: 'Hai sbloccato un nuovo trofeo.',
 							ctaLabel: 'Collezionalo',
+						},
+					};
+					const notificationCopy = thresholdCopy[payload.libriRiconosciuti];
+					document.dispatchEvent(new CustomEvent('tsbs:trofei-sbloccati', {
+						detail: {
+							trofei,
+							...notificationCopy,
 						},
 					}));
 				}

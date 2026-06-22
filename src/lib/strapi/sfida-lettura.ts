@@ -1,6 +1,6 @@
 // Logica server-side della Missione 6 - Sfida di lettura (365 giorni).
 // Regole: un solo inserimento al giorno (mezzanotte Europe/Rome), +1 punto per
-// libro riconosciuto, trofei idempotenti alle soglie 5/10/15/tutti i libri.
+// libro riconosciuto, trofei idempotenti alle soglie 4/6/12/20 libri.
 // Da usare solo nelle route API / pagine server Astro.
 
 import { getStrapiApiUrl } from './api-url';
@@ -21,6 +21,7 @@ const STRAPI_API = import.meta.env.AUTH_READONLY;
 
 // Numero di estratti proposti a ogni tentativo: 1 del libro scelto + 3 distrattori.
 const ESTRATTI_PER_TENTATIVO = 4;
+const OBIETTIVO_LETTURE = 20;
 
 // Mappatura soglia -> trofeo: i 4 trofei della sfida sono identificati dal
 // codice nel nome ("06a".."06d") e dall'Accademia del Membro (vedi decision log).
@@ -267,6 +268,7 @@ export async function rispondiDomandaSfida(
 	missione: MissioneProgressione,
 	libroDocumentId: string,
 	indiceScelto: number,
+	missioneGiaCompletata = false,
 ): Promise<{ esito?: EsitoRispostaSfida; errore?: string }> {
 	const existing = await getTentativoLetturaRecord(membro.documentId, libroDocumentId);
 	const storico = leggiStorico(existing?.storicoTentativi);
@@ -320,12 +322,14 @@ export async function rispondiDomandaSfida(
 
 	if (!corretta) {
 		// Aggiorna comunque la partecipazione (stato inCorso e storico tentativi).
-		await registraEsitoProva({
-			membro,
-			missione,
-			esito: false,
-			progresso: totaleLibri > 0 ? Math.round((libriRiconosciuti / totaleLibri) * 100) : 0,
-		});
+		if (!missioneGiaCompletata) {
+			await registraEsitoProva({
+				membro,
+				missione,
+				esito: false,
+				progresso: Math.min(100, Math.round((libriRiconosciuti / OBIETTIVO_LETTURE) * 100)),
+			});
+		}
 		return { esito };
 	}
 
@@ -337,15 +341,17 @@ export async function rispondiDomandaSfida(
 	// Trofei alle soglie raggiunte (idempotenti: assegnati una sola volta).
 	esito.trofeiSbloccati = await assegnaTrofeiSoglia(membro, libriRiconosciuti, totaleLibri);
 
-	// Partecipazione missione: completata solo quando tutti i libri sono
-	// riconosciuti; in quel momento il motore eroga anche punteggio missione.
-	const tuttiLetti = totaleLibri > 0 && libriRiconosciuti >= totaleLibri;
-	const progressione = await registraEsitoProva({
-		membro,
-		missione,
-		esito: tuttiLetti,
-		progresso: totaleLibri > 0 ? Math.round((libriRiconosciuti / totaleLibri) * 100) : 0,
-	});
+	// La missione si completa alla ventesima lettura, ma la sfida resta attiva:
+	// le letture successive continuano ad assegnare il punto giornaliero.
+	const obiettivoRaggiunto = libriRiconosciuti >= OBIETTIVO_LETTURE;
+	const progressione = missioneGiaCompletata
+		? null
+		: await registraEsitoProva({
+			membro,
+			missione,
+			esito: obiettivoRaggiunto,
+			progresso: Math.min(100, Math.round((libriRiconosciuti / OBIETTIVO_LETTURE) * 100)),
+		});
 
 	if (progressione) {
 		esito.puntiAssegnati += progressione.puntiAssegnati;

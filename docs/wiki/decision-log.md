@@ -41,6 +41,27 @@ Impatto:
 Stato:
 - approvata
 
+## 2026-06-22 - Missione 06: completamento a 20 letture e prosecuzione della sfida
+
+Decisione:
+- il contatore della Sfida di lettura usa l'obiettivo fisso di 20 letture e puo mostrare valori superiori, per esempio `21/20`
+- la partecipazione alla missione diventa `completata` al raggiungimento della ventesima lettura
+- dopo il completamento la pagina e le API della sfida restano utilizzabili fino alla naturale disponibilita dei libri e continuano a rispettare il limite di un tentativo al giorno
+- ogni ulteriore libro riconosciuto continua ad assegnare il punto previsto, senza riaprire o retrocedere la partecipazione completata
+- i trofei soglia restano fissati a 4, 6, 12 e 20 letture
+
+Motivo:
+- separare l'obiettivo di completamento della missione dalla prosecuzione annuale della Sfida di lettura
+- rendere coerenti contatore, testi approvati e progressione effettiva
+
+Impatto:
+- `src/pages/missioni/[slugMis]/sfida-lettura.astro`
+- `src/pages/api/missioni/[slugMis]/sfida-lettura.ts`
+- `src/lib/strapi/sfida-lettura.ts`
+
+Stato:
+- approvata
+
 ## 2026-06-18 - Verifica Tessera: Completa M1, Assegna Trofeo E Notifica Al Login
 
 Decisione:

@@ -51,9 +51,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 	}
 
 	const partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
-	if (partecipazione?.stato === 'completata') {
-		return json({ error: 'mission_already_completed' }, 409);
-	}
+	const missioneGiaCompletata = partecipazione?.stato === 'completata';
 
 	if (body.azione === 'domanda') {
 		const { domanda, errore } = await generaDomandaSfida(membro, libroDocumentId);
@@ -70,7 +68,7 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 			return json({ error: 'invalid_answer' }, 400);
 		}
 
-		const { esito, errore } = await rispondiDomandaSfida(membro, missione, libroDocumentId, indice);
+		const { esito, errore } = await rispondiDomandaSfida(membro, missione, libroDocumentId, indice, missioneGiaCompletata);
 		if (errore || !esito) {
 			return json({ error: errore ?? 'salvataggio_fallito' }, errore === 'salvataggio_fallito' || !errore ? 500 : 409);
 		}
