@@ -22,16 +22,22 @@ const shouldRender = isOpen || renderHidden;
 
 		<section class="trophy-instructions-modal__panel">
 			<div class="trophy-instructions-modal__content">
-				<h2 id="trophy-instructions-title">Istruzioni</h2>
-				<div id="trophy-instructions-copy">
-					<ul>
-						<li><strong>Click/Tap</strong> su una forma qui per aggiungerla</li>
-						<li><strong>Trascina</strong> le forme sulla griglia per spostarle</li>
-						<li><strong>Desktop:</strong> Passa il mouse su una forma → click <span aria-hidden="true">✖</span></li>
-						<li><strong>Mobile:</strong> Tap su una forma → tap sul pulsante <span aria-hidden="true">✖</span></li>
-						<li><span class="trophy-instructions-modal__dot trophy-instructions-modal__dot--valid" aria-hidden="true"></span> Verde = posizione valida durante drag</li>
-						<li><span class="trophy-instructions-modal__dot trophy-instructions-modal__dot--invalid" aria-hidden="true"></span> Rosso = posizione non valida o sovrapposizione</li>
-					</ul>
+				<h2 id="trophy-instructions-title">Come funziona</h2>
+				<div id="trophy-instructions-copy" class="trophy-instructions-modal__copy">
+					<p>Tocca o clicca una forma per aggiungerla alla griglia.</p>
+					<p>Trascinala per spostarla dove preferisci.</p>
+					<div>
+						<p>Per eliminarla:</p>
+						<ul>
+							<li>Da desktop: passa il mouse sulla forma e clicca su <span aria-hidden="true">✖</span></li>
+							<li>Da mobile: tocca la forma, poi tocca <span aria-hidden="true">✖</span></li>
+						</ul>
+					</div>
+					<div>
+						<p>Durante lo spostamento:</p>
+						<p><span class="trophy-instructions-modal__dot trophy-instructions-modal__dot--valid" aria-hidden="true"></span>Verde significa che la posizione è valida.</p>
+						<p><span class="trophy-instructions-modal__dot trophy-instructions-modal__dot--invalid" aria-hidden="true"></span>Rosso significa che la posizione non è disponibile o si sovrappone a un’altra forma.</p>
+					</div>
 				</div>
 			</div>
 
@@ -133,16 +139,32 @@ const shouldRender = isOpen || renderHidden;
 		line-height: 1.18;
 	}
 
-	.trophy-instructions-modal__content ul {
+	.trophy-instructions-modal__copy {
 		display: grid;
 		gap: 0.625rem;
-		padding-left: 1rem;
-		margin: 0;
 		color: var(--tsbs-color-heading);
 		font-family: var(--tsbs-font-body);
 		font-size: 1rem;
 		font-weight: 400;
 		line-height: 1.35;
+	}
+
+	.trophy-instructions-modal__copy p,
+	.trophy-instructions-modal__copy ul,
+	.trophy-instructions-modal__copy li {
+		margin: 0;
+		color: #000;
+	}
+
+	.trophy-instructions-modal__copy ul {
+		display: grid;
+		gap: 0.375rem;
+		padding-left: 1.25rem;
+	}
+
+	.trophy-instructions-modal__copy > div {
+		display: grid;
+		gap: 0.375rem;
 	}
 
 	.trophy-instructions-modal__dot {
