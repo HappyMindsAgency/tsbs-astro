@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import AvatarLottie from '../../components/AvatarLottie.astro';
 import arboreaBanner from '../../assets/Arborea-accademia-stendardo-the-secret-bookish-society.png';
 import arboreaLogo from '../../assets/Arborea-logo-the-secret-bookish-society.png';
 import trophyIcon from '../../assets/trofei-icona-scrivania.png';
@@ -105,7 +106,7 @@ const chronicleRows = [
 							</div>
 							<div class="academy-ranking-card__avatar" aria-hidden="true">
 								{row.avatarSrc ? (
-									<img src={row.avatarSrc} alt="" loading="lazy" decoding="async" />
+									<AvatarLottie src={row.avatarSrc} />
 								) : (
 									row.initials
 								)}

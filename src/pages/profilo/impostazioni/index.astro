@@ -3,8 +3,10 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import AvatarProfiloModal from '../../../components/PopupComponents/AvatarProfiloModal.astro';
 import ConfermaCambioPassword from '../../../components/toastComponents/ConfermaCambioPassword.astro';
-import avatar01 from '../../../assets/Avatar_01_tartaruga.svg';
+import { avatarLottieByNumber } from '../../../lib/avatar';
 import { resolveUserContext } from '../../../lib/theme';
+
+const defaultAvatarLottie = avatarLottieByNumber(1);
 
 const { lang = 'it' } = Astro.props;
 if (!Astro.cookies.has('jwt')) {
@@ -36,15 +38,12 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 			<div class="profile-settings__layout">
 				<aside class="profile-settings__summary" aria-labelledby="profile-summary-title">
 					<div class="profile-settings__avatar">
-						<img
-							src={avatar01.src}
-							width={avatar01.width}
-							height={avatar01.height}
-							alt=""
-							loading="eager"
-							decoding="async"
+						<canvas
+							class="avatar-lottie"
+							data-avatar-lottie
+							data-avatar-lottie-src={defaultAvatarLottie}
 							data-profile-avatar-current
-						/>
+						></canvas>
 						<button class="profile-settings__avatar-edit" type="button" data-avatar-profile-modal-open aria-label="Scegli nuovo avatar">
 							<i class="bi bi-pencil" aria-hidden="true"></i>
 						</button>
@@ -255,9 +254,11 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 </Layout>
 
 <script>
+	import { setAvatarLottie } from '../../../scripts/avatarLottie';
+
 	const setupProfileAvatarPicker = () => {
 		const openControls = document.querySelectorAll<HTMLElement>('[data-avatar-profile-modal-open]');
-		const currentAvatar = document.querySelector<HTMLImageElement>('[data-profile-avatar-current]');
+		const currentAvatar = document.querySelector<HTMLCanvasElement>('[data-profile-avatar-current]');
 
 		openControls.forEach((control) => {
 			if (control.dataset.avatarProfileOpenReady === 'true') return;
@@ -273,7 +274,7 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 
 			const src = event.detail?.src;
 			if (typeof src === 'string' && src.length > 0) {
-				currentAvatar.src = src;
+				setAvatarLottie(currentAvatar, src);
 			}
 		});
 	};
@@ -670,8 +671,8 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 			}
 
 			if (profilo.avatarSrc) {
-				const img = document.querySelector<HTMLImageElement>('[data-profile-avatar-current]');
-				if (img) img.src = profilo.avatarSrc;
+				const canvas = document.querySelector<HTMLCanvasElement>('[data-profile-avatar-current]');
+				if (canvas) setAvatarLottie(canvas, profilo.avatarSrc);
 			}
 
 			// Notifica la sezione tessera
@@ -801,7 +802,8 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 		border-radius: 50%;
 	}
 
-	.profile-settings__avatar img {
+	.profile-settings__avatar img,
+	.profile-settings__avatar canvas {
 		width: 82%;
 		height: 82%;
 		object-fit: contain;

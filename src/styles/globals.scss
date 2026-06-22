@@ -1,6 +1,13 @@
 @use "./fonts";
 @use "./toast";
 
+// Avatar utente animato (.lottie in loop) reso su <canvas>.
+.avatar-lottie {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
 // Token globali TSBS e override minimi delle variabili Bootstrap.
 :root {
   --tsbs-font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

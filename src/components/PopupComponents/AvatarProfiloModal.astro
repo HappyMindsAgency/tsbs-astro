@@ -1,16 +1,5 @@
 ---
-import avatar01 from '../../assets/Avatar_01_tartaruga.svg';
-import avatar02 from '../../assets/Avatar_02_ampolla.svg';
-import avatar03 from '../../assets/Avatar_03_fantasma.svg';
-import avatar04 from '../../assets/Avatar_04_candela.svg';
-import avatar05 from '../../assets/Avatar_05_penna_calamaio.svg';
-import avatar06 from '../../assets/Avatar_06_pavone.svg';
-import avatar07 from '../../assets/Avatar_07_libro.svg';
-import avatar08 from '../../assets/Avatar_08_piccione.svg';
-import avatar09 from '../../assets/Avatar_09_gatto1.svg';
-import avatar10 from '../../assets/Avatar_10_gatto2.svg';
-import avatar11 from '../../assets/Avatar_11_gatto3.svg';
-import avatar12 from '../../assets/Avatar_12_gatto4.svg';
+import { AVATAR_COUNT, avatarLottieByNumber } from '../../lib/avatar';
 
 interface Props {
 	isOpen?: boolean;
@@ -20,20 +9,10 @@ interface Props {
 const { isOpen = false, renderHidden = false } = Astro.props as Props;
 const shouldRender = isOpen || renderHidden;
 
-const avatars = [
-	avatar01,
-	avatar02,
-	avatar03,
-	avatar04,
-	avatar05,
-	avatar06,
-	avatar07,
-	avatar08,
-	avatar09,
-	avatar10,
-	avatar11,
-	avatar12,
-];
+const avatars = Array.from({ length: AVATAR_COUNT }, (_, index) => ({
+	number: index + 1,
+	lottie: avatarLottieByNumber(index + 1),
+}));
 ---
 
 {shouldRender && (
@@ -60,17 +39,14 @@ const avatars = [
 
 					<form class="scelta-avatar__form" data-avatar-profile-modal-form>
 						<div class="scelta-avatar__preview" aria-live="polite">
-							{avatars.map((avatar, index) => (
-								<img
-									class={`scelta-avatar__preview-image scelta-avatar__preview-image--${index + 1}`}
-									src={avatar.src}
-									width={avatar.width}
-									height={avatar.height}
-									alt={`Avatar ${index + 1}`}
-									loading={index === 0 ? 'eager' : 'lazy'}
-									decoding="async"
-									data-avatar-profile-preview={index + 1}
-								/>
+							{avatars.map((avatar) => (
+								<canvas
+									class={`scelta-avatar__preview-image scelta-avatar__preview-image--${avatar.number}`}
+									data-avatar-lottie
+									data-avatar-lottie-src={avatar.lottie}
+									data-avatar-profile-preview={avatar.number}
+									aria-hidden="true"
+								></canvas>
 							))}
 						</div>
 
@@ -80,33 +56,29 @@ const avatars = [
 							<legend class="visually-hidden">Seleziona un avatar</legend>
 
 							<div class="scelta-avatar__grid">
-								{avatars.map((avatar, index) => {
-									const avatarNumber = index + 1;
-									const avatarId = `profile-avatar-${avatarNumber}`;
+								{avatars.map((avatar) => {
+									const avatarId = `profile-avatar-${avatar.number}`;
 
 									return (
-										<label class={`scelta-avatar__option scelta-avatar__option--${avatarNumber}`} for={avatarId}>
+										<label class={`scelta-avatar__option scelta-avatar__option--${avatar.number}`} for={avatarId}>
 											<input
 												id={avatarId}
 												class="visually-hidden"
 												type="radio"
 												name="profile-avatar"
 												value={avatarId}
-												data-avatar-profile-option={avatarNumber}
-												data-avatar-profile-src={avatar.src}
-												checked={index === 0}
+												data-avatar-profile-option={avatar.number}
+												data-avatar-profile-src={avatar.lottie}
+												checked={avatar.number === 1}
 											/>
 											<span class="scelta-avatar__thumb">
-												<img
-													src={avatar.src}
-													width={avatar.width}
-													height={avatar.height}
-													alt=""
-													loading="lazy"
-													decoding="async"
-												/>
+												<canvas
+													data-avatar-lottie
+													data-avatar-lottie-src={avatar.lottie}
+													aria-hidden="true"
+												></canvas>
 											</span>
-											<span class="visually-hidden">Avatar {avatarNumber}</span>
+											<span class="visually-hidden">Avatar {avatar.number}</span>
 										</label>
 									);
 								})}
@@ -124,6 +96,8 @@ const avatars = [
 )}
 
 <script>
+	import '../../scripts/avatarLottie';
+
 	const setupAvatarProfileModal = () => {
 		document.querySelectorAll<HTMLElement>('[data-avatar-profile-modal]').forEach((modal) => {
 			if (modal.dataset.avatarProfileModalReady === 'true') return;
@@ -394,7 +368,8 @@ const avatars = [
 			transform 180ms ease;
 	}
 
-	.avatar-profile-modal .scelta-avatar__thumb img {
+	.avatar-profile-modal .scelta-avatar__thumb canvas {
+		display: block;
 		width: 100%;
 		height: 100%;
 		padding: 0;
