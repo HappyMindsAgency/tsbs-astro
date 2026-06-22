@@ -1,6 +1,5 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
-import loginHero from '../../../../assets/login.png';
 
 const { lang = 'it' } = Astro.props;
 ---
@@ -10,13 +9,12 @@ const { lang = 'it' } = Astro.props;
 		<div class="reset-stage">
 			<section class="reset-panel" aria-labelledby="reset-title">
 				<div class="reset-media" aria-hidden="true">
-					<img
+					<canvas
 						class="reset-visual"
-						src={loginHero.src}
-						width={loginHero.width}
-						height={loginHero.height}
-						alt=""
-					/>
+						data-avatar-lottie
+						data-avatar-lottie-src="/animation/bibliotecaria.lottie"
+						aria-hidden="true"
+					></canvas>
 				</div>
 
 				<div class="reset-content">
@@ -50,6 +48,10 @@ const { lang = 'it' } = Astro.props;
 </Layout>
 
 <script>
+import { initAvatarLotties } from '../../../../scripts/avatarLottie';
+initAvatarLotties();
+document.addEventListener('astro:page-load', () => initAvatarLotties());
+
 function initPasswordReset() {
   const form = document.getElementById('resetPasswordForm');
   const messageDiv = document.getElementById('formMessage') as HTMLElement | null;

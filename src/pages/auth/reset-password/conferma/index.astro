@@ -1,6 +1,5 @@
 ---
 import Layout from '../../../../layouts/Layout.astro';
-import loginHero from '../../../../assets/login.png';
 
 const { lang = 'it' } = Astro.props;
 // Token letto dal link ricevuto via email. Validità e scadenza sono verificate server-side.
@@ -12,13 +11,12 @@ const token = Astro.url.searchParams.get('token') ?? '';
 		<div class="reset-stage">
 			<section class="reset-panel" aria-labelledby="reset-title">
 				<div class="reset-media" aria-hidden="true">
-					<img
+					<canvas
 						class="reset-visual"
-						src={loginHero.src}
-						width={loginHero.width}
-						height={loginHero.height}
-						alt=""
-					/>
+						data-avatar-lottie
+						data-avatar-lottie-src="/animation/bibliotecaria.lottie"
+						aria-hidden="true"
+					></canvas>
 				</div>
 
 				<div class="reset-content">
@@ -72,6 +70,10 @@ const token = Astro.url.searchParams.get('token') ?? '';
 </Layout>
 
 <script>
+import { initAvatarLotties } from '../../../../scripts/avatarLottie';
+initAvatarLotties();
+document.addEventListener('astro:page-load', () => initAvatarLotties());
+
 function initPasswordResetConfirm() {
 	const form = document.getElementById('resetConfirmForm') as HTMLFormElement | null;
 	const messageDiv = document.getElementById('formMessage') as HTMLElement | null;

@@ -1,6 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import signInHero from '../assets/sign-in.png';
 import italianCities from '../data/italianCities.json';
 
 const { lang = 'it' } = Astro.props;
@@ -11,13 +10,12 @@ const { lang = 'it' } = Astro.props;
 		<div class="sign-in-stage">
 			<section class="sign-in-panel" aria-labelledby="sign-in-title">
 				<div class="sign-in-media" aria-hidden="true">
-					<img
+					<canvas
 						class="sign-in-visual"
-						src={signInHero.src}
-						width={signInHero.width}
-						height={signInHero.height}
-						alt=""
-					/>
+						data-avatar-lottie
+						data-avatar-lottie-src="/animation/santi-muratori.lottie"
+						aria-hidden="true"
+					></canvas>
 				</div>
 
 				<div class="sign-in-content">
@@ -134,6 +132,10 @@ const { lang = 'it' } = Astro.props;
 <script type="application/json" id="italian-cities-data" set:html={JSON.stringify(italianCities)}></script>
 
 <script>
+	import { initAvatarLotties } from '../scripts/avatarLottie';
+	initAvatarLotties();
+	document.addEventListener('astro:page-load', () => initAvatarLotties());
+
 	type ItalianCity = {
 		cityName: string;
 		cityIstatCode: string;
