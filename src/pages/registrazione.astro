@@ -552,6 +552,8 @@ const { lang = 'it' } = Astro.props;
 							password: formData.get('password'),
 							name: formData.get('name'),
 							surname: formData.get('surname'),
+							consensoPrivacy: formData.get('terms') === 'on',
+							consensoNewsletter: formData.get('marketing') === 'on',
 							// cityName e cityIstatCode non sono presenti nel modello Membro: ignorati.
 						}),
 					});

@@ -40,6 +40,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const password = typeof body.password === 'string' ? body.password        : '';
     const name     = typeof body.name     === 'string' ? body.name.trim()     : '';
     const surname  = typeof body.surname  === 'string' ? body.surname.trim()  : '';
+    const consensoPrivacy = body.consensoPrivacy === true;
+    const consensoNewsletter = body.consensoNewsletter === true;
 
     // --- Validazione server-side ---
 
@@ -120,7 +122,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // --- Step 3: invia le due email di registrazione (errore non bloccante) ---
     // La registrazione è già andata a buon fine: eventuali errori di invio
     // non devono impedire l'accesso dell'utente.
-    await sendRegistrationEmails({ username, email, name, surname });
+    await sendRegistrationEmails({
+        username,
+        email,
+        name,
+        surname,
+        consensoPrivacy,
+        consensoNewsletter,
+    });
 
     // --- Successo: imposta il cookie JWT e risponde ---
 
@@ -142,43 +151,64 @@ export const POST: APIRoute = async ({ request, cookies }) => {
  *  2. email di benvenuto/ringraziamento al membro appena registrato.
  */
 async function sendRegistrationEmails(
-    membro: { username: string; email: string; name: string; surname: string },
+    membro: {
+        username: string;
+        email: string;
+        name: string;
+        surname: string;
+        consensoPrivacy: boolean;
+        consensoNewsletter: boolean;
+    },
 ): Promise<void> {
-    const { username, email, name, surname } = membro;
+    const { username, email, name, surname, consensoPrivacy, consensoNewsletter } = membro;
 
-    const dataOra = new Intl.DateTimeFormat('it-IT', {
+    const now = new Date();
+    const dataIscrizione = new Intl.DateTimeFormat('it-IT', {
         dateStyle: 'long',
+        timeZone: 'Europe/Rome',
+    }).format(now);
+    const oraIscrizione = new Intl.DateTimeFormat('it-IT', {
         timeStyle: 'short',
         timeZone: 'Europe/Rome',
-    }).format(new Date());
-
-    const nomeCompleto = [name, surname].filter(Boolean).join(' ') || '—';
+    }).format(now);
 
     // --- 1) Notifica alla Redazione ---
     try {
         await sendNotification({
             to: EMAIL_REDAZIONE,
-            subject: 'Nuovo membro registrato — TSBS',
+            subject: 'Nuova iscrizione a The Secret Bookish Society | TSBS',
             html: `
-                <h2 style="margin:0 0 1rem;font-size:1.25rem;">Nuovo membro registrato</h2>
-                <p>Un nuovo utente si è registrato alla piattaforma. Di seguito il riepilogo dei dati.</p>
+                <h2 style="margin:0 0 1rem;font-size:1.25rem;">È stata registrata una nuova iscrizione a <em>The Secret Bookish Society</em></h2>
+                <p>Ecco il riepilogo dei dati:</p>
                 <table role="presentation" cellpadding="0" cellspacing="0"
                        style="width:100%;border-collapse:collapse;margin:1.25rem 0;">
                   <tr>
-                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;width:40%;">Nickname</td>
-                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${escapeHtml(username)}</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;width:40%;">Nome</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${escapeHtml(name || '—')}</td>
                   </tr>
                   <tr>
-                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;">Nome e cognome</td>
-                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${escapeHtml(nomeCompleto)}</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;">Cognome</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${escapeHtml(surname || '—')}</td>
                   </tr>
                   <tr>
                     <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;">Email</td>
                     <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${escapeHtml(email)}</td>
                   </tr>
                   <tr>
-                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;">Data e ora registrazione</td>
-                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${escapeHtml(dataOra)}</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;">Data iscrizione</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${escapeHtml(dataIscrizione)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;">Ora iscrizione</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${escapeHtml(oraIscrizione)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;">Privacy</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${consensoPrivacy ? 'Sì' : 'No'}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;font-weight:600;background:#f8f8f8;">Newsletter</td>
+                    <td style="padding:0.5rem 0.75rem;border:1px solid #e8e8e8;">${consensoNewsletter ? 'Sì' : 'No'}</td>
                   </tr>
                 </table>
             `,
@@ -192,11 +222,20 @@ async function sendRegistrationEmails(
     try {
         await sendNotification({
             to: email,
-            subject: 'La tua richiesta di ammissione è stata accolta — TSBS',
+            subject: 'La tua iscrizione a TSBS è completata | TSBS',
             html: `
-                <h2 style="margin:0 0 1rem;font-size:1.25rem;">Grazie per aver risposto alla Chiamata</h2>
-                <p>La tua richiesta di ammissione è stata accolta.</p>
-                <p>Ti diamo il benvenuto in The Secret Bookish Society: da questo momento fai parte della Società.</p>
+                <p>Ciao ${escapeHtml(username)},</p>
+                <p><em>The Secret Bookish Society</em> ha ricevuto la tua iscrizione.</p>
+                <p>
+                    Grazie per aver risposto alla Chiamata.<br>
+                    Da questo momento, il tuo nome è registrato negli archivi della Società.
+                </p>
+                <p>
+                    Hai varcato la soglia, ma l’ingresso non è ancora completo.<br>
+                    Per proseguire, affronta lo Smistamento e scopri quale Accademia ti attende.
+                </p>
+                <p><strong>Completa il tuo ingresso nella Società!</strong></p>
+                <p><em>The Secret Bookish Society</em></p>
             `,
         });
         logger.info(`[RegisterAPI] Email di benvenuto inviata a ${email}`);

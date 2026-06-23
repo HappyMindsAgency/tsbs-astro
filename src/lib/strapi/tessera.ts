@@ -1,7 +1,7 @@
 // src/lib/strapi/tessera.ts
 // Meccanismo condiviso per l'invio del numero tessera della Biblioteca Classense
 // in verifica: valida un minimo di 9 caratteri alfanumerici, imposta statoTessera: in_verifica sul Membro e
-// notifica la Redazione via email. Usato sia dalla pagina Impostazioni
+// notifica via email l'utente e la Redazione. Usato sia dalla pagina Impostazioni
 // (/api/user/tessera) sia dalla Missione 1 (missione-01-il-varco), così il
 // salvataggio avviene esattamente con lo stesso processo.
 
@@ -117,10 +117,38 @@ export async function inviaTesseraInVerifica(jwt: string, rawTessera: unknown): 
 
 	logger.info(`[Tessera] Tessera ${tessera} salvata e stato impostato a in_verifica per membro ${membroId}`);
 
-	// Step 4: invia notifica email alla Redazione (errore non bloccante)
+	// Step 4: invia le notifiche email all'utente e alla Redazione (errori non bloccanti)
+	await notificaUtente({ username: user.username, email: user.email });
 	await notificaRedazione({ username: user.username, email: user.email, tessera, membroId });
 
 	return { ok: true, statoTessera: 'in_verifica', tessera, membroId };
+}
+
+async function notificaUtente(data: { username?: string; email?: string }) {
+	if (!data.email) {
+		logger.warn('[Tessera] Email utente assente: notifica di verifica non inviata');
+		return;
+	}
+
+	try {
+		await sendNotification({
+			to: data.email,
+			subject: 'La tua tessera della Biblioteca è in verifica | TSBS',
+			html: `
+				<p>Ciao ${escapeHtml(data.username ?? '—')},</p>
+				<p>
+					abbiamo ricevuto la tua richiesta di verifica della tessera della Biblioteca Classense.<br>
+					La Società sta controllando i dettagli.<br>
+					Nel frattempo, continua a svolgere le missioni all’interno della Società.<br>
+					Ti avviseremo appena la verifica sarà completata.
+				</p>
+				<p><em>The Secret Bookish Society</em></p>
+			`,
+		});
+		logger.info(`[Tessera] Notifica di verifica inviata a ${data.email}`);
+	} catch (mailErr) {
+		logger.error('[Tessera] Invio email utente fallito (dato salvato correttamente)', mailErr);
+	}
 }
 
 async function notificaRedazione(data: {
