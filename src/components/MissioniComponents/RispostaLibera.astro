@@ -2,6 +2,7 @@
 import { marked } from 'marked';
 import TestPassed from '../toastComponents/TestPassed.astro';
 import TestNotPassed from '../toastComponents/TestNotPassed.astro';
+import { MISSIONI_SPECIALI } from '../../lib/strapi/missioni';
 
 const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props;
 
@@ -20,13 +21,13 @@ const quote = missione?.quiz?.descrizione?.trim() || '';
 const openQuoteLinksInNewTab = (html: string) =>
 	html.replace(/<a\s(?![^>]*\btarget=)/g, '<a target="_blank" rel="noopener noreferrer" ');
 const rawQuoteContent = quote ? marked.parse(quote, { async: false }) : '';
-const quoteContent = slugMis === 'missione-01-il-varco' ? openQuoteLinksInNewTab(rawQuoteContent) : rawQuoteContent;
+// Missione 1: la prova raccoglie il numero tessera e lo mette in verifica
+// (nessun trofeo immediato, la missione resta in corso).
+const isLibraryCardMission = missione?.documentId === MISSIONI_SPECIALI.libraryCard;
+const quoteContent = isLibraryCardMission ? openQuoteLinksInNewTab(rawQuoteContent) : rawQuoteContent;
 
 const answerLabel = 'Risposta libera';
 const hasMultipleQuestions = questions.length > 1;
-// Missione 1: la prova raccoglie il numero tessera e lo mette in verifica
-// (nessun trofeo immediato, la missione resta in corso).
-const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 ---
 
 <article class="mission-proof-question free-answer-mission" data-free-answer-mission data-lang={lang} aria-label="Prova missione">
@@ -111,7 +112,7 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 	)}
 </article>
 
-<script define:vars={{ questions, slugMis }}>
+<script define:vars={{ questions, slugMis, isLibraryCardMission }}>
 	const setupFreeAnswerMission = () => {
 		const root = document.querySelector('[data-free-answer-mission]');
 		if (!root || root.dataset.freeAnswerMissionReady === 'true') return;
@@ -126,7 +127,6 @@ const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 		const passedToast = root.querySelector('.test-result-toast--passed');
 		const notPassedToast = root.querySelector('.test-result-toast--not-passed');
 
-		const isLibraryCardMission = slugMis === 'missione-01-il-varco';
 		const libraryCardResult = root.querySelector('[data-library-card-result]');
 		const libraryCardError = root.querySelector('[data-library-card-error]');
 

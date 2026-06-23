@@ -2,6 +2,7 @@
 import { marked } from 'marked';
 import TestPassed from '../toastComponents/TestPassed.astro';
 import TestNotPassed from '../toastComponents/TestNotPassed.astro';
+import { MISSIONI_SPECIALI } from '../../lib/strapi/missioni';
 
 interface MissionAnswer {
 	label: string;
@@ -16,6 +17,7 @@ interface MissionQuestion {
 
 interface Props {
 	missione?: {
+		documentId?: string;
 		titolo?: string;
 		quiz?: { descrizione?: string | null } | null;
 	} | null;
@@ -42,7 +44,7 @@ const quote = missione?.quiz?.descrizione?.trim() || '';
 const openQuoteLinksInNewTab = (html: string) =>
 	html.replace(/<a\s(?![^>]*\btarget=)/g, '<a target="_blank" rel="noopener noreferrer" ');
 const rawQuoteContent = quote ? marked.parse(quote, { async: false }) : '';
-const quoteContent = slugMis === 'missione-01-il-varco' ? openQuoteLinksInNewTab(rawQuoteContent) : rawQuoteContent;
+const quoteContent = missione?.documentId === MISSIONI_SPECIALI.libraryCard ? openQuoteLinksInNewTab(rawQuoteContent) : rawQuoteContent;
 const hasMultipleQuestions = questions.length > 1;
 const rootClass = `mission-proof-question ${firstQuestionIsFreeAnswer ? 'free-answer-mission' : 'choice-question'}`;
 const panelClass = `container-xl tsbs-app-container mission-proof-question__panel ${

@@ -6,7 +6,7 @@ import RispostaLibera from '../../../../components/MissioniComponents/RispostaLi
 import ProvaMissioneMista from '../../../../components/MissioniComponents/ProvaMissioneMista.astro';
 import NotaEditor from '../../../../components/GrimorioComponents/NotaEditor.astro';
 import TrofeoModal from '../../../../components/PopupComponents/TrofeoModal.astro';
-import { getMissioneBySlug } from '../../../../lib/strapi/missioni';
+import { getMissioneBySlug, MISSIONI_SPECIALI } from '../../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, getPartecipazione } from '../../../../lib/strapi/progressione';
 import { resolveUserTheme } from '../../../../lib/theme';
 
@@ -21,8 +21,6 @@ if (!jwt) {
 
 const { slugMis } = Astro.params;
 const locale = typeof lang === 'string' && lang.trim() ? lang.trim() : 'it';
-const MISSIONE_GRIMORIO_SLUG = 'missione-02-il-segno';
-const MISSIONE_GRIMORIO_SLUG_ALTERNATIVE = 'il-segno';
 
 if (!slugMis) {
 	return Astro.redirect('/404');
@@ -49,7 +47,7 @@ if (missione.quiz?.cacciaAlTesoro) {
 	return Astro.redirect(`/missioni/${missione.slug}/caccia-tesoro/`);
 }
 
-const isMissioneGrimorio = missione.slug === MISSIONE_GRIMORIO_SLUG || missione.slug === MISSIONE_GRIMORIO_SLUG_ALTERNATIVE;
+const isMissioneGrimorio = missione.documentId === MISSIONI_SPECIALI.grimorio;
 const rawQuestions = missione?.quiz?.domande ?? [];
 const hasAnswerElements = rawQuestions.some((domanda) => (domanda.risposte || []).length > 0);
 
