@@ -13,6 +13,8 @@ import astrariaBanner from '../assets/Astraria-accademia-stendardo-the-secret-bo
 import astrariaLogo from '../assets/Astraria-logo-the-secret-bookish-society.png';
 import trophyIcon from '../assets/trofei-icona-scrivania.png';
 import { getAcademyMembersCount, getAcademyRanking } from '../lib/strapi/accademie';
+import { getGrimorioChronicleMeta, getGrimorioExcerpt, getGrimorioNotePubbliche, getGrimorioPublicNoteHref } from '../lib/strapi/grimorio';
+import { resolveUserAcademy } from '../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 const { accademia = 'arborea' } = Astro.params;
@@ -60,10 +62,13 @@ const academies: Record<AcademyKey, {
 const isAcademyKey = (value: string): value is AcademyKey => value in academies;
 const academyKey = isAcademyKey(accademia) ? accademia : fallbackAcademy;
 const academy = academies[academyKey];
-const rankingHref = '/classifica-generale/';
+const rankingHref = `/classifica-generale/?accademia=${academyKey}`;
 const academyMembersCount = await getAcademyMembersCount(academyKey);
 const academyMembersLabel = `${academyMembersCount} ${academyMembersCount === 1 ? 'Adepto' : 'Adepti'}`;
-const rankingRows = await getAcademyRanking(academyKey, jwt);
+const userAcademy = await resolveUserAcademy(jwt);
+const isUserAcademy = academyKey === userAcademy;
+const rankingRows = await getAcademyRanking(academyKey, jwt, isUserAcademy ? 5 : 100);
+const chronicleRows = academyKey === userAcademy ? await getGrimorioNotePubbliche(lang, academyKey) : [];
 
 ---
 
@@ -127,10 +132,12 @@ const rankingRows = await getAcademyRanking(academyKey, jwt);
 			<section class="academy-section" aria-labelledby="academy-ranking-title">
 				<div class="academy-section__head">
 					<h2 id="academy-ranking-title" class="tsbs-section-title">Classifica</h2>
-					<a class="missions-load-more academy-ranking-more academy-section__link--desktop d-none" href={rankingHref} style="display: none !important;">
-						<span>Guarda tutta la classifica</span>
-						<i class="bi bi-arrow-right" aria-hidden="true"></i>
-					</a>
+					{isUserAcademy && (
+						<a class="missions-load-more academy-ranking-more academy-section__link--desktop" href={rankingHref}>
+							<span>Guarda tutta la classifica</span>
+							<i class="bi bi-arrow-right" aria-hidden="true"></i>
+						</a>
+					)}
 				</div>
 
 				<div class="academy-ranking-list">
@@ -169,12 +176,52 @@ const rankingRows = await getAcademyRanking(academyKey, jwt);
 					))}
 				</div>
 
-				<a class="missions-load-more academy-ranking-more academy-section__link--mobile d-none" href={rankingHref} style="display: none !important;">
-					<span>Guarda tutta la classifica</span>
-					<i class="bi bi-arrow-right" aria-hidden="true"></i>
-				</a>
+				{isUserAcademy && (
+					<a class="missions-load-more academy-ranking-more academy-section__link--mobile" href={rankingHref}>
+						<span>Guarda tutta la classifica</span>
+						<i class="bi bi-arrow-right" aria-hidden="true"></i>
+					</a>
+				)}
 			</section>
+
+			{isUserAcademy && (
+				<section class="academy-section academy-chronicles" aria-labelledby="academy-chronicles-title">
+					<h2 id="academy-chronicles-title" class="tsbs-section-title">Cronache della Società</h2>
+
+					<div class="academy-chronicles-list">
+						{chronicleRows.map((note, index) => (
+							<a class={`academy-note-card ${index > 1 ? 'is-hidden' : ''}`} href={getGrimorioPublicNoteHref(note)} data-academy-note-card>
+								<div>
+									<p class="academy-note-card__meta">{getGrimorioChronicleMeta(note)}</p>
+									<h3>{note.titolo}</h3>
+									<p>{getGrimorioExcerpt(note.contenuto)}</p>
+								</div>
+								<i class="bi bi-chevron-right" aria-hidden="true"></i>
+							</a>
+						))}
+					</div>
+
+					{chronicleRows.length > 2 && (
+						<button class="missions-load-more academy-load-more" type="button" data-load-more aria-controls="academy-chronicles-title">
+							<span>Carica altro</span>
+							<i class="bi bi-arrow-right" aria-hidden="true"></i>
+						</button>
+					)}
+				</section>
+			)}
 
 		</div>
 	</main>
+
+	<script>
+		const academyLoadMore = document.querySelector<HTMLButtonElement>('.academy-load-more[data-load-more]');
+
+		academyLoadMore?.addEventListener('click', () => {
+			document.querySelectorAll<HTMLElement>('[data-academy-note-card].is-hidden').forEach((card) => {
+				card.classList.remove('is-hidden');
+			});
+
+			academyLoadMore.hidden = true;
+		});
+	</script>
 </Layout>

@@ -7,7 +7,15 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
-const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+const academyKeys = ['astraria', 'arcadia', 'armonia', 'arborea'] as const;
+type AcademyKey = typeof academyKeys[number];
+const isAcademyKey = (value: string | null): value is AcademyKey =>
+	value !== null && academyKeys.includes(value as AcademyKey);
+
+const userContext = await resolveUserContext(Astro.cookies.get('jwt')?.value);
+const requestedAcademy = Astro.url.searchParams.get('accademia');
+const accademia = isAcademyKey(requestedAcademy) ? requestedAcademy : userContext.accademia;
+const theme = `theme-${accademia}`;
 ---
 
 <RankingAccademia lang={lang} theme={theme} academy={accademia} showBoxCronache={false} showUserRank={true} />
