@@ -132,7 +132,7 @@ const taskCards = getFirstIncompleteMissionCards(
 		<section class="dashboard-section dashboard-grimoire" aria-labelledby="grimoire-title">
 			<div class="dashboard-section__head">
 				<h2 id="grimoire-title" class="tsbs-section-title">Grimorio</h2>
-				<a class="dashboard-grimoire__desktop-link tsbs-accent-link" href={grimorioHref}>Consulta il tuo Grimorio →</a>
+				<a class="dashboard-grimoire__desktop-link tsbs-accent-link d-none d-lg-inline-flex" href={grimorioHref}>Consulta il tuo Grimorio →</a>
 			</div>
 			<a class="tsbs-note-pad" href={featuredNoteHref} aria-label="Apri nota del Grimorio">
 				<h2>Titolo della nota</h2>
@@ -144,7 +144,7 @@ const taskCards = getFirstIncompleteMissionCards(
 					<span></span>
 				</div>
 			</a>
-			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href={grimorioHref}>Vai al tuo grimorio →</a>
+			<a class="dashboard-inline-link dashboard-grimoire__link tsbs-accent-link mt-2 d-lg-none" href={grimorioHref}>Consulta il tuo Grimorio →</a>
 		</section>
 
 		{eventiClassense.length > 0 && (
