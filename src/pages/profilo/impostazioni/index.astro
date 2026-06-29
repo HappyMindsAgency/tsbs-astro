@@ -1,6 +1,7 @@
 ﻿---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import BackButton from '../../../components/BackButton.astro';
 import AvatarProfiloModal from '../../../components/PopupComponents/AvatarProfiloModal.astro';
 import ConfermaCambioPassword from '../../../components/toastComponents/ConfermaCambioPassword.astro';
 import { avatarLottieByNumber } from '../../../lib/avatar';
@@ -28,10 +29,7 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 						<h1 id="profile-settings-title">Il tuo profilo</h1>
 						<p class="d-none">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
 					</div>
-					<a class="profile-settings__back-link" href="/atrio/">
-						<i class="bi bi-arrow-left" aria-hidden="true"></i>
-						<span>Indietro</span>
-					</a>
+					<BackButton href="/atrio/" label="Torna all’Atrio" withText variant="plain" class="profile-settings__back-link" />
 				</div>
 			</header>
 

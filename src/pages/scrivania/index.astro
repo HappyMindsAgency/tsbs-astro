@@ -9,6 +9,7 @@ import scrivaniaArcadiaPattern from '../../assets/scrivania-arcadia-pattern-the-
 import scrivaniaArmoniaPattern from '../../assets/scrivania-armonia-pattern-the-secret-bookish-society.png';
 import scrivaniaAstrariaPattern from '../../assets/scrivania-astraria-pattern-the-secret-bookish-society.png';
 import { resolveUserContext } from '../../lib/theme';
+import { withReturnTo } from '../../lib/navigation';
 import {
 	formatGrimorioDate,
 	getCurrentMembroFromJwt,
@@ -22,6 +23,7 @@ const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
 
 const featuredNoteHref = '/scrivania/grimorio/nuova/';
+const rankingHref = withReturnTo('/classifica-generale/', '/scrivania/');
 if (!jwt) {
 	return Astro.redirect('/');
 }
@@ -96,7 +98,7 @@ const getNoteHref = (note: (typeof notes)[number]) => {
 						/>
 						<span>Trofei</span>
 					</a>
-					<a class="desk-recap-card" href="/classifica-generale/">
+					<a class="desk-recap-card" href={rankingHref}>
 						<img
 							class="desk-recap-card__icon"
 							src={classificaIcon.src}

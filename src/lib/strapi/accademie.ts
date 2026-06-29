@@ -1,5 +1,6 @@
 import { getStrapiApiUrl } from './api-url';
 import { resolveAvatarSrc } from '../avatar';
+import { withReturnTo } from '../navigation';
 
 type StrapiCountResponse = {
 	data?: unknown[];
@@ -111,11 +112,18 @@ function mapMembroToRankingRow(
 	index: number,
 	currentMembroDocumentId: string | null,
 	accademiaSlug: string,
+	returnToOverride?: string | null,
 ): AcademyRankingRow {
 	const name = membro.nickname?.trim() || 'Membro';
 	const points = Number.parseInt(String(membro.punti ?? '0'), 10) || 0;
 	const current = membro.documentId === currentMembroDocumentId;
-	const currentHref = `/scrivania/trofei/?returnTo=${encodeURIComponent(`/sala-accademia-${accademiaSlug}/`)}`;
+	const academyReturnTo = `/sala-accademia-${accademiaSlug}/`;
+	const rowReturnTo = returnToOverride ?? academyReturnTo;
+	const currentHref = withReturnTo('/scrivania/trofei/', rowReturnTo);
+	const profileHref = withReturnTo(
+		`/scrivania/utenti-preferiti/esploso-profilo-utente/?membro=${encodeURIComponent(membro.documentId)}`,
+		rowReturnTo,
+	);
 
 	return {
 		documentId: membro.documentId,
@@ -126,13 +134,11 @@ function mapMembroToRankingRow(
 		name,
 		points,
 		current,
-		href: current
-			? currentHref
-			: `/scrivania/utenti-preferiti/esploso-profilo-utente/?membro=${encodeURIComponent(membro.documentId)}`,
+		href: current ? currentHref : profileHref,
 	};
 }
 
-export async function getAcademyRanking(accademiaSlug: string, jwt?: string, limit = 5): Promise<AcademyRankingRow[]> {
+export async function getAcademyRanking(accademiaSlug: string, jwt?: string, limit = 5, returnToOverride?: string | null): Promise<AcademyRankingRow[]> {
 	const slug = accademiaSlug.trim();
 	if (!slug) return [];
 
@@ -167,7 +173,7 @@ export async function getAcademyRanking(accademiaSlug: string, jwt?: string, lim
 				return nameA.localeCompare(nameB, 'it-IT');
 			})
 			.slice(0, limit)
-			.map((membro, index) => mapMembroToRankingRow(membro, index, currentMembroDocumentId, slug));
+			.map((membro, index) => mapMembroToRankingRow(membro, index, currentMembroDocumentId, slug, returnToOverride));
 	} catch {
 		return [];
 	}

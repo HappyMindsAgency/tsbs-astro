@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../Nav.astro';
+import BackButton from '../BackButton.astro';
 import AvatarLottie from '../AvatarLottie.astro';
 import arboreaPattern from '../../assets/Arborea-pattern-the-secret-bookish-society.webp';
 import arcadiaPattern from '../../assets/Arcadia-pattern-the-secret-bookish-society.webp';
@@ -17,6 +18,8 @@ const {
 	showBoxCronache = false,
 	showUserRank = false,
 	useLocalAcademyTheme = true,
+	backHref,
+	backLabel = 'Torna indietro',
 } = Astro.props;
 const academyKeys  = ['astraria', 'arcadia', 'armonia', 'arborea'] as const;
 type AcademyTheme = typeof academyKeys[number];
@@ -37,7 +40,8 @@ const academyPattern = academyPatterns[academyTheme];
 const localAcademyThemeClass = useLocalAcademyTheme ? ` theme-${academyTheme}` : '';
 const localAcademyPatternStyle = useLocalAcademyTheme ? `--tsbs-page-pattern-image: url(${academyPattern.src});` : undefined;
 const jwt = Astro.cookies.get('jwt')?.value;
-const rankingRows = (await getAcademyRanking(academyTheme, jwt, 100)).map((row) => ({
+const rankingReturnTo = `${Astro.url.pathname}${Astro.url.search}`;
+const rankingRows = (await getAcademyRanking(academyTheme, jwt, 100, rankingReturnTo)).map((row) => ({
 	...row,
 	current: showUserRank && row.current,
 }));
@@ -52,6 +56,7 @@ const chronicleRows = showBoxCronache ? await getGrimorioNotePubbliche(lang, aca
 	<main class={`tsbs-app-shell academy-page academy-ranking-page${localAcademyThemeClass}`} data-academy={academyTheme} style={localAcademyPatternStyle}>
 		<header class="missions-header academy-ranking-header">
 			<h1>La classifica</h1>
+			{backHref && <BackButton href={backHref} label={backLabel} class="academy-ranking-header__back" />}
 		</header>
 
 		<div class="container-xl tsbs-app-container academy-ranking-page__content">

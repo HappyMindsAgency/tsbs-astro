@@ -5,6 +5,7 @@ interface Props {
 	/** Mostra anche il testo accanto all'icona (default: solo icona) */
 	withText?: boolean;
 	icon?: string;
+	variant?: 'default' | 'plain';
 	class?: string;
 }
 
@@ -13,12 +14,13 @@ const {
 	label = 'Indietro',
 	withText = false,
 	icon = 'bi-arrow-left',
+	variant = 'default',
 	class: className = '',
 } = Astro.props;
 ---
 
 <a
-	class:list={['tsbs-back-button', { 'tsbs-back-button--text': withText }, className]}
+	class:list={['tsbs-back-button', `tsbs-back-button--${variant}`, { 'tsbs-back-button--text': withText }, className]}
 	href={href}
 	aria-label={label}
 	title={label}
@@ -54,10 +56,33 @@ const {
 		border-radius: var(--tsbs-radius-md);
 	}
 
+	.tsbs-back-button--plain {
+		width: auto;
+		height: auto;
+		min-height: 2.75rem;
+		color: var(--tsbs-back-button-color, var(--tsbs-theme-accent, var(--tsbs-color-heading)));
+		background: transparent;
+		border-color: transparent;
+		border-radius: var(--tsbs-radius-md);
+	}
+
+	.tsbs-back-button--plain.tsbs-back-button--text {
+		padding: 0;
+	}
+
 	.tsbs-back-button:hover,
 	.tsbs-back-button:focus {
 		color: var(--profile-current-academy-accent);
 		background: var(--tsbs-color-white);
 		border-color: var(--tsbs-color-white);
+	}
+
+	.tsbs-back-button--plain:hover,
+	.tsbs-back-button--plain:focus {
+		color: var(--tsbs-back-button-hover-color, var(--tsbs-theme-accent, var(--tsbs-color-heading)));
+		background: transparent;
+		border-color: transparent;
+		text-decoration: underline;
+		text-underline-offset: 0.18em;
 	}
 </style>

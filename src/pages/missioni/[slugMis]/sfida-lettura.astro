@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import BackButton from '../../../components/BackButton.astro';
 import RitchText from '../../../components/RitchText.astro';
 import DomandaModal from '../../../components/PopupComponents/DomandaModal.astro';
 import TrofeoModal from '../../../components/PopupComponents/TrofeoModal.astro';
@@ -81,10 +82,7 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 
 	<main class="tsbs-app-shell reading-challenge">
 		<header class="mission-detail__topbar">
-			<a class="mission-detail__back" href={missionPath}>
-				<i class="bi bi-arrow-left" aria-hidden="true"></i>
-				<span>Torna alle missioni</span>
-			</a>
+			<BackButton href={missionPath} label="Torna alla missione" withText variant="plain" class="mission-detail__back" />
 		</header>
 
 		<section

@@ -1,11 +1,13 @@
 ﻿---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import BackButton from '../../../components/BackButton.astro';
 import AvatarLottie from '../../../components/AvatarLottie.astro';
 import { getProfileDetailByJwt } from '../../../lib/strapi/preferiti';
 import { getTrofeiStanzaByMembroDocumentId } from '../../../lib/strapi/trofei';
 import { buildTrophyCatalog } from '../../../lib/trofei-forme';
 import { resolveUserContext } from '../../../lib/theme';
+import { getReturnToLabel, getSafeReturnTo } from '../../../lib/navigation';
 
 const { lang = 'it' } = Astro.props;
 if (!Astro.cookies.has('jwt')) {
@@ -41,6 +43,8 @@ const cells = Array.from({ length: board.rows * board.cols });
 const { theme, accademia } = await resolveUserContext(jwt);
 const profileAcademies = ['astraria', 'arcadia', 'armonia', 'arborea'];
 const profileAcademy = profileAcademies.includes(currentProfile.academy) ? currentProfile.academy : accademia;
+const returnTo = getSafeReturnTo(Astro.url, '/scrivania/utenti-preferiti/');
+const returnToLabel = getReturnToLabel(returnTo, 'Torna agli utenti preferiti');
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -49,6 +53,8 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 	<main class={`tsbs-app-shell desk-page profile-exploded-page theme-${profileAcademy}`} data-profile-academy={profileAcademy}>
 		<header class="desk-hero profile-exploded-hero" aria-labelledby="profile-exploded-title">
 			<div class="desk-hero__panel profile-exploded-hero__panel">
+				<BackButton href={returnTo} label={returnToLabel} class="profile-exploded-back" />
+
 				<button
 					class={`profile-favorite-button${currentProfile.isFavorite ? ' is-favorite' : ''}`}
 					type="button"
@@ -166,6 +172,23 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 		background: color-mix(in srgb, var(--desk-accent) 58%, #ffffff);
 	}
 
+	:global(.profile-exploded-back.tsbs-back-button) {
+		position: absolute;
+		top: 0.625rem;
+		left: 0.625rem;
+		z-index: 2;
+		color: #ffffff;
+		background: color-mix(in srgb, var(--desk-accent) 74%, #ffffff);
+		border-color: #ffffff;
+	}
+
+	:global(.profile-exploded-back.tsbs-back-button:hover),
+	:global(.profile-exploded-back.tsbs-back-button:focus) {
+		color: var(--desk-accent);
+		background: #ffffff;
+		border-color: #ffffff;
+	}
+
 	.desk-avatar__img {
 		width: 100%;
 		height: 100%;
@@ -180,8 +203,8 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 		right: 0.625rem;
 		display: grid;
 		place-items: center;
-		width: 1.875rem;
-		height: 1.875rem;
+		width: 2.75rem;
+		height: 2.75rem;
 		padding: 0;
 		color: var(--desk-accent);
 		background: #ffffff;
@@ -315,8 +338,18 @@ const profileAcademy = profileAcademies.includes(currentProfile.academy) ? curre
 		.profile-favorite-button {
 			top: 1.25rem;
 			right: 1.25rem;
-			width: 2.25rem;
-			height: 2.25rem;
+		}
+
+		:global(.profile-exploded-back.tsbs-back-button) {
+			top: 1.25rem;
+			left: 1.25rem;
+		}
+
+		:global(.profile-exploded-back.tsbs-back-button:hover),
+		:global(.profile-exploded-back.tsbs-back-button:focus) {
+			color: var(--desk-accent);
+			background: #ffffff;
+			border-color: #ffffff;
 		}
 
 		.profile-exploded-content {

@@ -1,6 +1,7 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
+import BackButton from '../../../components/BackButton.astro';
 import RitchText from '../../../components/RitchText.astro';
 import { getMissioneBySlug } from '../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, getPartecipazione } from '../../../lib/strapi/progressione';
@@ -44,10 +45,7 @@ const avviaActionHref = `/api/missioni/${missione.slug}/avvia`;
 
 	<main class="tsbs-app-shell mission-detail">
 		<header class="mission-detail__topbar">
-			<a class="mission-detail__back" href="/missioni/">
-				<i class="bi bi-arrow-left" aria-hidden="true"></i>
-				<span>Torna alle missioni</span>
-			</a>
+			<BackButton href="/missioni/" label="Torna alle missioni" withText variant="plain" class="mission-detail__back" />
 		</header>
 
 		<section class="container-xl tsbs-app-container mission-detail__content" aria-labelledby="mission-title">

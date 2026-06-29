@@ -1237,17 +1237,17 @@ body:has(.tsbs-legal-page) {
 	.academy-hero .academy-hero__back.tsbs-back-button {
 		position: absolute;
 		top: 1rem;
-		left: 1rem;
+		right: 1rem;
 		z-index: 2;
-		color: var(--tsbs-theme-accent);
-		background: rgba(255, 255, 255, 0.7);
-		border-color: color-mix(in srgb, var(--tsbs-theme-accent) 45%, transparent);
+		color: var(--tsbs-color-white);
+		background: var(--tsbs-theme-accent);
+		border-color: var(--tsbs-theme-accent);
 	}
 
 	.academy-hero .academy-hero__back.tsbs-back-button:hover,
 	.academy-hero .academy-hero__back.tsbs-back-button:focus {
-		color: var(--tsbs-color-white);
-		background: var(--tsbs-theme-accent);
+		color: var(--tsbs-theme-accent);
+		background: var(--tsbs-theme-cta-active-bg);
 		border-color: var(--tsbs-theme-accent);
 	}
 
@@ -1602,12 +1602,33 @@ body:has(.tsbs-legal-page) {
 		background: var(--tsbs-color-surface);
 	}
 
+	.academy-ranking-header {
+		position: relative;
+	}
+
 	.academy-ranking-page .academy-ranking-header h1 {
 		margin: 0;
 		color: var(--tsbs-color-white);
 		font-size: 2rem;
 		font-weight: 700;
 		line-height: 1;
+	}
+
+	.academy-ranking-header .academy-ranking-header__back.tsbs-back-button {
+		position: absolute;
+		top: 50%;
+		right: 1rem;
+		color: var(--tsbs-color-white);
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 74%, var(--tsbs-color-white));
+		border-color: var(--tsbs-color-white);
+		transform: translateY(-50%);
+	}
+
+	.academy-ranking-header .academy-ranking-header__back.tsbs-back-button:hover,
+	.academy-ranking-header .academy-ranking-header__back.tsbs-back-button:focus {
+		color: var(--tsbs-theme-accent);
+		background: var(--tsbs-color-white);
+		border-color: var(--tsbs-color-white);
 	}
 
 	.academy-ranking-page__content {

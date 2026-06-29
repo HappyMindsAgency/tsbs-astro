@@ -1,6 +1,7 @@
 ﻿---
 import RankingAccademia from '../components/ClassificaComponents/RankingAccademia.astro';
 import { resolveUserContext } from '../lib/theme';
+import { getReturnToLabel, getSafeReturnTo } from '../lib/navigation';
 
 const { lang = 'it' } = Astro.props;
 if (!Astro.cookies.has('jwt')) {
@@ -16,6 +17,16 @@ const userContext = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 const requestedAcademy = Astro.url.searchParams.get('accademia');
 const accademia = isAcademyKey(requestedAcademy) ? requestedAcademy : userContext.accademia;
 const theme = `theme-${accademia}`;
+const returnTo = getSafeReturnTo(Astro.url, '');
+const returnToLabel = returnTo ? getReturnToLabel(returnTo, 'Torna indietro') : undefined;
 ---
 
-<RankingAccademia lang={lang} theme={theme} academy={accademia} showBoxCronache={false} showUserRank={true} />
+<RankingAccademia
+	lang={lang}
+	theme={theme}
+	academy={accademia}
+	showBoxCronache={false}
+	showUserRank={true}
+	backHref={returnTo || undefined}
+	backLabel={returnToLabel}
+/>

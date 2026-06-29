@@ -13,6 +13,7 @@ import astrariaLogo from '../assets/Astraria-logo-the-secret-bookish-society.png
 import trophyIcon from '../assets/trofei-icona-scrivania.png';
 import { getAcademyMembersCount, getAcademyRanking } from '../lib/strapi/accademie';
 import { getGrimorioChronicleMeta, getGrimorioExcerpt, getGrimorioNotePubbliche, getGrimorioPublicNoteHref } from '../lib/strapi/grimorio';
+import { withReturnTo } from '../lib/navigation';
 import { resolveUserAcademy } from '../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -72,6 +73,7 @@ const academyMembersCount = await getAcademyMembersCount(academyKey);
 const academyMembersLabel = `${academyMembersCount} ${academyMembersCount === 1 ? 'Adepto' : 'Adepti'}`;
 const rankingRows = await getAcademyRanking(academyKey, jwt);
 const chronicleRows = await getGrimorioNotePubbliche(lang, academyKey);
+const academyReturnTo = `/sala-accademia-${academyKey}/`;
 ---
 
 <Layout lang={lang} theme={`theme-${academyKey}`} accademia={academyKey}>
@@ -185,7 +187,7 @@ const chronicleRows = await getGrimorioNotePubbliche(lang, academyKey);
 
 				<div class="academy-chronicles-list">
 					{chronicleRows.map((note, index) => (
-						<a class={`academy-note-card ${index > 1 ? 'is-hidden' : ''}`} href={getGrimorioPublicNoteHref(note)} data-academy-note-card>
+						<a class={`academy-note-card ${index > 1 ? 'is-hidden' : ''}`} href={withReturnTo(getGrimorioPublicNoteHref(note), academyReturnTo)} data-academy-note-card>
 							<div>
 								<p class="academy-note-card__meta">{getGrimorioChronicleMeta(note)}</p>
 								<h3>{note.titolo}</h3>
