@@ -68,12 +68,12 @@ const academies: Record<AcademyKey, {
 const isAcademyKey = (value: string): value is AcademyKey => value in academies;
 const academyKey = isAcademyKey(userAcademy) ? userAcademy : fallbackAcademy;
 const academy = academies[academyKey];
-const rankingHref = '/classifica-generale/';
+const academyReturnTo = `/sala-accademia-${academyKey}/`;
+const rankingHref = withReturnTo('/classifica-generale/', academyReturnTo);
 const academyMembersCount = await getAcademyMembersCount(academyKey);
 const academyMembersLabel = `${academyMembersCount} ${academyMembersCount === 1 ? 'Adepto' : 'Adepti'}`;
 const rankingRows = await getAcademyRanking(academyKey, jwt);
 const chronicleRows = await getGrimorioNotePubbliche(lang, academyKey);
-const academyReturnTo = `/sala-accademia-${academyKey}/`;
 ---
 
 <Layout lang={lang} theme={`theme-${academyKey}`} accademia={academyKey}>

@@ -17,8 +17,8 @@ const userContext = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 const requestedAcademy = Astro.url.searchParams.get('accademia');
 const accademia = isAcademyKey(requestedAcademy) ? requestedAcademy : userContext.accademia;
 const theme = `theme-${accademia}`;
-const returnTo = getSafeReturnTo(Astro.url, '');
-const returnToLabel = returnTo ? getReturnToLabel(returnTo, 'Torna indietro') : undefined;
+const returnTo = getSafeReturnTo(Astro.url, `/sala-accademia-${accademia}/`);
+const returnToLabel = getReturnToLabel(returnTo, 'Torna indietro');
 ---
 
 <RankingAccademia
@@ -27,6 +27,6 @@ const returnToLabel = returnTo ? getReturnToLabel(returnTo, 'Torna indietro') : 
 	academy={accademia}
 	showBoxCronache={false}
 	showUserRank={true}
-	backHref={returnTo || undefined}
+	backHref={returnTo}
 	backLabel={returnToLabel}
 />
