@@ -58,6 +58,7 @@ const featuredEpistleExcerpt = featuredEpistola
 const atrioReturnTo = '/atrio/';
 const featuredNoteHref = withReturnTo('/scrivania/grimorio/nuova/', atrioReturnTo);
 const grimorioHref = withReturnTo('/scrivania/grimorio/', atrioReturnTo);
+const epistoleArchiveHref = withReturnTo('/epistole/', atrioReturnTo);
 const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 const taskCards = getFirstIncompleteMissionCards(
 	missioniAttive,
@@ -99,7 +100,7 @@ const taskCards = getFirstIncompleteMissionCards(
 				<a class="btn tsbs-cta-primary dashboard-button" href={featuredEpistleHref}>Leggi l'Epistola</a>
 			</div>
 		</section>
-		<a class="dashboard-inline-link dashboard-epistle-link tsbs-accent-link" href="/epistole/">Apri l’Archivio delle Epistole →</a>
+		<a class="dashboard-inline-link dashboard-epistle-link tsbs-accent-link" href={epistoleArchiveHref}>Apri l’Archivio delle Epistole →</a>
 
 		<section class="dashboard-section" aria-labelledby="tasks-title">
 			<div class="dashboard-section__head">

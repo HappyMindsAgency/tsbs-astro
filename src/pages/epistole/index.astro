@@ -1,9 +1,11 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
+import BackButton from '../../components/BackButton.astro';
 import FiltroEpistole from '../../lib/filtri/FiltroEpistole.astro';
 import { getEpistole } from '../../lib/strapi/epistole';
 import { getMembroMissioniByJwt } from '../../lib/strapi/missioni';
+import { getReturnToLabel, getSafeReturnTo } from '../../lib/navigation';
 import { resolveUserContext } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
@@ -20,6 +22,8 @@ const [epistole, membroMissioni] = await Promise.all([
 	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
 ]);
 const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
+const returnTo = getSafeReturnTo(Astro.url, '/atrio/');
+const backLabel = getReturnToLabel(returnTo, "Torna all'Atrio");
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>
@@ -28,6 +32,7 @@ const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 	<main class="tsbs-app-shell missions-shell epistole-page">
 		<header class="missions-header epistole-header">
 			<h1>Epistole</h1>
+			<BackButton href={returnTo} label={backLabel} class="epistole-header__back" />
 		</header>
 
 		<div class="container-xl tsbs-app-container epistole-content">

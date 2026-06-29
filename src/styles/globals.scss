@@ -4172,6 +4172,27 @@ body:has(.tsbs-legal-page) {
 		line-height: 1;
 	}
 
+	.epistole-header {
+		position: relative;
+	}
+
+	.epistole-header .epistole-header__back.tsbs-back-button {
+		position: absolute;
+		top: 50%;
+		right: 1rem;
+		color: var(--tsbs-color-white);
+		background: color-mix(in srgb, var(--tsbs-theme-accent) 74%, var(--tsbs-color-white));
+		border-color: var(--tsbs-color-white);
+		transform: translateY(-50%);
+	}
+
+	.epistole-header .epistole-header__back.tsbs-back-button:hover,
+	.epistole-header .epistole-header__back.tsbs-back-button:focus {
+		color: var(--tsbs-theme-accent);
+		background: var(--tsbs-color-white);
+		border-color: var(--tsbs-color-white);
+	}
+
 	.epistole-content {
 		display: grid;
 		gap: 3rem;
