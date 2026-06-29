@@ -810,7 +810,6 @@ body:has(.tsbs-legal-page) {
 		.dashboard-epistle p:not(.dashboard-eyebrow) {
 			color: var(--tsbs-color-heading);
 			font-size: 0.9375rem;
-			font-style: italic;
 			line-height: 1.45;
 		}
 
@@ -944,7 +943,7 @@ body:has(.tsbs-legal-page) {
 			margin: 0;
 			color: var(--tsbs-theme-accent);
 			font-size: 0.875rem;
-			font-style: italic;
+			font-weight: 500;
 			line-height: 1.4;
 		}
 
@@ -4215,7 +4214,6 @@ body:has(.tsbs-legal-page) {
 	.epistole-featured p:not(.epistole-eyebrow) {
 		color: var(--tsbs-color-heading);
 		font-size: 0.9375rem;
-		font-style: italic;
 		line-height: 1.45;
 	}
 
@@ -4870,7 +4868,7 @@ body:has(.tsbs-legal-page) {
 			right: 1.25rem;
 			left: 1.25rem;
 			color: #9aa3b5;
-			font-style: italic;
+			font-weight: 500;
 			pointer-events: none;
 	}
 
