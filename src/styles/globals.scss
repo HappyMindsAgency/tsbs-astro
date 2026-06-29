@@ -4573,6 +4573,17 @@ body:has(.tsbs-legal-page) {
 		line-height: 1.08;
 	}
 
+	.desk-username-link {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.desk-username-link:hover,
+	.desk-username-link:focus-visible {
+		color: inherit;
+		text-decoration: none;
+	}
+
 	.desk-rank,
 	.desk-code {
 		margin: 0;

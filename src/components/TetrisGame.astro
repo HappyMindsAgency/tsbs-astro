@@ -109,6 +109,8 @@ const { lang = 'it' } = Astro.props;
 <style>
   /* ── Wrapper ── */
   .tetris-wrapper {
+    --tetris-board-width: 300px;
+    --tetris-board-height: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -165,13 +167,15 @@ const { lang = 'it' } = Astro.props;
     display: flex;
     gap: 0.75rem;
     align-items: flex-start;
+    justify-content: center;
+    width: 100%;
   }
 
   /* ── Board wrap ── */
   .tetris-board-wrap {
     position: relative;
-    width: 300px;
-    height: 600px;
+    width: var(--tetris-board-width);
+    height: var(--tetris-board-height);
     flex-shrink: 0;
     border: 1px solid #4a3320;
     border-radius: 2px;
@@ -181,8 +185,8 @@ const { lang = 'it' } = Astro.props;
 
   #tetris-canvas {
     display: block;
-    width: 300px;
-    height: 600px;
+    width: var(--tetris-board-width);
+    height: var(--tetris-board-height);
     image-rendering: pixelated;
     cursor: default;
   }
@@ -372,13 +376,58 @@ const { lang = 'it' } = Astro.props;
 
   @media (max-width: 480px) {
     .tetris-wrapper {
+      --tetris-board-width: min(300px, calc(100vw - 3rem));
+      --tetris-board-height: calc(var(--tetris-board-width) * 2);
       padding: 0.5rem;
       max-width: 100%;
+      overflow: hidden;
+    }
+    .tetris-hud {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.25rem;
+      padding-inline: 0.4rem;
+    }
+    .tetris-hud__label {
+      font-size: 0.52rem;
+      letter-spacing: 0.12em;
+    }
+    .tetris-hud__value {
+      font-size: 1rem;
+      min-width: 0;
+    }
+    .tetris-main {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tetris-sidebar {
+      width: var(--tetris-board-width);
+    }
+    .tetris-next-wrap {
+      width: 100%;
+      padding-block: 0.4rem;
     }
     .tetris-sidebar__legend {
       display: none;
     }
     .tetris-sidebar__hint {
+      display: none;
+    }
+    #tetris-next-canvas {
+      width: 64px;
+      height: 64px;
+    }
+    .tetris-overlay__inner {
+      padding: 1rem 0.75rem;
+    }
+    .tetris-overlay__title {
+      font-size: 1.35rem;
+    }
+    .tetris-overlay__body {
+      font-size: 0.72rem;
+    }
+    .tetris-overlay__controls {
       display: none;
     }
   }
@@ -526,14 +575,10 @@ const { lang = 'it' } = Astro.props;
   const dpr = window.devicePixelRatio || 1;
   canvas.width = CANVAS_W * dpr;
   canvas.height = CANVAS_H * dpr;
-  canvas.style.width = CANVAS_W + 'px';
-  canvas.style.height = CANVAS_H + 'px';
   ctx.scale(dpr, dpr);
 
   nextCanvas.width = NEXT_SIZE * dpr;
   nextCanvas.height = NEXT_SIZE * dpr;
-  nextCanvas.style.width = '80px';
-  nextCanvas.style.height = '80px';
   nextCtx.scale(dpr, dpr);
 
   // ── DOM refs ──────────────────────────────────────────────
