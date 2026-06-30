@@ -4,8 +4,9 @@
 // Form POST con progressive enhancement: funziona anche senza JavaScript.
 
 import type { APIRoute } from 'astro';
-import { getMissioneBySlug, getMissionProofHref } from '../../../../lib/strapi/missioni';
+import { getMissioneBySlug, getMissionProofHref, MISSIONI_SPECIALI } from '../../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, avviaPartecipazione, getPartecipazione } from '../../../../lib/strapi/progressione';
+import { ensureReferralCode } from '../../../../lib/strapi/referral';
 import { logger } from '../../../../services/logger';
 
 export const POST: APIRoute = async ({ params, cookies }) => {
@@ -39,6 +40,12 @@ export const POST: APIRoute = async ({ params, cookies }) => {
 	if (!avviata) {
 		// Best-effort: la prova ricrea comunque la partecipazione al bisogno.
 		logger.error(`[Avvia] Partecipazione non creata per ${missione.slug} (membro ${membro.documentId})`);
+	}
+
+	// Missione referral: genera (una volta) il codice in externalAuthId, poi
+	// torna al dettaglio che mostra il link di condivisione.
+	if (missione.documentId === MISSIONI_SPECIALI.referral) {
+		await ensureReferralCode(membro.documentId, membro.externalAuthId);
 	}
 
 	return redirect(getMissionProofHref(missione));

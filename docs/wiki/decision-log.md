@@ -20,6 +20,36 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-06-30 - Missione 12: Referral Via Link (niente quiz, completa il referrer)
+
+Decisione:
+- la Missione 12 (documentId `hd3ihjp8r5v6aiqnycfpfi0x`) è di tipo "referral": niente quiz né domande, mappata in `MISSIONI_SPECIALI.referral`
+- non genera mai 404 per assenza domande: `getMissionProofHref` e la pagina `prova/` reindirizzano al dettaglio; il dettaglio mostra il link di invito invece della prova
+- all'avvio della missione il sistema genera un codice univoco e stabile (6 caratteri base36, per il vincolo `maxLength: 6` di `externalAuthId`; ritenta se gia in uso) e lo salva in `Membro.externalAuthId` (campo finora inutilizzato, nessun conflitto con auth esterna), una volta sola (se presente lo riusa)
+- il link condiviso è `https://<origin>/?ref=CODICE` (origin dagli header proxy Vercel); `src/middleware.ts` intercetta `?ref`, registra il referral e reindirizza all'URL pulito
+- visitare il link con codice valido (apertura pagina, nessuna registrazione richiesta) completa la missione 12 per il referrer e gli assegna il trofeo, riusando il motore `registraEsitoProva` (idempotente, premio solo al primo completamento)
+- il trofeo viene accodato in `Membro.datiAggiuntivi.trofeiDaNotificare` del referrer e mostrato al primo login da `NotificaTrofeiToast`, stesso pattern della verifica tessera
+- casi limite (default): auto-referral (visitatore = referrer, confronto via JWT) scartato; codice non valido → landing normale senza errori; click multipli idempotenti
+- completamento una sola volta (primo referral valido); nessun conteggio referral
+
+Motivo:
+- aggiunta isolata: nessuna modifica al comportamento delle altre missioni, identificazione per documentId
+- riuso del motore progressione e della coda trofei evita logiche divergenti e un nuovo modale
+- `externalAuthId` era libero e adatto a ospitare un identificativo stabile per membro
+
+Impatto:
+- `src/lib/strapi/referral.ts` (nuovo: `ensureReferralCode`, `registraReferral`, lookup per codice, coda notifica)
+- `src/lib/strapi/missioni.ts` (`MISSIONI_SPECIALI.referral`, `getMissionProofHref`)
+- `src/lib/strapi/progressione.ts` (`externalAuthId` su `MembroProgressione`)
+- `src/pages/api/missioni/[slugMis]/avvia.ts` (genera codice per la missione referral)
+- `src/pages/missioni/[slugMis]/index.astro` (UI link + copia)
+- `src/pages/missioni/[slugMis]/prova/index.astro` (referral → dettaglio, niente 404)
+- `src/middleware.ts` (intercetta `?ref`)
+- compilazione richiesta su Strapi: Missione 12 con relazione `trofeo` valorizzata (senza trofeo il completamento avviene ma nessun premio viene assegnato)
+
+Stato:
+- approvata
+
 ## 2026-06-18 - Eventi Society Dinamici Da Strapi
 
 Decisione:

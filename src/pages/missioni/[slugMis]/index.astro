@@ -3,7 +3,7 @@ import Layout from '../../../layouts/Layout.astro';
 import Nav from '../../../components/Nav.astro';
 import BackButton from '../../../components/BackButton.astro';
 import RitchText from '../../../components/RitchText.astro';
-import { getMissioneBySlug } from '../../../lib/strapi/missioni';
+import { getMissioneBySlug, MISSIONI_SPECIALI } from '../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, getPartecipazione } from '../../../lib/strapi/progressione';
 import { resolveUserTheme } from '../../../lib/theme';
 
@@ -38,6 +38,17 @@ const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.p
 // "Avvia la missione" crea la Partecipazione (inCorso, progresso 50) e
 // reindirizza alla prova: il target è calcolato lato server dall'endpoint.
 const avviaActionHref = `/api/missioni/${missione.slug}/avvia`;
+
+// Missione 12 "referral": niente quiz. Se il membro ha gia un codice
+// (externalAuthId), mostriamo il link di condivisione; altrimenti "Avvia" lo genera.
+const isReferral = missione.documentId === MISSIONI_SPECIALI.referral;
+const referralCode = isReferral ? membro?.externalAuthId?.trim() || '' : '';
+let referralLink = '';
+if (referralCode) {
+	const host = Astro.request.headers.get('x-forwarded-host') || Astro.request.headers.get('host') || Astro.url.host;
+	const proto = Astro.request.headers.get('x-forwarded-proto') || Astro.url.protocol.replace(':', '');
+	referralLink = `${proto}://${host}/?ref=${referralCode}`;
+}
 ---
 
 <Layout lang={lang} theme={theme}>
@@ -74,9 +85,17 @@ const avviaActionHref = `/api/missioni/${missione.slug}/avvia`;
 
 				{missioneCompletata ? (
 					<button class="btn tsbs-cta-primary mission-detail__cta" type="button" disabled>Missione completata</button>
+				) : referralLink ? (
+					<div class="mission-detail__referral" data-referral>
+						<label for="referral-link">Il tuo link di invito</label>
+						<div class="mission-detail__referral-row">
+							<input id="referral-link" type="text" readonly value={referralLink} data-referral-link />
+							<button class="btn tsbs-cta-primary" type="button" data-referral-copy>Copia</button>
+						</div>
+					</div>
 				) : (
 					<form class="mission-detail__cta-form" method="POST" action={avviaActionHref}>
-						<button class="btn tsbs-cta-primary mission-detail__cta" type="submit">Avvia la missione</button>
+						<button class="btn tsbs-cta-primary mission-detail__cta" type="submit">{isReferral ? 'Genera il mio link' : 'Avvia la missione'}</button>
 					</form>
 				)}
 			</div>
@@ -84,10 +103,44 @@ const avviaActionHref = `/api/missioni/${missione.slug}/avvia`;
 	</main>
 </Layout>
 
+<script>
+	// Copia link referral negli appunti, con fallback select+execCommand.
+	function initReferralCopy() {
+		const btn = document.querySelector('[data-referral-copy]');
+		const input = document.querySelector('[data-referral-link]');
+		if (!(btn instanceof HTMLButtonElement) || !(input instanceof HTMLInputElement)) return;
+
+		btn.addEventListener('click', async () => {
+			try {
+				await navigator.clipboard.writeText(input.value);
+			} catch {
+				input.select();
+				document.execCommand('copy');
+			}
+			const original = btn.textContent;
+			btn.textContent = 'Copiato!';
+			setTimeout(() => { btn.textContent = original; }, 1500);
+		});
+	}
+	document.addEventListener('astro:page-load', initReferralCopy);
+	initReferralCopy();
+</script>
+
 <style>
 	/* Il form wrappa solo il pulsante: display:contents lo toglie dal layout
 	   così il bottone resta l'elemento del grid e conserva centratura/margini. */
 	.mission-detail__cta-form {
 		display: contents;
+	}
+
+	.mission-detail__referral-row {
+		display: flex;
+		gap: 0.5rem;
+		align-items: stretch;
+	}
+
+	.mission-detail__referral-row input {
+		flex: 1;
+		min-width: 0;
 	}
 </style>

@@ -47,6 +47,11 @@ if (missione.quiz?.cacciaAlTesoro) {
 	return Astro.redirect(`/missioni/${missione.slug}/caccia-tesoro/`);
 }
 
+// La missione referral non ha quiz: niente 404, si torna al dettaglio (link di invito).
+if (missione.documentId === MISSIONI_SPECIALI.referral) {
+	return Astro.redirect(`/missioni/${missione.slug}/`);
+}
+
 const isMissioneGrimorio = missione.documentId === MISSIONI_SPECIALI.grimorio;
 const rawQuestions = missione?.quiz?.domande ?? [];
 const hasAnswerElements = rawQuestions.some((domanda) => (domanda.risposte || []).length > 0);

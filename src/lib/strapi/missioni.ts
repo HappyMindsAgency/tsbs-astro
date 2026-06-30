@@ -131,6 +131,7 @@ export const MISSIONI_SPECIALI = {
 	levelUpRadici:    'plq11gza9ok008lj2gai3za4', // M05 le-radici — level-up
 	readingChallenge: 'xafn0jxvn8xzsy4svj6m5t29', // M06 i-custodi-del-sapere — sfida lettura
 	treasureHunt:     'j1ht6oi0pfm7ogav2z61h3iq', // M11 il-rituale-del-custode — caccia + level-up
+	referral:         'hd3ihjp8r5v6aiqnycfpfi0x', // M12 — diffusione via link referral, niente quiz
 } as const;
 
 // URL della "prova" della missione: sfida-lettura o caccia al tesoro per le
@@ -139,6 +140,8 @@ export const MISSIONI_SPECIALI = {
 export function getMissionProofHref(missione: Pick<Missione, 'documentId' | 'slug'>): string {
 	if (missione.documentId === MISSIONI_SPECIALI.readingChallenge) return `/missioni/${missione.slug}/sfida-lettura/`;
 	if (missione.documentId === MISSIONI_SPECIALI.treasureHunt) return `/missioni/${missione.slug}/caccia-tesoro/`;
+	// La missione referral non ha prova/quiz: si resta sul dettaglio, che mostra il link di condivisione.
+	if (missione.documentId === MISSIONI_SPECIALI.referral) return `/missioni/${missione.slug}/`;
 	return `/missioni/${missione.slug}/prova/`;
 }
 

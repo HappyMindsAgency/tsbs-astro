@@ -181,10 +181,9 @@ export class AuthService {
      * @param cognome Il cognome (opzionale).
      * @returns true se la creazione ha avuto successo, false altrimenti.
      *
-     * TODO: Aggiungere externalAuthId una volta chiarito:
-     *   - cos'è (codice generato? assegnato? da quale sistema?)
-     *   - se viene creato qui, durante l'onboarding o manualmente
-     *   - formato esatto (6 caratteri: numerico? alfanumerico?)
+     * Nota: externalAuthId NON si imposta in registrazione. Ospita il codice
+     * referral della missione 12, generato al primo avvio della missione
+     * (src/lib/strapi/referral.ts → ensureReferralCode).
      */
     async createMembro(
         userId: number,

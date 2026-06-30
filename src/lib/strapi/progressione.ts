@@ -25,6 +25,8 @@ export type MembroProgressione = {
 	documentId: string;
 	email: string | null;
 	punti: number | null;
+	// Codice referral della missione 12 (vuoto finche il membro non avvia la missione).
+	externalAuthId: string | null;
 	livello: MissioneLivello | null;
 	accademia: { documentId: string; slug: string | null; nome: string | null } | null;
 };
@@ -98,6 +100,7 @@ export async function getMembroProgressioneByJwt(jwt: string): Promise<MembroPro
 	searchParams.set('filters[user][id][$eq]', String(user.id));
 	searchParams.set('fields[0]', 'email');
 	searchParams.set('fields[1]', 'punti');
+	searchParams.set('fields[2]', 'externalAuthId');
 	searchParams.set('populate[livello][fields][0]', 'nome');
 	searchParams.set('populate[livello][fields][1]', 'slug');
 	searchParams.set('populate[livello][fields][2]', 'ordine');

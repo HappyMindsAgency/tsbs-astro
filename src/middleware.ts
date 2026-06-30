@@ -1,5 +1,8 @@
 import { defineMiddleware } from 'astro:middleware';
 import { getAuthenticatedUserAcademy } from './lib/strapi/user-academy';
+import { registraReferral } from './lib/strapi/referral';
+
+const REFERRAL_QUERY_PARAM = 'ref';
 
 const MAINTENANCE_MODE_ENABLED = false;
 const MAINTENANCE_PATH = '/maintenance';
@@ -68,6 +71,22 @@ function getRequestBase(context: Parameters<Parameters<typeof defineMiddleware>[
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const { pathname, searchParams } = context.url;
+
+	// Link referral (missione 12): visitare /?ref=CODICE completa la missione e
+	// assegna il trofeo al referrer. Idempotente; auto-referral scartato lato
+	// servizio tramite il JWT del visitatore. Si pulisce subito la query e si
+	// reindirizza, così refresh/prefetch non ripetono l'azione sull'URL sporco.
+	// ponytail: GET con side effect; accettabile perché tutto il completamento è idempotente.
+	const referralCode = searchParams.get(REFERRAL_QUERY_PARAM)?.trim();
+	if (referralCode && !isApiRoute(pathname) && !isStaticAsset(pathname)) {
+		await registraReferral(referralCode, context.cookies.get('jwt')?.value);
+		const base = getRequestBase(context);
+		const clean = new URL(context.url);
+		clean.searchParams.delete(REFERRAL_QUERY_PARAM);
+		clean.host = base.host;
+		clean.protocol = base.protocol;
+		return new Response(null, { status: 302, headers: { Location: clean.toString() } });
+	}
 
 	// Guarda auth solo per route non-API, non-asset, non-maintenance.
 	if (!isApiRoute(pathname) && !isStaticAsset(pathname) && !isMaintenanceRoute(pathname)) {
