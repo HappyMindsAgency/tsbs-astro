@@ -446,6 +446,7 @@ h1,
 
 .theme-arborea {
   --tsbs-page-pattern-image: url("../assets/Arborea-pattern-the-secret-bookish-society.webp");
+  --missions-page-pattern-image: url("../assets/scrivania-arborea-30.jpg");
   --tsbs-theme-accent: var(--tsbs-color-arborea);
   --tsbs-theme-cta-bg: #7b872e;
   --tsbs-theme-cta-border: #7b872e;
@@ -462,6 +463,7 @@ h1,
 
 .theme-armonia {
   --tsbs-page-pattern-image: url("../assets/Armonia-pattern-the-secret-bookish-society.webp");
+  --missions-page-pattern-image: url("../assets/scrivania-armonia-30.jpg");
   --tsbs-theme-accent: var(--tsbs-color-armonia);
   --tsbs-theme-cta-bg: #d7a839;
   --tsbs-theme-cta-border: #d7a839;
@@ -478,6 +480,7 @@ h1,
 
 .theme-arcadia {
   --tsbs-page-pattern-image: url("../assets/Arcadia-pattern-the-secret-bookish-society.webp");
+  --missions-page-pattern-image: url("../assets/scrivania-arcadia-30.jpg");
   --tsbs-theme-accent: var(--tsbs-color-arcadia);
   --tsbs-theme-cta-bg: #72191c;
   --tsbs-theme-cta-border: #72191c;
@@ -494,6 +497,7 @@ h1,
 
 .theme-astraria {
   --tsbs-page-pattern-image: url("../assets/Astraria-pattern-the-secret-bookish-society.webp");
+  --missions-page-pattern-image: url("../assets/scrivania-astraria-30.jpg");
   --tsbs-theme-accent: var(--tsbs-color-astraria);
   --tsbs-theme-cta-bg: #2a3369;
   --tsbs-theme-cta-border: #2a3369;
@@ -1923,8 +1927,16 @@ body:has(.tsbs-legal-page) {
 // PAGINA MISSIONI
 	.missions-shell {
 		--missions-header-bg: var(--tsbs-theme-accent);
+		--missions-page-bg-overlay: linear-gradient(rgba(255, 251, 242, 0.22), rgba(255, 251, 242, 0.22));
 		min-height: 100vh;
-		background: var(--tsbs-color-surface);
+		background-color: var(--tsbs-color-surface);
+	}
+
+	.tsbs-app-shell.missions-shell {
+		background-image: var(--missions-page-bg-overlay), var(--missions-page-pattern-image, var(--tsbs-page-pattern-image));
+		background-repeat: repeat-y;
+		background-position: center top;
+		background-size: auto 31.25rem, auto 31.25rem;
 	}
 
 	.missions-header {
@@ -2062,6 +2074,10 @@ body:has(.tsbs-legal-page) {
 	}
 
 	@media (min-width: 992px) {
+		.tsbs-app-shell.missions-shell {
+			background-size: 100% auto, 100% auto;
+		}
+
 		.missions-header {
 			place-items: center start;
 			min-height: 5.625rem;
