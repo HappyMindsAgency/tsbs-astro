@@ -2,14 +2,17 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import TetrisGame from '../../components/TetrisGame.astro';
+import { resolveUserTheme } from '../../lib/theme';
 
 const { lang = 'it' } = Astro.props;
-if (!Astro.cookies.has('jwt')) {
+const jwt = Astro.cookies.get('jwt')?.value;
+if (!jwt) {
 	return Astro.redirect('/');
 }
+const theme = await resolveUserTheme(jwt);
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme}>
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell codici-page">
@@ -18,6 +21,7 @@ if (!Astro.cookies.has('jwt')) {
 				<p class="codici-header__eyebrow">Archivio Segreto</p>
 				<h1 class="codici-header__title">I Codici</h1>
 				<p class="codici-header__sub">Antichi frammenti cifrati ritrovati tra i volumi della Società.</p>
+				<a class="btn tsbs-cta-primary codici-header__link" href="/scrivania/il-segnalibro/">Vai a Il Segnalibro</a>
 			</header>
 
 			<div class="codici-game-wrap">
@@ -66,9 +70,26 @@ if (!Astro.cookies.has('jwt')) {
 		text-align: center;
 	}
 
+	.codici-header__link {
+		margin-top: 1rem;
+	}
+
 	.codici-game-wrap {
 		display: flex;
 		justify-content: center;
 		padding-bottom: 3rem;
+	}
+
+	/* Su mobile comprime l'header per lasciare l'altezza al gioco. */
+	@media (max-width: 767px) {
+		.codici-header {
+			padding-block: 1rem 0.5rem;
+		}
+		.codici-header__sub {
+			display: none;
+		}
+		.codici-game-wrap {
+			padding-bottom: 1.5rem;
+		}
 	}
 </style>

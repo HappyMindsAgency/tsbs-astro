@@ -312,9 +312,13 @@ const { lang = 'it' } = Astro.props;
 		}
 	}
 
-	@media (max-width: 480px) {
+	/* Touch/mobile: board scalato sia in larghezza sia in altezza viewport (svh),
+	   così board + HUD + d-pad restano visibili insieme senza scroll. Allineato al
+	   breakpoint del d-pad (767px). La frazione svh è la manopola da ritoccare se
+	   su un device specifico il board risulta troppo alto/basso. */
+	@media (max-width: 767px) {
 		.snake-wrapper {
-			--snake-board-size: min(400px, calc(100vw - 3rem));
+			--snake-board-size: min(400px, calc(100vw - 2rem), 52svh);
 			padding: 0.5rem;
 			overflow: hidden;
 		}

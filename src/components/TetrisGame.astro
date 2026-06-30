@@ -374,10 +374,15 @@ const { lang = 'it' } = Astro.props;
     }
   }
 
-  @media (max-width: 480px) {
+  /* Touch/mobile: il board è 1:2 (alto). Lo dimensioniamo partendo dall'ALTEZZA del
+     viewport (svh), poi deriviamo la larghezza, così board + HUD + d-pad stanno tutti
+     in schermo. Capato anche dalla larghezza per non sforare in orizzontale.
+     Allineato al breakpoint del d-pad (767px). La frazione svh è la manopola da
+     ritoccare per device particolari. */
+  @media (max-width: 767px) {
     .tetris-wrapper {
-      --tetris-board-width: min(300px, calc(100vw - 3rem));
-      --tetris-board-height: calc(var(--tetris-board-width) * 2);
+      --tetris-board-height: min(calc((100vw - 2rem) * 2), 58svh);
+      --tetris-board-width: calc(var(--tetris-board-height) / 2);
       padding: 0.5rem;
       max-width: 100%;
       overflow: hidden;
@@ -401,22 +406,10 @@ const { lang = 'it' } = Astro.props;
       align-items: center;
       gap: 0.5rem;
     }
+    /* ponytail: anteprima "Prossimo" e legenda nascoste su mobile, per dare tutto
+       lo spazio verticale al board (= giocabilità). Su desktop restano visibili. */
     .tetris-sidebar {
-      width: var(--tetris-board-width);
-    }
-    .tetris-next-wrap {
-      width: 100%;
-      padding-block: 0.4rem;
-    }
-    .tetris-sidebar__legend {
       display: none;
-    }
-    .tetris-sidebar__hint {
-      display: none;
-    }
-    #tetris-next-canvas {
-      width: 64px;
-      height: 64px;
     }
     .tetris-overlay__inner {
       padding: 1rem 0.75rem;
