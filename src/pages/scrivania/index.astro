@@ -4,10 +4,10 @@ import Nav from '../../components/Nav.astro';
 import classificaIcon from '../../assets/03_classifica_bianco_scrivania.svg';
 import grimorioIcon from '../../assets/icona-grimorio-light-scrivania.png';
 import trofeiIcon from '../../assets/01_trofei_bianco_scrivania.svg';
-import scrivaniaArboreaPattern from '../../assets/scrivania-arborea-pattern-the-secret-bookish-society.png';
-import scrivaniaArcadiaPattern from '../../assets/scrivania-arcadia-pattern-the-secret-bookish-society.png';
-import scrivaniaArmoniaPattern from '../../assets/scrivania-armonia-pattern-the-secret-bookish-society.png';
-import scrivaniaAstrariaPattern from '../../assets/scrivania-astraria-pattern-the-secret-bookish-society.png';
+import scrivaniaArboreaHero from '../../assets/scrivania-arborea.jpg';
+import scrivaniaArcadiaHero from '../../assets/scrivania-arcadia.jpg';
+import scrivaniaArmoniaHero from '../../assets/scrivania-armonia.jpg';
+import scrivaniaAstrariaHero from '../../assets/scrivania-astraria.jpg';
 import { resolveUserContext } from '../../lib/theme';
 import { withReturnTo } from '../../lib/navigation';
 import {
@@ -31,13 +31,13 @@ if (!jwt) {
 const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 const membro = await getCurrentMembroFromJwt(jwt);
 const notes = membro ? await getGrimorioNoteByMembro(membro.documentId, lang) : [];
-const deskHeroPatterns = {
-	arborea: scrivaniaArboreaPattern,
-	arcadia: scrivaniaArcadiaPattern,
-	armonia: scrivaniaArmoniaPattern,
-	astraria: scrivaniaAstrariaPattern,
+const deskHeroImages = {
+	arborea: scrivaniaArboreaHero,
+	arcadia: scrivaniaArcadiaHero,
+	armonia: scrivaniaArmoniaHero,
+	astraria: scrivaniaAstrariaHero,
 };
-const deskHeroPattern = deskHeroPatterns[accademia] ?? scrivaniaArboreaPattern;
+const deskHeroImage = deskHeroImages[accademia] ?? scrivaniaArboreaHero;
 
 const getNoteMeta = (note: (typeof notes)[number]) => {
 	const dayLabel = formatGrimorioDate(note.publishedAt);
@@ -57,28 +57,30 @@ const getNoteHref = (note: (typeof notes)[number]) => {
 <Layout lang={lang} theme={theme} accademia={accademia}>
 	<Nav lang={lang} />
 
-	<main class="tsbs-app-shell desk-page" style={`--desk-hero-pattern: url(${deskHeroPattern.src});`}>
+	<main class="tsbs-app-shell desk-page" style={`--desk-hero-pattern: url(${deskHeroImage.src});`}>
 		<header class="desk-hero" aria-labelledby="desk-title">
 			<div class="desk-hero__panel">
 				<a class="desk-favorites-button" href="/scrivania/utenti-preferiti/" aria-label="Utenti preferiti">
 					<i class="bi bi-heart" aria-hidden="true"></i>
 				</a>
 
-				<p class="desk-academy-pill" data-desk-accademia>—</p>
+				<div class="desk-identity-card">
+					<p class="desk-academy-pill" data-desk-accademia>—</p>
 
-				<div class="desk-avatar" aria-hidden="true" data-desk-avatar>
-					<i class="bi bi-eyeglasses" data-desk-avatar-fallback></i>
-					<canvas class="avatar-lottie" data-avatar-lottie data-desk-avatar-img hidden></canvas>
+					<div class="desk-avatar" aria-hidden="true" data-desk-avatar>
+						<i class="bi bi-eyeglasses" data-desk-avatar-fallback></i>
+						<canvas class="avatar-lottie" data-avatar-lottie data-desk-avatar-img hidden></canvas>
+					</div>
+
+					<h1 id="desk-title">
+						<a class="desk-username-link" href="/scrivania/i-codici/" data-desk-username>—</a>
+					</h1>
+					<p class="desk-rank" data-desk-livello>—</p>
+					<p class="desk-code">
+						<i class="bi bi-person-vcard" aria-hidden="true"></i>
+						<span data-desk-codice>—</span>
+					</p>
 				</div>
-
-				<h1 id="desk-title">
-					<a class="desk-username-link" href="/scrivania/i-codici/" data-desk-username>—</a>
-				</h1>
-				<p class="desk-rank" data-desk-livello>—</p>
-				<p class="desk-code">
-					<i class="bi bi-person-vcard" aria-hidden="true"></i>
-					<span data-desk-codice>—</span>
-				</p>
 			</div>
 		</header>
 
