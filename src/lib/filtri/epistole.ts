@@ -119,21 +119,35 @@ function matchesExactLevel(epistola: Epistola, effectiveLevelOrder: number | nul
 /**
  * Seleziona l'epistola in evidenza (Atrio + featured /epistole):
  * stessa accademia (o globale), livello ESATTAMENTE uguale a quello dell'utente,
- * e tra i match quella con `ordine` minore.
+ * e tra i match quella con `ordine` minore. Se servono piu card, l'Atrio completa
+ * con le successive epistole comunque visibili per accademia/progressione.
  */
 export function selectFeaturedEpistola(epistole: Epistola[], context: EpistolaVisibilityContext) {
+	return selectFeaturedEpistole(epistole, context, 1)[0] ?? null;
+}
+
+export function selectFeaturedEpistole(epistole: Epistola[], context: EpistolaVisibilityContext, limit = 2) {
 	const effectiveLevelOrder = getUnlockedEpistolaLevelOrder(
 		context.livelloMembro,
 		context.testSmistamentoCompletato === true,
 	);
 
-	const candidates = epistole.filter(
+	const exactLevelCandidates = epistole.filter(
 		(epistola) =>
 			isVisibleByAcademy(epistola, context.accademiaMembro) &&
 			matchesExactLevel(epistola, effectiveLevelOrder),
 	);
+	const selected = exactLevelCandidates.sort(sortEpistoleByOrdineAsc).slice(0, limit);
 
-	return candidates.sort(sortEpistoleByOrdineAsc)[0] ?? null;
+	if (selected.length >= limit) return selected;
+
+	const selectedIds = new Set(selected.map((epistola) => epistola.documentId));
+	const fallbackCandidates = epistole
+		.filter((epistola) => !selectedIds.has(epistola.documentId))
+		.filter((epistola) => isEpistolaVisible(epistola, context))
+		.sort(sortEpistoleByLevelDescThenOrdineDesc);
+
+	return [...selected, ...fallbackCandidates].slice(0, limit);
 }
 
 // Ordinamento per `ordine` crescente (ordine minore prima); i null vanno in fondo.

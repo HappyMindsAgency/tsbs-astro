@@ -7,7 +7,7 @@ import NotificaTrofeiToast from '../../components/PopupComponents/NotificaTrofei
 import { resolveUserContext } from '../../lib/theme';
 import { getEventiClassense } from '../../lib/classense';
 import { getEpistole } from '../../lib/strapi/epistole';
-import { selectFeaturedEpistola, getEpistolaExcerptByWords } from '../../lib/filtri/epistole';
+import { selectFeaturedEpistole, getEpistolaExcerptByWords } from '../../lib/filtri/epistole';
 import { getFirstIncompleteMissionCards } from '../../lib/filtri/missioni';
 import {
 	getMembroMissioniByJwt,
@@ -43,18 +43,26 @@ const [
 	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
 ]);
 
-// Epistola in evidenza: stessa accademia dell'utente + livello esatto, tra queste quella con ordine minore.
-const featuredEpistola = selectFeaturedEpistola(epistole, {
+// Epistole in evidenza: stessa accademia dell'utente + livello esatto, tra queste quelle con ordine minore.
+const featuredEpistole = selectFeaturedEpistole(epistole, {
 	accademiaMembro: membroMissioni?.accademia?.slug ?? null,
 	livelloMembro: membroMissioni?.livello ?? null,
 	testSmistamentoCompletato: Boolean(membroMissioni?.accademia),
-});
+}, 2);
 
-const featuredEpistleHref = featuredEpistola ? `/epistole/${featuredEpistola.slug}/` : '/epistole/';
-const featuredEpistleTitle = featuredEpistola?.titolo ?? 'Una nuova Epistola ti attende';
-const featuredEpistleExcerpt = featuredEpistola
-	? getEpistolaExcerptByWords(featuredEpistola.contenuto, 40)
-	: 'La Società ha lasciato un nuovo messaggio per te. Leggilo con attenzione: potrebbe contenere il prossimo passo da seguire.';
+const fallbackEpistleCard = {
+	href: '/epistole/',
+	title: 'Una nuova Epistola ti attende',
+	excerpt: 'La Società ha lasciato un nuovo messaggio per te. Leggilo con attenzione: potrebbe contenere il prossimo passo da seguire.',
+};
+const featuredEpistleCards = featuredEpistole.length > 0
+	? featuredEpistole.map((epistola) => ({
+		href: `/epistole/${epistola.slug}/`,
+		title: epistola.titolo,
+		excerpt: getEpistolaExcerptByWords(epistola.contenuto, 40),
+	}))
+	: [fallbackEpistleCard];
+const featuredEpistleHref = featuredEpistleCards[0]?.href ?? '/epistole/';
 const atrioReturnTo = '/atrio/';
 const featuredNoteHref = withReturnTo('/scrivania/grimorio/nuova/', atrioReturnTo);
 const grimorioHref = withReturnTo('/scrivania/grimorio/', atrioReturnTo);
@@ -92,15 +100,22 @@ const taskCards = getFirstIncompleteMissionCards(
 			</div>
 		</header>
 
-		<section class="tsbs-card dashboard-epistle" aria-labelledby="epistle-title">
-			<div class="dashboard-epistle__content">
-				<p class="dashboard-eyebrow">EPISTOLE</p>
-				<h1 id="epistle-title">{featuredEpistleTitle}</h1>
-				<p>{featuredEpistleExcerpt}</p>
-				<a class="btn tsbs-cta-primary dashboard-button" href={featuredEpistleHref}>Leggi l'Epistola</a>
+		<section class="dashboard-epistles-section" aria-label="Epistole in evidenza">
+			<a class="dashboard-inline-link dashboard-epistle-link dashboard-epistle-link--desktop tsbs-accent-link" href={epistoleArchiveHref}>Apri l’Archivio delle Epistole →</a>
+			<div class="dashboard-epistles">
+				{featuredEpistleCards.map((epistola, index) => (
+					<article class="tsbs-card dashboard-epistle" aria-labelledby={`epistle-title-${index + 1}`}>
+						<div class="dashboard-epistle__content">
+							<p class="dashboard-eyebrow">EPISTOLE</p>
+							<h2 id={`epistle-title-${index + 1}`}>{epistola.title}</h2>
+							<p>{epistola.excerpt}</p>
+							<a class="btn tsbs-cta-primary dashboard-button" href={epistola.href}>Leggi l'Epistola</a>
+						</div>
+					</article>
+				))}
 			</div>
+			<a class="dashboard-inline-link dashboard-epistle-link dashboard-epistle-link--mobile tsbs-accent-link" href={epistoleArchiveHref}>Apri l’Archivio delle Epistole →</a>
 		</section>
-		<a class="dashboard-inline-link dashboard-epistle-link tsbs-accent-link" href={epistoleArchiveHref}>Apri l’Archivio delle Epistole →</a>
 
 		<section class="dashboard-section" aria-labelledby="tasks-title">
 			<div class="dashboard-section__head">
