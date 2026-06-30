@@ -23,6 +23,7 @@ const { theme, accademia } = await resolveUserContext(jwt);
 				<p class="segnalibro-header__eyebrow">Archivio Segreto</p>
 				<h1 class="segnalibro-header__title">Il Segnalibro</h1>
 				<p class="segnalibro-header__sub">Un antico passatempo ritrovato tra le pagine della Società.</p>
+				<a class="btn tsbs-cta-primary segnalibro-header__link" href="/scrivania/i-codici/">Vai a I Codici</a>
 			</header>
 
 			<div class="segnalibro-game-wrap">
@@ -71,9 +72,26 @@ const { theme, accademia } = await resolveUserContext(jwt);
 		text-align: center;
 	}
 
+	.segnalibro-header__link {
+		margin-top: 1rem;
+	}
+
 	.segnalibro-game-wrap {
 		display: flex;
 		justify-content: center;
 		padding-bottom: 3rem;
+	}
+
+	/* Su mobile comprime l'header per lasciare l'altezza al gioco. */
+	@media (max-width: 767px) {
+		.segnalibro-header {
+			padding-block: 1rem 0.5rem;
+		}
+		.segnalibro-header__sub {
+			display: none;
+		}
+		.segnalibro-game-wrap {
+			padding-bottom: 1.5rem;
+		}
 	}
 </style>
