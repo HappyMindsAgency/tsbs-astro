@@ -480,6 +480,7 @@ h1,
 
 .theme-arcadia {
   --tsbs-page-pattern-image: url("../assets/Arcadia-pattern-the-secret-bookish-society.webp");
+  --tsbs-page-pattern-overlay: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9));
   --missions-page-pattern-image: url("../assets/scrivania-arcadia-30.jpg");
   --tsbs-theme-accent: var(--tsbs-color-arcadia);
   --tsbs-theme-cta-bg: #72191c;
