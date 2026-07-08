@@ -2342,7 +2342,8 @@ body:has(.tsbs-legal-page) {
 		}
 
 			.tsbs-app-shell.missions-shell.biblioteca-page,
-			.tsbs-app-shell.missions-shell.biblioteca-academies-page {
+			.tsbs-app-shell.missions-shell.biblioteca-academies-page,
+			.tsbs-app-shell.missions-shell.faq-page {
 				background-image: var(--tsbs-page-pattern-overlay), var(--tsbs-page-pattern-image);
 				background-repeat: repeat;
 				background-position: top left;
@@ -2662,7 +2663,7 @@ body:has(.tsbs-legal-page) {
 
 	.faq-page {
 		min-height: 100vh;
-		background: var(--tsbs-color-surface);
+		background-color: var(--tsbs-color-surface);
 	}
 
 	.faq-content {
