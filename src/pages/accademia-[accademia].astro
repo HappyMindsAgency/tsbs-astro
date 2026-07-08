@@ -14,7 +14,7 @@ import astrariaLogo from '../assets/Astraria-logo-the-secret-bookish-society.png
 import trophyIcon from '../assets/trofei-icona-scrivania.png';
 import { getAcademyMembersCount, getAcademyRanking } from '../lib/strapi/accademie';
 import { getGrimorioChronicleMeta, getGrimorioExcerpt, getGrimorioNotePubbliche, getGrimorioPublicNoteHref } from '../lib/strapi/grimorio';
-import { resolveUserAcademy } from '../lib/theme';
+import { resolveUserContext } from '../lib/theme';
 
 const { lang = 'it' } = Astro.props;
 const { accademia = 'arborea' } = Astro.params;
@@ -65,14 +65,14 @@ const academy = academies[academyKey];
 const rankingHref = `/classifica-generale/?accademia=${academyKey}`;
 const academyMembersCount = await getAcademyMembersCount(academyKey);
 const academyMembersLabel = `${academyMembersCount} ${academyMembersCount === 1 ? 'Adepto' : 'Adepti'}`;
-const userAcademy = await resolveUserAcademy(jwt);
+const { theme, accademia: userAcademy } = await resolveUserContext(jwt);
 const isUserAcademy = academyKey === userAcademy;
 const rankingRows = await getAcademyRanking(academyKey, jwt, isUserAcademy ? 5 : 100);
 const chronicleRows = academyKey === userAcademy ? await getGrimorioNotePubbliche(lang, academyKey) : [];
 
 ---
 
-<Layout lang={lang}>
+<Layout lang={lang} theme={theme} accademia={userAcademy}>
 	<Nav lang={lang} />
 
 	<main class={`tsbs-app-shell academy-page theme-${academyKey}`} data-academy={academyKey}>

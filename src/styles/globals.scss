@@ -2517,9 +2517,7 @@ body:has(.tsbs-legal-page) {
 		gap: 1rem;
 		padding: 1.25rem 1rem;
 		color: var(--tsbs-color-heading);
-		background:
-			linear-gradient(135deg, color-mix(in srgb, var(--tsbs-theme-accent) 12%, transparent), transparent 42%),
-			var(--tsbs-color-neutral-soft);
+		background: var(--tsbs-color-neutral-soft);
 		border: 1px solid color-mix(in srgb, var(--tsbs-theme-accent) 34%, var(--tsbs-color-neutral-soft));
 		border-radius: 0.5rem;
 	}

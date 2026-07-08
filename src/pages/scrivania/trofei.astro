@@ -10,6 +10,10 @@ import trofeoMedaglia from '../../assets/trofeo-medaglia.png';
 import trofeoScudo from '../../assets/trofeo-scudo.png';
 import trofeoStendardo from '../../assets/trofeo-stendardo.png';
 import trofeoTartaruga from '../../assets/trofeo-tartaruga.png';
+import bkgSalaTrofeiArborea from '../../assets/bkg-sala-trofei-arborea.jpg';
+import bkgSalaTrofeiArcadia from '../../assets/bkg-sala-trofei-arcadia.jpg';
+import bkgSalaTrofeiArmonia from '../../assets/bkg-sala-trofei-armonia.jpg';
+import bkgSalaTrofeiAstraria from '../../assets/bkg-sala-trofei-astraria.jpg';
 import { resolveUserContext } from '../../lib/theme';
 import { getTrofeiStanzaByJwt } from '../../lib/strapi/trofei';
 import BackButton from '../../components/BackButton.astro';
@@ -24,6 +28,13 @@ const jwt = Astro.cookies.get('jwt')?.value;
 const { theme, accademia } = await resolveUserContext(jwt);
 const returnTo = getSafeReturnTo(Astro.url, '/scrivania/');
 const backLabel = getReturnToLabel(returnTo, 'Torna alla scrivania');
+const trophyRoomBackgrounds = {
+	arborea: bkgSalaTrofeiArborea,
+	arcadia: bkgSalaTrofeiArcadia,
+	armonia: bkgSalaTrofeiArmonia,
+	astraria: bkgSalaTrofeiAstraria,
+};
+const trophyRoomBackground = trophyRoomBackgrounds[accademia] ?? bkgSalaTrofeiArborea;
 
 const board = {
 	rows: 6,
@@ -205,7 +216,11 @@ const paletteOrder = [...trophyCatalog].sort((a, b) => {
 						</button>
 					</div>
 
-					<div class="trophy-board" data-trophy-board style={`--trophy-rows: ${board.rows}; --trophy-cols: ${board.cols};`}>
+					<div
+						class="trophy-board"
+						data-trophy-board
+						style={`--trophy-rows: ${board.rows}; --trophy-cols: ${board.cols}; --trophy-board-bg: url(${trophyRoomBackground.src});`}
+					>
 						<div class="trophy-board__grid" aria-hidden="true">
 							{cells.map(() => <span></span>)}
 						</div>
@@ -907,7 +922,7 @@ const paletteOrder = [...trophyCatalog].sort((a, b) => {
 	}
 
 	.trophy-board__grid {
-		background-image: url('../../assets/bg-grigla-trofei.png');
+		background-image: var(--trophy-board-bg);
 		background-size: 100% 100%;
 		background-repeat: no-repeat;
 	}
