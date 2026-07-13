@@ -8,6 +8,10 @@ import { getTrofeiStanzaByMembroDocumentId } from '../../../lib/strapi/trofei';
 import { buildTrophyCatalog } from '../../../lib/trofei-forme';
 import { resolveUserContext } from '../../../lib/theme';
 import { getReturnToLabel, getSafeReturnTo } from '../../../lib/navigation';
+import bkgSalaTrofeiArborea from '../../../assets/bkg-sala-trofei-arborea.jpg';
+import bkgSalaTrofeiArcadia from '../../../assets/bkg-sala-trofei-arcadia.jpg';
+import bkgSalaTrofeiArmonia from '../../../assets/bkg-sala-trofei-armonia.jpg';
+import bkgSalaTrofeiAstraria from '../../../assets/bkg-sala-trofei-astraria.jpg';
 
 const { lang = 'it' } = Astro.props;
 if (!Astro.cookies.has('jwt')) {
@@ -43,6 +47,13 @@ const cells = Array.from({ length: board.rows * board.cols });
 const { theme, accademia } = await resolveUserContext(jwt);
 const profileAcademies = ['astraria', 'arcadia', 'armonia', 'arborea'];
 const profileAcademy = profileAcademies.includes(currentProfile.academy) ? currentProfile.academy : accademia;
+const profileTrophyRoomBackgrounds = {
+	arborea: bkgSalaTrofeiArborea,
+	arcadia: bkgSalaTrofeiArcadia,
+	armonia: bkgSalaTrofeiArmonia,
+	astraria: bkgSalaTrofeiAstraria,
+};
+const profileTrophyRoomBackground = profileTrophyRoomBackgrounds[profileAcademy] ?? bkgSalaTrofeiArborea;
 const returnTo = getSafeReturnTo(Astro.url, '/scrivania/utenti-preferiti/');
 const returnToLabel = getReturnToLabel(returnTo, 'Torna agli utenti preferiti');
 ---
@@ -83,7 +94,7 @@ const returnToLabel = getReturnToLabel(returnTo, 'Torna agli utenti preferiti');
 			<section
 				class="profile-trophy-board"
 				aria-label="Trofei impostati dall'utente"
-				style={`--profile-trophy-rows: ${board.rows}; --profile-trophy-cols: ${board.cols};`}
+				style={`--profile-trophy-rows: ${board.rows}; --profile-trophy-cols: ${board.cols}; --profile-trophy-board-bg: url(${profileTrophyRoomBackground.src});`}
 			>
 				<div class="profile-trophy-board__grid" aria-hidden="true">
 					{cells.map(() => <span></span>)}
@@ -258,7 +269,7 @@ const returnToLabel = getReturnToLabel(returnTo, 'Torna agli utenti preferiti');
 	}
 
 	.profile-trophy-board__grid {
-		background-image: url('../../../assets/bg-grigla-trofei.png');
+		background-image: var(--profile-trophy-board-bg);
 		background-size: 100% 100%;
 		background-repeat: no-repeat;
 	}
