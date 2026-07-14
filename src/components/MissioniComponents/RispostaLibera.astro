@@ -53,9 +53,20 @@ const hasMultipleQuestions = questions.length > 1;
 							<button class="btn mission-proof-question__back" type="button" data-free-answer-back disabled aria-label="Torna alla domanda precedente">
 								<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
 							</button>
-							<p class="mission-proof-question__progress" data-free-answer-progress aria-live="polite">
-								Step 1/{questions.length}
-							</p>
+							<div
+								class="mission-proof-question__progress"
+								data-free-answer-progress
+								role="progressbar"
+								aria-label="Avanzamento prova"
+								aria-valuemin="0"
+								aria-valuemax={questions.length}
+								aria-valuenow="1"
+								aria-valuetext={`Domanda 1 di ${questions.length}`}
+								aria-live="polite"
+								style={`--mission-proof-question-progress: ${100 / questions.length}%`}
+							>
+								<span class="mission-proof-question__progress-bar" aria-hidden="true"></span>
+							</div>
 						</div>
 					)}
 				</div>
@@ -219,7 +230,12 @@ const hasMultipleQuestions = questions.length > 1;
 			submit.disabled = !hasAnswer();
 
 			if (back) back.disabled = currentPromptIndex === 0;
-			if (progress) progress.textContent = `Step ${currentPromptIndex + 1}/${questions.length}`;
+			if (progress) {
+				const currentQuestionNumber = currentPromptIndex + 1;
+				progress.setAttribute('aria-valuenow', String(currentQuestionNumber));
+				progress.setAttribute('aria-valuetext', `Domanda ${currentQuestionNumber} di ${questions.length}`);
+				progress.style.setProperty('--mission-proof-question-progress', `${(currentQuestionNumber / questions.length) * 100}%`);
+			}
 		};
 
 		input.addEventListener('input', () => {

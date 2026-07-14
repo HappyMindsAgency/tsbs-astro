@@ -40,7 +40,19 @@ const { lang = 'it' } = Astro.props;
 						<button class="btn mission-proof-question__back sorting-test__back" type="button" data-sorting-back disabled aria-label="Torna alla domanda precedente">
 							<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
 						</button>
-						<p class="mission-proof-question__progress sorting-test__progress" data-sorting-progress aria-live="polite"></p>
+						<div
+							class="mission-proof-question__progress sorting-test__progress"
+							data-sorting-progress
+							role="progressbar"
+							aria-label="Avanzamento test di smistamento"
+							aria-valuemin="0"
+							aria-valuemax="1"
+							aria-valuenow="0"
+							aria-valuetext="Caricamento avanzamento"
+							aria-live="polite"
+						>
+							<span class="mission-proof-question__progress-bar" aria-hidden="true"></span>
+						</div>
 					</div>
 				</div>
 
@@ -75,10 +87,6 @@ const { lang = 'it' } = Astro.props;
 
 	.sorting-test__form {
 		gap: 3rem;
-	}
-
-	.sorting-test__progress {
-		color: var(--tsbs-color-heading);
 	}
 
 	.sorting-test .choice-question__fieldset {
@@ -222,8 +230,12 @@ const { lang = 'it' } = Astro.props;
 
 		function renderDomanda(index: number) {
 			const d = domande[index];
+			const currentQuestion = index + 1;
 			questionTextEl!.textContent = d.domanda;
-			progressEl!.textContent = `${index + 1}/${domande.length}`;
+			progressEl!.setAttribute('aria-valuemax', String(domande.length));
+			progressEl!.setAttribute('aria-valuenow', String(currentQuestion));
+			progressEl!.setAttribute('aria-valuetext', `Domanda ${currentQuestion} di ${domande.length}`);
+			progressEl!.style.setProperty('--mission-proof-question-progress', `${(currentQuestion / domande.length) * 100}%`);
 
 			answersEl!.innerHTML = '';
 			d.risposte.forEach((risposta, rIdx) => {

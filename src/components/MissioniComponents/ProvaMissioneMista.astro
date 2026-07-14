@@ -78,12 +78,23 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 						<div class="mission-proof-question__step-controls">
 							<button class="btn mission-proof-question__back" type="button" data-mixed-question-back disabled aria-label="Torna alla domanda precedente">
 								<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
-								</button>
-								<p class="mission-proof-question__progress" data-mixed-question-progress aria-live="polite">
-									Step 1/{questions.length}
-								</p>
+							</button>
+							<div
+								class="mission-proof-question__progress"
+								data-mixed-question-progress
+								role="progressbar"
+								aria-label="Avanzamento prova"
+								aria-valuemin="0"
+								aria-valuemax={questions.length}
+								aria-valuenow="1"
+								aria-valuetext={`Domanda 1 di ${questions.length}`}
+								aria-live="polite"
+								style={`--mission-proof-question-progress: ${100 / questions.length}%`}
+							>
+								<span class="mission-proof-question__progress-bar" aria-hidden="true"></span>
 							</div>
-						)}
+						</div>
+					)}
 				</div>
 				<!-- <textarea
 					id="mission-mixed-free-answer"
@@ -112,12 +123,23 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 						<div class="mission-proof-question__step-controls">
 							<button class="btn mission-proof-question__back" type="button" data-mixed-question-back disabled aria-label="Torna alla domanda precedente">
 								<i class="bi bi-arrow-left-circle-fill" aria-hidden="true"></i>
-								</button>
-								<p class="mission-proof-question__progress" data-mixed-question-progress aria-live="polite">
-									Step 1/{questions.length}
-								</p>
+							</button>
+							<div
+								class="mission-proof-question__progress"
+								data-mixed-question-progress
+								role="progressbar"
+								aria-label="Avanzamento prova"
+								aria-valuemin="0"
+								aria-valuemax={questions.length}
+								aria-valuenow="1"
+								aria-valuetext={`Domanda 1 di ${questions.length}`}
+								aria-live="polite"
+								style={`--mission-proof-question-progress: ${100 / questions.length}%`}
+							>
+								<span class="mission-proof-question__progress-bar" aria-hidden="true"></span>
 							</div>
-						)}
+						</div>
+					)}
 				</div>
 
 				<div class="choice-question__answers" data-mixed-choice-answers>
@@ -301,7 +323,10 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 				back.disabled = currentQuestionIndex === 0;
 			});
 			progressElements.forEach((progress) => {
-				progress.textContent = `Step ${currentQuestionIndex + 1}/${questions.length}`;
+				const currentQuestionNumber = currentQuestionIndex + 1;
+				progress.setAttribute('aria-valuenow', String(currentQuestionNumber));
+				progress.setAttribute('aria-valuetext', `Domanda ${currentQuestionNumber} di ${questions.length}`);
+				progress.style.setProperty('--mission-proof-question-progress', `${(currentQuestionNumber / questions.length) * 100}%`);
 			});
 		};
 

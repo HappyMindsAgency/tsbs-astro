@@ -3886,12 +3886,28 @@ body:has(.tsbs-legal-page) {
 		width: 100%;
 	}
 
-	.mission-proof-question__step-controls {
-		display: flex;
+	.mission-proof-question__prompt-row:has(.mission-proof-question__step-controls) {
+		grid-template-columns: minmax(0, 1fr) auto;
 		align-items: center;
-		justify-content: flex-end;
-		justify-self: end;
-		gap: 0.5rem;
+		column-gap: 0.75rem;
+		row-gap: 1rem;
+	}
+
+	.mission-proof-question__prompt-row:has(.mission-proof-question__step-controls) > :not(.mission-proof-question__step-controls) {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.mission-proof-question__prompt-row:has(.mission-proof-question__back:disabled) {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.mission-proof-question__prompt-row:has(.mission-proof-question__back:disabled) > :not(.mission-proof-question__step-controls) {
+		grid-column: 1;
+	}
+
+	.mission-proof-question__step-controls {
+		display: contents;
 	}
 
 	.mission-proof-question__back {
@@ -3903,7 +3919,7 @@ body:has(.tsbs-legal-page) {
 		padding: 0;
 		color: var(--mission-proof-question-accent);
 		font-weight: 800;
-		font-size: 1.05rem;
+		font-size: 1.375rem;
 		line-height: 1;
 		background: transparent;
 		border: 0;
@@ -3927,12 +3943,31 @@ body:has(.tsbs-legal-page) {
 	}
 
 	.mission-proof-question__progress {
-		margin: 0;
-		color: var(--tsbs-color-heading);
-		font-size: 0.95rem;
-		font-weight: 800;
-		line-height: 1.15;
-		white-space: nowrap;
+		position: relative;
+		grid-column: 1 / -1;
+		grid-row: 2;
+		flex: 1 1 auto;
+		width: 100%;
+		min-width: 0;
+		height: 0.625rem;
+		overflow: hidden;
+		background: var(--tsbs-color-neutral-accent-soft);
+		border-radius: 999px;
+	}
+
+	.mission-proof-question__progress-bar {
+		display: block;
+		width: var(--mission-proof-question-progress, 0%);
+		height: 100%;
+		background: var(--mission-proof-question-accent);
+		border-radius: inherit;
+		transition: width 280ms ease;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.mission-proof-question__progress-bar {
+			transition: none;
+		}
 	}
 
 	.free-answer-mission {
