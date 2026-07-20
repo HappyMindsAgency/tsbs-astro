@@ -84,6 +84,12 @@ Logica operativa della maintenance mode, bypass e futura gestione tramite variab
 
 Da consultare quando si lavora su `src/middleware.ts`, pagina `/maintenance`, deploy Vercel o variabili ambiente legate alla visibilita pubblica della web app.
 
+### [Audit Cancellazione Account](./audit-cancellazione-account.md)
+
+Analisi (sola lettura) del flusso di eliminazione account lato Astro vs Strapi, con bug identificati e direzione fix.
+
+Da consultare quando si lavora su `delete-account`, lifecycle Membro/User, orfani relazionali o conformita GDPR sulla cancellazione.
+
 ## Workflow Aggiornamento Wiki
 
 ### Cambiamenti Strutturali

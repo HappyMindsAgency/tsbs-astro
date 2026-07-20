@@ -32,7 +32,11 @@ export const POST: APIRoute = async ({ request }) => {
 		// simula session_config_error
 		// jwt = ''; // Simula una risposta di Strapi senza JWT
 		if (jwt && user) {
-            // Registra l'ultimo login in background — nessun blocco sul redirect in caso di errore
+            // Registra l'ultimo login in background — nessun blocco sul redirect in caso di errore.
+            // ponytail: fire-and-forget verso una self-route. Su Vercel la function si congela
+            // dopo la risposta, quindi questa PUT può NON completarsi (ultimoLogin è cosmetico,
+            // accettato best-effort). Se un giorno serve affidabile: scrivere ultimoLogin
+            // direttamente su Strapi qui (con lookup membro) invece del round-trip HTTP, non await.
             fetch(`${baseUrl}/api/user/dati-aggiuntivi`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Cookie': `jwt=${jwt}` },

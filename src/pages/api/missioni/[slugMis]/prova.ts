@@ -95,7 +95,11 @@ export const POST: APIRoute = async ({ params, request, cookies }) => {
 	const progressione = await registraEsitoProva({ membro, missione, esito: passed, risposte });
 
 	if (!progressione) {
-		logger.error(`[Prova] Registrazione esito fallita per ${missione.slug}`);
+		// La scrittura su Strapi è fallita (es. cold-start Render oltre il timeout).
+		// NON rispondere success:true: il client deve sapere che progresso/trofeo
+		// NON sono stati salvati, così può ritentare invece di perderli in silenzio.
+		logger.error(`[Prova] Registrazione esito NON salvata per ${missione.slug} (membro ${membro.documentId})`);
+		return json({ success: false, error: 'progressione_non_salvata' }, 502);
 	}
 
 	return json({
