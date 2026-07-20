@@ -4,7 +4,6 @@
 // il frontend richiede l'azione e renderizza l'esito (es. modale trofeo).
 
 import { getStrapiApiUrl } from './api-url';
-import { fetchStrapiWithRetry } from './fetch-retry';
 import { getLevelOrder } from '../filtri/missioni';
 import { resolveStrapiMediaUrl } from './trofei';
 import { MISSIONI_SPECIALI, type MissioneLivello } from './missioni';
@@ -88,7 +87,7 @@ export function getTodayRome(): string {
 
 // Risolve il Membro del JWT con i dati necessari alla progressione.
 export async function getMembroProgressioneByJwt(jwt: string): Promise<MembroProgressione | null> {
-	const userRes = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/users/me`, {
+	const userRes = await fetch(`${STRAPI_API_BASE_URL}/users/me`, {
 		headers: { Authorization: `Bearer ${jwt}`, 'Content-Type': 'application/json' },
 	});
 	if (!userRes.ok) return null;
@@ -109,7 +108,7 @@ export async function getMembroProgressioneByJwt(jwt: string): Promise<MembroPro
 	searchParams.set('populate[accademia][fields][1]', 'nome');
 	searchParams.set('pagination[pageSize]', '1');
 
-	const membroRes = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/membri?${searchParams}`, { headers: adminHeaders() });
+	const membroRes = await fetch(`${STRAPI_API_BASE_URL}/membri?${searchParams}`, { headers: adminHeaders() });
 	if (!membroRes.ok) return null;
 
 	const payload = await membroRes.json();
@@ -138,7 +137,7 @@ export async function getPartecipazione(membroDocumentId: string, missioneDocume
 	searchParams.set('fields[4]', 'datiRuntime');
 	searchParams.set('pagination[pageSize]', '1');
 
-	const response = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/partecipazioni-missione?${searchParams}`, {
+	const response = await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione?${searchParams}`, {
 		headers: adminHeaders(),
 	});
 	if (!response.ok) return null;
@@ -158,7 +157,7 @@ export async function avviaPartecipazione(
 	if (existing) return true;
 
 	const now = new Date().toISOString();
-	const created = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
+	const created = await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
 		method: 'POST',
 		headers: adminHeaders(),
 		body: JSON.stringify({
@@ -261,12 +260,12 @@ export async function registraEsitoProva(args: {
 	};
 
 	const saved = existing
-		? await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/partecipazioni-missione/${existing.documentId}`, {
+		? await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione/${existing.documentId}`, {
 			method: 'PUT',
 			headers: adminHeaders(),
 			body: JSON.stringify({ data: payload }),
 		})
-		: await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
+		: await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
 			method: 'POST',
 			headers: adminHeaders(),
 			body: JSON.stringify({
@@ -337,7 +336,7 @@ export async function assegnaTrofeoSeNuovo(membroDocumentId: string, trofeoDocum
 	searchParams.set('fields[0]', 'dataOttenimento');
 	searchParams.set('pagination[pageSize]', '1');
 
-	const existingRes = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/trofei-membro?${searchParams}`, {
+	const existingRes = await fetch(`${STRAPI_API_BASE_URL}/trofei-membro?${searchParams}`, {
 		headers: adminHeaders(),
 	});
 	if (!existingRes.ok) {
@@ -348,7 +347,7 @@ export async function assegnaTrofeoSeNuovo(membroDocumentId: string, trofeoDocum
 	const existingPayload = await existingRes.json();
 	if (existingPayload?.data?.[0]) return false;
 
-	const createRes = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/trofei-membro`, {
+	const createRes = await fetch(`${STRAPI_API_BASE_URL}/trofei-membro`, {
 		method: 'POST',
 		headers: adminHeaders(),
 		body: JSON.stringify({
@@ -381,7 +380,7 @@ export async function aggiungiPuntiMembro(membroDocumentId: string, punti: numbe
 	const currentPayload = await currentRes.json();
 	const correnti = Number.parseInt(String(currentPayload?.data?.punti ?? '0'), 10) || 0;
 
-	const updateRes = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}`, {
+	const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}`, {
 		method: 'PUT',
 		headers: adminHeaders(),
 		body: JSON.stringify({ data: { punti: correnti + punti } }),
@@ -412,7 +411,7 @@ export async function applicaLevelUp(membro: MembroProgressione, missioneDocumen
 	searchParams.set('fields[0]', 'documentId');
 	searchParams.set('pagination[pageSize]', '1');
 
-	const levelRes = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/livelli?${searchParams}`, { headers: adminHeaders() });
+	const levelRes = await fetch(`${STRAPI_API_BASE_URL}/livelli?${searchParams}`, { headers: adminHeaders() });
 	if (!levelRes.ok) return null;
 
 	const levelPayload = await levelRes.json();
@@ -422,7 +421,7 @@ export async function applicaLevelUp(membro: MembroProgressione, missioneDocumen
 		return null;
 	}
 
-	const updateRes = await fetchStrapiWithRetry(`${STRAPI_API_BASE_URL}/membri/${membro.documentId}`, {
+	const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membro.documentId}`, {
 		method: 'PUT',
 		headers: adminHeaders(),
 		body: JSON.stringify({ data: { livello: { connect: [levelDocumentId] } } }),
