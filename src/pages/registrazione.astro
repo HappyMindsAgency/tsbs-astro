@@ -40,6 +40,29 @@ const { lang = 'it' } = Astro.props;
 						</div>
 
 						<div class="sign-in-field">
+							<label for="sign-in-email">Email*</label>
+							<input id="sign-in-email" name="email" type="email" autocomplete="email" required />
+						</div>
+
+						<div class="sign-in-field">
+							<label for="sign-in-city">Città</label>
+							<div class="sign-in-city" data-city-autocomplete>
+								<input
+									id="sign-in-city"
+									name="cityName"
+									type="text"
+									autocomplete="address-level2"
+									aria-autocomplete="list"
+									aria-expanded="false"
+									aria-controls="sign-in-city-results"
+									data-city-input
+								/>
+								<input id="sign-in-city-code" name="cityIstatCode" type="hidden" data-city-code />
+								<div id="sign-in-city-results" class="sign-in-city__results" role="listbox" data-city-results hidden></div>
+							</div>
+						</div>
+
+						<div class="sign-in-field">
 							<label for="sign-in-username">Username*</label>
 							<input
 								id="sign-in-username"
@@ -51,11 +74,6 @@ const { lang = 'it' } = Astro.props;
 								data-username-input
 							/>
 							<p class="sign-in-username-status" id="sign-in-username-status" role="status" aria-live="polite" data-username-status hidden></p>
-						</div>
-
-						<div class="sign-in-field">
-							<label for="sign-in-email">Email*</label>
-							<input id="sign-in-email" name="email" type="email" autocomplete="email" required />
 						</div>
 
 						<div class="sign-in-field">
@@ -79,24 +97,6 @@ const { lang = 'it' } = Astro.props;
 							</p>
 						</div>
 
-						<div class="sign-in-field">
-							<label for="sign-in-city">Città</label>
-							<div class="sign-in-city" data-city-autocomplete>
-								<input
-									id="sign-in-city"
-									name="cityName"
-									type="text"
-									autocomplete="address-level2"
-									aria-autocomplete="list"
-									aria-expanded="false"
-									aria-controls="sign-in-city-results"
-									data-city-input
-								/>
-								<input id="sign-in-city-code" name="cityIstatCode" type="hidden" data-city-code />
-								<div id="sign-in-city-results" class="sign-in-city__results" role="listbox" data-city-results hidden></div>
-							</div>
-						</div>
-
 						<div class="sign-in-consents">
 							<label class="sign-in-check">
 								<input type="checkbox" name="marketing" />
@@ -111,7 +111,7 @@ const { lang = 'it' } = Astro.props;
 							<label class="sign-in-check">
 								<input type="checkbox" name="terms" required />
 								<span>
-									Dichiaro di aver letto e accettato i <a href="/termini-e-condizioni/">Termini di Servizio</a> e la <a href="/privacy-policy/">Privacy Policy</a> della web app.*
+									Dichiaro di aver letto e accettato i <a href="/termini-e-condizioni/">Termini di Servizio</a> e la <a href="/privacy-policy/">Privacy Policy</a> della web app*
 								</span>
 							</label>
 						</div>
