@@ -96,7 +96,6 @@ export async function getMembroProgressioneByJwt(jwt: string): Promise<MembroPro
 	if (!user?.id) return null;
 
 	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[user][id][$eq]', String(user.id));
 	searchParams.set('fields[0]', 'email');
 	searchParams.set('fields[1]', 'punti');
@@ -127,7 +126,6 @@ type PartecipazioneRaw = {
 
 export async function getPartecipazione(membroDocumentId: string, missioneDocumentId: string) {
 	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
 	searchParams.set('filters[missione][documentId][$eq]', missioneDocumentId);
 	searchParams.set('fields[0]', 'stato');
@@ -330,7 +328,6 @@ async function premiaCompletamento(
 // Crea il Trofeo-membro solo se non esiste gia (membro+trofeo): "solo la prima volta".
 export async function assegnaTrofeoSeNuovo(membroDocumentId: string, trofeoDocumentId: string): Promise<boolean> {
 	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[membri][documentId][$eq]', membroDocumentId);
 	searchParams.set('filters[trofeo][documentId][$eq]', trofeoDocumentId);
 	searchParams.set('fields[0]', 'dataOttenimento');
@@ -372,7 +369,7 @@ export async function aggiungiPuntiMembro(membroDocumentId: string, punti: numbe
 	if (punti <= 0) return true;
 
 	const currentRes = await fetch(
-		`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}?status=draft&fields[0]=punti`,
+		`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}?fields[0]=punti`,
 		{ headers: adminHeaders() },
 	);
 	if (!currentRes.ok) return false;

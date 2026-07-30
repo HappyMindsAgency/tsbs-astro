@@ -88,7 +88,6 @@ async function getCurrentMembroFromJwt(jwt: string) {
 	if (!user.email) return null;
 
 	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[email][$eq]', user.email);
 	searchParams.set('fields[0]', 'email');
 	searchParams.set('fields[1]', 'datiAggiuntivi');
@@ -125,8 +124,6 @@ async function getTrofeiConquistatiByMembro(membroDocumentId: string) {
 	// Nessun filtro `locale`: il raccordo trofeo-membro non ha campi localizzati, e vincolarlo
 	// a it-IT escluderebbe i record creati in altri locale. La localizzazione dei dati mostrati
 	// (nome/descrizione) resta sul Trofeo collegato.
-	// Coerente con le partecipazioni missione: i record personali di gioco sono in draft.
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[membri][documentId][$eq]', membroDocumentId);
 	searchParams.set('sort[0]', 'dataOttenimento:asc');
 	searchParams.set('pagination[pageSize]', '100');
@@ -161,7 +158,6 @@ function sanitizeLayout(value: unknown): TrofeoLayoutItem[] {
 async function getMembroDatiAggiuntiviByDocumentId(membroDocumentId: string) {
 	const apiBaseUrl = getStrapiApiUrl();
 	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[documentId][$eq]', membroDocumentId);
 	searchParams.set('fields[0]', 'datiAggiuntivi');
 	searchParams.set('pagination[pageSize]', '1');

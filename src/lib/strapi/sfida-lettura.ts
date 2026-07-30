@@ -85,7 +85,6 @@ export async function getLibriSfida(): Promise<LibroSfida[]> {
 
 export async function getTentativiLetturaByMembro(membroDocumentId: string): Promise<TentativoLetturaRecord[]> {
 	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
 	searchParams.set('fields[0]', 'dataUltimoTentativo');
 	searchParams.set('fields[1]', 'rispostaDomanda');
@@ -153,7 +152,6 @@ function shuffle<T>(items: T[]): T[] {
 
 async function getTentativoLetturaRecord(membroDocumentId: string, libroDocumentId: string) {
 	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
 	searchParams.set('filters[libro][documentId][$eq]', libroDocumentId);
 	searchParams.set('fields[0]', 'dataUltimoTentativo');

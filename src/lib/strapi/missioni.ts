@@ -251,7 +251,6 @@ export async function getMembroMissioniByJwt(jwt: string) {
 	if (!user.email) return null;
 
 	const searchParams = new URLSearchParams();
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[email][$eq]', user.email);
 	searchParams.set('fields[0]', 'email');
 	searchParams.set('populate[accademia][fields][0]', 'slug');
@@ -273,7 +272,6 @@ export async function getMembroMissioniByJwt(jwt: string) {
 async function getPartecipazioniMissioneByMembro(membroDocumentId: string, lang = 'it') {
 	const searchParams = new URLSearchParams();
 	searchParams.set('locale', getItalianStrapiLocale(lang));
-	searchParams.set('status', 'draft');
 	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
 	searchParams.set('pagination[pageSize]', '100');
 	searchParams.set('fields[0]', 'stato');
