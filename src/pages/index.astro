@@ -55,7 +55,7 @@ const errorMessage = error ? (errorMessages[error] || "Si è verificato un error
 								autocomplete="username"
 								value={identifier}
 								required
-								pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$|^[a-zA-Z0-9_.-]{3,}$"
+								pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$|^[a-zA-Z0-9_.-]{3,}$"
 								title="Inserisci un'email valida o un nome utente di almeno 3 caratteri senza spazi."
 							/>
 						</div>
