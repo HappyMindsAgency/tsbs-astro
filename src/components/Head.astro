@@ -340,9 +340,23 @@ metaSocialTwitter.description = metaSocialTwitter.description || '';
         document.addEventListener('astro:before-preparation', () => {
             const bar = getOrCreateBar();
             bar.classList.remove('is-done');
-            // force reflow: garantisce che il browser riparta da width:0% prima di animare
-            void bar.offsetWidth;
+
+            // Salto istantaneo (no transition) a una percentuale già visibile: su
+            // navigazioni veloci l'animazione di 4s partendo da 0% non fa in tempo
+            // a diventare percepibile prima dello swap. Il salto garantisce che la
+            // barra sia visibile fin dal click; la crescita verso l'80% resta lenta.
+            // L'inline width va rimosso DOPO aver aggiunto is-loading (non prima):
+            // l'inline ha precedenza sulla classe, quindi finché è impostato blocca
+            // la barra al 20% invece di lasciarla crescere verso l'80% della classe.
+            bar.style.transition = 'none';
+            bar.style.opacity = '1';
+            bar.style.width = '20%';
+            void bar.offsetWidth; // commit del salto prima di riattivare la transition
+            bar.style.transition = '';
+
             bar.classList.add('is-loading');
+            bar.style.width = '';
+            bar.style.opacity = '';
         });
 
         document.addEventListener('astro:page-load', () => {

@@ -86,8 +86,8 @@ const { lang = 'it' } = Astro.props;
 		padding: 1.5rem 1rem;
 		background: #1a1008;
 		border: 1px solid #4a3320;
-		border-radius: 0.5rem;
-		box-shadow: 0 0 40px rgba(0, 0, 0, 0.6), inset 0 0 60px rgba(0, 0, 0, 0.3);
+		border-radius: 8px;
+		box-shadow: 0 4px 32px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.25);
 		font-family: var(--tsbs-font-body, "Inter", sans-serif);
 		max-width: 480px;
 		margin-inline: auto;
@@ -271,14 +271,15 @@ const { lang = 'it' } = Astro.props;
 		width: 2.5rem;
 		height: 2.5rem;
 		background: #2a1a08;
-		border: 1px solid #4a3320;
+		border: 1px solid #b89a7e;
 		color: #b89a7e;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		cursor: pointer;
 		font-size: 1rem;
-		transition: background 0.15s;
+		box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 4px rgba(0,0,0,0.4);
+		transition: background 0.15s, box-shadow 0.1s, transform 0.1s;
 		-webkit-tap-highlight-color: transparent;
 		touch-action: manipulation;
 	}
@@ -292,6 +293,8 @@ const { lang = 'it' } = Astro.props;
 	.snake-dpad__btn:active {
 		background: #4a3320;
 		color: #d4a96a;
+		box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+		transform: translateY(1px);
 	}
 
 	.snake-dpad__btn:focus-visible {
@@ -304,8 +307,10 @@ const { lang = 'it' } = Astro.props;
 		justify-content: center;
 	}
 
-	/* ── Nasconde dpad su desktop ampio ── */
-	@media (min-width: 768px) {
+	/* Controlli touch legati al tipo di input, non alla larghezza: un tablet
+	   touch largo (≥768px) deve comunque avere il d-pad; un desktop con mouse
+	   non lo vede mai, indipendentemente dalla dimensione finestra. */
+	@media (hover: hover) and (pointer: fine) {
 		.snake-dpad,
 		.snake-mobile-controls {
 			display: none;
@@ -667,11 +672,19 @@ const { lang = 'it' } = Astro.props;
 		}
 	}
 
-	// D-pad
-	document.getElementById('dpad-up')!.addEventListener('click',    () => { if (gameState === 'playing') setDir('UP'); });
-	document.getElementById('dpad-down')!.addEventListener('click',  () => { if (gameState === 'playing') setDir('DOWN'); });
-	document.getElementById('dpad-left')!.addEventListener('click',  () => { if (gameState === 'playing') setDir('LEFT'); });
-	document.getElementById('dpad-right')!.addEventListener('click', () => { if (gameState === 'playing') setDir('RIGHT'); });
+	// D-pad: touchstart per reattività su touch (evita il delay del click emulato),
+	// click come fallback per input da mouse. Stesso pattern usato in TetrisGame.
+	function dpadPress(id: string, action: () => void) {
+		const btn = document.getElementById(id);
+		if (!btn) return;
+		btn.addEventListener('touchstart', (e) => { e.preventDefault(); action(); }, { passive: false });
+		btn.addEventListener('click', () => action());
+	}
+
+	dpadPress('dpad-up',    () => { if (gameState === 'playing') setDir('UP'); });
+	dpadPress('dpad-down',  () => { if (gameState === 'playing') setDir('DOWN'); });
+	dpadPress('dpad-left',  () => { if (gameState === 'playing') setDir('LEFT'); });
+	dpadPress('dpad-right', () => { if (gameState === 'playing') setDir('RIGHT'); });
 
 	startBtn.addEventListener('click', startGame);
 	pauseBtn.addEventListener('click', togglePause);

@@ -121,8 +121,8 @@ const { lang = 'it' } = Astro.props;
     padding: 1rem;
     background: #1a1008;
     border: 1px solid #4a3320;
-    border-radius: 4px;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.6);
+    border-radius: 8px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.6), inset 0 0 40px rgba(0,0,0,0.25);
     font-family: var(--tsbs-font-body, 'Inter', sans-serif);
   }
 
@@ -338,7 +338,7 @@ const { lang = 'it' } = Astro.props;
     width: 48px;
     height: 48px;
     background: #1a1008;
-    border: 1px solid #4a3320;
+    border: 1px solid #b89a7e;
     border-radius: 6px;
     color: #d4a96a;
     font-size: 1.1rem;
@@ -346,12 +346,16 @@ const { lang = 'it' } = Astro.props;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.1s;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 4px rgba(0,0,0,0.4);
+    transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
   .tetris-dpad__btn:active {
     background: rgba(212,169,106,0.18);
+    color: #e8c07e;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.6);
+    transform: translateY(1px);
   }
   .tetris-dpad__btn--rotate {
     background: rgba(212,169,106,0.08);
@@ -367,7 +371,10 @@ const { lang = 'it' } = Astro.props;
   }
 
   /* ── Responsive ── */
-  @media (min-width: 768px) {
+  /* Controlli touch legati al tipo di input, non alla larghezza: un tablet
+     touch largo (≥768px) deve comunque avere il d-pad; un desktop con mouse
+     non lo vede mai, indipendentemente dalla dimensione finestra. */
+  @media (hover: hover) and (pointer: fine) {
     .tetris-dpad,
     .tetris-mobile-controls {
       display: none;
@@ -381,7 +388,9 @@ const { lang = 'it' } = Astro.props;
      ritoccare per device particolari. */
   @media (max-width: 767px) {
     .tetris-wrapper {
-      --tetris-board-height: min(calc((100vw - 2rem) * 2), 58svh);
+      /* Frazione svh ridotta rispetto a prima (58→52) per lasciare spazio
+         alla striscia "Prossimo" che ora resta visibile invece di sparire. */
+      --tetris-board-height: min(calc((100vw - 2rem) * 2), 52svh);
       --tetris-board-width: calc(var(--tetris-board-height) / 2);
       padding: 0.5rem;
       max-width: 100%;
@@ -404,12 +413,32 @@ const { lang = 'it' } = Astro.props;
     .tetris-main {
       flex-direction: column;
       align-items: center;
+      gap: 0.4rem;
+    }
+    /* La legenda testuale è ridondante con le icone già sul d-pad: si nasconde.
+       L'anteprima "Prossimo" è invece informazione di gioco reale (non deducibile
+       altrimenti) e resta visibile, compressa in una striscia orizzontale sotto
+       il board invece di sparire del tutto. */
+    .tetris-sidebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
       gap: 0.5rem;
     }
-    /* ponytail: anteprima "Prossimo" e legenda nascoste su mobile, per dare tutto
-       lo spazio verticale al board (= giocabilità). Su desktop restano visibili. */
-    .tetris-sidebar {
+    .tetris-sidebar__legend {
       display: none;
+    }
+    .tetris-next-wrap {
+      flex-direction: row;
+      padding: 0.3rem 0.6rem;
+    }
+    .tetris-sidebar__label {
+      font-size: 0.55rem;
+    }
+    #tetris-next-canvas {
+      width: 40px;
+      height: 40px;
     }
     .tetris-overlay__inner {
       padding: 1rem 0.75rem;
