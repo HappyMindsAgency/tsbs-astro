@@ -97,6 +97,17 @@ const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.
 				</div>
 			</section>
 
+			<a class="biblioteca-map-box" href="/biblioteca/mappa/" aria-labelledby="biblioteca-map-title">
+				<div class="biblioteca-map-box__marker" aria-hidden="true">
+					<i class="bi bi-map"></i>
+				</div>
+
+				<div class="biblioteca-map-box__copy">
+					<h2 id="biblioteca-map-title">La Mappa</h2>
+					<p>Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor.</p>
+				</div>
+			</a>
+
 			<section class="biblioteca-faq-box" aria-labelledby="biblioteca-faq-title">
 				<div class="biblioteca-faq-box__copy">
 					<h2 id="biblioteca-faq-title">Hai dubbi sul percorso?</h2>

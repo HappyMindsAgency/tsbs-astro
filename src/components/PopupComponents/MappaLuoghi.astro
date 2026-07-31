@@ -1,0 +1,255 @@
+---
+import placeholderImage from '../../assets/mappa-img-test-orizzontale.jpg';
+---
+
+<div
+	class="mappa-luoghi-modal"
+	data-map-place-modal
+	hidden
+	role="dialog"
+	aria-modal="true"
+	aria-labelledby="mappa-luoghi-modal-title"
+	aria-describedby="mappa-luoghi-modal-description"
+>
+	<button class="mappa-luoghi-modal__backdrop" type="button" data-map-place-close tabindex="-1" aria-hidden="true"></button>
+
+	<section class="mappa-luoghi-modal__panel" tabindex="-1">
+		<button class="mappa-luoghi-modal__close" type="button" data-map-place-close aria-label="Chiudi la finestra">
+			<i class="bi bi-x-lg" aria-hidden="true"></i>
+		</button>
+
+		<div class="mappa-luoghi-modal__media">
+			<img
+				class="mappa-luoghi-modal__image"
+				src={placeholderImage.src}
+				width={placeholderImage.width}
+				height={placeholderImage.height}
+				alt=""
+				data-map-place-image
+			/>
+		</div>
+
+		<div class="mappa-luoghi-modal__copy">
+			<h2 id="mappa-luoghi-modal-title" data-map-place-title>Chiostro d’ingresso</h2>
+			<p id="mappa-luoghi-modal-description" data-map-place-description>
+				Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis.
+			</p>
+		</div>
+	</section>
+</div>
+
+<script>
+	type MapPlaceDetail = {
+		trigger?: HTMLElement;
+		title?: string;
+		description?: string;
+		imageSrc?: string;
+		imageAlt?: string;
+	};
+
+	const setupMapPlaceModal = () => {
+		document.querySelectorAll<HTMLElement>('[data-map-place-modal]').forEach((modal) => {
+			if (modal.dataset.mapPlaceModalReady === 'true') return;
+			modal.dataset.mapPlaceModalReady = 'true';
+
+			const title = modal.querySelector<HTMLElement>('[data-map-place-title]');
+			const description = modal.querySelector<HTMLElement>('[data-map-place-description]');
+			const image = modal.querySelector<HTMLImageElement>('[data-map-place-image]');
+			const closeButton = modal.querySelector<HTMLButtonElement>('.mappa-luoghi-modal__close');
+			const closeControls = modal.querySelectorAll<HTMLElement>('[data-map-place-close]');
+			let lastTrigger: HTMLElement | undefined;
+
+			if (!title || !description || !image || !closeButton) return;
+
+			const updateImageLayout = () => {
+				const isPortrait = image.naturalHeight > image.naturalWidth;
+				modal.classList.toggle('mappa-luoghi-modal--portrait', isPortrait);
+
+				if (!isPortrait) {
+					modal.style.removeProperty('--mappa-luoghi-modal-portrait-width');
+					return;
+				}
+
+				modal.style.removeProperty('--mappa-luoghi-modal-portrait-width');
+				const imageWidth = image.getBoundingClientRect().width;
+				if (imageWidth > 0) {
+					modal.style.setProperty('--mappa-luoghi-modal-portrait-width', `${Math.ceil(imageWidth)}px`);
+				}
+			};
+
+			const scheduleImageLayout = () => window.requestAnimationFrame(updateImageLayout);
+
+			image.addEventListener('load', scheduleImageLayout);
+			updateImageLayout();
+
+			const closeModal = () => {
+				modal.hidden = true;
+				document.body.classList.remove('is-map-place-modal-open');
+				lastTrigger?.focus();
+			};
+
+			window.addEventListener('tsbs:map-place-open', (event) => {
+				if (!(event instanceof CustomEvent)) return;
+
+				const detail = event.detail as MapPlaceDetail;
+				lastTrigger = detail.trigger;
+				title.textContent = detail.title || 'Chiostro d’ingresso';
+				description.textContent = detail.description || '';
+
+				if (detail.imageSrc) image.src = detail.imageSrc;
+				image.alt = detail.imageAlt || '';
+
+				modal.hidden = false;
+				document.body.classList.add('is-map-place-modal-open');
+				scheduleImageLayout();
+				closeButton.focus();
+			});
+
+			closeControls.forEach((control) => control.addEventListener('click', closeModal));
+
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'Escape' && !modal.hidden) closeModal();
+			});
+
+			window.addEventListener('resize', () => {
+				if (!modal.hidden) scheduleImageLayout();
+			});
+		});
+	};
+
+	setupMapPlaceModal();
+	document.addEventListener('astro:page-load', setupMapPlaceModal);
+</script>
+
+<style lang="scss">
+	.mappa-luoghi-modal {
+		position: fixed;
+		inset: 0;
+		z-index: 1250;
+		display: grid;
+		place-items: center;
+		padding: 1rem;
+	}
+
+	.mappa-luoghi-modal[hidden] {
+		display: none;
+	}
+
+	.mappa-luoghi-modal__backdrop {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		cursor: default;
+		background: color-mix(in srgb, var(--tsbs-color-heading) 58%, transparent);
+		border: 0;
+	}
+
+	.mappa-luoghi-modal__panel {
+		position: relative;
+		z-index: 1;
+		width: min(100%, 40rem);
+		max-height: calc(100dvh - 2rem);
+		overflow: auto;
+		color: var(--tsbs-color-body);
+		background: var(--biblioteca-card-bg, var(--tsbs-color-surface));
+		border-radius: 0.75rem;
+		box-shadow: 0 1rem 2.5rem color-mix(in srgb, var(--tsbs-color-heading) 24%, transparent);
+	}
+
+	.mappa-luoghi-modal__close {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		z-index: 2;
+		display: grid;
+		place-items: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		padding: 0;
+		color: var(--tsbs-theme-cta-color);
+		font-size: 1.125rem;
+		cursor: pointer;
+		background: var(--tsbs-theme-cta-bg);
+		border: 1px solid var(--tsbs-theme-cta-border);
+		border-radius: 50%;
+	}
+
+	.mappa-luoghi-modal__close:focus-visible {
+		outline: 0.1875rem solid var(--tsbs-theme-accent);
+		outline-offset: 0.1875rem;
+	}
+
+	.mappa-luoghi-modal__media {
+		background: transparent;
+	}
+
+	.mappa-luoghi-modal__image {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	.mappa-luoghi-modal--portrait .mappa-luoghi-modal__panel {
+		width: min(100%, var(--mappa-luoghi-modal-portrait-width, 34rem));
+	}
+
+	.mappa-luoghi-modal--portrait .mappa-luoghi-modal__media {
+		display: grid;
+		place-items: center;
+	}
+
+	.mappa-luoghi-modal--portrait .mappa-luoghi-modal__image {
+		width: auto;
+		max-width: 100%;
+		max-height: min(42dvh, 23rem);
+	}
+
+	.mappa-luoghi-modal__copy {
+		padding: 1.5rem 1.25rem 2rem;
+	}
+
+	.mappa-luoghi-modal--portrait .mappa-luoghi-modal__copy {
+		padding: 1.25rem;
+	}
+
+	.mappa-luoghi-modal__copy h2 {
+		margin: 0;
+		color: var(--tsbs-color-heading);
+		font-size: clamp(1.375rem, 5vw, 1.75rem);
+		font-weight: 800;
+		line-height: 1.15;
+	}
+
+	.mappa-luoghi-modal__copy p {
+		margin: 0.875rem 0 0;
+		font-size: 1rem;
+		line-height: 1.5;
+	}
+
+	:global(body.is-map-place-modal-open) {
+		overflow: hidden;
+	}
+
+	@media (min-width: 48rem) {
+		.mappa-luoghi-modal {
+			padding: 1.5rem;
+		}
+
+		.mappa-luoghi-modal__copy {
+			padding: 2rem 2.5rem 2.5rem;
+		}
+
+		.mappa-luoghi-modal--portrait .mappa-luoghi-modal__media {
+			padding: 0;
+		}
+
+		.mappa-luoghi-modal--portrait .mappa-luoghi-modal__image {
+			max-height: min(52dvh, 30rem);
+		}
+
+		.mappa-luoghi-modal--portrait .mappa-luoghi-modal__copy {
+			padding: 1.5rem;
+		}
+	}
+</style>

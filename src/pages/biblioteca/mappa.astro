@@ -1,0 +1,220 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import MappaLuoghi from '../../components/PopupComponents/MappaLuoghi.astro';
+import { resolveUserContext } from '../../lib/theme';
+import pianoTerraImage from '../../assets/mappa_pianoterra_00.jpg';
+import pianoPrimoImage from '../../assets/mappa_piano_primo_01.jpg';
+import pianoSecondoImage from '../../assets/mappa_piano_secondo_02.jpg';
+
+const { lang = 'it' } = Astro.props;
+const jwt = Astro.cookies.get('jwt')?.value;
+
+if (!jwt) {
+	return Astro.redirect('/');
+}
+
+const { theme, accademia } = await resolveUserContext(jwt);
+
+// Contenuti provvisori: saranno sostituiti con le informazioni definitive di ogni luogo.
+const groundFloorHotspots = [
+	{ id: 'luogo-1', x: 81.2, y: 38.9 },
+	{ id: 'luogo-2', x: 70, y: 46.5 },
+	{ id: 'luogo-3', x: 85.4, y: 53.3 },
+	{ id: 'luogo-4', x: 65.4, y: 55.6 },
+	{ id: 'luogo-5', x: 74.9, y: 60.4 },
+	{ id: 'luogo-6', x: 50.5, y: 67.5 },
+	{ id: 'luogo-7', x: 85.8, y: 76.8 },
+];
+
+const firstFloorHotspots = [
+	{ id: 'luogo-1', x: 57.4, y: 51 },
+	{ id: 'luogo-2', x: 77.4, y: 59.7 },
+	{ id: 'luogo-3', x: 53.5, y: 70.3 },
+];
+
+const secondFloorHotspots = [
+	{ id: 'luogo-1', x: 65.1, y: 21.8 },
+	{ id: 'luogo-2', x: 87.5, y: 34.4 },
+	{ id: 'luogo-3', x: 79.9, y: 42 },
+	{ id: 'luogo-4', x: 53.2, y: 47 },
+	{ id: 'luogo-5', x: 73, y: 49.9 },
+];
+
+const temporaryPlaceTitle = 'Chiostro d’ingresso';
+const temporaryPlaceDescription =
+	'Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis.';
+
+const mapFloors = [
+	{
+		id: 'piano-terra',
+		label: 'Piano terra',
+		image: pianoTerraImage,
+		alt: 'Mappa della Biblioteca Classense al piano terra',
+		hotspots: groundFloorHotspots,
+	},
+	{
+		id: 'piano-primo',
+		label: 'Piano primo',
+		image: pianoPrimoImage,
+		alt: 'Mappa della Biblioteca Classense al piano primo',
+		hotspots: firstFloorHotspots,
+	},
+	{
+		id: 'piano-secondo',
+		label: 'Piano secondo',
+		image: pianoSecondoImage,
+		alt: 'Mappa della Biblioteca Classense al piano secondo',
+		hotspots: secondFloorHotspots,
+	},
+];
+---
+
+<Layout lang={lang} theme={theme} accademia={accademia}>
+	<Nav lang={lang} />
+	<MappaLuoghi />
+
+	<main class="tsbs-app-shell missions-shell biblioteca-page biblioteca-map-page">
+		<header class="missions-header biblioteca-header">
+			<h1>La Mappa</h1>
+		</header>
+
+		<section class="container-xl tsbs-app-container biblioteca-content" aria-labelledby="biblioteca-map-page-title">
+			<h2 id="biblioteca-map-page-title" class="visually-hidden">La Mappa</h2>
+
+			<div class="biblioteca-intro">
+				<p>Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor. Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor. Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor. Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor.</p>
+			</div>
+
+			<section class="biblioteca-map-viewer" aria-label="Mappa della Biblioteca Classense" data-map-viewer>
+				<div class="biblioteca-map-viewer__tabs" role="tablist" aria-label="Seleziona un piano">
+					{mapFloors.map((floor, index) => (
+						<button
+							id={`map-tab-${floor.id}`}
+							class="biblioteca-map-viewer__tab"
+							type="button"
+							role="tab"
+							aria-selected={index === 0 ? 'true' : 'false'}
+							aria-controls="map-panel"
+							tabindex={index === 0 ? 0 : -1}
+							data-map-tab
+							data-floor-id={floor.id}
+							data-image-src={floor.image.src}
+							data-image-alt={floor.alt}
+						>
+							{floor.label}
+						</button>
+					))}
+				</div>
+
+				<div id="map-panel" class="biblioteca-map-viewer__panel" role="tabpanel" aria-labelledby="map-tab-piano-terra" tabindex="0">
+					<img
+						class="biblioteca-map-viewer__image"
+						src={mapFloors[0].image.src}
+						width={mapFloors[0].image.width}
+						height={mapFloors[0].image.height}
+						alt={mapFloors[0].alt}
+						data-map-image
+					/>
+					<div class="biblioteca-map-viewer__hotspots" data-map-hotspots>
+						{mapFloors.flatMap((floor) => floor.hotspots.map((hotspot, index) => (
+							<button
+								class="biblioteca-map-viewer__hotspot"
+								type="button"
+								style={`left: ${hotspot.x}%; top: ${hotspot.y}%;`}
+								data-map-hotspot
+								data-floor-id={floor.id}
+								data-map-place-title={temporaryPlaceTitle}
+								data-map-place-description={temporaryPlaceDescription}
+								aria-label={`Apri le informazioni del luogo ${index + 1}`}
+								hidden={floor.id !== 'piano-terra'}
+							>
+								<span class="visually-hidden">Apri le informazioni del luogo {index + 1}</span>
+							</button>
+						)))}
+					</div>
+				</div>
+			</section>
+		</section>
+	</main>
+</Layout>
+
+<script>
+	const initMapViewer = () => {
+		document.querySelectorAll<HTMLElement>('[data-map-viewer]').forEach((viewer) => {
+			if (viewer.dataset.mapViewerInitialized === 'true') return;
+			viewer.dataset.mapViewerInitialized = 'true';
+
+			const tabs = Array.from(viewer.querySelectorAll<HTMLButtonElement>('[data-map-tab]'));
+			const image = viewer.querySelector<HTMLImageElement>('[data-map-image]');
+			const panel = viewer.querySelector<HTMLElement>('[role="tabpanel"]');
+			const hotspots = viewer.querySelector<HTMLElement>('[data-map-hotspots]');
+
+			if (!image || !panel || tabs.length === 0) return;
+
+			const selectTab = (tab: HTMLButtonElement, shouldFocus = false) => {
+				tabs.forEach((candidate) => {
+					const isSelected = candidate === tab;
+					candidate.setAttribute('aria-selected', String(isSelected));
+					candidate.tabIndex = isSelected ? 0 : -1;
+				});
+
+				image.src = tab.dataset.imageSrc || image.src;
+				image.alt = tab.dataset.imageAlt || '';
+				panel.setAttribute('aria-labelledby', tab.id);
+				hotspots?.querySelectorAll<HTMLElement>('[data-map-hotspot]').forEach((hotspot) => {
+					hotspot.hidden = hotspot.dataset.floorId !== tab.dataset.floorId;
+				});
+
+				if (shouldFocus) tab.focus();
+			};
+
+			tabs.forEach((tab, index) => {
+				tab.addEventListener('click', () => selectTab(tab));
+				tab.addEventListener('keydown', (event) => {
+					const offsets: Record<string, number> = {
+						ArrowRight: 1,
+						ArrowDown: 1,
+						ArrowLeft: -1,
+						ArrowUp: -1,
+					};
+
+					if (event.key === 'Home') {
+						event.preventDefault();
+						selectTab(tabs[0], true);
+						return;
+					}
+
+					if (event.key === 'End') {
+						event.preventDefault();
+						selectTab(tabs[tabs.length - 1], true);
+						return;
+					}
+
+					const offset = offsets[event.key];
+					if (!offset) return;
+
+					event.preventDefault();
+					selectTab(tabs[(index + offset + tabs.length) % tabs.length], true);
+				});
+			});
+
+			viewer.querySelectorAll<HTMLButtonElement>('[data-map-hotspot]').forEach((hotspot) => {
+				hotspot.addEventListener('click', () => {
+					window.dispatchEvent(
+						new CustomEvent('tsbs:map-place-open', {
+							detail: {
+								trigger: hotspot,
+								title: hotspot.dataset.mapPlaceTitle,
+								description: hotspot.dataset.mapPlaceDescription,
+							},
+						}),
+					);
+				});
+			});
+		});
+	};
+
+	initMapViewer();
+	document.addEventListener('astro:page-load', initMapViewer);
+</script>
