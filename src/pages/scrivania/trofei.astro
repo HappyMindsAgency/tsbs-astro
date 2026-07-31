@@ -152,13 +152,13 @@ const paletteOrder = [...trophyCatalog].sort((a, b) => {
 
 	<main class="tsbs-app-shell trophies-page" style={`--trophy-rows: ${board.rows}; --trophy-cols: ${board.cols};`}>
 		<header class="trophies-header" aria-labelledby="trophies-title">
-			<h1 id="trophies-title">Trofei</h1>
+			<h1 id="trophies-title">La stanza dei Trofei</h1>
 			<BackButton href={returnTo} label={backLabel} />
 		</header>
 
 		<div class="container-xl tsbs-app-container trophies-content">
 			<div class="trophies-intro">
-				<p>I trofei raccolgono i successi conquistati al completamento delle tue missioni. Qui puoi vedere quelli che hai ottenuto, aggiungerli alla tua raccolta e spostarli come preferisci, componendo la traccia visibile del tuo percorso all'interno della Società.</p>
+				<p>Qui trovi i riconoscimenti ottenuti completando le missioni e avanzando nel tuo cammino all'interno della Società. Puoi vedere i trofei che hai ottenuto, aggiungerli alla tua raccolta e spostarli come preferisci, componendo la tua griglia.</p>
 			</div>
 
 			<section
@@ -174,7 +174,7 @@ const paletteOrder = [...trophyCatalog].sort((a, b) => {
 					<div class="trophy-palette__panel">
 						<div class="trophy-palette__head">
 							<div>
-								<p>Trofei disponibili</p>
+								<p>Trofei conquistati</p>
 								<span>Clicca o trascina nella griglia</span>
 							</div>
 							<button class="trophy-palette__info" type="button" aria-label="Apri istruzioni trofei" data-trophy-instructions-trigger>
