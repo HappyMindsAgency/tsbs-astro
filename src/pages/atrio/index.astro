@@ -63,6 +63,18 @@ const featuredEpistleCards = featuredEpistole.length > 0
 	}))
 	: [fallbackEpistleCard];
 const featuredEpistleHref = featuredEpistleCards[0]?.href ?? '/epistole/';
+
+// Epistola del WelcomeToast (solo al primo accesso post-onboarding): fissa per accademia, non filtrata per livello/ordine.
+const WELCOME_EPISTOLA_SLUG_BY_ACCADEMIA: Record<string, string> = {
+	arborea: 'arborea-corrado-ricci-al-raggiungimento-del-livello-2-iniziato',
+	arcadia: 'arcadia-santi-muratori-al-raggiungimento-del-livello-2-iniziato',
+	armonia: 'armonia-barbara-longhi-al-raggiungimento-del-livello-2-iniziato',
+	astraria: 'astraria-maria-ponti-pasolini-al-raggiungimento-del-livello-2-iniziato',
+};
+const welcomeEpistolaSlug = membroMissioni?.accademia?.slug
+	? WELCOME_EPISTOLA_SLUG_BY_ACCADEMIA[membroMissioni.accademia.slug]
+	: undefined;
+const welcomeEpistleHref = welcomeEpistolaSlug ? `/epistole/${welcomeEpistolaSlug}/` : featuredEpistleHref;
 const atrioReturnTo = '/atrio/';
 const featuredNoteHref = withReturnTo('/scrivania/grimorio/nuova/', atrioReturnTo);
 const grimorioHref = withReturnTo('/scrivania/grimorio/', atrioReturnTo);
@@ -194,7 +206,7 @@ const taskCards = getFirstIncompleteMissionCards(
 		isOpen={showWelcomeToast}
 		theme={theme}
 		accademia={accademia}
-		epistolaHref={featuredEpistleHref}
+		epistolaHref={welcomeEpistleHref}
 	/>
 	<NotificaTrofeiToast theme={theme} />
 </Layout>
