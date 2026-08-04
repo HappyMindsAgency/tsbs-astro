@@ -3206,6 +3206,13 @@ body:has(.tsbs-legal-page) {
 		background: var(--tsbs-color-surface);
 	}
 
+	.tsbs-app-shell.missions-shell.event-detail-page {
+		background-image: var(--tsbs-page-pattern-overlay), var(--tsbs-page-pattern-image);
+		background-repeat: repeat;
+		background-position: top left;
+		background-size: var(--tsbs-page-pattern-size);
+	}
+
 	.event-detail-header {
 		--missions-header-bg: var(--tsbs-theme-accent);
 	}
