@@ -1876,6 +1876,10 @@ body:has(.tsbs-legal-page) {
 			padding-bottom: 5rem;
 		}
 
+		.academy-content > .academy-ranking-section {
+			width: min(100%, 50rem);
+		}
+
 		.academy-section {
 			gap: 1.5rem;
 		}
@@ -1913,9 +1917,18 @@ body:has(.tsbs-legal-page) {
 		}
 
 		.academy-ranking-card {
-			grid-template-columns: 2rem 2.5rem minmax(0, 1fr) auto;
+			grid-template-columns: 3rem 3.5rem minmax(0, 1fr) auto;
 			min-height: 5.125rem;
 			padding: 1rem 1.5rem;
+		}
+
+		.academy-ranking-card__avatar {
+			width: 3.5rem;
+			height: 3.5rem;
+		}
+
+		.academy-ranking-card__name {
+			font-size: 1.3rem;
 		}
 
 		.academy-ranking-card__points {
