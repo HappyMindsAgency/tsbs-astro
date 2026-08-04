@@ -1,4 +1,6 @@
 ---
+import concludiProvaIcon from '../../assets/concludi-prova.svg';
+
 const { isOpen = true, theme = '' } = Astro.props;
 ---
 
@@ -6,7 +8,7 @@ const { isOpen = true, theme = '' } = Astro.props;
 	<div class={`intro-sorting-toast ${theme}`} data-intro-sorting-toast role="dialog" aria-modal="true" aria-labelledby="intro-sorting-toast-title">
 		<section class="intro-sorting-toast__panel" aria-describedby="intro-sorting-toast-copy">
 			<div class="intro-sorting-toast__icon" aria-hidden="true">
-				<i class="bi bi-stars"></i>
+				<img src={concludiProvaIcon.src} alt="" />
 			</div>
 
 			<div class="intro-sorting-toast__content" id="intro-sorting-toast-copy">
@@ -119,9 +121,9 @@ const { isOpen = true, theme = '' } = Astro.props;
 		border-radius: 50%;
 	}
 
-	.intro-sorting-toast__icon .bi {
-		font-size: 2rem;
-		line-height: 1;
+	.intro-sorting-toast__icon img {
+		width: 2rem;
+		height: 2rem;
 	}
 
 	.intro-sorting-toast__content {

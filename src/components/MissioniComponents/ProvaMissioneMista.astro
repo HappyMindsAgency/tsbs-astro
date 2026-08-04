@@ -3,6 +3,7 @@ import { marked } from 'marked';
 import TestPassed from '../toastComponents/TestPassed.astro';
 import TestNotPassed from '../toastComponents/TestNotPassed.astro';
 import { MISSIONI_SPECIALI } from '../../lib/strapi/missioni';
+import concludiProvaIcon from '../../assets/concludi-prova.svg';
 
 interface MissionAnswer {
 	label: string;
@@ -165,7 +166,7 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 	<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
 </article>
 
-<script define:vars={{ questions, slugMis }}>
+<script define:vars={{ questions, slugMis, completeIconSrc: concludiProvaIcon.src }}>
 	const setupMixedQuestionMission = () => {
 		const root = document.querySelector('[data-mixed-question]');
 		if (!root || root.dataset.mixedQuestionReady === 'true') return;
@@ -315,7 +316,7 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 			}
 
 			submit.innerHTML = isLastQuestion
-				? `<span>Concludi la prova</span><i class="bi bi-stars ${mode === 'free' ? 'free-answer-mission__complete-icon' : 'choice-question__complete-icon'}" aria-hidden="true"></i>`
+				? `<span>Concludi la prova</span><img class="${mode === 'free' ? 'free-answer-mission__complete-icon' : 'choice-question__complete-icon'}" src="${completeIconSrc}" alt="" aria-hidden="true">`
 				: 'Avanti →';
 			submit.disabled = !hasCurrentAnswer();
 
@@ -382,8 +383,8 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 
 	.free-answer-mission__complete-icon,
 	.choice-question__complete-icon {
-		color: var(--tsbs-color-white);
-		font-size: 1.125rem;
-		line-height: 1;
+		width: 1.125rem;
+		height: 1.125rem;
+		flex: 0 0 auto;
 	}
 </style>

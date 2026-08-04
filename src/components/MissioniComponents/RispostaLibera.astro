@@ -3,6 +3,7 @@ import { marked } from 'marked';
 import TestPassed from '../toastComponents/TestPassed.astro';
 import TestNotPassed from '../toastComponents/TestNotPassed.astro';
 import { MISSIONI_SPECIALI } from '../../lib/strapi/missioni';
+import concludiProvaIcon from '../../assets/concludi-prova.svg';
 
 const { missione = null, questions: providedQuestions = [], lang = 'it', slugMis = '' } = Astro.props;
 
@@ -123,7 +124,7 @@ const hasMultipleQuestions = questions.length > 1;
 	)}
 </article>
 
-<script define:vars={{ questions, slugMis, isLibraryCardMission }}>
+<script define:vars={{ questions, slugMis, isLibraryCardMission, completeIconSrc: concludiProvaIcon.src }}>
 	const setupFreeAnswerMission = () => {
 		const root = document.querySelector('[data-free-answer-mission]');
 		if (!root || root.dataset.freeAnswerMissionReady === 'true') return;
@@ -225,7 +226,7 @@ const hasMultipleQuestions = questions.length > 1;
 			input.value = savedAnswer;
 			input.setAttribute('placeholder', 'Inserisci qui la tua risposta');
 			submit.innerHTML = isLastPrompt
-				? '<span>Concludi la prova</span><i class="bi bi-stars free-answer-mission__complete-icon" aria-hidden="true"></i>'
+				? `<span>Concludi la prova</span><img class="free-answer-mission__complete-icon" src="${completeIconSrc}" alt="" aria-hidden="true">`
 				: 'Avanti →';
 			submit.disabled = !hasAnswer();
 
@@ -291,9 +292,9 @@ const hasMultipleQuestions = questions.length > 1;
 	}
 
 	.free-answer-mission__complete-icon {
-		color: var(--tsbs-color-white);
-		font-size: 1.125rem;
-		line-height: 1;
+		width: 1.125rem;
+		height: 1.125rem;
+		flex: 0 0 auto;
 	}
 
 	.library-card-error {

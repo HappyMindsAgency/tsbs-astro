@@ -1,6 +1,7 @@
 ---
 import TestPassed from '../toastComponents/TestPassed.astro';
 import TestNotPassed from '../toastComponents/TestNotPassed.astro';
+import concludiProvaIcon from '../../assets/concludi-prova.svg';
 
 interface MissionAnswer {
 	label: string;
@@ -93,7 +94,7 @@ const hasMultipleQuestions = questions.length > 1;
 	<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
 </article>
 
-<script define:vars={{ questions, slugMis }}>
+<script define:vars={{ questions, slugMis, completeIconSrc: concludiProvaIcon.src }}>
 	const setupChoiceQuestion = () => {
 		const root = document.querySelector('[data-choice-question]');
 		if (!root || root.dataset.choiceQuestionReady === 'true') return;
@@ -209,7 +210,7 @@ const hasMultipleQuestions = questions.length > 1;
 				}),
 			);
 			submit.innerHTML = isLastQuestion
-				? '<span>Concludi la prova</span><i class="bi bi-stars choice-question__complete-icon" aria-hidden="true"></i>'
+				? `<span>Concludi la prova</span><img class="choice-question__complete-icon" src="${completeIconSrc}" alt="" aria-hidden="true">`
 				: 'Avanti →';
 			submit.disabled = !hasSelectedAnswer();
 
@@ -268,9 +269,9 @@ const hasMultipleQuestions = questions.length > 1;
 	}
 
 	.choice-question__complete-icon {
-		color: var(--tsbs-color-white);
-		font-size: 1.125rem;
-		line-height: 1;
+		width: 1.125rem;
+		height: 1.125rem;
+		flex: 0 0 auto;
 	}
 
 	.choice-question__lore {
