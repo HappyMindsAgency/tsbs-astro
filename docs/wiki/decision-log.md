@@ -20,6 +20,30 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-08-04 - Mappa Classense: Hotspot Dinamici Da Strapi
+
+Decisione:
+- la pagina `/biblioteca/mappa/` legge dalla single type Strapi `Mappa`, nella locale italiana pubblicata, il titolo principale e tutti i modali degli hotspot
+- ogni modale viene collegato integralmente ai campi `titolo`, `contenuto`, `immagine`, `piano` e `posizione`; non sono mantenuti hotspot, coordinate, testi o immagini di test nel frontend
+- `piano` associa il modale alla mappa corretta: `zero` → piano terra, `uno` → piano primo, `due` → piano secondo
+- `posizione` contiene una coppia di coordinate percentuali nel formato `x,y`, con valori compresi fra 0 e 100; esempio: `81.2,38.9`
+- un modale viene mostrato come hotspot solo se ha `titolo`, `piano` riconosciuto e `posizione` valida; i record incompleti restano editabili in Strapi ma non generano punti sulla mappa
+- `immagine` è facoltativa: senza immagine il popup presenta soltanto titolo e contenuto
+- le tre immagini di sfondo della mappa restano asset del frontend in questa fase, perché non sono contenuti della single type
+
+Motivo:
+- permettere alla Redazione di gestire dati e contenuti di ogni luogo direttamente da Strapi, mantenendo coordinate responsive rispetto alle mappe verticali
+- evitare duplicazioni e contenuti provvisori nel frontend mentre i testi definitivi sono ancora in definizione
+
+Impatto:
+- `src/lib/strapi/mappa.ts`
+- `src/pages/biblioteca/mappa.astro`
+- `src/components/PopupComponents/MappaLuoghi.astro`
+- Strapi: single type `Mappa`, componente ripetibile `modali` e relativo campo media `immagine`
+
+Stato:
+- approvata
+
 ## 2026-06-30 - Missione 12: Referral Via Link (niente quiz, completa il referrer)
 
 Decisione:

@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import MappaLuoghi from '../../components/PopupComponents/MappaLuoghi.astro';
 import { resolveUserContext } from '../../lib/theme';
+import { getMappaContent } from '../../lib/strapi/mappa';
 import pianoTerraImage from '../../assets/mappa_pianoterra_00.jpg';
 import pianoPrimoImage from '../../assets/mappa_piano_primo_01.jpg';
 import pianoSecondoImage from '../../assets/mappa_piano_secondo_02.jpg';
@@ -15,35 +16,9 @@ if (!jwt) {
 }
 
 const { theme, accademia } = await resolveUserContext(jwt);
-
-// Contenuti provvisori: saranno sostituiti con le informazioni definitive di ogni luogo.
-const groundFloorHotspots = [
-	{ id: 'luogo-1', x: 81.2, y: 38.9 },
-	{ id: 'luogo-2', x: 70, y: 46.5 },
-	{ id: 'luogo-3', x: 85.4, y: 53.3 },
-	{ id: 'luogo-4', x: 65.4, y: 55.6 },
-	{ id: 'luogo-5', x: 74.9, y: 60.4 },
-	{ id: 'luogo-6', x: 50.5, y: 67.5 },
-	{ id: 'luogo-7', x: 85.8, y: 76.8 },
-];
-
-const firstFloorHotspots = [
-	{ id: 'luogo-1', x: 57.4, y: 51 },
-	{ id: 'luogo-2', x: 77.4, y: 59.7 },
-	{ id: 'luogo-3', x: 53.5, y: 70.3 },
-];
-
-const secondFloorHotspots = [
-	{ id: 'luogo-1', x: 65.1, y: 21.8 },
-	{ id: 'luogo-2', x: 87.5, y: 34.4 },
-	{ id: 'luogo-3', x: 79.9, y: 42 },
-	{ id: 'luogo-4', x: 53.2, y: 47 },
-	{ id: 'luogo-5', x: 73, y: 49.9 },
-];
-
-const temporaryPlaceTitle = 'Chiostro d’ingresso';
-const temporaryPlaceDescription =
-	'Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis.';
+const mappa = await getMappaContent(lang);
+const mapTitle = mappa.titolo;
+const hotspots = mappa.hotspots;
 
 const mapFloors = [
 	{
@@ -51,21 +26,21 @@ const mapFloors = [
 		label: 'Piano terra',
 		image: pianoTerraImage,
 		alt: 'Mappa della Biblioteca Classense al piano terra',
-		hotspots: groundFloorHotspots,
+		hotspots: hotspots.filter((hotspot) => hotspot.piano === 'piano-terra'),
 	},
 	{
 		id: 'piano-primo',
 		label: 'Piano primo',
 		image: pianoPrimoImage,
 		alt: 'Mappa della Biblioteca Classense al piano primo',
-		hotspots: firstFloorHotspots,
+		hotspots: hotspots.filter((hotspot) => hotspot.piano === 'piano-primo'),
 	},
 	{
 		id: 'piano-secondo',
 		label: 'Piano secondo',
 		image: pianoSecondoImage,
 		alt: 'Mappa della Biblioteca Classense al piano secondo',
-		hotspots: secondFloorHotspots,
+		hotspots: hotspots.filter((hotspot) => hotspot.piano === 'piano-secondo'),
 	},
 ];
 ---
@@ -76,11 +51,11 @@ const mapFloors = [
 
 	<main class="tsbs-app-shell missions-shell biblioteca-page biblioteca-map-page">
 		<header class="missions-header biblioteca-header">
-			<h1>La Mappa</h1>
+			<h1>{mapTitle}</h1>
 		</header>
 
 		<section class="container-xl tsbs-app-container biblioteca-content" aria-labelledby="biblioteca-map-page-title">
-			<h2 id="biblioteca-map-page-title" class="visually-hidden">La Mappa</h2>
+			<h2 id="biblioteca-map-page-title" class="visually-hidden">{mapTitle}</h2>
 
 			<div class="biblioteca-intro">
 				<p>Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor. Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor. Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor. Lorem ipsum dolor sit amet consectetur adipiscing elit. Tempus leo eu aenean sed diam urna tempor.</p>
@@ -117,19 +92,22 @@ const mapFloors = [
 						data-map-image
 					/>
 					<div class="biblioteca-map-viewer__hotspots" data-map-hotspots>
-						{mapFloors.flatMap((floor) => floor.hotspots.map((hotspot, index) => (
+						{mapFloors.flatMap((floor) => floor.hotspots.map((hotspot) => (
 							<button
+								id={hotspot.id}
 								class="biblioteca-map-viewer__hotspot"
 								type="button"
 								style={`left: ${hotspot.x}%; top: ${hotspot.y}%;`}
 								data-map-hotspot
 								data-floor-id={floor.id}
-								data-map-place-title={temporaryPlaceTitle}
-								data-map-place-description={temporaryPlaceDescription}
-								aria-label={`Apri le informazioni del luogo ${index + 1}`}
+								data-map-place-title={hotspot.titolo}
+								data-map-place-description={hotspot.contenuto}
+								data-map-place-image-src={hotspot.immagineUrl || undefined}
+								data-map-place-image-alt={hotspot.immagineAlt}
+								aria-label={`Apri le informazioni su ${hotspot.titolo}`}
 								hidden={floor.id !== 'piano-terra'}
 							>
-								<span class="visually-hidden">Apri le informazioni del luogo {index + 1}</span>
+								<span class="visually-hidden">Apri le informazioni su {hotspot.titolo}</span>
 							</button>
 						)))}
 					</div>
@@ -203,10 +181,12 @@ const mapFloors = [
 				hotspot.addEventListener('click', () => {
 					window.dispatchEvent(
 						new CustomEvent('tsbs:map-place-open', {
-							detail: {
-								trigger: hotspot,
-								title: hotspot.dataset.mapPlaceTitle,
-								description: hotspot.dataset.mapPlaceDescription,
+								detail: {
+									trigger: hotspot,
+									title: hotspot.dataset.mapPlaceTitle,
+									description: hotspot.dataset.mapPlaceDescription,
+									imageSrc: hotspot.dataset.mapPlaceImageSrc,
+									imageAlt: hotspot.dataset.mapPlaceImageAlt,
 							},
 						}),
 					);

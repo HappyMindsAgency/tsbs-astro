@@ -39,6 +39,30 @@ Questo file raccoglie le informazioni backend note e le regole operative per Str
 - Epistola
 - Grimorio
 
+## Single Type Mappa
+
+La single type `Mappa` alimenta la pagina autenticata `/biblioteca/mappa/` nella locale italiana pubblicata.
+
+Campi letti dal frontend:
+- `titolo` — titolo principale della pagina;
+- `modali` — componente ripetibile dei luoghi della Classense.
+
+Ogni elemento di `modali` deve usare questi campi:
+- `titolo` — titolo del popup;
+- `contenuto` — testo del popup;
+- `immagine` — media opzionale del popup, predisposto per immagini orizzontali e verticali;
+- `piano` — valore tecnico del piano: `zero`, `uno` o `due`;
+- `posizione` — coordinate percentuali nel formato testuale `x,y`, per esempio `81.2,38.9`.
+
+Regole di pubblicazione:
+- `zero` visualizza il punto sul piano terra, `uno` sul piano primo e `due` sul piano secondo;
+- ogni coordinata deve essere compresa tra `0` e `100`; il primo valore indica la posizione orizzontale, il secondo quella verticale;
+- per generare un hotspot devono essere compilati `titolo`, `piano` e `posizione` valida;
+- i modali senza `immagine` sono validi e aprono un popup solo testuale;
+- record privi di piano o coordinate valide non vengono esposti come hotspot finché non sono completati.
+
+Le immagini dei tre piani non sono al momento gestite nella single type: restano asset locali della pagina Astro.
+
 ## Entita Di Raccordo Previste
 
 - Categoria Missioni
