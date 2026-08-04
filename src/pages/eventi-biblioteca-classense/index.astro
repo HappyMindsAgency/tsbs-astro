@@ -8,8 +8,8 @@ import { resolveUserContext } from '../../lib/theme';
 const { lang = 'it' } = Astro.props;
 
 const eventTabs = [
-	{ id: 'society', label: 'Society' },
 	{ id: 'biblioteca', label: 'Biblioteca' },
+	{ id: 'society', label: 'Society' },
 ];
 
 if (!Astro.cookies.has('jwt')) {
@@ -122,7 +122,8 @@ const visibleEventsBeforeLoadMore = 3;
 	<script>
 		const syncEventPane = (pane: Element) => {
 			const button = pane.querySelector<HTMLButtonElement>('[data-events-load-more]');
-			const hiddenCards = pane.querySelectorAll<HTMLElement>('[data-event-card].is-hidden-mobile, [data-event-card].is-hidden-desktop');
+			const hiddenCardClass = window.matchMedia('(min-width: 992px)').matches ? 'is-hidden-desktop' : 'is-hidden-mobile';
+			const hiddenCards = pane.querySelectorAll<HTMLElement>(`[data-event-card].${hiddenCardClass}`);
 
 			if (!button) return;
 
@@ -130,6 +131,10 @@ const visibleEventsBeforeLoadMore = 3;
 		};
 
 		document.querySelectorAll('.events-tab-content .tab-pane').forEach(syncEventPane);
+
+		window.addEventListener('resize', () => {
+			document.querySelectorAll('.events-tab-content .tab-pane').forEach(syncEventPane);
+		});
 
 		document.querySelectorAll('[data-bs-toggle="tab"]').forEach((tabButton) => {
 			tabButton.addEventListener('shown.bs.tab', (event) => {
