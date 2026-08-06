@@ -1,41 +1,74 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import bg404 from '../assets/bg-404.svg';
+import desktopBg404 from '../assets/404-tsbs.jpg';
+import mobileBg404 from '../assets/404-mobile-tsbs.jpg';
 
 const { lang = 'it' } = Astro.props;
 ---
 
 <Layout lang={lang} theme="theme-neutral" entita="none">
 	<main class="not-found-page" aria-labelledby="not-found-title">
+		<picture class="not-found-background" aria-hidden="true">
+			<source media="(max-width: 575.98px)" srcset={mobileBg404.src} />
+			<img src={desktopBg404.src} alt="" />
+		</picture>
 		<section class="not-found-content">
 			<p class="not-found-kicker">404</p>
 			<h1 id="not-found-title" class="not-found-title">Qui non puoi entrare</h1>
 			<p class="not-found-intro">
-				La pagina che cercavi sembra essere scomparsa dagli archivi. Succede, a volte, quando un documento non è ancora pronto per essere rivelato.
+				Hai trovato una porta segreta che non appare nella mappa della Società. Torna indietro e segui le tracce già rivelate.
 			</p>
 			<a class="btn global-cta-var2 not-found-cta" href="/atrio/">Rientra nella Società</a>
 		</section>
 	</main>
 </Layout>
 
-<style lang="scss" define:vars={{ bg404: `url(${bg404.src})` }}>
+<style is:global lang="scss">
+	body:has(.not-found-page) {
+		min-width: 0;
+		background-image: none;
+	}
+
 	.not-found-page {
-		--not-found-title: #461901;
-		--not-found-copy: #7b3306;
+		--not-found-title: #fff;
+		--not-found-copy: #fff;
 
 		display: grid;
 		min-height: 100vh;
 		min-height: 100dvh;
+		position: relative;
+		overflow: hidden;
+		width: 100vw;
 		padding: clamp(2.5rem, 8vw, 5rem) clamp(0.9375rem, 4vw, 2rem);
 		place-items: center;
 		text-align: center;
 		background-color: var(--tsbs-color-white);
-		background-image: var(--bg404);
-		background-position: center;
-		background-size: cover;
+	}
+
+	.not-found-background {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+	}
+
+	.not-found-background img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+	}
+
+	.not-found-background::after {
+		position: absolute;
+		inset: 0;
+		background: rgb(5 14 32 / 52%);
+		content: '';
 	}
 
 	.not-found-content {
+		position: relative;
+		z-index: 1;
 		width: min(100%, 35rem);
 		margin-inline: auto;
 	}
@@ -44,7 +77,7 @@ const { lang = 'it' } = Astro.props;
 		margin-bottom: clamp(0.5rem, 1.4vw, 0.75rem);
 		color: var(--not-found-copy);
 		font-family: Georgia, "Times New Roman", serif;
-		font-size: clamp(0.875rem, 2.8vw, 1.35rem);
+		font-size: clamp(1.225rem, 3.92vw, 1.89rem);
 		font-weight: 400;
 		line-height: 1.2;
 		letter-spacing: 0.34em;
@@ -59,6 +92,7 @@ const { lang = 'it' } = Astro.props;
 		font-size: clamp(2.5rem, 12vw, 4.125rem);
 		font-weight: 600;
 		line-height: 1.12;
+		text-shadow: 0 0.125rem 0.75rem rgb(0 0 0 / 35%);
 	}
 
 	.not-found-intro {
@@ -68,6 +102,7 @@ const { lang = 'it' } = Astro.props;
 		font-family: var(--tsbs-font-body);
 		font-size: clamp(0.95rem, 2.4vw, 1rem);
 		line-height: 1.55;
+		text-shadow: 0 0.125rem 0.75rem rgb(0 0 0 / 35%);
 	}
 
 	.not-found-cta {
@@ -78,6 +113,7 @@ const { lang = 'it' } = Astro.props;
 		font-family: var(--tsbs-font-body);
 		font-size: 0.8125rem;
 		line-height: 1.2;
+		color: #fff;
 		text-decoration: none;
 		text-transform: uppercase;
 	}
@@ -85,7 +121,10 @@ const { lang = 'it' } = Astro.props;
 	@media (max-width: 575.98px) {
 		.not-found-page {
 			align-items: center;
-			background-size: auto 100%;
+		}
+
+		.not-found-background img {
+			object-position: 10% center;
 		}
 
 		.not-found-title {
