@@ -7,6 +7,7 @@ import { getEpistole } from '../../lib/strapi/epistole';
 import { getMembroMissioniByJwt } from '../../lib/strapi/missioni';
 import { getReturnToLabel, getSafeReturnTo } from '../../lib/navigation';
 import { resolveUserContext } from '../../lib/theme';
+import { logger } from '../../services/logger';
 
 const { lang = 'it' } = Astro.props;
 
@@ -18,8 +19,16 @@ const jwt = Astro.cookies.get('jwt')?.value;
 const { theme, accademia } = await resolveUserContext(jwt);
 
 const [epistole, membroMissioni] = await Promise.all([
-	getEpistole(),
-	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
+	getEpistole().catch((err) => {
+		logger.error('[Epistole] getEpistole fallita', err);
+		return [];
+	}),
+	jwt
+		? getMembroMissioniByJwt(jwt).catch((err) => {
+			logger.error('[Epistole] getMembroMissioniByJwt fallita', err);
+			return null;
+		})
+		: Promise.resolve(null),
 ]);
 const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 const returnTo = getSafeReturnTo(Astro.url, '/atrio/');

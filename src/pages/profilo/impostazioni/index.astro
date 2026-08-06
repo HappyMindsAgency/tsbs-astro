@@ -18,7 +18,7 @@ if (!Astro.cookies.has('jwt')) {
 const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 ---
 
-<Layout lang={lang} theme={theme} accademia={accademia}>
+<Layout lang={lang} theme={theme} accademia={accademia} entita="none">
 	<Nav lang={lang} />
 	<main class="tsbs-app-shell profile-settings-page">
 		<div class="container-xl tsbs-app-container profile-settings">

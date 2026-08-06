@@ -6,7 +6,7 @@ const { lang = 'it' } = Astro.props;
 const token = Astro.url.searchParams.get('token') ?? '';
 ---
 
-<Layout lang={lang} theme="theme-neutral">
+<Layout lang={lang} theme="theme-neutral" entita="none">
 	<main class="reset-page">
 		<div class="reset-stage">
 			<section class="reset-panel" aria-labelledby="reset-title">

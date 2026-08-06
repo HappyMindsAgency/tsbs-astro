@@ -15,9 +15,17 @@ if (!Astro.cookies.has('jwt')) {
 	return Astro.redirect('/');
 }
 
+if (!slugEv) {
+	return Astro.redirect('/404');
+}
+
 const { theme, accademia } = await resolveUserContext(Astro.cookies.get('jwt')?.value);
 
 const societyEvent = await getEventoSocietyBySlug(slugEv, lang);
+
+if (!societyEvent) {
+	return Astro.redirect('/404');
+}
 ---
 
 <Layout lang={lang} theme={theme} accademia={accademia}>

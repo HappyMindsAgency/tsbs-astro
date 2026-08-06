@@ -8,7 +8,9 @@ import NotaEditor from '../../../../components/GrimorioComponents/NotaEditor.ast
 import TrofeoModal from '../../../../components/PopupComponents/TrofeoModal.astro';
 import { getMissioneBySlug, MISSIONI_SPECIALI } from '../../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, getPartecipazione } from '../../../../lib/strapi/progressione';
+import { getGrimorioBozzaByMembro, getGrimorioCategorySlug } from '../../../../lib/strapi/grimorio';
 import { resolveUserTheme } from '../../../../lib/theme';
+import { logger } from '../../../../services/logger';
 
 export const prerender = false;
 
@@ -28,15 +30,28 @@ if (!slugMis) {
 
 const theme = await resolveUserTheme(jwt);
 const [missione, membro] = await Promise.all([
-	getMissioneBySlug(slugMis, locale),
-	getMembroProgressioneByJwt(jwt),
+	getMissioneBySlug(slugMis, locale).catch((err) => {
+		logger.error('[Prova Missione] getMissioneBySlug fallita', err);
+		return null;
+	}),
+	getMembroProgressioneByJwt(jwt).catch((err) => {
+		logger.error('[Prova Missione] getMembroProgressioneByJwt fallita', err);
+		return null;
+	}),
 ]);
 
 if (!missione) {
 	return Astro.redirect('/404');
 }
 
-const partecipazione = membro ? await getPartecipazione(membro.documentId, missione.documentId) : null;
+let partecipazione = null;
+if (membro) {
+	try {
+		partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+	} catch (err) {
+		logger.error('[Prova Missione] getPartecipazione fallita', err);
+	}
+}
 if (partecipazione?.stato === 'completata') {
 	return Astro.redirect(`/missioni/${missione.slug}/`);
 }
@@ -53,6 +68,18 @@ if (missione.documentId === MISSIONI_SPECIALI.referral) {
 }
 
 const isMissioneGrimorio = missione.documentId === MISSIONI_SPECIALI.grimorio;
+
+// Se il membro ha gia' una bozza di nota per questa missione, la ricarichiamo:
+// senza questo, il salvataggio la duplicherebbe invece di aggiornarla.
+let notaEsistente = null;
+if (isMissioneGrimorio && membro) {
+	try {
+		notaEsistente = await getGrimorioBozzaByMembro(membro.documentId, locale);
+	} catch (err) {
+		logger.error('[Prova Missione] getGrimorioBozzaByMembro fallita', err);
+	}
+}
+const notaCategorySlug = notaEsistente ? getGrimorioCategorySlug(notaEsistente) : null;
 const rawQuestions = missione?.quiz?.domande ?? [];
 const hasAnswerElements = rawQuestions.some((domanda) => (domanda.risposte || []).length > 0);
 
@@ -88,7 +115,13 @@ const ProvaComponent = hasMixedQuestionComponents
 				</header>
 
 				<div class="container-xl tsbs-app-container note-page__content">
-					<NotaEditor missioneSlug={missione.slug} />
+					<NotaEditor
+						missioneSlug={missione.slug}
+						titleValue={notaEsistente?.titolo ?? ''}
+						bodyValue={notaEsistente?.contenuto ?? ''}
+						noteDocumentId={notaEsistente?.documentId ?? ''}
+						categorySlug={notaCategorySlug}
+					/>
 				</div>
 			</section>
 		) : (

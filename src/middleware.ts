@@ -13,13 +13,52 @@ const BYPASS_COOKIE_NAME = 'maintenance_bypass';
 const BYPASS_COOKIE_MAX_AGE = 60 * 60 * 12;
 
 // Percorsi accessibili senza sessione attiva.
-const PUBLIC_PATHS = ['/', '/registrazione/', '/auth/'];
+const PUBLIC_PATHS = [
+	'/',
+	'/registrazione/',
+	'/auth/',
+	'/privacy-policy/',
+	'/cookie-policy/',
+	'/termini-e-condizioni/',
+];
 
 function isPublicPath(pathname: string) {
 	return PUBLIC_PATHS.some((p) => {
 		if (p === '/') return pathname === '/';
 		return pathname === p || pathname.startsWith(p);
 	});
+}
+
+// Prefissi di route che richiedono una sessione autenticata (verificati contro
+// src/pages/**: ogni pagina sotto questi prefissi legge/richiede il cookie jwt
+// al proprio interno). Un path sconosciuto che non matcha nessuno di questi
+// deve poter proseguire verso next() così Astro puo' risolvere 404.astro
+// invece di essere reindirizzato al login.
+const PROTECTED_PATH_PREFIXES = [
+	'/atrio',
+	'/scrivania',
+	'/profilo',
+	'/missioni',
+	'/epistole',
+	'/biblioteca',
+	'/test-smistamento',
+	'/classifica-generale',
+	'/faq',
+	'/eventi-biblioteca-classense',
+];
+
+// Prefissi di route dinamiche (slug appeso direttamente, senza slash) che
+// richiedono sessione autenticata: /accademia-[accademia] e
+// /sala-accademia-[accademia].
+const PROTECTED_DYNAMIC_PREFIXES = ['/accademia-', '/sala-accademia-'];
+
+function requiresAuth(pathname: string) {
+	const matchesStaticPrefix = PROTECTED_PATH_PREFIXES.some(
+		(p) => pathname === p || pathname.startsWith(`${p}/`),
+	);
+	if (matchesStaticPrefix) return true;
+
+	return PROTECTED_DYNAMIC_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
 function isLoginPage(pathname: string) {
@@ -100,7 +139,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 			return new Response(null, { status: 302, headers: { Location: new URL(targetPath, base).toString() } });
 		}
 
-		if (!isPublicPath(pathname) && !hasJwt) {
+		if (!isPublicPath(pathname) && !hasJwt && requiresAuth(pathname)) {
 			const base = getRequestBase(context);
 			return new Response(null, { status: 302, headers: { Location: new URL('/', base).toString() } });
 		}

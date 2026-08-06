@@ -75,6 +75,23 @@ function adminHeaders() {
 	return { Authorization: `Bearer ${STRAPI_API}`, 'Content-Type': 'application/json' };
 }
 
+// Mutex in-memory per chiave: accoda le chiamate concorrenti sulla stessa
+// risorsa (es. membro+missione) cosi il pattern GET-poi-PUT/POST di ciascuna
+// non si interfoglia con quello di un'altra richiesta concorrente.
+// ponytail: lock in-memory per istanza serverless, non protegge da race tra istanze diverse -- se necessario, richiede un vincolo unique/transazione lato Strapi (fuori scope, Strapi e' read-only per questo progetto)
+const locks = new Map<string, Promise<unknown>>();
+
+function withLock<T>(key: string, fn: () => Promise<T>): Promise<T> {
+	const prior = locks.get(key) ?? Promise.resolve();
+	const run = prior.then(fn, fn);
+	const tail = run.then(() => undefined, () => undefined);
+	locks.set(key, tail);
+	tail.finally(() => {
+		if (locks.get(key) === tail) locks.delete(key);
+	});
+	return run;
+}
+
 // "Giorno" coerente di progetto: fuso Europe/Rome, formato ISO YYYY-MM-DD.
 export function getTodayRome(): string {
 	return new Intl.DateTimeFormat('en-CA', {
@@ -151,31 +168,33 @@ export async function avviaPartecipazione(
 	membroDocumentId: string,
 	missioneDocumentId: string,
 ): Promise<boolean> {
-	const existing = await getPartecipazione(membroDocumentId, missioneDocumentId);
-	if (existing) return true;
+	return withLock(`partecipazione:${membroDocumentId}:${missioneDocumentId}`, async () => {
+		const existing = await getPartecipazione(membroDocumentId, missioneDocumentId);
+		if (existing) return true;
 
-	const now = new Date().toISOString();
-	const created = await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
-		method: 'POST',
-		headers: adminHeaders(),
-		body: JSON.stringify({
-			data: {
-				stato: 'inCorso',
-				progresso: '50',
-				dataInizio: now,
-				dataCompletamento: null,
-				membro: { connect: [membroDocumentId] },
-				missione: { connect: [missioneDocumentId] },
-			},
-		}),
+		const now = new Date().toISOString();
+		const created = await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
+			method: 'POST',
+			headers: adminHeaders(),
+			body: JSON.stringify({
+				data: {
+					stato: 'inCorso',
+					progresso: '50',
+					dataInizio: now,
+					dataCompletamento: null,
+					membro: { connect: [membroDocumentId] },
+					missione: { connect: [missioneDocumentId] },
+				},
+			}),
+		});
+
+		if (!created.ok) {
+			logger.error(`[Progressione] Avvio partecipazione fallito: ${await created.text()}`);
+			return false;
+		}
+
+		return true;
 	});
-
-	if (!created.ok) {
-		logger.error(`[Progressione] Avvio partecipazione fallito: ${await created.text()}`);
-		return false;
-	}
-
-	return true;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -231,67 +250,70 @@ export async function registraEsitoProva(args: {
 	progresso?: number;
 }): Promise<EsitoProgressione | null> {
 	const { membro, missione, esito, risposte, extraRuntime, progresso } = args;
-	const existing = await getPartecipazione(membro.documentId, missione.documentId);
-	const giaCompletata = existing?.stato === 'completata';
-	const now = new Date().toISOString();
 
-	const datiRuntimeBase = isRecord(existing?.datiRuntime) ? existing.datiRuntime : {};
-	const tentativi = [...leggiTentativi(existing?.datiRuntime), {
-		dataTentativo: getTodayRome(),
-		esito,
-		...(risposte ? { risposte } : {}),
-	}];
+	return withLock(`partecipazione:${membro.documentId}:${missione.documentId}`, async () => {
+		const existing = await getPartecipazione(membro.documentId, missione.documentId);
+		const giaCompletata = existing?.stato === 'completata';
+		const now = new Date().toISOString();
 
-	// Rimuove le eventuali chiavi numeriche legacy gia migrate nell'array.
-	const altreChiavi = Object.fromEntries(
-		Object.entries(datiRuntimeBase).filter(([key]) => !/^\d+$/.test(key)),
-	);
+		const datiRuntimeBase = isRecord(existing?.datiRuntime) ? existing.datiRuntime : {};
+		const tentativi = [...leggiTentativi(existing?.datiRuntime), {
+			dataTentativo: getTodayRome(),
+			esito,
+			...(risposte ? { risposte } : {}),
+		}];
 
-	const completata = esito || giaCompletata;
-	// `progresso` e un campo string su Strapi (percentuale 0-100).
-	const payload = {
-		stato: completata ? 'completata' : 'inCorso',
-		progresso: String(completata ? 100 : (progresso ?? (Number.parseInt(String(existing?.progresso ?? '0'), 10) || 0))),
-		dataInizio: existing?.dataInizio || now,
-		dataCompletamento: existing?.dataCompletamento || (esito ? now : null),
-		datiRuntime: { ...altreChiavi, ...(extraRuntime ?? {}), tentativi },
-	};
+		// Rimuove le eventuali chiavi numeriche legacy gia migrate nell'array.
+		const altreChiavi = Object.fromEntries(
+			Object.entries(datiRuntimeBase).filter(([key]) => !/^\d+$/.test(key)),
+		);
 
-	const saved = existing
-		? await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione/${existing.documentId}`, {
-			method: 'PUT',
-			headers: adminHeaders(),
-			body: JSON.stringify({ data: payload }),
-		})
-		: await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
-			method: 'POST',
-			headers: adminHeaders(),
-			body: JSON.stringify({
-				data: {
-					...payload,
-					membro: { connect: [membro.documentId] },
-					missione: { connect: [missione.documentId] },
-				},
-			}),
-		});
+		const completata = esito || giaCompletata;
+		// `progresso` e un campo string su Strapi (percentuale 0-100).
+		const payload = {
+			stato: completata ? 'completata' : 'inCorso',
+			progresso: String(completata ? 100 : (progresso ?? (Number.parseInt(String(existing?.progresso ?? '0'), 10) || 0))),
+			dataInizio: existing?.dataInizio || now,
+			dataCompletamento: existing?.dataCompletamento || (esito ? now : null),
+			datiRuntime: { ...altreChiavi, ...(extraRuntime ?? {}), tentativi },
+		};
 
-	if (!saved.ok) {
-		logger.error(`[Progressione] Salvataggio partecipazione fallito (${missione.slug}): ${await saved.text()}`);
-		return null;
-	}
+		const saved = existing
+			? await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione/${existing.documentId}`, {
+				method: 'PUT',
+				headers: adminHeaders(),
+				body: JSON.stringify({ data: payload }),
+			})
+			: await fetch(`${STRAPI_API_BASE_URL}/partecipazioni-missione`, {
+				method: 'POST',
+				headers: adminHeaders(),
+				body: JSON.stringify({
+					data: {
+						...payload,
+						membro: { connect: [membro.documentId] },
+						missione: { connect: [missione.documentId] },
+					},
+				}),
+			});
 
-	const result: EsitoProgressione = {
-		esito,
-		missioneCompletata: completata,
-		primaVolta: esito && !giaCompletata,
-		puntiAssegnati: 0,
-		trofeiSbloccati: [],
-		livelloAggiornato: null,
-	};
+		if (!saved.ok) {
+			logger.error(`[Progressione] Salvataggio partecipazione fallito (${missione.slug}): ${await saved.text()}`);
+			return null;
+		}
 
-	if (!result.primaVolta) return result;
+		const result: EsitoProgressione = {
+			esito,
+			missioneCompletata: completata,
+			primaVolta: esito && !giaCompletata,
+			puntiAssegnati: 0,
+			trofeiSbloccati: [],
+			livelloAggiornato: null,
+		};
 
-	return premiaCompletamento(membro, missione, result);
+		if (!result.primaVolta) return result;
+
+		return premiaCompletamento(membro, missione, result);
+	});
 }
 
 // Eroga trofeo e punti al primo completamento. L'idempotenza e garantita due
@@ -327,67 +349,71 @@ async function premiaCompletamento(
 
 // Crea il Trofeo-membro solo se non esiste gia (membro+trofeo): "solo la prima volta".
 export async function assegnaTrofeoSeNuovo(membroDocumentId: string, trofeoDocumentId: string): Promise<boolean> {
-	const searchParams = new URLSearchParams();
-	searchParams.set('filters[membri][documentId][$eq]', membroDocumentId);
-	searchParams.set('filters[trofeo][documentId][$eq]', trofeoDocumentId);
-	searchParams.set('fields[0]', 'dataOttenimento');
-	searchParams.set('pagination[pageSize]', '1');
+	return withLock(`trofeo:${membroDocumentId}:${trofeoDocumentId}`, async () => {
+		const searchParams = new URLSearchParams();
+		searchParams.set('filters[membri][documentId][$eq]', membroDocumentId);
+		searchParams.set('filters[trofeo][documentId][$eq]', trofeoDocumentId);
+		searchParams.set('fields[0]', 'dataOttenimento');
+		searchParams.set('pagination[pageSize]', '1');
 
-	const existingRes = await fetch(`${STRAPI_API_BASE_URL}/trofei-membro?${searchParams}`, {
-		headers: adminHeaders(),
+		const existingRes = await fetch(`${STRAPI_API_BASE_URL}/trofei-membro?${searchParams}`, {
+			headers: adminHeaders(),
+		});
+		if (!existingRes.ok) {
+			logger.error(`[Progressione] Verifica trofeo-membro fallita: ${await existingRes.text()}`);
+			return false;
+		}
+
+		const existingPayload = await existingRes.json();
+		if (existingPayload?.data?.[0]) return false;
+
+		const createRes = await fetch(`${STRAPI_API_BASE_URL}/trofei-membro`, {
+			method: 'POST',
+			headers: adminHeaders(),
+			body: JSON.stringify({
+				data: {
+					dataOttenimento: getTodayRome(),
+					membri: { connect: [membroDocumentId] },
+					trofeo: { connect: [trofeoDocumentId] },
+				},
+			}),
+		});
+
+		if (!createRes.ok) {
+			logger.error(`[Progressione] Creazione trofeo-membro fallita: ${await createRes.text()}`);
+			return false;
+		}
+
+		return true;
 	});
-	if (!existingRes.ok) {
-		logger.error(`[Progressione] Verifica trofeo-membro fallita: ${await existingRes.text()}`);
-		return false;
-	}
-
-	const existingPayload = await existingRes.json();
-	if (existingPayload?.data?.[0]) return false;
-
-	const createRes = await fetch(`${STRAPI_API_BASE_URL}/trofei-membro`, {
-		method: 'POST',
-		headers: adminHeaders(),
-		body: JSON.stringify({
-			data: {
-				dataOttenimento: getTodayRome(),
-				membri: { connect: [membroDocumentId] },
-				trofeo: { connect: [trofeoDocumentId] },
-			},
-		}),
-	});
-
-	if (!createRes.ok) {
-		logger.error(`[Progressione] Creazione trofeo-membro fallita: ${await createRes.text()}`);
-		return false;
-	}
-
-	return true;
 }
 
 // Somma punti sul cumulativo Membro.punti rileggendo il valore corrente.
 export async function aggiungiPuntiMembro(membroDocumentId: string, punti: number): Promise<boolean> {
 	if (punti <= 0) return true;
 
-	const currentRes = await fetch(
-		`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}?fields[0]=punti`,
-		{ headers: adminHeaders() },
-	);
-	if (!currentRes.ok) return false;
+	return withLock(`punti:${membroDocumentId}`, async () => {
+		const currentRes = await fetch(
+			`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}?fields[0]=punti`,
+			{ headers: adminHeaders() },
+		);
+		if (!currentRes.ok) return false;
 
-	const currentPayload = await currentRes.json();
-	const correnti = Number.parseInt(String(currentPayload?.data?.punti ?? '0'), 10) || 0;
+		const currentPayload = await currentRes.json();
+		const correnti = Number.parseInt(String(currentPayload?.data?.punti ?? '0'), 10) || 0;
 
-	const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}`, {
-		method: 'PUT',
-		headers: adminHeaders(),
-		body: JSON.stringify({ data: { punti: correnti + punti } }),
+		const updateRes = await fetch(`${STRAPI_API_BASE_URL}/membri/${membroDocumentId}`, {
+			method: 'PUT',
+			headers: adminHeaders(),
+			body: JSON.stringify({ data: { punti: correnti + punti } }),
+		});
+
+		if (!updateRes.ok) {
+			logger.error(`[Progressione] Aggiornamento punti membro fallito: ${await updateRes.text()}`);
+		}
+
+		return updateRes.ok;
 	});
-
-	if (!updateRes.ok) {
-		logger.error(`[Progressione] Aggiornamento punti membro fallito: ${await updateRes.text()}`);
-	}
-
-	return updateRes.ok;
 }
 
 // Applica il level-up collegato alla missione completata. Idempotente e mai

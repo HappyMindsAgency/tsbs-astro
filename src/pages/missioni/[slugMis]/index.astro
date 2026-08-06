@@ -6,6 +6,7 @@ import RitchText from '../../../components/RitchText.astro';
 import { getMissioneBySlug, MISSIONI_SPECIALI } from '../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, getPartecipazione } from '../../../lib/strapi/progressione';
 import { resolveUserTheme } from '../../../lib/theme';
+import { logger } from '../../../services/logger';
 
 export const prerender = false;
 
@@ -23,15 +24,28 @@ if (!slugMis) {
 
 const theme = await resolveUserTheme(jwt);
 const [missione, membro] = await Promise.all([
-	getMissioneBySlug(slugMis, lang),
-	getMembroProgressioneByJwt(jwt),
+	getMissioneBySlug(slugMis, lang).catch((err) => {
+		logger.error('[Missione] getMissioneBySlug fallita', err);
+		return null;
+	}),
+	getMembroProgressioneByJwt(jwt).catch((err) => {
+		logger.error('[Missione] getMembroProgressioneByJwt fallita', err);
+		return null;
+	}),
 ]);
 
 if (!missione) {
 	return Astro.redirect('/404');
 }
 
-const partecipazione = membro ? await getPartecipazione(membro.documentId, missione.documentId) : null;
+let partecipazione = null;
+if (membro) {
+	try {
+		partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+	} catch (err) {
+		logger.error('[Missione] getPartecipazione fallita', err);
+	}
+}
 const missioneCompletata = partecipazione?.stato === 'completata';
 const hasDescription = Boolean(missione.descrizione?.trim());
 const trophyLabel = missione.trofeo?.nome || (missione.punteggio ? `${missione.punteggio} punti` : '');

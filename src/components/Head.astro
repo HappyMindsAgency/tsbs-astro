@@ -13,6 +13,13 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 const { entita, documentId, lang = 'it' } = Astro.props;
 
 const defaultTitle = 'The Secret Bookish Society - Biblioteca Classense';
+const defaultDescription = '';
+
+// ponytail: entita non passata o esplicitamente 'none' => niente fetch Strapi,
+// si usa il fallback statico sotto. Upgrade quando servira' un SEO dinamico
+// anche per queste pagine (atrio, faq, 404, maintenance, landing, onboarding,
+// reset-password, profilo/impostazioni).
+const skipSeoFetch = !entita || entita === 'none';
 
 const STRAPI_LOCALE_BY_LANG: Record<string, string> = {
   it: 'it-IT',
@@ -110,66 +117,69 @@ let endpoint = '';
 let populate = [];
 let filters = {};
 
-if (documentId && entita) {
-    endpoint = entita
-    filters = { documentId: documentId }
-} else if (!documentId && entita) {
-    endpoint = entita;
-} else if (!entita) {
-    endpoint = 'pagina-home';
-}
+if (!skipSeoFetch) {
+    if (documentId && entita) {
+        endpoint = entita
+        filters = { documentId: documentId }
+    } else if (!documentId && entita) {
+        endpoint = entita;
+    }
 
 
-if (entita === 'privacy-policy' || entita === 'pagina-privacy-policy' || entita === 'pagina-cookie-policy') {
-    populate = [
-        'seo'
-    ];
-} else {
-
-    if (documentId) {
+    if (entita === 'privacy-policy' || entita === 'pagina-privacy-policy' || entita === 'pagina-cookie-policy') {
         populate = [
-            'seo',
-            'seo.metaSocial',
-            'seo.metaSocial.image',
+            'seo'
         ];
     } else {
-        populate = [            
-            'seo',
-            'seo.metaSocial',
-            'seo.metaSocial.image',
-        ];
-    } 
 
+        if (documentId) {
+            populate = [
+                'seo',
+                'seo.metaSocial',
+                'seo.metaSocial.image',
+            ];
+        } else {
+            populate = [
+                'seo',
+                'seo.metaSocial',
+                'seo.metaSocial.image',
+            ];
+        }
+
+    }
 }
 
 let getSEOdataFetch : any;
 let getSEORawData : any;
 let seo : any;
 
-
-try {
-    if (documentId) {
-        getSEOdataFetch = client.collection(endpoint);
-
-        getSEORawData = await getSEOdataFetch.find({
-            populate: populate,
-            locale: getStrapiLocale(lang),
-            filters: filters
-        });
-
-        seo = getSEORawData.data[0].seo;
-    } else if (endpoint!= 'pagina-home') {
-        getSEOdataFetch = client.single(endpoint);
-
-        getSEORawData = await getSEOdataFetch.find({
-            populate: populate,
-            locale: getStrapiLocale(lang),
-        });
-
-        seo = getSEORawData.data.seo;
-    }
-} catch {
+if (skipSeoFetch) {
     seo = null;
+} else {
+    try {
+        if (documentId) {
+            getSEOdataFetch = client.collection(endpoint);
+
+            getSEORawData = await getSEOdataFetch.find({
+                populate: populate,
+                locale: getStrapiLocale(lang),
+                filters: filters
+            });
+
+            seo = getSEORawData.data[0].seo;
+        } else {
+            getSEOdataFetch = client.single(endpoint);
+
+            getSEORawData = await getSEOdataFetch.find({
+                populate: populate,
+                locale: getStrapiLocale(lang),
+            });
+
+            seo = getSEORawData.data.seo;
+        }
+    } catch {
+        seo = null;
+    }
 }
 
 
@@ -251,7 +261,7 @@ metaSocialTwitter.description = metaSocialTwitter.description || '';
      <SEO 
         title={titleDefault}
         titleDefault={titleDefault}
-        description={seo ? seo.metaDescription : ''}
+        description={seo ? seo.metaDescription : defaultDescription}
         noindex={ seo ? (seo && seo.metaRobots && seo.metaRobots.includes('noindex') ? true : false) : true }
         nofollow={ seo ? (seo && seo.metaRobots && seo.metaRobots.includes('nofollow') ? true : false) : true }
         openGraph={{

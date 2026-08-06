@@ -223,6 +223,23 @@ export async function getGrimorioNotaBySlugForMembro(slug: string, membroDocumen
 	return nota ? normalizeNota(nota) : null;
 }
 
+export async function getGrimorioBozzaByMembro(membroDocumentId: string, lang = 'it') {
+	const searchParams = new URLSearchParams();
+	searchParams.set('locale', getItalianStrapiLocale(lang));
+	searchParams.set('status', 'published');
+	searchParams.set('filters[membro][documentId][$eq]', membroDocumentId);
+	searchParams.set('filters[categorie_grimorio][slug][$eq]', 'salvata');
+	searchParams.set('sort[0]', 'publishedAt:desc');
+	searchParams.set('pagination[pageSize]', '1');
+	setGrimorioFields(searchParams);
+	setGrimorioRelations(searchParams);
+
+	const response = await fetchStrapi<StrapiCollectionResponse<GrimorioNota>>('/grimori', searchParams);
+	const nota = response.data?.[0];
+
+	return nota ? normalizeNota(nota) : null;
+}
+
 export async function getGrimorioNotaPubblicaBySlug(slug: string, lang = 'it') {
 	const searchParams = new URLSearchParams();
 	searchParams.set('locale', getItalianStrapiLocale(lang));

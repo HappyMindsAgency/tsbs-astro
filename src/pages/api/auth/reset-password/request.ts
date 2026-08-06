@@ -4,11 +4,14 @@ import { PasswordResetService } from '../../../../services/password-reset.servic
 import { logger } from '../../../../services/logger';
 import { AuthService } from '../../../../services/auth.service';
 import { getStrapiApiUrl } from '../../../../lib/strapi/api-url';
+import { checkRateLimit, getClientIp, tooManyRequestsResponse } from '../../../../lib/rate-limit';
 
 // Configuration
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 const TOKEN_EXPIRY_MINUTES = 15;
+const RATE_LIMIT_MAX = 3;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 
 // Inizializzazione lazy del servizio (singleton)
 let passwordResetService: PasswordResetService | null = null;
@@ -41,6 +44,10 @@ interface RequestBody {
 
 export const POST: APIRoute = async ({ request }) => {
     logger.info('[PasswordResetAPI] POST request ricevuta');
+
+    if (!checkRateLimit(`reset-password:${getClientIp(request)}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+        return tooManyRequestsResponse();
+    }
 
     try {
         let requestBody: RequestBody;

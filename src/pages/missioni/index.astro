@@ -8,6 +8,7 @@ import {
 	getPartecipazioniMissioneByJwt,
 } from '../../lib/strapi/missioni';
 import { resolveUserContext } from '../../lib/theme';
+import { logger } from '../../services/logger';
 
 const { lang = 'it' } = Astro.props;
 
@@ -19,9 +20,22 @@ const jwt = Astro.cookies.get('jwt')?.value;
 const { theme, accademia } = await resolveUserContext(jwt);
 
 const [missioniAttive, partecipazioniMissione, membroMissioni] = await Promise.all([
-	getMissioniAttive(lang),
-	jwt ? getPartecipazioniMissioneByJwt(jwt, lang) : Promise.resolve([]),
-	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
+	getMissioniAttive(lang).catch((err) => {
+		logger.error('[Missioni] getMissioniAttive fallita', err);
+		return [];
+	}),
+	jwt
+		? getPartecipazioniMissioneByJwt(jwt, lang).catch((err) => {
+			logger.error('[Missioni] getPartecipazioniMissioneByJwt fallita', err);
+			return [];
+		})
+		: Promise.resolve([]),
+	jwt
+		? getMembroMissioniByJwt(jwt).catch((err) => {
+			logger.error('[Missioni] getMembroMissioniByJwt fallita', err);
+			return null;
+		})
+		: Promise.resolve(null),
 ]);
 const testSmistamentoCompletato = Boolean(membroMissioni?.accademia);
 ---

@@ -15,6 +15,7 @@ import {
 	getPartecipazioniMissioneByJwt,
 } from '../../lib/strapi/missioni';
 import { withReturnTo } from '../../lib/navigation';
+import { logger } from '../../services/logger';
 const { lang = 'it' } = Astro.props;
 
 if (!Astro.cookies.has('jwt')) {
@@ -37,10 +38,26 @@ const [
 ] = await Promise.all([
 	resolveUserContext(jwt),
 	getEventiClassense(),
-	getEpistole(),
-	getMissioniAttive(lang),
-	jwt ? getPartecipazioniMissioneByJwt(jwt, lang) : Promise.resolve([]),
-	jwt ? getMembroMissioniByJwt(jwt) : Promise.resolve(null),
+	getEpistole().catch((err) => {
+		logger.error('[Atrio] getEpistole fallita', err);
+		return [];
+	}),
+	getMissioniAttive(lang).catch((err) => {
+		logger.error('[Atrio] getMissioniAttive fallita', err);
+		return [];
+	}),
+	jwt
+		? getPartecipazioniMissioneByJwt(jwt, lang).catch((err) => {
+			logger.error('[Atrio] getPartecipazioniMissioneByJwt fallita', err);
+			return [];
+		})
+		: Promise.resolve([]),
+	jwt
+		? getMembroMissioniByJwt(jwt).catch((err) => {
+			logger.error('[Atrio] getMembroMissioniByJwt fallita', err);
+			return null;
+		})
+		: Promise.resolve(null),
 ]);
 
 // Epistole in evidenza: stessa accademia dell'utente + livello esatto, tra queste quelle con ordine minore.
@@ -89,7 +106,7 @@ const taskCards = getFirstIncompleteMissionCards(
 );
 
 ---
-<Layout lang={lang} theme={theme} accademia={accademia}>
+<Layout lang={lang} theme={theme} accademia={accademia} entita="none">
 	<Nav lang={lang} />
 
 	<main class="tsbs-app-shell dashboard-shell">

@@ -14,13 +14,21 @@ import { isNicknameBlacklisted } from '../../../data/nicknameBlacklist';
 import { containsBadWord } from '../../../data/badWords';
 import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 import { logger } from '../../../services/logger';
+import { checkRateLimit, getClientIp, tooManyRequestsResponse } from '../../../lib/rate-limit';
 
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+
 type CheckReason = 'invalid' | 'badword' | 'taken' | 'error';
 
 export const POST: APIRoute = async ({ request }) => {
+    if (!checkRateLimit(`check-nickname:${getClientIp(request)}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+        return tooManyRequestsResponse();
+    }
+
     let body: { username?: unknown };
 
     try {

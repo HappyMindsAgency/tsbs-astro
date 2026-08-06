@@ -10,6 +10,7 @@ import { getMissioneBySlug } from '../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt } from '../../../lib/strapi/progressione';
 import { getStatoSfidaLettura, type LibroSfida } from '../../../lib/strapi/sfida-lettura';
 import { resolveUserTheme } from '../../../lib/theme';
+import { logger } from '../../../services/logger';
 
 export const prerender = false;
 
@@ -30,15 +31,27 @@ if (!slugMis) {
 
 const [theme, missione, membro] = await Promise.all([
 	resolveUserTheme(jwt),
-	getMissioneBySlug(slugMis, locale),
-	getMembroProgressioneByJwt(jwt),
+	getMissioneBySlug(slugMis, locale).catch((err) => {
+		logger.error('[Sfida Lettura] getMissioneBySlug fallita', err);
+		return null;
+	}),
+	getMembroProgressioneByJwt(jwt).catch((err) => {
+		logger.error('[Sfida Lettura] getMembroProgressioneByJwt fallita', err);
+		return null;
+	}),
 ]);
 
 if (!missione || !membro) {
 	return Astro.redirect('/404');
 }
 
-const stato = await getStatoSfidaLettura(membro.documentId);
+let stato;
+try {
+	stato = await getStatoSfidaLettura(membro.documentId);
+} catch (err) {
+	logger.error('[Sfida Lettura] getStatoSfidaLettura fallita', err);
+	return Astro.redirect('/404');
+}
 const riconosciuti = new Set(stato.libriRiconosciuti);
 
 // Raggruppa la lista chiusa dei libri per genere (accordion).

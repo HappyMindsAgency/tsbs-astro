@@ -15,6 +15,7 @@ import { containsBadWord } from '../../../data/badWords';
 import { logger } from '../../../services/logger';
 import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
 import { sendNotification } from '../../../lib/mailer';
+import { checkRateLimit, getClientIp, tooManyRequestsResponse } from '../../../lib/rate-limit';
 
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
@@ -22,8 +23,15 @@ const STRAPI_API = import.meta.env.AUTH_READONLY;
 // Indirizzo email della Redazione — configurabile via .env
 const EMAIL_REDAZIONE = import.meta.env.EMAIL_REDAZIONE ?? 'assistenzaweb@happyminds.it';
 
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+
 export const POST: APIRoute = async ({ request, cookies }) => {
     logger.info('[RegisterAPI] POST request received');
+
+    if (!checkRateLimit(`register:${getClientIp(request)}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+        return tooManyRequestsResponse();
+    }
 
     let body: Record<string, unknown>;
 

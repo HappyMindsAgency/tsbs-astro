@@ -1,7 +1,19 @@
 ---
 import { marked } from "marked";
+import DOMPurify from "isomorphic-dompurify";
 const { block, className, pstyle }  = Astro.props;
-const content = block ? marked(block, { breaks: true, gfm: true }) : "nothing";
+const rawHtml = block ? marked(block, { breaks: true, gfm: true }) : "nothing";
+// Sanitizzazione XSS: rich text arriva da input utente (es. note Grimorio) senza
+// controlli lato scrittura, quindi va sanitizzato qui, al momento del render con
+// set:html, cosi' copre tutti i punti di ingresso (non solo il Grimorio).
+const content = block
+    ? DOMPurify.sanitize(rawHtml, {
+        // whitelist ragionevole per rich text; DOMPurify blocca di default
+        // protocolli pericolosi (javascript:, ecc.) su href/src
+        ALLOWED_TAGS: ["b", "i", "strong", "em", "u", "s", "p", "br", "ul", "ol", "li", "a", "h1", "h2", "h3", "h4", "blockquote", "code", "pre"],
+        ALLOWED_ATTR: ["href", "src"],
+      })
+    : rawHtml;
 ---
 {block && 
 <div class={`block-richtext custombody ${className}`} set:html={content}></div>

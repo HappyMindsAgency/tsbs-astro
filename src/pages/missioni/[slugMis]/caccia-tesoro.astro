@@ -8,6 +8,7 @@ import { getMissioneBySlug } from '../../../lib/strapi/missioni';
 import { getMembroProgressioneByJwt, getPartecipazione } from '../../../lib/strapi/progressione';
 import { getStatoCacciaTesoro } from '../../../lib/strapi/caccia-tesoro';
 import { resolveUserTheme } from '../../../lib/theme';
+import { logger } from '../../../services/logger';
 
 export const prerender = false;
 
@@ -28,8 +29,14 @@ if (!slugMis) {
 
 const [theme, missione, membro] = await Promise.all([
 	resolveUserTheme(jwt),
-	getMissioneBySlug(slugMis, locale),
-	getMembroProgressioneByJwt(jwt),
+	getMissioneBySlug(slugMis, locale).catch((err) => {
+		logger.error('[Caccia al Tesoro] getMissioneBySlug fallita', err);
+		return null;
+	}),
+	getMembroProgressioneByJwt(jwt).catch((err) => {
+		logger.error('[Caccia al Tesoro] getMembroProgressioneByJwt fallita', err);
+		return null;
+	}),
 ]);
 
 // Solo i quiz contrassegnati come caccia al tesoro usano questa pagina.
@@ -37,13 +44,24 @@ if (!missione || !membro || !missione.quiz?.cacciaAlTesoro) {
 	return Astro.redirect('/404');
 }
 
-const stato = await getStatoCacciaTesoro(membro, missione);
+let stato;
+try {
+	stato = await getStatoCacciaTesoro(membro, missione);
+} catch (err) {
+	logger.error('[Caccia al Tesoro] getStatoCacciaTesoro fallita', err);
+	return Astro.redirect('/404');
+}
 
 if (stato.steps.length === 0) {
 	return Astro.redirect('/404');
 }
 
-const partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+let partecipazione = null;
+try {
+	partecipazione = await getPartecipazione(membro.documentId, missione.documentId);
+} catch (err) {
+	logger.error('[Caccia al Tesoro] getPartecipazione fallita', err);
+}
 if (partecipazione?.stato === 'completata') {
 	return Astro.redirect(missionPath);
 }

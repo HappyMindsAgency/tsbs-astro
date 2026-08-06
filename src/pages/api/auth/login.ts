@@ -3,13 +3,21 @@ import type { APIRoute } from 'astro';
 import { LoginError, isValidIdentifier, redirectWithLoginError, buildJwtCookieHeader, AuthServiceError } from '../../../utils/auth.utils';
 import { AuthService } from '../../../services/auth.service';
 import { getStrapiApiUrl } from '../../../lib/strapi/api-url';
+import { checkRateLimit, getClientIp, tooManyRequestsResponse } from '../../../lib/rate-limit';
 
 const STRAPI_API_BASE_URL = getStrapiApiUrl();
 const STRAPI_API = import.meta.env.AUTH_READONLY;
 
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+
 export const POST: APIRoute = async ({ request }) => {
 	const baseUrl = new URL(request.url).origin;
 	let identifier = '';
+
+	if (!checkRateLimit(`login:${getClientIp(request)}`, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS)) {
+		return tooManyRequestsResponse();
+	}
 
 	try {
 		const formData = await request.formData();
