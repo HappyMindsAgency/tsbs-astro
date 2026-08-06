@@ -19,13 +19,15 @@ export default defineConfig({
     // progressione.ts, ecc.) usano ancora fetch() singolo senza retry: estendere
     // quando anche quelle scritture avranno bisogno di resilienza sui 5xx.
     adapter: isVercel ? vercel({ isr: false, maxDuration: 30 }) : node({ mode: 'standalone' }),
-    // ponytail: nessuna ragione documentata trovata per checkOrigin:false (nessun commento,
-    // nessuna chiamata cross-origin legittima in src/** verso le API in src/pages/api/**).
-    // Rimosso l'override: Astro usa il default (checkOrigin:true), che blocca POST/PUT/PATCH/DELETE
-    // con Origin header non corrispondente, mitigando CSRF su change-password, update-username,
-    // delete-account, accademia, tessera, ecc. Se in futuro serve consentire un client cross-origin
-    // legittimo (es. webview mobile), reintrodurre security.checkOrigin solo dopo aver aggiunto
-    // una verifica manuale di Origin/Referer nelle singole route sensibili.
+    // checkOrigin:false — il default true (Astro) confronta l'header Origin del
+    // browser con l'url.origin ricostruito da x-forwarded-host/proto: dietro il
+    // proxy/edge di Vercel questi due non sempre combaciano (visto in prod: 403
+    // "Cross-site POST form submissions are forbidden" su /api/auth/login, mai
+    // in locale dove non c'è proxy in mezzo). Nessuna verifica CSRF alternativa
+    // in atto sulle route POST sensibili (change-password, delete-account, ecc.).
+    security: {
+        checkOrigin: false,
+    },
     server: {
         host: true,
         port: 4321,
