@@ -2023,6 +2023,12 @@ body:has(.tsbs-legal-page) {
 		line-height: 1;
 	}
 
+	@media (max-width: 991.98px) {
+		.biblioteca-map-page .missions-header h1 {
+			line-height: 1.50;
+		}
+	}
+
 	.missions-header--note {
 		display: flex;
 		align-items: center;
