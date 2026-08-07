@@ -4,9 +4,9 @@ import Nav from '../../components/Nav.astro';
 import MappaLuoghi from '../../components/PopupComponents/MappaLuoghi.astro';
 import { resolveUserContext } from '../../lib/theme';
 import { getMappaContent } from '../../lib/strapi/mappa';
-import pianoTerraImage from '../../assets/mappa_pianoterra_00.jpg';
-import pianoPrimoImage from '../../assets/mappa_piano_primo_01.jpg';
-import pianoSecondoImage from '../../assets/mappa_piano_secondo_02.jpg';
+import pianoTerraImage from '../../assets/mappa_pianoterra_01.jpg';
+import pianoPrimoImage from '../../assets/mappa_piano1_02.jpg';
+import pianoSecondoImage from '../../assets/mappa_piano2_02.jpg';
 
 const { lang = 'it' } = Astro.props;
 const jwt = Astro.cookies.get('jwt')?.value;
