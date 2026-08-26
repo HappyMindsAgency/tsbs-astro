@@ -7,8 +7,12 @@ const rawHtml = block ? await marked(block, { breaks: true, gfm: true }) : "noth
 // controlli lato scrittura. Deve restare server-side e compatibile con Vercel.
 const content = block
     ? sanitizeHtml(rawHtml, {
-        allowedTags: ["b", "i", "strong", "em", "u", "s", "p", "br", "ul", "ol", "li", "a", "h1", "h2", "h3", "h4", "blockquote", "code", "pre"],
-        allowedAttributes: { a: ["href"] },
+        allowedTags: ["b", "i", "strong", "em", "u", "s", "p", "br", "ul", "ol", "li", "a", "img", "h1", "h2", "h3", "h4", "blockquote", "code", "pre"],
+        allowedAttributes: {
+            a: ["href"],
+            // Le immagini Markdown diventano <img>; conserva solo attributi descrittivi e di dimensione.
+            img: ["src", "alt", "title", "width", "height"],
+        },
         allowedSchemes: ["http", "https", "mailto"],
         allowProtocolRelative: false,
       })

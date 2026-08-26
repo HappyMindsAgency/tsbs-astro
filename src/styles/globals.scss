@@ -233,6 +233,12 @@ h1,
   font: inherit;
 }
 
+.block-richtext.custombody img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
 .tsbs-subtitle {
   font-family: var(--tsbs-font-heading);
   font-size: var(--tsbs-font-size-subtitle);

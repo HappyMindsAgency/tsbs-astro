@@ -20,6 +20,23 @@ Stato:
 - proposta / approvata / superata
 ```
 
+## 2026-08-26 - Immagini Nei Rich Text Markdown
+
+Decisione:
+- il renderer condiviso dei rich text supporta immagini Markdown e conserva esclusivamente il tag `img` con gli attributi `src`, `alt`, `title`, `width` e `height`
+- gli URL delle immagini restano limitati agli schemi web gia ammessi dalla sanitizzazione; attributi eseguibili e markup non consentito continuano a essere rimossi
+- ogni immagine resa dal componente comune e responsive: non supera la larghezza del contenitore e mantiene le proporzioni
+
+Motivo:
+- consentire alla Redazione di inserire immagini nei contenuti Strapi senza annullare la protezione XSS condivisa da Epistole, Missioni, Eventi, FAQ, policy e Grimorio
+
+Impatto:
+- `src/components/RitchText.astro`
+- `src/styles/globals.scss`
+
+Stato:
+- approvata
+
 ## 2026-08-04 - Mappa Classense: Hotspot Dinamici Da Strapi
 
 Decisione:
