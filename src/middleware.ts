@@ -1,6 +1,7 @@
 import { defineMiddleware } from 'astro:middleware';
 import { getAuthenticatedUserAcademy } from './lib/strapi/user-academy';
 import { registraReferral } from './lib/strapi/referral';
+import { isSessionWithinCutoff, setAuthCookie } from './utils/auth.utils';
 
 const REFERRAL_QUERY_PARAM = 'ref';
 
@@ -129,8 +130,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 	// Guarda auth solo per route non-API, non-asset, non-maintenance.
 	if (!isApiRoute(pathname) && !isStaticAsset(pathname) && !isMaintenanceRoute(pathname)) {
-		const hasJwt = context.cookies.has('jwt');
-		const jwt = context.cookies.get('jwt')?.value;
+		let jwt = context.cookies.get('jwt')?.value;
+		if (jwt && !isSessionWithinCutoff(jwt)) {
+			context.cookies.delete('jwt', { path: '/' });
+			jwt = undefined;
+		}
+		const hasJwt = Boolean(jwt);
+		if (hasJwt) {
+			// Sessione scorrevole: ad ogni richiesta autenticata il Max-Age del
+			// cookie riparte da 24h, così un utente attivo non viene sloggato a
+			// metà sessione. Un utente inattivo per 24h continua a scadere.
+			setAuthCookie(context.cookies, jwt as string);
+		}
 		const academy = hasJwt ? await getAuthenticatedUserAcademy(jwt) : null;
 
 		if (isLoginPage(pathname) && hasJwt) {

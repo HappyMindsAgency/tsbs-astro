@@ -46,13 +46,49 @@ export function redirectToAtrio(_baseUrl: string): Response {
     return new Response(null, { status: 303, headers: { Location: '/atrio/' } });
 }
 
+/** Durata massima della sessione: 24h (era 7gg). */
+export const AUTH_COOKIE_MAX_AGE_SECONDS = 24 * 60 * 60;
+
+/**
+ * Timestamp (unix, secondi) di attivazione del limite di 24h.
+ * Qualsiasi JWT emesso prima di questo istante (`iat` del token) viene
+ * considerato scaduto anche se il suo cookie originale (7gg) non lo sarebbe
+ * ancora: forza il re-login di tutte le sessioni pre-esistenti al deploy.
+ * ponytail: costante statica volutamente, non uno "startup timestamp" dinamico:
+ * un valore che si aggiorna da solo invaliderebbe le sessioni ad ogni deploy.
+ */
+export const SESSION_CUTOFF_UNIX = 1790084859;
+
+/**
+ * Decodifica (senza verifica di firma, non serve: la firma la verifica Strapi)
+ * il campo `iat` di un JWT per poterlo confrontare con `SESSION_CUTOFF_UNIX`.
+ */
+function getJwtIssuedAt(jwt: string): number | null {
+    try {
+        const payload = jwt.split('.')[1];
+        const json = Buffer.from(payload, 'base64').toString('utf-8');
+        const { iat } = JSON.parse(json) as { iat?: number };
+        return typeof iat === 'number' ? iat : null;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * true se il JWT è stato emesso dopo il cutoff dei 24h, quindi la sessione è
+ * ancora valida secondo la nuova policy.
+ */
+export function isSessionWithinCutoff(jwt: string): boolean {
+    const iat = getJwtIssuedAt(jwt);
+    return iat !== null && iat >= SESSION_CUTOFF_UNIX;
+}
+
 /**
  * Imposta il cookie JWT per la sessione utente.
  * @param cookies L'oggetto `AstroCookies` fornito da Astro.
  * @param jwt Il token JWT da memorizzare.
  */
 export function setAuthCookie(cookies: AstroCookies, jwt: string): void {
-    const maxAgeInSeconds = 7 * 24 * 60 * 60; // 7 days
     const isProduction = import.meta.env.NODE_ENV === 'production';
 
     cookies.set('jwt', jwt, {
@@ -60,7 +96,7 @@ export function setAuthCookie(cookies: AstroCookies, jwt: string): void {
         secure: isProduction,
         sameSite: 'lax',
         path: '/',
-        maxAge: maxAgeInSeconds,
+        maxAge: AUTH_COOKIE_MAX_AGE_SECONDS,
     });
 }
 
@@ -70,10 +106,9 @@ export function setAuthCookie(cookies: AstroCookies, jwt: string): void {
  * il bug "immutable headers" dell'adapter Vercel.
  */
 export function buildJwtCookieHeader(jwt: string): string {
-    const maxAge = 7 * 24 * 60 * 60;
     const isProduction = import.meta.env.NODE_ENV === 'production';
     const secure = isProduction ? '; Secure' : '';
-    return `jwt=${jwt}; HttpOnly${secure}; SameSite=Lax; Path=/; Max-Age=${maxAge}`;
+    return `jwt=${jwt}; HttpOnly${secure}; SameSite=Lax; Path=/; Max-Age=${AUTH_COOKIE_MAX_AGE_SECONDS}`;
 }
 
 export class AuthServiceError extends Error {
