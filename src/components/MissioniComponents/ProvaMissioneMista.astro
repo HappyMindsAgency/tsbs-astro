@@ -57,7 +57,7 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 }`;
 ---
 
-<article class={rootClass} data-mixed-question data-lang={lang} aria-label="Prova missione">
+<article class={rootClass} data-mixed-question data-mixed-question-payload={JSON.stringify({ questions, slugMis })} data-lang={lang} aria-label="Prova missione">
 	<header class="mission-proof-question__header">
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
@@ -166,10 +166,24 @@ const submitClass = `btn tsbs-cta-primary mission-proof-question__cta ${
 	<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
 </article>
 
-<script define:vars={{ questions, slugMis, completeIconSrc: concludiProvaIcon.src }}>
+<script define:vars={{ completeIconSrc: concludiProvaIcon.src }}>
 	const setupMixedQuestionMission = () => {
 		const root = document.querySelector('[data-mixed-question]');
 		if (!root || root.dataset.mixedQuestionReady === 'true') return;
+
+		// Vedi commento in SceltaDomanda.astro: dati letti dal DOM, non dalla
+		// chiusura, per non subire listener 'astro:page-load' di missioni
+		// precedenti ancora appesi a document dopo una View Transition.
+		let payload;
+		try {
+			payload = JSON.parse(root.dataset.mixedQuestionPayload || '{}');
+		} catch {
+			payload = {};
+		}
+		const questions = Array.isArray(payload.questions) ? payload.questions : [];
+		const slugMis = payload.slugMis || '';
+		if (questions.length === 0) return;
+
 		root.dataset.mixedQuestionReady = 'true';
 
 		const panel = root.querySelector('[data-mixed-question-panel]');

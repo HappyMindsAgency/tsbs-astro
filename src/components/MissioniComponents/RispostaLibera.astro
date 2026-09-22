@@ -31,7 +31,7 @@ const answerLabel = 'Risposta libera';
 const hasMultipleQuestions = questions.length > 1;
 ---
 
-<article class="mission-proof-question free-answer-mission" data-free-answer-mission data-lang={lang} aria-label="Prova missione">
+<article class="mission-proof-question free-answer-mission" data-free-answer-mission data-free-answer-payload={JSON.stringify({ questions, slugMis, isLibraryCardMission })} data-lang={lang} aria-label="Prova missione">
 	<header class="mission-proof-question__header">
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
@@ -124,10 +124,25 @@ const hasMultipleQuestions = questions.length > 1;
 	)}
 </article>
 
-<script define:vars={{ questions, slugMis, isLibraryCardMission, completeIconSrc: concludiProvaIcon.src }}>
+<script define:vars={{ completeIconSrc: concludiProvaIcon.src }}>
 	const setupFreeAnswerMission = () => {
 		const root = document.querySelector('[data-free-answer-mission]');
 		if (!root || root.dataset.freeAnswerMissionReady === 'true') return;
+
+		// Vedi commento in SceltaDomanda.astro: dati letti dal DOM, non dalla
+		// chiusura, per non subire listener 'astro:page-load' di missioni
+		// precedenti ancora appesi a document dopo una View Transition.
+		let payload;
+		try {
+			payload = JSON.parse(root.dataset.freeAnswerPayload || '{}');
+		} catch {
+			payload = {};
+		}
+		const questions = Array.isArray(payload.questions) ? payload.questions : [];
+		const slugMis = payload.slugMis || '';
+		const isLibraryCardMission = Boolean(payload.isLibraryCardMission);
+		if (questions.length === 0) return;
+
 		root.dataset.freeAnswerMissionReady = 'true';
 
 		const form = root.querySelector('[data-free-answer-form]');

@@ -9,6 +9,7 @@ import {
 	assegnaTrofeoSeNuovo,
 	getTodayRome,
 	registraEsitoProva,
+	withLock,
 	type MembroProgressione,
 	type MissioneProgressione,
 	type TrofeoSbloccato,
@@ -209,46 +210,52 @@ export async function generaDomandaSfida(
 	membro: MembroProgressione,
 	libroDocumentId: string,
 ): Promise<{ domanda?: DomandaSfida; errore?: string }> {
-	const [libri, tentativi] = await Promise.all([
-		getLibriSfida(),
-		getTentativiLetturaByMembro(membro.documentId),
-	]);
+	// Lock per membro (non per libro): il limite e' un solo tentativo al
+	// giorno sull'intera sfida, quindi il check-poi-scrittura va serializzato
+	// per membro cosi' due richieste concorrenti non superano entrambe il
+	// controllo "tentativo_gia_effettuato_oggi" prima che una delle due salvi.
+	return withLock(`sfida-lettura:${membro.documentId}`, async () => {
+		const [libri, tentativi] = await Promise.all([
+			getLibriSfida(),
+			getTentativiLetturaByMembro(membro.documentId),
+		]);
 
-	const libroScelto = libri.find((libro) => libro.documentId === libroDocumentId);
-	if (!libroScelto) return { errore: 'libro_non_valido' };
+		const libroScelto = libri.find((libro) => libro.documentId === libroDocumentId);
+		if (!libroScelto) return { errore: 'libro_non_valido' };
 
-	if (getLibriRiconosciuti(tentativi).includes(libroDocumentId)) {
-		return { errore: 'libro_gia_riconosciuto' };
-	}
+		if (getLibriRiconosciuti(tentativi).includes(libroDocumentId)) {
+			return { errore: 'libro_gia_riconosciuto' };
+		}
 
-	if (haTentativoOdierno(tentativi)) {
-		return { errore: 'tentativo_gia_effettuato_oggi' };
-	}
+		if (haTentativoOdierno(tentativi)) {
+			return { errore: 'tentativo_gia_effettuato_oggi' };
+		}
 
-	const distrattori = shuffle(libri.filter((libro) => libro.documentId !== libroDocumentId))
-		.slice(0, ESTRATTI_PER_TENTATIVO - 1);
+		const distrattori = shuffle(libri.filter((libro) => libro.documentId !== libroDocumentId))
+			.slice(0, ESTRATTI_PER_TENTATIVO - 1);
 
-	if (distrattori.length < ESTRATTI_PER_TENTATIVO - 1) {
-		return { errore: 'estratti_insufficienti' };
-	}
+		if (distrattori.length < ESTRATTI_PER_TENTATIVO - 1) {
+			return { errore: 'estratti_insufficienti' };
+		}
 
-	const estratti = shuffle([
-		{ libroDocumentId: libroScelto.documentId, estratto: libroScelto.estratto!.trim() },
-		...distrattori.map((libro) => ({ libroDocumentId: libro.documentId, estratto: libro.estratto!.trim() })),
-	]);
+		const estratti = shuffle([
+			{ libroDocumentId: libroScelto.documentId, estratto: libroScelto.estratto!.trim() },
+			...distrattori.map((libro) => ({ libroDocumentId: libro.documentId, estratto: libro.estratto!.trim() })),
+		]);
 
-	const existing = await getTentativoLetturaRecord(membro.documentId, libroDocumentId);
-	const storico = leggiStorico(existing?.storicoTentativi);
-	const saved = await salvaTentativoLettura(membro.documentId, libroDocumentId, existing?.documentId ?? null, {
-		storicoTentativi: {
-			...storico,
-			propostaCorrente: { data: getTodayRome(), estratti } satisfies PropostaCorrente,
-		},
+		const existing = await getTentativoLetturaRecord(membro.documentId, libroDocumentId);
+		const storico = leggiStorico(existing?.storicoTentativi);
+		const saved = await salvaTentativoLettura(membro.documentId, libroDocumentId, existing?.documentId ?? null, {
+			storicoTentativi: {
+				...storico,
+				propostaCorrente: { data: getTodayRome(), estratti } satisfies PropostaCorrente,
+			},
+		});
+
+		if (!saved) return { errore: 'salvataggio_fallito' };
+
+		return { domanda: { estratti: estratti.map((item) => item.estratto) } };
 	});
-
-	if (!saved) return { errore: 'salvataggio_fallito' };
-
-	return { domanda: { estratti: estratti.map((item) => item.estratto) } };
 }
 
 export type EsitoRispostaSfida = {
@@ -268,101 +275,108 @@ export async function rispondiDomandaSfida(
 	indiceScelto: number,
 	missioneGiaCompletata = false,
 ): Promise<{ esito?: EsitoRispostaSfida; errore?: string }> {
-	const existing = await getTentativoLetturaRecord(membro.documentId, libroDocumentId);
-	const storico = leggiStorico(existing?.storicoTentativi);
-	const proposta = leggiPropostaCorrente(storico);
-	const today = getTodayRome();
+	// Stessa chiave di lock di generaDomandaSfida: check "un tentativo al
+	// giorno" e scrittura devono essere atomici rispetto a qualsiasi altra
+	// richiesta concorrente dello stesso membro sulla sfida.
+	return withLock(`sfida-lettura:${membro.documentId}`, async () => {
+		const existing = await getTentativoLetturaRecord(membro.documentId, libroDocumentId);
+		const storico = leggiStorico(existing?.storicoTentativi);
+		const proposta = leggiPropostaCorrente(storico);
+		const today = getTodayRome();
 
-	if (!existing || !proposta || proposta.data !== today) {
-		return { errore: 'proposta_non_valida' };
-	}
-
-	const tentativi = await getTentativiLetturaByMembro(membro.documentId);
-	if (haTentativoOdierno(tentativi)) {
-		return { errore: 'tentativo_gia_effettuato_oggi' };
-	}
-
-	const estrattoScelto = proposta.estratti[indiceScelto];
-	if (!estrattoScelto) return { errore: 'risposta_non_valida' };
-
-	const corretta = estrattoScelto.libroDocumentId === libroDocumentId;
-
-	// Storico in formato consigliato: array `tentativi` con date ISO.
-	const storicoTentativi = Array.isArray(storico.tentativi) ? storico.tentativi : [];
-	const saved = await salvaTentativoLettura(membro.documentId, libroDocumentId, existing.documentId, {
-		dataUltimoTentativo: today,
-		rispostaDomanda: corretta,
-		storicoTentativi: {
-			...storico,
-			propostaCorrente: null,
-			tentativi: [...storicoTentativi, {
-				dataTentativo: today,
-				estrattiProposti: proposta.estratti.map((item) => item.libroDocumentId),
-				indiceScelto,
-				rispostaDomanda: corretta,
-			}],
-		},
-	});
-
-	if (!saved) return { errore: 'salvataggio_fallito' };
-
-	const libri = await getLibriSfida();
-	const totaleLibri = libri.length;
-	const libriRiconosciuti = getLibriRiconosciuti(await getTentativiLetturaByMembro(membro.documentId)).length;
-
-	const esito: EsitoRispostaSfida = {
-		corretta,
-		libriRiconosciuti,
-		totaleLibri,
-		puntiAssegnati: 0,
-		trofeiSbloccati: [],
-	};
-
-	if (!corretta) {
-		// Aggiorna comunque la partecipazione (stato inCorso e storico tentativi).
-		if (!missioneGiaCompletata) {
-			await registraEsitoProva({
-				membro,
-				missione,
-				esito: false,
-				progresso: Math.min(100, Math.round((libriRiconosciuti / OBIETTIVO_LETTURE) * 100)),
-			});
+		if (!existing || !proposta || proposta.data !== today) {
+			return { errore: 'proposta_non_valida' };
 		}
-		return { esito };
-	}
 
-	// +1 punto per ogni libro riconosciuto correttamente.
-	if (await aggiungiPuntiMembro(membro.documentId, 1)) {
-		esito.puntiAssegnati = 1;
-	}
+		const tentativi = await getTentativiLetturaByMembro(membro.documentId);
+		if (haTentativoOdierno(tentativi)) {
+			return { errore: 'tentativo_gia_effettuato_oggi' };
+		}
 
-	// Trofei alle soglie raggiunte (idempotenti: assegnati una sola volta).
-	esito.trofeiSbloccati = await assegnaTrofeiSoglia(membro, libriRiconosciuti, totaleLibri);
+		const estrattoScelto = proposta.estratti[indiceScelto];
+		if (!estrattoScelto) return { errore: 'risposta_non_valida' };
 
-	// La missione si completa alla ventesima lettura, ma la sfida resta attiva:
-	// le letture successive continuano ad assegnare il punto giornaliero.
-	const obiettivoRaggiunto = libriRiconosciuti >= OBIETTIVO_LETTURE;
-	const progressione = missioneGiaCompletata
-		? null
-		: await registraEsitoProva({
-			membro,
-			missione,
-			esito: obiettivoRaggiunto,
-			progresso: Math.min(100, Math.round((libriRiconosciuti / OBIETTIVO_LETTURE) * 100)),
+		const corretta = estrattoScelto.libroDocumentId === libroDocumentId;
+
+		// Storico in formato consigliato: array `tentativi` con date ISO.
+		const storicoTentativi = Array.isArray(storico.tentativi) ? storico.tentativi : [];
+		const saved = await salvaTentativoLettura(membro.documentId, libroDocumentId, existing.documentId, {
+			dataUltimoTentativo: today,
+			rispostaDomanda: corretta,
+			storicoTentativi: {
+				...storico,
+				propostaCorrente: null,
+				tentativi: [...storicoTentativi, {
+					dataTentativo: today,
+					estrattiProposti: proposta.estratti.map((item) => item.libroDocumentId),
+					indiceScelto,
+					rispostaDomanda: corretta,
+				}],
+			},
 		});
 
-	if (progressione) {
-		esito.puntiAssegnati += progressione.puntiAssegnati;
-		esito.trofeiSbloccati = [...esito.trofeiSbloccati, ...progressione.trofeiSbloccati];
-	}
+		if (!saved) return { errore: 'salvataggio_fallito' };
 
-	return { esito };
+		const libri = await getLibriSfida();
+		const totaleLibri = libri.length;
+		const libriRiconosciuti = getLibriRiconosciuti(await getTentativiLetturaByMembro(membro.documentId)).length;
+
+		const esito: EsitoRispostaSfida = {
+			corretta,
+			libriRiconosciuti,
+			totaleLibri,
+			puntiAssegnati: 0,
+			trofeiSbloccati: [],
+		};
+
+		if (!corretta) {
+			// Aggiorna comunque la partecipazione (stato inCorso e storico tentativi).
+			if (!missioneGiaCompletata) {
+				await registraEsitoProva({
+					membro,
+					missione,
+					esito: false,
+					progresso: Math.min(100, Math.round((libriRiconosciuti / OBIETTIVO_LETTURE) * 100)),
+				});
+			}
+			return { esito };
+		}
+
+		// +1 punto per ogni libro riconosciuto correttamente.
+		if (await aggiungiPuntiMembro(membro.documentId, 1)) {
+			esito.puntiAssegnati = 1;
+		}
+
+		// Trofei alle soglie raggiunte (idempotenti: assegnati una sola volta).
+		esito.trofeiSbloccati = await assegnaTrofeiSoglia(membro, libriRiconosciuti, totaleLibri);
+
+		// La missione si completa alla ventesima lettura, ma la sfida resta attiva:
+		// le letture successive continuano ad assegnare il punto giornaliero.
+		const obiettivoRaggiunto = libriRiconosciuti >= OBIETTIVO_LETTURE;
+		const progressione = missioneGiaCompletata
+			? null
+			: await registraEsitoProva({
+				membro,
+				missione,
+				esito: obiettivoRaggiunto,
+				progresso: Math.min(100, Math.round((libriRiconosciuti / OBIETTIVO_LETTURE) * 100)),
+			});
+
+		if (progressione) {
+			esito.puntiAssegnati += progressione.puntiAssegnati;
+			esito.trofeiSbloccati = [...esito.trofeiSbloccati, ...progressione.trofeiSbloccati];
+		}
+
+		return { esito };
+	});
 }
 
 // Risolve e assegna i trofei soglia per l'Accademia del Membro: il criterio di
 // mappatura e il codice "06a..06d" + nome Accademia contenuti in Trofeo.nome.
-async function assegnaTrofeiSoglia(
-	membro: MembroProgressione,
+// Firma ridotta a Pick<MembroProgressione> (non il tipo completo) cosi' puo'
+// essere chiamata anche dal backfill, che non ha punti/livello/email a disposizione.
+export async function assegnaTrofeiSoglia(
+	membro: Pick<MembroProgressione, 'documentId' | 'accademia'>,
 	libriRiconosciuti: number,
 	totaleLibri: number,
 ): Promise<TrofeoSbloccato[]> {
@@ -428,4 +442,82 @@ async function trovaTrofeoSoglia(codice: string, accademiaNome: string): Promise
 		immagineUrl: resolveStrapiMediaUrl(match.immagine?.url),
 		punti: match.punti,
 	};
+}
+
+type MembroAccademiaLite = {
+	documentId: string;
+	accademia: { documentId: string; slug: string | null; nome: string | null } | null;
+};
+
+// Rilegge tutti i tentativi-lettura con risposta corretta, li raggruppa per
+// membro e ri-applica assegnaTrofeiSoglia: idempotente (assegnaTrofeoSeNuovo
+// salta chi ha gia' il trofeo), quindi va bene anche su chi e' gia' a posto.
+// Recupera i trofei soglia persi per la race condition di rispondiDomandaSfida
+// prima dell'introduzione del lock per-membro (vedi decision-log).
+async function getTuttiTentativiLetturaCorretti(): Promise<Array<{ membro: MembroAccademiaLite | null }>> {
+	const pageSize = 100;
+	const risultati: Array<{ membro: MembroAccademiaLite | null }> = [];
+	let page = 1;
+
+	// ponytail: while(true) con break su pagina corta, non serve una libreria
+	// di paginazione per un giro di backfill una tantum.
+	while (true) {
+		const searchParams = new URLSearchParams();
+		searchParams.set('filters[rispostaDomanda][$eq]', 'true');
+		searchParams.set('fields[0]', 'rispostaDomanda');
+		searchParams.set('populate[membro][fields][0]', 'documentId');
+		searchParams.set('populate[membro][populate][accademia][fields][0]', 'slug');
+		searchParams.set('populate[membro][populate][accademia][fields][1]', 'nome');
+		searchParams.set('pagination[page]', String(page));
+		searchParams.set('pagination[pageSize]', String(pageSize));
+
+		const response = await fetch(`${STRAPI_API_BASE_URL}/tentativi-lettura?${searchParams}`, { headers: adminHeaders() });
+		if (!response.ok) break;
+
+		const payload = await response.json();
+		const data = (payload?.data ?? []) as Array<{ membro: MembroAccademiaLite | null }>;
+		risultati.push(...data);
+
+		if (data.length < pageSize) break;
+		page += 1;
+	}
+
+	return risultati;
+}
+
+export type BackfillTrofeiSogliaResult = {
+	membriControllati: number;
+	trofeiAssegnati: Array<{ membroDocumentId: string; trofeo: TrofeoSbloccato }>;
+};
+
+// Recupero una tantum dei trofei soglia (4/6/12/20) non assegnati a causa
+// della race condition risolta in rispondiDomandaSfida. Sicura da rilanciare
+// piu' volte: ogni assegnazione passa comunque da assegnaTrofeoSeNuovo.
+export async function backfillTrofeiSogliaSfidaLettura(): Promise<BackfillTrofeiSogliaResult> {
+	const [tentativi, libri] = await Promise.all([getTuttiTentativiLetturaCorretti(), getLibriSfida()]);
+	const totaleLibri = libri.length;
+
+	const conteggiPerMembro = new Map<string, { membro: MembroAccademiaLite; count: number }>();
+	for (const { membro } of tentativi) {
+		if (!membro?.documentId) continue;
+		const voce = conteggiPerMembro.get(membro.documentId) ?? { membro, count: 0 };
+		voce.count += 1;
+		conteggiPerMembro.set(membro.documentId, voce);
+	}
+
+	const sogliaMinima = Math.min(...SOGLIE_TROFEI.map((s) => (s.soglia === 'tutti' ? totaleLibri : s.soglia)));
+	const trofeiAssegnati: BackfillTrofeiSogliaResult['trofeiAssegnati'] = [];
+	let membriControllati = 0;
+
+	for (const { membro, count } of conteggiPerMembro.values()) {
+		if (count < sogliaMinima) continue;
+		membriControllati += 1;
+
+		const sbloccati = await assegnaTrofeiSoglia(membro, count, totaleLibri);
+		for (const trofeo of sbloccati) {
+			trofeiAssegnati.push({ membroDocumentId: membro.documentId, trofeo });
+		}
+	}
+
+	return { membriControllati, trofeiAssegnati };
 }

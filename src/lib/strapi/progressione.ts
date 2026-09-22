@@ -81,7 +81,7 @@ function adminHeaders() {
 // ponytail: lock in-memory per istanza serverless, non protegge da race tra istanze diverse -- se necessario, richiede un vincolo unique/transazione lato Strapi (fuori scope, Strapi e' read-only per questo progetto)
 const locks = new Map<string, Promise<unknown>>();
 
-function withLock<T>(key: string, fn: () => Promise<T>): Promise<T> {
+export function withLock<T>(key: string, fn: () => Promise<T>): Promise<T> {
 	const prior = locks.get(key) ?? Promise.resolve();
 	const run = prior.then(fn, fn);
 	const tail = run.then(() => undefined, () => undefined);

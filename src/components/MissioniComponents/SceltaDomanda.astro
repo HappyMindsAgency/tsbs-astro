@@ -32,7 +32,7 @@ const eyebrow = missione?.titolo || 'NOME DELLA MISSIONE';
 const hasMultipleQuestions = questions.length > 1;
 ---
 
-<article class="mission-proof-question choice-question" data-choice-question data-lang={lang} aria-label="Prova missione">
+<article class="mission-proof-question choice-question" data-choice-question data-choice-question-payload={JSON.stringify({ questions, slugMis })} data-lang={lang} aria-label="Prova missione">
 	<header class="mission-proof-question__header">
 		<div class="container-xl tsbs-app-container mission-proof-question__header-content">
 			<p class="mission-proof-question__eyebrow">{eyebrow}</p>
@@ -94,10 +94,27 @@ const hasMultipleQuestions = questions.length > 1;
 	<TestNotPassed renderHidden={true} buttonHref="/missioni/" />
 </article>
 
-<script define:vars={{ questions, slugMis, completeIconSrc: concludiProvaIcon.src }}>
+<script define:vars={{ completeIconSrc: concludiProvaIcon.src }}>
 	const setupChoiceQuestion = () => {
 		const root = document.querySelector('[data-choice-question]');
 		if (!root || root.dataset.choiceQuestionReady === 'true') return;
+
+		// Dati letti dal DOM (non da una chiusura JS) apposta: con le View
+		// Transitions di Astro i listener 'astro:page-load' di pagine precedenti
+		// restano appesi a document e possono scattare su questa pagina. Se i
+		// dati venissero dalla chiusura, un listener vecchio inizializzerebbe il
+		// quiz con le domande di un'altra missione. Leggendoli qui, anche un
+		// listener "stantio" prende comunque i dati corretti della pagina attuale.
+		let payload;
+		try {
+			payload = JSON.parse(root.dataset.choiceQuestionPayload || '{}');
+		} catch {
+			payload = {};
+		}
+		const questions = Array.isArray(payload.questions) ? payload.questions : [];
+		const slugMis = payload.slugMis || '';
+		if (questions.length === 0) return;
+
 		root.dataset.choiceQuestionReady = 'true';
 
 		const form = root.querySelector('[data-choice-question-form]');
