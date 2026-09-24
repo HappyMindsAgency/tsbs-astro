@@ -24,14 +24,9 @@ const STRAPI_API = import.meta.env.AUTH_READONLY;
 const ESTRATTI_PER_TENTATIVO = 4;
 const OBIETTIVO_LETTURE = 20;
 
-// Mappatura soglia -> trofeo: i 4 trofei della sfida sono identificati dal
-// codice nel nome ("06a".."06d") e dall'Accademia del Membro (vedi decision log).
-const SOGLIE_TROFEI: Array<{ codice: string; soglia: number | 'tutti' }> = [
-	{ codice: '06a', soglia: 4 },
-	{ codice: '06b', soglia: 6 },
-	{ codice: '06c', soglia: 12 },
-	{ codice: '06d', soglia: 20 },
-];
+// Soglie trofeo della sfida: ogni Trofeo ha ora i campi Strapi `soglia` (numero)
+// e `accademia` (relazione), popolati sui 16 record (4 soglie x 4 accademie).
+const SOGLIE_TROFEI = [4, 6, 12, 20] as const;
 
 export type LibroSfida = {
 	id: number;
@@ -348,7 +343,7 @@ export async function rispondiDomandaSfida(
 		}
 
 		// Trofei alle soglie raggiunte (idempotenti: assegnati una sola volta).
-		esito.trofeiSbloccati = await assegnaTrofeiSoglia(membro, libriRiconosciuti, totaleLibri);
+		esito.trofeiSbloccati = await assegnaTrofeiSoglia(membro, libriRiconosciuti);
 
 		// La missione si completa alla ventesima lettura, ma la sfida resta attiva:
 		// le letture successive continuano ad assegnare il punto giornaliero.
@@ -371,30 +366,28 @@ export async function rispondiDomandaSfida(
 	});
 }
 
-// Risolve e assegna i trofei soglia per l'Accademia del Membro: il criterio di
-// mappatura e il codice "06a..06d" + nome Accademia contenuti in Trofeo.nome.
+// Risolve e assegna i trofei soglia per l'Accademia del Membro, tramite i
+// campi Strapi `soglia` (numero) e `accademia` (relazione) sul Trofeo.
 // Firma ridotta a Pick<MembroProgressione> (non il tipo completo) cosi' puo'
 // essere chiamata anche dal backfill, che non ha punti/livello/email a disposizione.
 export async function assegnaTrofeiSoglia(
 	membro: Pick<MembroProgressione, 'documentId' | 'accademia'>,
 	libriRiconosciuti: number,
-	totaleLibri: number,
 ): Promise<TrofeoSbloccato[]> {
-	const accademiaNome = membro.accademia?.nome?.trim() || membro.accademia?.slug?.trim();
-	if (!accademiaNome) {
+	const accademiaDocumentId = membro.accademia?.documentId;
+	if (!accademiaDocumentId) {
 		logger.warn(`[Sfida Lettura] Membro ${membro.documentId} senza Accademia: trofei soglia non assegnabili`);
 		return [];
 	}
 
 	const sbloccati: TrofeoSbloccato[] = [];
 
-	for (const { codice, soglia } of SOGLIE_TROFEI) {
-		const valoreSoglia = soglia === 'tutti' ? totaleLibri : soglia;
-		if (valoreSoglia <= 0 || libriRiconosciuti < valoreSoglia) continue;
+	for (const soglia of SOGLIE_TROFEI) {
+		if (libriRiconosciuti < soglia) continue;
 
-		const trofeo = await trovaTrofeoSoglia(codice, accademiaNome);
+		const trofeo = await trovaTrofeoSoglia(soglia, accademiaDocumentId);
 		if (!trofeo) {
-			logger.warn(`[Sfida Lettura] Trofeo soglia ${codice} non trovato per Accademia ${accademiaNome}`);
+			logger.warn(`[Sfida Lettura] Trofeo soglia ${soglia} non trovato per Accademia ${accademiaDocumentId}`);
 			continue;
 		}
 
@@ -410,29 +403,28 @@ export async function assegnaTrofeiSoglia(
 
 type TrofeoSogliaView = TrofeoSbloccato & { punti: number | null };
 
-async function trovaTrofeoSoglia(codice: string, accademiaNome: string): Promise<TrofeoSogliaView | null> {
+async function trovaTrofeoSoglia(soglia: number, accademiaDocumentId: string): Promise<TrofeoSogliaView | null> {
 	const searchParams = new URLSearchParams();
 	searchParams.set('status', 'published');
-	searchParams.set('filters[nome][$containsi]', codice);
+	searchParams.set('filters[soglia][$eq]', String(soglia));
+	searchParams.set('filters[accademia][documentId][$eq]', accademiaDocumentId);
 	searchParams.set('fields[0]', 'nome');
 	searchParams.set('fields[1]', 'descrizione');
 	searchParams.set('fields[2]', 'punti');
 	searchParams.set('populate[immagine][fields][0]', 'url');
-	searchParams.set('pagination[pageSize]', '10');
+	searchParams.set('pagination[pageSize]', '1');
 
 	const response = await fetch(`${STRAPI_API_BASE_URL}/trofei?${searchParams}`, { headers: adminHeaders() });
 	if (!response.ok) return null;
 
 	const payload = await response.json();
-	const candidati = (payload?.data ?? []) as Array<{
+	const match = (payload?.data ?? [])[0] as {
 		documentId: string;
 		nome: string;
 		descrizione: string | null;
 		punti: number | null;
 		immagine: { url: string | null } | null;
-	}>;
-
-	const match = candidati.find((trofeo) => trofeo.nome.toLocaleLowerCase('it-IT').includes(accademiaNome.toLocaleLowerCase('it-IT')));
+	} | undefined;
 	if (!match) return null;
 
 	return {
@@ -466,8 +458,9 @@ async function getTuttiTentativiLetturaCorretti(): Promise<Array<{ membro: Membr
 		searchParams.set('filters[rispostaDomanda][$eq]', 'true');
 		searchParams.set('fields[0]', 'rispostaDomanda');
 		searchParams.set('populate[membro][fields][0]', 'documentId');
-		searchParams.set('populate[membro][populate][accademia][fields][0]', 'slug');
-		searchParams.set('populate[membro][populate][accademia][fields][1]', 'nome');
+		searchParams.set('populate[membro][populate][accademia][fields][0]', 'documentId');
+		searchParams.set('populate[membro][populate][accademia][fields][1]', 'slug');
+		searchParams.set('populate[membro][populate][accademia][fields][2]', 'nome');
 		searchParams.set('pagination[page]', String(page));
 		searchParams.set('pagination[pageSize]', String(pageSize));
 
@@ -494,8 +487,7 @@ export type BackfillTrofeiSogliaResult = {
 // della race condition risolta in rispondiDomandaSfida. Sicura da rilanciare
 // piu' volte: ogni assegnazione passa comunque da assegnaTrofeoSeNuovo.
 export async function backfillTrofeiSogliaSfidaLettura(): Promise<BackfillTrofeiSogliaResult> {
-	const [tentativi, libri] = await Promise.all([getTuttiTentativiLetturaCorretti(), getLibriSfida()]);
-	const totaleLibri = libri.length;
+	const tentativi = await getTuttiTentativiLetturaCorretti();
 
 	const conteggiPerMembro = new Map<string, { membro: MembroAccademiaLite; count: number }>();
 	for (const { membro } of tentativi) {
@@ -505,7 +497,7 @@ export async function backfillTrofeiSogliaSfidaLettura(): Promise<BackfillTrofei
 		conteggiPerMembro.set(membro.documentId, voce);
 	}
 
-	const sogliaMinima = Math.min(...SOGLIE_TROFEI.map((s) => (s.soglia === 'tutti' ? totaleLibri : s.soglia)));
+	const sogliaMinima = Math.min(...SOGLIE_TROFEI);
 	const trofeiAssegnati: BackfillTrofeiSogliaResult['trofeiAssegnati'] = [];
 	let membriControllati = 0;
 
@@ -513,7 +505,7 @@ export async function backfillTrofeiSogliaSfidaLettura(): Promise<BackfillTrofei
 		if (count < sogliaMinima) continue;
 		membriControllati += 1;
 
-		const sbloccati = await assegnaTrofeiSoglia(membro, count, totaleLibri);
+		const sbloccati = await assegnaTrofeiSoglia(membro, count);
 		for (const trofeo of sbloccati) {
 			trofeiAssegnati.push({ membroDocumentId: membro.documentId, trofeo });
 		}
