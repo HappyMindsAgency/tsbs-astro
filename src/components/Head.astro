@@ -9,6 +9,11 @@ import { strapi } from "@strapi/client";
 import { getStrapiMediaUrl } from "../lib/utility-functions.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import favicon from "../assets/favicon/favicon.ico";
+import appleTouchIcon from "../assets/favicon/apple-touch-icon.png";
+import favicon32 from "../assets/favicon/favicon-32x32.png";
+import favicon16 from "../assets/favicon/favicon-16x16.png";
+import siteWebmanifest from "../assets/favicon/site.webmanifest";
 
 const { entita, documentId, lang = 'it' } = Astro.props;
 
@@ -114,7 +119,8 @@ interface Seo {
 };
 
 let endpoint = '';
-let populate = [];
+//let populate = [];
+let populate: any[] = [];
 let filters = {};
 
 if (!skipSeoFetch) {
@@ -278,7 +284,7 @@ metaSocialTwitter.description = metaSocialTwitter.description || '';
         }}
         extend={{
             // extending the default link tags
-            link: [{ rel: "image/x-icon", href: "/favicon.ico" }],
+            link: [{ rel: "image/x-icon", href: favicon }],
             // extending the default meta tags
             meta: [
                 {
@@ -295,6 +301,11 @@ metaSocialTwitter.description = metaSocialTwitter.description || '';
     <meta name="viewport" content="width=device-width, initial-scale=1" />  
 
     <!-- FAVICON DA INSERIRE -->
+
+    <link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon.src}>
+    <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src}>
+    <link rel="icon" type="image/png" sizes="16x16" href={favicon16.src}>
+    <link rel="manifest" href={siteWebmanifest}>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
