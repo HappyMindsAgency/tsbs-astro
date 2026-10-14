@@ -142,37 +142,34 @@ export async function getAcademyRanking(accademiaSlug: string, jwt?: string, lim
 	const slug = accademiaSlug.trim();
 	if (!slug) return [];
 
-	const searchParams = new URLSearchParams();
-	searchParams.set('filters[accademia][slug][$eq]', slug);
-	searchParams.set('fields[0]', 'documentId');
-	searchParams.set('fields[1]', 'nickname');
-	searchParams.set('fields[2]', 'punti');
-	searchParams.set('fields[3]', 'datiAggiuntivi');
-	searchParams.set('sort[0]', 'punti:desc');
-	searchParams.set('sort[1]', 'nickname:asc');
-	searchParams.set('pagination[pageSize]', String(Math.max(limit, 100)));
-	searchParams.set('status', 'draft');
+	// Postgres mette i `punti` null in testa con `punti:desc`: prima chi ha punti,
+	// poi si completa con i null in ordine di nickname.
+	const fetchMembri = async (puntiFilter: '$notNull' | '$null', sort: string[], size: number): Promise<MembroRankingRaw[]> => {
+		const searchParams = new URLSearchParams();
+		searchParams.set('filters[accademia][slug][$eq]', slug);
+		searchParams.set(`filters[punti][${puntiFilter}]`, 'true');
+		searchParams.set('fields[0]', 'documentId');
+		searchParams.set('fields[1]', 'nickname');
+		searchParams.set('fields[2]', 'punti');
+		searchParams.set('fields[3]', 'datiAggiuntivi');
+		sort.forEach((value, index) => searchParams.set(`sort[${index}]`, value));
+		searchParams.set('pagination[pageSize]', String(size));
+
+		const response = await fetch(`${STRAPI_API_BASE_URL}/membri?${searchParams}`, { headers });
+		if (!response.ok) throw new Error(`Ranking membri fallito: ${response.status}`);
+		return ((await response.json()) as StrapiMembersResponse).data ?? [];
+	};
 
 	try {
-		const [currentMembroDocumentId, rankingResponse] = await Promise.all([
+		const [currentMembroDocumentId, withPoints] = await Promise.all([
 			getCurrentMembroDocumentId(jwt),
-			fetch(`${STRAPI_API_BASE_URL}/membri?${searchParams}`, { headers }),
+			fetchMembri('$notNull', ['punti:desc', 'nickname:asc'], limit),
 		]);
+		const withoutPoints = withPoints.length < limit
+			? await fetchMembri('$null', ['nickname:asc'], limit - withPoints.length)
+			: [];
 
-		if (!rankingResponse.ok) return [];
-
-		const payload = (await rankingResponse.json()) as StrapiMembersResponse;
-		return (payload.data ?? [])
-			.toSorted((a, b) => {
-				const pointsA = Number.parseInt(String(a.punti ?? '0'), 10) || 0;
-				const pointsB = Number.parseInt(String(b.punti ?? '0'), 10) || 0;
-				if (pointsA !== pointsB) return pointsB - pointsA;
-
-				const nameA = a.nickname?.trim() || 'Membro';
-				const nameB = b.nickname?.trim() || 'Membro';
-				return nameA.localeCompare(nameB, 'it-IT');
-			})
-			.slice(0, limit)
+		return [...withPoints, ...withoutPoints]
 			.map((membro, index) => mapMembroToRankingRow(membro, index, currentMembroDocumentId, slug, returnToOverride));
 	} catch {
 		return [];
